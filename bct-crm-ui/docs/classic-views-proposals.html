@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Classic views 提案</title>
+<link rel="icon" type="image/svg+xml" href="../assets/fav.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* Proposal page only — not part of the prototype. Three directions for the Classic views,
+   drawn with the prototype's BCT tokens: Midnight / Deep Blue as ink, BCT cyan as the one accent. */
+:root{
+  --mid:#052870; --deep:#0042B7; --cyan:#00A0E4; --ink:#10182a;
+  --canvas:#f6f8fb; --surface:#fff; --field:#f4f6f9; --line:#e1e6ef; --line2:#e9edf4;
+  --tx:#172033; --tx2:#344258; --tx3:#56657a; --tick:#cfd6e0;
+  --warn-bg:#fff3cf; --warn:#7a4f00; --red-bg:#fde8e3; --red:#a33a00; --ok:#1f6b3a;
+  --tint:#e8effb;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#e9edf3;color:var(--tx);font-family:Inter,"Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.nb{display:inline-block}
+
+/* ---------- Proposal chrome ---------- */
+.pp-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;max-width:1360px;margin:0 auto;padding:28px 24px 16px}
+.pp-top h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em}
+.pp-top p{margin:6px 0 0;font-size:14px;color:var(--tx3)}
+.pp-ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:#fff;border:1px solid var(--line)}
+.seg button{height:36px;padding:0 16px;border:0;border-radius:999px;background:none;font-size:14px;font-weight:500;color:var(--tx2);cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--mid);color:#fff}
+.replay{height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.replay:hover{border-color:#aeb9c8}
+.note{max-width:1360px;margin:0 auto 18px;padding:0 24px}
+.note-card{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px 24px;padding:16px 20px;border-radius:14px;background:#fff;border:1px solid var(--line)}
+.note-card h3{grid-column:1/-1;margin:0;font-size:16px;font-weight:600}
+.note-card h3 small{margin-left:8px;font-size:13px;font-weight:500;color:var(--tx3)}
+.note-card dt{font-size:12px;font-weight:600;color:var(--tx3);letter-spacing:.04em}
+.note-card dd{margin:4px 0 0;font-size:13.5px;line-height:1.65;color:var(--tx2)}
+.frame-wrap{padding:0 24px 48px;overflow-x:auto}
+.frame{display:grid;grid-template-columns:200px minmax(0,1fr);min-width:1140px;max-width:1312px;min-height:800px;margin:0 auto;background:var(--canvas);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgb(23 32 51/10%)}
+
+/* ---------- Sidebar stub (same order as the prototype) ---------- */
+.sb{background:#fff;border-right:1px solid var(--line2);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+.brand{display:flex;align-items:center;gap:8px;padding:2px 8px 18px}
+.brand img{height:20px}
+.brand span{padding-left:8px;border-left:1px solid var(--line);font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--tx3)}
+.sb-lbl{padding:6px 10px;font-size:12px;color:var(--tx3)}
+.sb-item{display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;border-radius:6px;font-size:13px;font-weight:500;color:var(--tx2)}
+.sb-item.on{background:var(--tint);color:var(--tx)}
+.sb-item i{display:grid;place-items:center;width:24px;height:24px;border-radius:6px;background:var(--field);color:var(--tx3)}
+.sb-item.on i{background:#d9e5f9;color:var(--deep)}
+.sb-item svg{width:14px;height:14px}
+.sb-item.later{color:var(--tx3)}
+.sb-item .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-item i{flex:0 0 auto}
+.sb-item.later em{flex:0 0 auto;white-space:nowrap;padding:0 6px;border:1px solid var(--line);border-radius:5px;font-style:normal;font-size:10.5px;line-height:16px}
+
+/* ---------- Shared bits ---------- */
+.mn{padding:28px 32px 32px;min-width:0}
+.eyebrow{font-size:12.5px;color:var(--tx3)}
+.pills{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pill{height:30px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12.5px;color:var(--tx2);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.pill.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.vsep{width:1px;height:18px;background:var(--line);margin:0 4px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px}
+.ct{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13.5px;font-weight:500;color:var(--tx)}
+.ct .go{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);color:var(--tx3)}
+.ct .go svg{width:13px;height:13px}
+.big{font-weight:300;letter-spacing:-.035em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.big sup{font-size:.36em;font-weight:500;letter-spacing:0;vertical-align:.95em;margin-left:2px;color:var(--tx3)}
+.muted{color:var(--tx3)}
+.flag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;font-size:11px;font-weight:500}
+.flag.warn{background:var(--warn-bg);color:var(--warn)}
+.flag.red{background:var(--red-bg);color:var(--red)}
+.flag.new{background:#e0f3fb;color:#0a6a98}
+.btn{height:34px;padding:0 14px;border:0;border-radius:999px;background:var(--ink);color:#fff;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--tx);border:1px solid var(--line)}
+.btn svg{width:14px;height:14px}
+
+/* Kanban (shared by A and B) */
+.kb{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kb-col{background:#eef1f6;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.kb-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 6px;padding:2px 4px 4px;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--tx3)}
+.kb-h small{font-size:12px;font-weight:500;letter-spacing:0;text-transform:none;white-space:nowrap}
+.kb-c{display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;text-align:left;cursor:pointer;transition:border-color .15s, box-shadow .15s}
+.kb-c:hover{border-color:#aeb9c8}
+.kb-c.sel{border-color:var(--deep);box-shadow:0 0 0 3px rgb(0 66 183/14%)}
+.kb-c b{font-size:13px;font-weight:600;line-height:1.35}
+.kb-c span{font-size:11.5px;color:var(--tx3)}
+.kb-c .row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 8px;margin-top:3px}
+.kb-c .row span{white-space:nowrap}
+.kb-c .amt{font-size:13px;font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums}
+.kb-c .flag{align-self:flex-start}
+
+/* Barcode micro-chart (ref 1): thin ticks, one highlighted run, cyan "today" tick */
+.bc{display:block;width:100%;height:28px}
+
+/* ---------- A. Insight header ---------- */
+.a-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:22px}
+.a-title h2{margin:6px 0 14px;font-size:52px;font-weight:400;letter-spacing:-.035em;line-height:1;color:var(--ink)}
+.stack{position:relative;width:360px;height:178px;margin-right:104px;flex:0 0 auto}
+.ins{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;padding:18px 20px;border-radius:18px;
+  background:linear-gradient(155deg,#eef4ff 0%,#dbe8fb 100%);border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 14px 34px rgb(0 66 183/13%), inset 0 1px 0 rgba(255,255,255,.9);
+  transition:transform .45s cubic-bezier(.2,.7,.2,1), opacity .45s cubic-bezier(.2,.7,.2,1);transform-origin:left center}
+.ins[data-pos="0"]{z-index:3}
+.ins[data-pos="1"]{z-index:2;transform:translate(52px,0) scale(.92);opacity:.75}
+.ins[data-pos="2"]{z-index:1;transform:translate(98px,0) scale(.84);opacity:.45}
+.ins[data-pos="1"] .ins-body,.ins[data-pos="2"] .ins-body,.ins[data-pos="1"] .ins-foot,.ins[data-pos="2"] .ins-foot{visibility:hidden}
+.ins-tag{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--deep)}
+.ins-tag svg{width:13px;height:13px}
+.ins-body{font-size:17px;line-height:1.45;color:var(--mid)}
+.ins-body b{font-weight:600}
+.ins-foot{margin-top:auto;display:flex;align-items:center;gap:10px;font-size:12.5px}
+.ins-foot .ask{border:0;background:none;padding:0;color:var(--deep);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.ins-foot .ask svg{width:13px;height:13px}
+.ins-foot .n{margin-left:auto;color:var(--tx3);font-variant-numeric:tabular-nums}
+.ins-foot .nx{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1px solid rgba(5,40,112,.15);background:rgba(255,255,255,.7);cursor:pointer;color:var(--mid)}
+.ins-foot .nx svg{width:14px;height:14px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{padding:16px 18px 14px}
+.kpi .big{font-size:40px;margin:14px 0 6px}
+.kpi .sub{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--tx3);margin-bottom:10px}
+.kpi .sub b{color:var(--tx);font-weight:600}
+
+/* ---------- B. Docked assistant ---------- */
+.b-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+.b-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:16px}
+.b-head h2{margin:4px 0 0;font-size:30px;font-weight:500;letter-spacing:-.02em}
+.asst{position:sticky;top:0;display:flex;flex-direction:column;min-height:640px;padding:16px;border-radius:18px;background:#fff;border:1px solid var(--line)}
+.asst-h{display:flex;align-items:center;gap:10px}
+.asst-h .mk{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--deep),var(--mid));color:#fff}
+.asst-h .mk svg{width:17px;height:17px}
+.asst-h b{display:block;font-size:14px}
+.asst-h small{font-size:12px;color:var(--tx3)}
+.ctx{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
+.ctx span{height:24px;padding:0 9px;border-radius:6px;background:var(--field);font-size:11.5px;color:var(--tx2);display:inline-flex;align-items:center}
+.asst-body{flex:1;padding:14px 2px 10px;font-size:13.5px;line-height:1.6;color:var(--tx2)}
+.asst-body p{margin:0 0 10px}
+.asst-body p b{color:var(--tx)}
+.alist{display:flex;flex-direction:column;gap:6px;margin:6px 0 12px}
+.alist button{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;text-align:left;cursor:pointer;font-size:13px}
+.alist button:hover{border-color:#aeb9c8}
+.alist button b{font-weight:600;color:var(--tx)}
+.alist svg{width:13px;height:13px;color:var(--tx3);flex:0 0 auto}
+.deal-h{font-size:17px;font-weight:600;color:var(--tx);line-height:1.3}
+.deal-m{margin:4px 0 14px;font-size:12.5px;color:var(--tx3)}
+.mini{padding:12px;border-radius:12px;background:var(--field);margin-bottom:12px}
+.mini .lbl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--tx3);margin-bottom:6px}
+.src{font-size:11.5px;color:var(--tx3);margin-top:10px}
+.back{border:0;background:none;padding:0;margin-bottom:10px;color:var(--deep);font-size:12.5px;font-weight:500;cursor:pointer}
+.sugg{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.sugg button{height:28px;padding:0 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:var(--tx2);cursor:pointer}
+.ainput{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;border:1px solid var(--line);border-radius:14px;font-size:13px;color:#8490a1}
+.ainput span{flex:1}
+.ainput i{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--ink);color:#fff}
+.ainput svg{width:14px;height:14px}
+
+/* ---------- C. Bento reports ---------- */
+.c-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:22px}
+.c-head h2{margin:6px 0 14px;font-size:36px;font-weight:400;letter-spacing:-.03em;color:var(--ink)}
+.heads{display:flex;gap:34px}
+.hd .big{font-size:52px}
+.hd .row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--tx3)}
+.delta{height:20px;padding:0 7px;border-radius:999px;background:#d8f1fb;color:#05638c;font-size:11px;font-weight:600;display:inline-flex;align-items:center}
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}
+.bento .card{padding:18px}
+.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}
+.gauge{display:block;width:100%;max-width:260px;margin:10px auto 0}
+.g-num{margin-top:-62px;text-align:center}
+.g-num .big{font-size:44px}
+.g-num div{font-size:12px;color:var(--tx3);margin-top:4px}
+.trio{display:flex;justify-content:space-between;margin-top:16px;padding-top:12px;border-top:1px solid var(--line2);font-size:12px;color:var(--tx3)}
+.trio b{display:block;margin-top:2px;font-size:14px;color:var(--tx);font-variant-numeric:tabular-nums}
+.segs{display:flex;gap:6px;margin-top:22px}
+.seg-b{display:flex;flex-direction:column;gap:8px;min-width:0}
+.seg-b .p{font-size:13px;font-weight:600;color:var(--tx)}
+.seg-b i{display:block;height:64px;border-radius:12px;transform-origin:left center}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:16px;font-size:12px;color:var(--tx3)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend span::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--c)}
+.ins-card{display:flex;flex-direction:column;gap:12px;background:linear-gradient(155deg,#eef4ff 0%,#dbe8fb 100%);border-color:rgba(255,255,255,.9);box-shadow:0 14px 34px rgb(0 66 183/10%)}
+.ins-card .ins-body{font-size:18px}
+.ins-card .acts{margin-top:auto;display:flex;gap:8px}
+.bars{display:flex;align-items:flex-end;gap:3px;height:120px;margin-top:18px}
+.bars i{flex:1;min-width:2px;border-radius:2px;background:var(--tick);transform-origin:bottom}
+.bars i.m{background:var(--mid)}
+.bars i.t{background:var(--cyan)}
+.axis{display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px;color:var(--tx3)}
+.waffle{flex:0 0 150px;width:150px;display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:16px}
+.waffle i{aspect-ratio:1;border-radius:3px;background:var(--line2)}
+.waffle i.w{background:var(--mid)}
+.wf-row{display:flex;align-items:flex-end;gap:26px}
+.wf-row .big{font-size:44px}
+.chk{display:flex;flex-direction:column;margin-top:10px}
+.chk div{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line2);font-size:13px}
+.chk div:last-child{border-bottom:0}
+.chk i{flex:0 0 auto;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1.5px solid #aeb9c8}
+.chk i.done{background:var(--ink);border-color:var(--ink);color:#fff}
+.chk i svg{width:12px;height:12px}
+.chk span{flex:1;min-width:0}
+.chk span small{display:block;font-size:11.5px;color:var(--tx3);margin-top:1px}
+.chk em{font-style:normal;font-weight:600;font-variant-numeric:tabular-nums}
+.gantt{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.gantt div{display:grid;grid-template-columns:90px 1fr 44px;align-items:center;gap:10px;font-size:12.5px;color:var(--tx3)}
+.gantt b{height:14px;border-radius:7px;transform-origin:left}
+.gantt em{font-style:normal;text-align:right;color:var(--tx);font-weight:600}
+
+/* ================= 精緻 (rich) visual layer =================
+   Borrowed from the references: glass + bloom (ref 1), isometric hero + assistant character (ref 2),
+   iridescent wash + frosted cards + person card (ref 3). Assets are BCT versions generated for this page. */
+.sb-user{margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px 8px 0;border-top:1px solid var(--line2);font-size:12.5px}
+.sb-user b{display:block;font-weight:600;color:var(--tx)}
+.sb-user small{color:var(--tx3);font-size:11px}
+.av{display:inline-grid;place-items:center;border-radius:50%;object-fit:cover;flex:0 0 auto;background:#dfe6f1}
+.av-i{background:var(--tint);color:var(--deep);font-weight:600}
+.av-sm{width:34px;height:34px;font-size:11px}
+.av-xs{width:18px;height:18px;font-size:8px;margin-right:6px;vertical-align:-4px}
+.kb-c .who{display:flex;align-items:center}
+.orb-sm{width:18px;height:18px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 1px 2px rgb(0 66 183/30%))}
+.btn .orb-sm{width:18px;height:18px;margin-left:-4px}
+
+body[data-vis="rich"] .frame{border:10px solid #0f1522;border-radius:34px;box-shadow:0 30px 70px rgb(15 21 34/22%)}
+body[data-vis="rich"] .mn{position:relative;overflow:hidden}
+body[data-vis="rich"] .card{border-radius:20px}
+
+/* A — glass stack with a bloom behind it */
+.bloom{position:absolute;top:10px;right:40px;width:560px;height:340px;border-radius:50%;
+  background:radial-gradient(closest-side, rgba(0,160,228,.55), rgba(0,66,183,.22) 55%, transparent 100%);filter:blur(36px);pointer-events:none}
+.stack-orb{position:absolute;left:-58px;top:-16px;width:120px;height:120px;z-index:0;filter:drop-shadow(0 12px 24px rgb(0 66 183/30%))}
+body[data-vis="rich"] .ins{background:linear-gradient(150deg, rgba(255,255,255,.62), rgba(214,233,252,.32));
+  -webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);
+  border:1px solid rgba(255,255,255,.85);box-shadow:0 22px 44px -16px rgba(0,66,183,.42), inset 0 1px 0 rgba(255,255,255,.95)}
+body[data-vis="rich"] .a-head{margin-top:14px}
+body[data-vis="rich"] .a-head,body[data-vis="rich"] .kpis,body[data-vis="rich"] .kb{position:relative;z-index:1}
+
+/* B — isometric hero + assistant character */
+.hero-b{position:relative;height:236px;margin-bottom:16px;border-radius:22px;background:#f4f7ff;overflow:hidden;border:1px solid var(--line2)}
+.hero-art{position:absolute;right:-30px;top:-12px;height:268px;width:auto;
+  -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 22%);mask-image:linear-gradient(90deg, transparent 0, #000 22%)}
+.hb-text{position:relative;z-index:1;padding:26px 28px;max-width:360px}
+.hb-text h2{margin:8px 0 10px;font-size:34px;font-weight:500;letter-spacing:-.025em;line-height:1.12;color:var(--ink)}
+.acc-w{color:var(--deep)}
+.hb-text p{margin:0;font-size:13px;line-height:1.6;color:var(--tx3)}
+.b-right{display:flex;flex-direction:column;gap:12px;position:sticky;top:0}
+body[data-vis="rich"] .asst{min-height:0;position:static}
+.mascot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:18px 16px 18px 20px;border-radius:20px;
+  background:linear-gradient(160deg,#ffffff 0%,#eef4fd 100%);border:1px solid var(--line)}
+.m-hi{font-size:13px;color:var(--tx3)}
+.m-me{margin-top:2px;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3}
+.mascot p{margin:6px 0 12px;font-size:12.5px;color:var(--tx3);line-height:1.5}
+.m-orb{width:104px;height:104px;flex:0 0 auto;filter:drop-shadow(0 14px 22px rgb(0 66 183/30%));animation:float 3.6s ease-in-out infinite alternate}
+@keyframes float{to{transform:translateY(-5px)}}
+.quick{padding:14px 16px;border-radius:18px;background:#fff;border:1px solid var(--line)}
+.q-h{font-size:13px;font-weight:500;margin-bottom:10px}
+.q-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.q-grid button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 2px;border:0;border-radius:12px;background:none;cursor:pointer;font-size:11.5px;color:var(--tx2)}
+.q-grid button:hover{background:var(--field)}
+.q-grid i{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--field);color:var(--ink)}
+.q-grid svg{width:16px;height:16px}
+
+/* C — layout from reference 3, colours from B (2026-10-28): light canvas, white cards, BCT blue.
+   The rainbow wash and frosted pastel cards were dropped. */
+body[data-vis="rich"][data-opt="C"] .bento .card{background:#fff;border:1px solid var(--line);box-shadow:0 1px 2px rgb(28 42 61/4%)}
+body[data-vis="rich"][data-opt="C"] .bento .ins-card{background:linear-gradient(155deg,#eef4ff 0%,#dbe8fb 100%);border-color:rgba(255,255,255,.9);box-shadow:0 14px 34px rgb(0 66 183/10%)}
+body[data-vis="rich"][data-opt="C"] .bento .person{background:linear-gradient(180deg,#ffffff 0%,#f3f7fd 100%)}
+.person{display:flex;flex-direction:column}
+.pc{position:relative;height:150px;margin:12px -18px 0;display:grid;place-items:center;overflow:hidden}
+.ribbon{position:absolute;inset:0;width:100%;height:100%}
+.ribbon path{stroke:var(--cyan);opacity:.85}
+.pc-img{position:relative;width:118px;height:118px;border-radius:50%;object-fit:cover;border:5px solid rgba(255,255,255,.9);box-shadow:0 14px 30px -10px rgba(0,66,183,.4)}
+.pc-meta{margin-top:10px;text-align:center}
+.pc-meta b{display:block;font-size:16px;font-weight:600}
+.pc-meta span{font-size:12.5px;color:var(--tx3)}
+.pc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:14px;font-size:12px;color:var(--tx3)}
+.pc-acts{display:flex;gap:6px;flex:0 0 auto}
+.pc-acts button{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;border:0;background:var(--ink);color:#fff;cursor:pointer}
+.pc-acts button:first-child{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.pc-acts svg{width:15px;height:15px}
+
+@media (prefers-reduced-motion: reduce){ .ins{transition:none} .m-orb{animation:none} }
+@media (max-width:760px){ .note-card{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+
+<header class="pp-top">
+  <div>
+    <h1>Classic views 提案</h1>
+    <p>參考三張圖，在同一組虛構資料上示範三種做法。A、B 用 Pipeline 頁，C 用 Reports 頁。「精緻」加上生成的 BCT 插圖、玻璃球和頭像。</p>
+  </div>
+  <div class="pp-ctrl">
+    <div class="seg" role="tablist" aria-label="提案">
+      <button role="tab" data-opt="A" aria-selected="true">A 洞察頁首</button>
+      <button role="tab" data-opt="B" aria-selected="false">B 頁內助理</button>
+      <button role="tab" data-opt="C" aria-selected="false">C Bento 報表</button>
+    </div>
+    <div class="seg" role="tablist" aria-label="視覺">
+      <button role="tab" data-vis="plain" aria-selected="false">平實</button>
+      <button role="tab" data-vis="rich" aria-selected="true">精緻</button>
+    </div>
+    <button class="replay" id="replay" type="button">重播動態</button>
+  </div>
+</header>
+
+<section class="note" aria-live="polite"><div class="note-card" id="note"></div></section>
+
+<div class="frame-wrap">
+  <div class="frame">
+    <aside class="sb" aria-label="Classic views">
+      <div class="brand"><img src="../assets/bct-logo.svg" alt="BCT" /><span>CRM</span></div>
+      <div class="sb-lbl">Classic views</div>
+      <div class="sb-item" data-v="leads"><i data-ic="inbox"></i>Leads</div>
+      <div class="sb-item" data-v="pipeline"><i data-ic="chart"></i>Pipeline</div>
+      <div class="sb-item" data-v="accounts"><i data-ic="users"></i>Accounts</div>
+      <div class="sb-item" data-v="tasks"><i data-ic="check"></i>Tasks</div>
+      <div class="sb-item" data-v="reports"><i data-ic="list"></i>Reports</div>
+      <div class="sb-item later" data-v="later"><i data-ic="list"></i><span class="tx">Leadership dashboards</span><em>Phase 2</em></div>
+      <div class="sb-user" id="sb-user"></div>
+    </aside>
+    <main class="mn" id="mn"></main>
+  </div>
+</div>
+
+<script>
+const IC = {
+  inbox:'<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  chart:'<path d="M4 20h16"/><path d="M8 16v-4"/><path d="M12 16V7"/><path d="M16 16v-6"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  list:'<rect width="18" height="16" x="3" y="4" rx="2"/><path d="M7 9h.01"/><path d="M7 15h.01"/><path d="M11 9h6"/><path d="M11 15h6"/>',
+  spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>',
+  arrow:'<path d="M7 17 17 7"/><path d="M7 7h10v10"/>',
+  next:'<path d="m9 18 6-6-6-6"/>',
+  send:'<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
+  mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>'
+};
+const svg = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+document.querySelectorAll('[data-ic]').forEach(el => el.innerHTML = svg(el.dataset.ic));
+const $ = s => document.querySelector(s);
+/* Generated BCT assets (assets/gen): isometric district, AI glass orb, illustrated contacts. */
+const ASSET='../assets/gen/';
+const AVATAR={hana:'avatar-hana.webp',omar:'avatar-omar.webp',rajesh:'avatar-rajesh.webp',sheldon:'avatar-sheldon.webp'};
+let VIS='rich';
+const rich = () => VIS==='rich';
+const orb = (cls='orb-sm') => `<img class="${cls}" src="${ASSET}ai-orb.webp" alt="" aria-hidden="true">`;
+const aiIcon = () => rich() ? orb() : svg('spark');
+function avatar(who, initials, cls='av'){ return rich() && AVATAR[who] ? `<img class="${cls}" src="${ASSET}${AVATAR[who]}" alt="">` : `<span class="${cls} av-i">${initials}</span>`; }
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Seeded numbers so every replay draws the same chart. */
+function rnd(seed){ let s=seed; return () => (s = (s*16807) % 2147483647) / 2147483647; }
+
+/* Barcode: n ticks; ticks in [a,b) are dark; last tick is the cyan "today". */
+function barcode(seed, a, b, n=56){
+  const r=rnd(seed); let x=0, out='';
+  for(let i=0;i<n;i++){
+    const h = i===n-1 ? 28 : 10 + Math.round(r()*14);
+    const c = i===n-1 ? 'var(--cyan)' : (i>=a && i<b ? 'var(--ink)' : 'var(--tick)');
+    out += `<rect x="${x}" y="${28-h}" width="2" height="${h}" rx="1" fill="${c}"/>`; x+=4;
+  }
+  return `<svg class="bc" viewBox="0 0 ${n*4} 28" preserveAspectRatio="none" aria-hidden="true">${out}</svg>`;
+}
+
+const DEALS = {
+  kpo:{n:'AI document processing',a:'Qamar Energy',v:'$310K',s:0,d:'Close Q1 2027',c:['','ML']},
+  sahyadri:{n:'Core banking security review',a:'Sahyadri Bank',v:'$280K',s:0,d:'Close 31 Jan',c:['rajesh','RK']},
+  muscat:{n:'Citizen services portal — phase\u00a02',a:'Muscat Municipality',v:'$190K',s:0,d:'Close 20 Dec',c:['','SH']},
+  datalake:{n:'Data Lake modernisation',a:'Qamar Energy',v:'$820K',s:1,d:'Close 15 Dec',f:['warn','Quiet 31 days'],c:['hana','HA']},
+  gulf:{n:'Warehouse management system',a:'Gulf Harbor Logistics',v:'$540K',s:1,d:'Close 26 Oct',f:['red','Closes Monday'],c:['omar','OH']},
+  fieldops:{n:'Field Ops mobile app',a:'Qamar Energy',v:'$410K',s:2,d:'Close 30 Nov',c:['','SB']},
+  erp:{n:'ERP Managed Services — renewal',a:'Qamar Energy',v:'$640K',s:3,d:'Closed 12 Aug',c:['hana','HA']}
+};
+const STAGES=[['Discovery','3 · $780K'],['Proposal','2 · $1.36M'],['Negotiation','1 · $410K'],['Won','1 · $640K']];
+function kanban(){
+  return `<div class="kb">${STAGES.map((st,i)=>`<div class="kb-col"><div class="kb-h">${st[0]}<small>${st[1]}</small></div>
+    ${Object.entries(DEALS).filter(([,d])=>d.s===i).map(([k,d])=>`<button class="kb-c" data-deal="${k}"><b>${d.n}</b>${rich()&&d.c?`<span class="who">${avatar(d.c[0],d.c[1],"av av-xs")}${d.a}</span>`:`<span>${d.a}</span>`}
+      ${d.f?`<span class="flag ${d.f[0]}">${d.f[1]}</span>`:''}<div class="row"><span class="amt">${d.v}</span><span>${d.d}</span></div></button>`).join('')}
+  </div>`).join('')}</div>`;
+}
+const pills = `<div class="pills"><button class="pill on">My deals</button><button class="pill">All deals</button><span class="vsep"></span><button class="pill">Services</button><button class="pill">Resell</button><button class="pill">IP</button><button class="pill">KPO / BPO</button></div>`;
+function bigNum(pre,val,unit,dec){ return `<span class="big"><span data-count="${val}" data-dec="${dec??2}" data-pre="${pre}">${pre}${val.toFixed(dec??2)}</span>${unit?`<sup>${unit}</sup>`:''}</span>`; }
+
+/* ---------- A ---------- */
+const INSIGHTS = [
+  ['Pipeline insight', '<b>Data Lake</b> has been quiet for 31 days. On its own it would cover your <b class="nb">$400K Q4 gap.</b>'],
+  ['Closing soon', '<b>Gulf Harbor</b> closes Monday with pricing still open. Omar asked for a phased licence.'],
+  ['Trend', '<b>Proposal</b> now holds 53% of your pipeline value, up from <span class="nb">31% in September.</span>']
+];
+function viewA(){
+  return `${rich()?'<div class="bloom" aria-hidden="true"></div>':''}<div class="a-head">
+    <div class="a-title"><div class="eyebrow">Your deals · synced 2 min ago</div><h2>Pipeline</h2>${pills}</div>
+    <div class="stack" id="stack">${rich()?orb('stack-orb'):''}${INSIGHTS.map((x,i)=>`<article class="ins" data-pos="${i}">
+      <div class="ins-tag">${aiIcon()}${x[0]}</div><div class="ins-body">${x[1]}</div>
+      <div class="ins-foot"><button class="ask">Ask about this ${svg('arrow')}</button><span class="n">${i+1} / 3</span><button class="nx" aria-label="Next insight">${svg('next')}</button></div>
+    </article>`).join('')}</div>
+  </div>
+  <div class="kpis">
+    <div class="card kpi"><div class="ct">Open pipeline<span class="go">${svg('arrow')}</span></div>${bigNum('$',2.55,'M')}<div class="sub"><span>6 deals</span><span><b>+12%</b> vs Sep</span></div>${barcode(3,30,48)}</div>
+    <div class="card kpi"><div class="ct">Q4 forecast<span class="go">${svg('arrow')}</span></div>${bigNum('$',1.10,'M')}<div class="sub"><span>Target $1.5M</span><span><b>73%</b></span></div>${barcode(7,0,41)}</div>
+    <div class="card kpi"><div class="ct">Closing this month<span class="go">${svg('arrow')}</span></div>${bigNum('',1,'deal',0)}<div class="sub"><span>Gulf Harbor</span><span><b>$540K</b></span></div>${barcode(11,44,52)}</div>
+    <div class="card kpi"><div class="ct">Avg. days in stage<span class="go">${svg('arrow')}</span></div>${bigNum('',18,'d',0)}<div class="sub"><span>Slowest: Proposal</span><span><b>27 d</b></span></div>${barcode(19,12,27)}</div>
+  </div>
+  ${kanban()}`;
+}
+function bindA(){
+  const cards=[...document.querySelectorAll('.ins')];
+  const rotate=()=>{ cards.forEach(c=>c.dataset.pos=(+c.dataset.pos+2)%3); };
+  document.querySelectorAll('.ins .nx').forEach(b=>b.addEventListener('click',rotate));
+  document.querySelectorAll('.ins .ask').forEach(b=>b.addEventListener('click',()=>toast('會帶著這張洞察回到對話，直接追問')));
+}
+
+/* ---------- B ---------- */
+const DEAL_DETAIL = {
+  datalake:{t:'Data Lake modernisation',m:'Qamar Energy · Proposal · $820K · close 15 Dec',bc:[4,30],last:'Last touch 20 Sep · workshop',p:'Quiet for <b>31 days</b> after a good workshop. It is your biggest open deal and would cover the <b>$400K</b> Q4 gap on its own.',src:'Based on OPP-1042 · 9 emails · 3 meetings'},
+  gulf:{t:'Warehouse management system',m:'Gulf Harbor Logistics · Proposal · $540K · close 26 Oct',bc:[38,55],last:'Last touch 14 Oct · proposal v2',p:'Closes <b>Monday</b>. Finance pushed back on price on 8 Oct and Omar asked for a <b>phased licence</b>. Revised pricing is overdue by one day.',src:'Based on OPP-1031 · 14 emails · 2 meetings'},
+  kpo:{t:'AI document processing',m:'Qamar Energy · Discovery · $310K · Q1 2027',bc:[46,56],last:'Last touch today · website lead linked',p:'Khalid from procurement asked for pricing through the website this morning. I linked it to this deal instead of creating a <span class="nb">new lead.</span>',src:'Based on OPP-1066 · LEAD-0312 · 2 meetings'},
+  fieldops:{t:'Field Ops mobile app',m:'Qamar Energy · Negotiation · $410K · close 30 Nov',bc:[40,54],last:'Last touch 16 Oct · revised SOW',p:'Revised SOW is with procurement. Demo to field supervisors is <b>Thursday</b>; that is the next moment that can move it.',src:'Based on OPP-1017 · 11 emails · 3 meetings'}
+};
+function asstSummary(){
+  return `<p>Three things on this board need you:</p>
+  <div class="alist">
+    <button data-deal="gulf"><span><b>Gulf Harbor</b> · closes Monday, pricing open</span>${svg('next')}</button>
+    <button data-deal="datalake"><span><b>Data Lake</b> · quiet for 31 days</span>${svg('next')}</button>
+    <button data-deal="kpo"><span><b>AI doc processing</b> · new website lead linked</span>${svg('next')}</button>
+  </div>
+  <p class="muted" style="font-size:12.5px">Select any card and I'll brief you on it.</p>`;
+}
+function asstDeal(k){
+  const d=DEAL_DETAIL[k]||{t:DEALS[k].n,m:`${DEALS[k].a} · ${DEALS[k].v}`,bc:[20,30],last:'Recent activity on track',p:'Nothing urgent here. Activity is steady and the next step is booked.',src:'Based on the deal record'};
+  return `<button class="back">← Board summary</button>
+    <div class="deal-h">${d.t}</div><div class="deal-m">${d.m}</div>
+    <div class="mini"><div class="lbl"><span>Last 60 days</span><span>${d.last}</span></div>${barcode(k.length*13,d.bc[0],d.bc[1],56)}</div>
+    <p>${d.p}</p>
+    <div class="pills" style="margin-top:12px"><button class="btn">${svg('mail')}Draft follow-up</button><button class="btn ghost">Open record</button></div>
+    <div class="src">${d.src}</div>`;
+}
+function viewB(){
+  const head = rich()
+    ? `<section class="hero-b"><img class="hero-art" src="${ASSET}hero-iso-simple.webp" alt="Isometric illustration: an office tower, shipping containers and a storage tank linked by dotted routes">
+        <div class="hb-text"><div class="eyebrow">Your deals · synced 2 min ago</div><h2>Your <span class="acc-w">pipeline</span>,<br>at a glance</h2><p>6 open deals across 4 accounts. The dotted routes are the deals that connect them.</p></div></section>`
+    : `<div class="b-head"><div><div class="eyebrow">Your deals · synced 2 min ago</div><h2>Pipeline</h2></div></div>`;
+  const mascot = rich()
+    ? `<div class="mascot"><div><div class="m-hi">Hi Sheldon,</div><div class="m-me">I'm your deal assistant</div><p>Watching 6 deals and 2 new leads for you.</p><button class="btn">Ask me anything</button></div>${orb('m-orb')}</div>`
+    : '';
+  const quick = rich()
+    ? `<div class="quick"><div class="q-h">Quick actions</div><div class="q-grid">${[['mail','Draft email'],['check','Log meeting'],['plus','New lead'],['chart','Forecast']].map(q=>`<button><i>${svg(q[0])}</i><span>${q[1]}</span></button>`).join('')}</div></div>`
+    : '';
+  return `<div class="b-grid">
+    <div>
+      ${head}
+      <div style="margin-bottom:14px">${pills}</div>
+      ${kanban()}
+    </div>
+    <div class="b-right">${mascot}
+    <aside class="asst" aria-label="Assistant">
+      ${rich()?'':`<div class="asst-h"><span class="mk">${svg('spark')}</span><div><b>Assistant</b><small>Sees what you're looking at</small></div></div>`}
+      <div class="ctx"><span>Pipeline</span><span>My deals</span><span>6 open deals</span></div>
+      <div class="asst-body" id="asst">${asstSummary()}</div>
+      <div class="sugg"><button>Which deals slipped?</button><button>Forecast by type</button></div>
+      <div class="ainput"><span>Ask about this board…</span><i>${svg('send')}</i></div>
+    </aside>${quick}</div>
+  </div>`;
+}
+function bindB(){
+  const body=$('#asst');
+  const swap=html=>{
+    const go=()=>{ body.innerHTML=html; if(!REDUCED) body.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.7,.2,1)'}); };
+    if(REDUCED) return go();
+    body.animate([{opacity:0}],{duration:120,fill:'forwards'}).onfinish=a=>{ a.target?.cancel?.(); go(); };
+  };
+  const select=k=>{
+    document.querySelectorAll('.kb-c').forEach(c=>c.classList.toggle('sel',c.dataset.deal===k));
+    swap(k?asstDeal(k):asstSummary());
+  };
+  $('#mn').addEventListener('click',e=>{
+    const c=e.target.closest('[data-deal]'); if(c){ select(c.dataset.deal); return; }
+    if(e.target.closest('.back')) select(null);
+  });
+}
+
+/* ---------- C ---------- */
+function gauge(p){
+  // semicircle, r=100, centre (120,120); value arc drawn with dash so it can sweep in
+  const L=Math.PI*100, end=Math.PI*(1-p), ex=120+100*Math.cos(end), ey=120-100*Math.sin(end);
+  return `<svg class="gauge" viewBox="0 0 240 132" aria-label="Forecast at ${Math.round(p*100)}% of target" role="img">
+    <path d="M20 120 A100 100 0 0 1 220 120" fill="none" stroke="var(--line2)" stroke-width="14" stroke-linecap="round"/>
+    <path id="g-val" d="M20 120 A100 100 0 0 1 220 120" fill="none" stroke="var(--ink)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${L*p} ${L}" />
+    <circle id="g-dot" cx="${ex}" cy="${ey}" r="7" fill="var(--cyan)" stroke="#fff" stroke-width="3"/>
+  </svg>`;
+}
+function activityBars(){
+  const r=rnd(42), n=60; let out='';
+  for(let i=0;i<n;i++){
+    const busy = (i>14&&i<20)||(i>44&&i<52);
+    const h = Math.round((busy?55:18) + r()*(busy?45:30));
+    const cls = i===n-1 ? 't' : (busy && r()>.35 ? 'm' : '');
+    out+=`<i class="${cls}" style="height:${h}%"></i>`;
+  }
+  return out;
+}
+function viewC(){
+  return `<div class="c-head">
+    <div><div class="eyebrow">Reports · Q4 2026 · figures as of today 06:00</div><h2>Good morning, Sheldon</h2>
+      <div class="pills"><button class="btn">${rich()?orb():svg('plus')}Ask for a report</button><button class="pill">Q4 2026</button><button class="pill on">Mine</button><button class="pill">Middle East</button></div></div>
+    <div class="heads">
+      <div class="hd">${bigNum('$',2.55,'M')}<div class="row">Open pipeline <span class="delta">+12%</span></div></div>
+      <div class="hd">${bigNum('',73,'%',0)}<div class="row">To target <span class="delta">+8 pts</span></div></div>
+      <div class="hd">${bigNum('',60,'%',0)}<div class="row">Win rate <span class="delta">90 days</span></div></div>
+    </div>
+  </div>
+  <div class="bento">
+    <div class="card s4"><div class="ct">Q4 forecast<span class="go">${svg('arrow')}</span></div>${gauge(.73)}
+      <div class="g-num">${bigNum('$',1.10,'M')}<div>of $1.5M target</div></div>
+      <div class="trio"><span>Committed<b>$540K</b></span><span>Best case<b>$560K</b></span><span>Gap<b>$400K</b></span></div></div>
+    <div class="card s4"><div class="ct">Pipeline by deal type<span class="go">${svg('arrow')}</span></div>
+      <div class="segs">
+        <div class="seg-b" style="flex:35"><span class="p">35%</span><i style="background:var(--ink)"></i></div>
+        <div class="seg-b" style="flex:32"><span class="p">32%</span><i style="background:var(--deep)"></i></div>
+        <div class="seg-b" style="flex:21"><span class="p">21%</span><i style="background:var(--cyan)"></i></div>
+        <div class="seg-b" style="flex:12"><span class="p">12%</span><i style="background:var(--tick)"></i></div>
+      </div>
+      <div class="legend"><span style="--c:var(--ink)">Services</span><span style="--c:var(--deep)">Services + IP</span><span style="--c:var(--cyan)">Resell</span><span style="--c:var(--tick)">KPO / BPO</span></div></div>
+    <div class="card s4 ins-card"><div class="ins-tag">${aiIcon()}Insight</div>
+      <div class="ins-body"><b>Proposal</b> holds 53% of your value, and two deals there have had no activity <span class="nb">this month.</span></div>
+      <div class="acts"><button class="btn">Show me</button><button class="btn ghost">Ask about this</button></div></div>
+    <div class="card s8"><div class="ct"><span>Activity, last 60 days <span class="muted" style="font-weight:400">· 142 emails · 31 meetings</span></span><span class="go">${svg('arrow')}</span></div>
+      <div class="bars" id="bars">${activityBars()}</div>
+      <div class="axis"><span>29 Aug</span><span>Workshop · 20 Sep</span><span>Proposal v2 · 14 Oct</span><span>Today</span></div></div>
+    <div class="card s4"><div class="ct">Win rate · last 90 days<span class="go">${svg('arrow')}</span></div>
+      <div class="wf-row"><div class="waffle" id="waffle">${Array.from({length:100},(_,i)=>`<i class="${i<60?'w':''}"></i>`).join('')}</div>
+      <div>${bigNum('',60,'%',0)}<div class="muted" style="font-size:12px;margin-top:6px">3 won · 2 lost</div></div></div></div>
+    ${rich()?`<div class="card s4 person"><div class="ct">Key contact this week<span class="go">${svg('arrow')}</span></div>
+      <div class="pc"><svg class="ribbon" viewBox="0 0 320 170" preserveAspectRatio="none" aria-hidden="true"><path d="M-20 140 C 50 40, 110 170, 170 92 S 270 10, 340 70" fill="none" stroke-width="26" stroke-linecap="round"/></svg>${avatar('hana','HA','pc-img')}</div>
+      <div class="pc-meta"><b>Hana Al-Rashdi</b><span>Head of IT · Qamar Energy</span></div>
+      <div class="pc-row"><span>Decides on Data Lake · <span class="nb">3 meetings this quarter</span></span><div class="pc-acts"><button aria-label="Call Hana">${svg('phone')}</button><button aria-label="Email Hana">${svg('mail')}</button></div></div></div>`:''}
+    <div class="card ${rich()?'s4':'s6'}"><div class="ct">Closing this month<span class="go">${svg('arrow')}</span></div>
+      <div class="chk">
+        <div><i class="done">${svg('check')}</i><span>Revised SOW to Qamar procurement<small>Field Ops mobile app · sent 16 Oct</small></span><em>$410K</em></div>
+        <div><i></i><span>Send revised pricing to Omar Haddad<small>Gulf Harbor · overdue by 1 day</small></span><em>$540K</em></div>
+        <div><i></i><span>Phased proposal to Hana<small>Data Lake · due Fri 23 Oct</small></span><em>$820K</em></div>
+      </div></div>
+    <div class="card ${rich()?'s4':'s6'}"><div class="ct">Average days in stage<span class="go">${svg('arrow')}</span></div>
+      <div class="gantt">
+        <div>Discovery<b style="width:44%;background:var(--tick)"></b><em>12 d</em></div>
+        <div>Proposal<b style="width:100%;background:var(--ink)"></b><em>27 d</em></div>
+        <div>Negotiation<b style="width:33%;background:var(--cyan)"></b><em>9 d</em></div>
+      </div>
+      <div class="muted" style="font-size:12px;margin-top:14px">Proposal is where deals wait longest. BCT average is <span class="nb">19 days.</span></div></div>
+  </div>`;
+}
+
+/* ---------- Motion (light: small rise + fade, numbers count up) ---------- */
+function countUp(root){
+  root.querySelectorAll('[data-count]').forEach(n=>{
+    const t=+n.dataset.count, dec=+n.dataset.dec, pre=n.dataset.pre||'', fmt=v=>pre+v.toFixed(dec);
+    if(REDUCED || (t<10&&!dec)){ n.textContent=fmt(t); return; }
+    const from=t*.62, t0=performance.now()+180, d=900; n.textContent=fmt(from);
+    const step=now=>{ const k=Math.max(0,Math.min(1,(now-t0)/d)), e=1-Math.pow(1-k,3); n.textContent = k<1?fmt(from+(t-from)*e):fmt(t); if(k<1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+function enter(){
+  const mn=$('#mn'); countUp(mn); if(REDUCED) return;
+  const art=mn.querySelector('.hero-art'); if(art) art.animate([{opacity:0, transform:'translateX(16px)'},{opacity:1, transform:'none'}],{duration:700, easing:'cubic-bezier(.2,.7,.2,1)', fill:'backwards'});
+  const b=mn.querySelector('.bloom'); if(b) b.animate([{opacity:0},{opacity:1}],{duration:900, fill:'backwards'});
+  const ease='cubic-bezier(.2,.7,.2,1)';
+  [...mn.querySelectorAll('.a-head, .kpi, .kb-col, .b-head, .hero-b, .mascot, .asst, .quick, .c-head, .bento > .card')].forEach((el,i)=>
+    el.animate([{opacity:0, transform:'translateY(8px)'},{opacity:1, transform:'none'}],{duration:320, delay:Math.min(i,10)*60, easing:ease, fill:'backwards'}));
+  mn.querySelectorAll('.bc rect').forEach((r,i)=>{ r.style.transformBox='fill-box'; r.style.transformOrigin='bottom'; r.animate([{transform:'scaleY(0)'},{transform:'none'}],{duration:420, delay:200+(i%56)*6, easing:ease, fill:'backwards'}); });
+  mn.querySelectorAll('.bars i').forEach((b,i)=>b.animate([{transform:'scaleY(0)'},{transform:'none'}],{duration:480, delay:250+i*10, easing:ease, fill:'backwards'}));
+  mn.querySelectorAll('.seg-b i, .gantt b').forEach((b,i)=>b.animate([{transform:'scaleX(0)'},{transform:'none'}],{duration:560, delay:300+i*80, easing:ease, fill:'backwards'}));
+  mn.querySelectorAll('.waffle i.w').forEach((b,i)=>b.animate([{opacity:0}, {opacity:1}],{duration:200, delay:300+i*12, fill:'backwards'}));
+  const gv=$('#g-val'); if(gv){ const L=Math.PI*100*.73; gv.animate([{strokeDasharray:`0 ${Math.PI*100}`},{strokeDasharray:`${L} ${Math.PI*100}`}],{duration:900, delay:250, easing:ease, fill:'backwards'}); $('#g-dot').animate([{opacity:0},{opacity:1}],{duration:200, delay:1100, fill:'backwards'}); }
+}
+
+/* ---------- Notes ---------- */
+const NOTES = {
+  A:{t:'A · 洞察頁首', s:'五個 Classic views 共用同一個模式',
+     vis:'洞察疊卡改成<span class="nb">半透明玻璃</span>，後面一團 BCT <span class="nb">青色柔光</span>，玻璃後面透出 <span class="nb">AI 玻璃球。</span>案子卡片加上<span class="nb">聯絡人頭像。</span>',
+     ref:'第 1 張的「Account Insights」疊卡、條碼小圖、細字大數字。',
+     how:'每個頁面的頁首放 2 到 3 張 AI 洞察疊卡，點箭頭換下一張，<span class="nb">「Ask about this」</span>帶著這張洞察<span class="nb">回到對話。</span>下方一排大數字，各附一條條碼小圖。原本的看板、<span class="nb">表格不動。</span>',
+     fit:'一致性最高，改動最小。AI 主動找你，直接出現在<span class="nb">傳統畫面裡</span>，最能說明 <span class="nb">AI-native。</span>',
+     cost:'頁首變高，看板往下推約 180px。每頁要寫 2 到 3 則洞察的文案。'},
+  B:{t:'B · 頁內助理', s:'助理固定在頁面右側',
+     vis:'頁首是生成的<span class="nb">等角白模插圖</span>，簡化成三個物件：<span class="nb">辦公大樓</span>、貨櫃、<span class="nb">油槽</span>，<span class="nb">青色虛線</span>把它們連起來。右上是<span class="nb">玻璃球助理卡</span>，下面加<span class="nb">快捷入口。</span>',
+     ref:'第 1 張右側的 AI Assistant，第 2 張右上的助理卡和底部輸入框。',
+     how:'助理知道你在看哪一頁、篩了什麼。沒選東西時列出這頁最需要處理的三件事；點任何卡片，右側<span class="nb">換成</span>這筆案子的摘要、活動條碼和下一步。',
+     fit:'看板和 AI 並排，業務一邊瀏覽一邊問，<span class="nb">不必切換畫面。</span>',
+     cost:'和現有的右側紀錄面板、底部輸入框功能重疊，要決定留哪個。看板變窄，手機上要改成<span class="nb">底部抽屜。</span>'},
+  C:{t:'C · Bento 報表', s:'只改 Reports 頁',
+     vis:'版面照第三張，配色跟 B 一樣：<span class="nb">淺灰底</span>、<span class="nb">白卡片</span>、<span class="nb">BCT 藍。</span>新增<span class="nb">「本週關鍵聯絡人」</span><span class="nb">人物卡</span>，<span class="nb">插畫頭像</span>配一條<span class="nb">青色彩帶。</span>',
+     ref:'第 2、3 張的卡片拼貼、<span class="nb">半圓儀表</span>、<span class="nb">分段色塊</span>、<span class="nb">點陣圖</span>、清單，第 3 張的問候語加右上大數字。',
+     how:'每張卡一種圖：forecast 儀表、案型分段、60 天活動條碼、勝率點陣、本月要結的案子、<span class="nb">各階段天數。</span>顏色只用 Midnight 加 <span class="nb">BCT 青色當強調。</span>',
+     fit:'Reports 最需要視覺個性，也是釘選的 Q4 snapshot 所在的地方。主管看一眼就懂。',
+     cost:'工最多。本質上是傳統 dashboard，AI-native 的感覺要靠<span class="nb">洞察卡</span>和<span class="nb">「Ask for a report」撐。</span>'}
+};
+function renderNote(o){
+  const n=NOTES[o];
+  $('#note').innerHTML=`<h3>${n.t}<small>${n.s}</small></h3>
+    <div><dt>參考</dt><dd>${n.ref}</dd></div><div><dt>做法</dt><dd>${n.how}</dd></div><div><dt>精緻版</dt><dd>${n.vis}</dd></div><div><dt>適合</dt><dd>${n.fit}</dd></div><div><dt>代價</dt><dd>${n.cost}</dd></div>`;
+}
+
+/* ---------- Switching ---------- */
+let current='A';
+function show(o){
+  current=o;
+  document.body.dataset.opt=o; document.body.dataset.vis=VIS;
+  document.querySelectorAll('.seg button[data-opt]').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.opt===o)));
+  document.querySelectorAll('.seg button[data-vis]').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.vis===VIS)));
+  $('#sb-user').innerHTML = `${avatar('sheldon','SC','av av-sm')}<span><b>Sheldon Cooper</b><small>Sales · Middle East</small></span>`;
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.toggle('on', i.dataset.v===(o==='C'?'reports':'pipeline')));
+  renderNote(o);
+  $('#mn').innerHTML = o==='A'?viewA():o==='B'?viewB():viewC();
+  if(o==='A') bindA(); if(o==='B') bindB();
+  enter();
+  try{ localStorage.setItem('cv-proposal', o); }catch(e){}
+}
+document.querySelectorAll('.seg button[data-opt]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.opt)));
+document.querySelectorAll('.seg button[data-vis]').forEach(b=>b.addEventListener('click',()=>{ VIS=b.dataset.vis; try{ localStorage.setItem('cv-vis', VIS); }catch(e){} show(current); }));
+$('#replay').addEventListener('click',()=>show(current));
+
+let tt; function toast(m){ let t=$('#pp-toast'); if(!t){ t=document.createElement('div'); t.id='pp-toast'; t.setAttribute('role','status');
+  t.style.cssText='position:fixed;top:18px;left:50%;transform:translateX(-50%);padding:9px 16px;border-radius:8px;background:#052870;color:#fff;font-size:13px;z-index:9;transition:opacity .2s'; document.body.appendChild(t); }
+  t.textContent=m; t.style.opacity=1; clearTimeout(tt); tt=setTimeout(()=>t.style.opacity=0,1800); }
+
+let start='A'; try{ start=localStorage.getItem('cv-proposal')||'A'; VIS=localStorage.getItem('cv-vis')||'rich'; }catch(e){}
+show(start);
+</script>
+</body>
+</html>

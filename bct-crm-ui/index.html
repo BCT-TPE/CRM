@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BCT CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<!-- Gina UI base (copied unchanged from gina-ui 2). Do not edit: override in bct-crm.css. -->
+<link rel="stylesheet" href="vendor/gina/tokens.css" />
+<link rel="stylesheet" href="vendor/gina/app.css" />
+<link rel="stylesheet" href="vendor/gina/app-business-v2.css" />
+<!-- BCT CRM: brand tokens + CRM-specific components -->
+<link rel="stylesheet" href="bct-crm.css?v=20261028zp" />
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg" />
+<!-- AI assistant faces (neutral / thinking / happy), preloaded so swaps never flash -->
+<link rel="preload" as="image" href="assets/ai/ai-face.webp" />
+<link rel="preload" as="image" href="assets/ai/ai-face-think.webp" />
+<link rel="preload" as="image" href="assets/ai/ai-face-happy.webp" />
+</head>
+<body class="business-theme bct">
+
+<button class="collapse-btn" data-action="toggle-sidebar" aria-label="Toggle sidebar" aria-expanded="true"><svg class="i" data-i="panel-left"></svg></button>
+
+<!-- ============ Sidebar ============ -->
+<aside class="sidebar" aria-label="Workspace navigation">
+  <div class="sidebar-resizer" id="sidebar-resizer" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" tabindex="0" title="Drag to resize · double-click to reset"></div>
+  <a class="sidebar-brand" href="index.html" data-action="go-home" aria-label="BCT CRM home"><img src="assets/bct-logo.svg" alt="BCT" width="516" height="134" /><span class="brand-product">CRM</span></a>
+  <div class="side-search">
+    <svg class="i" data-i="search"></svg>
+    <input id="hist-search" type="search" placeholder="Search" aria-label="Search conversations and records" />
+  </div>
+  <div class="side-top">
+    <button class="side-nav-item btn-new" data-action="new-chat"><svg class="i" data-i="plus"></svg><span>New chat</span></button>
+  </div>
+  <div class="side-scroll" id="side-scroll">
+    <!-- Classic views sit where Gina lists its Agents: same row style, same 26px icon tiles. Shown as "Workspace" (2026-10-28). -->
+    <div class="side-label classic-label">Workspace</div>
+    <nav class="side-agents" aria-label="Workspace">
+      <button class="side-nav-item" data-view="pipeline"><svg class="i cv cv-pipeline" data-i="chart"></svg><span>Pipeline</span></button>
+      <button class="side-nav-item" data-view="accounts"><svg class="i cv cv-accounts" data-i="users"></svg><span>Accounts</span></button>
+      <button class="side-nav-item" data-view="reports"><svg class="i cv cv-reports" data-i="list-box"></svg><span>Reports</span></button>
+    </nav>
+    <div>
+      <details class="history-group" id="pinned-group" open>
+        <summary class="side-label history-summary"><span>Pinned</span><svg class="i history-chevron" data-i="chevron-down"></svg></summary>
+        <div id="pinned-list"></div>
+      </details>
+      <details class="history-group" id="history-group" open>
+        <summary class="side-label history-summary"><span>Recents</span><svg class="i history-chevron" data-i="chevron-down"></svg></summary>
+        <div id="hist-list"></div>
+      </details>
+    </div>
+  </div>
+  <div class="side-bottom">
+    <button class="side-nav-item user-btn" aria-haspopup="menu" aria-expanded="false" data-action="user-menu"><img class="avatar-d avatar-img" src="assets/gen/avatar-sheldon.webp" alt=""><span class="user-name">Sheldon Cooper<small>Sales · Middle East</small></span><svg class="i chev" data-i="chevron-down"></svg></button>
+  </div>
+</aside>
+
+<!-- ============ Main ============ -->
+<main class="main">
+  <div class="chat-head" id="chat-head" hidden>
+    <button class="ch-back" id="ch-back" type="button" aria-label="Back to the page"><svg class="i" data-i="chevron-left"></svg><span id="ch-back-label">Back</span></button>
+    <span class="ch-title" id="ch-title"><span id="ch-title-text"></span></span>
+    <span class="ch-sep" aria-hidden="true">·</span>
+    <span class="ch-agents" id="ch-sync"><span>Synced 2 min ago</span></span>
+    <button class="ch-export" id="ch-export" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="export-pop" title="Export conversation"><svg class="i" data-i="download"></svg><span>Export</span></button>
+    <button class="ch-ask" id="ch-ask" type="button" title="Start a conversation about this page"><img src="assets/ai/ai-face.webp" alt=""><span>Ask about this page</span></button>
+  </div>
+  <div class="scroll" id="scroll">
+    <section class="hero" id="hero">
+      <!-- Home, option A "today first" (2026-10-28, docs/home-proposals.html): greeting + the assistant's one-line
+           brief, today's list, suggestion chips, and the pinned Q4 numbers as one slim strip. -->
+      <div class="hero-title">
+        <div class="hero-avatar"><button type="button" class="ai-face bct-orb" aria-label="Say hi to your assistant"><img class="base" src="assets/ai/ai-face.webp" alt=""><img class="wave" src="assets/ai/ai-face.webp" alt="" aria-hidden="true"><i class="lid l"></i><i class="lid r"></i><span class="ripple" aria-hidden="true"></span><span class="drops" aria-hidden="true"></span></button></div>
+        <div class="hero-text">
+          <h1 id="hero-greeting"><span id="hero-greeting-line">Good morning, Sheldon</span></h1>
+          <p class="hero-brief" id="hero-brief">Three things today: <b>Gulf Harbor’s pricing</b> is a day overdue, you call <b class="nb">Rajesh at 11:00,</b> and <b class="nb">Faisal’s new lead</b> hasn’t had <span class="nb">a reply.</span></p>
+        </div>
+      </div>
+      <section class="home-today" id="home-today" aria-labelledby="home-today-h">
+        <div class="ht-head"><span id="home-today-h">Today</span><small id="home-task-count"></small><button class="ht-week" data-action="home-week">Show my week</button></div>
+        <div class="ht-list" data-tasks="home"></div>
+      </section>
+      <div class="home-chips" aria-label="Start a conversation">
+        <div class="home-chips-l">Or start with</div>
+        <div class="home-chips-row">
+          <button class="home-chip" data-scenario="log"><svg class="i" data-i="message"></svg>Log a meeting</button>
+          <button class="home-chip" data-scenario="quarter"><svg class="i" data-i="gauge"></svg>How's my quarter?</button>
+          <button class="home-chip" data-scenario="pipeline"><svg class="i" data-i="chart"></svg>Qamar Energy pipeline</button>
+          <button class="home-chip" data-start="draft-hana"><svg class="i" data-i="mail"></svg>Draft a follow-up</button>
+        </div>
+      </div>
+      <div class="home-pinned" id="home-pinned" hidden></div>
+    </section>
+
+    <section class="thread" id="thread"></section>
+    <section class="view" id="view" aria-live="polite"></section>
+  </div>
+
+  <div class="bottom">
+    <div class="composer">
+      <div class="ctx-row" id="ctx-row" hidden aria-label="Context for this conversation"></div>
+      <div class="attach-row" id="attach-row" hidden aria-label="Attached files"></div>
+      <textarea id="input" aria-label="Ask or tell the CRM" rows="1" placeholder="Ask about a deal, or tell me what happened…"></textarea>
+      <div class="drop-hint" aria-hidden="true">Drop to attach</div>
+      <div class="composer-toolbar">
+        <span class="toolbar-spacer"></span>
+        <button class="cbtn mic" id="mic" type="button" data-action="toggle-mic" aria-label="Speak instead" aria-pressed="false"><svg class="i" data-i="mic"></svg><span class="tip">Speak instead</span></button>
+        <button class="cbtn send" id="send" data-action="send" aria-label="Send"><svg class="i" data-i="arrow-up"></svg></button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============ Record panel: the classic record, opened from a source chip ============ -->
+<aside class="review-panel record-panel" id="review-panel" aria-labelledby="review-panel-title" aria-hidden="true">
+  <div class="review-panel-resizer" id="review-panel-resizer" role="separator" aria-orientation="vertical" aria-label="Resize record panel" tabindex="0" title="Drag to resize"></div>
+  <header class="review-panel-header">
+    <div class="record-head">
+      <p class="record-kind" id="record-kind"></p>
+      <h2 id="review-panel-title"></h2>
+      <p id="record-sub"></p>
+    </div>
+    <div class="review-panel-actions">
+      <button data-action="open-full-record" aria-label="Open full record in classic view" title="Open full record"><svg class="i" data-i="maximize"></svg></button>
+      <button data-action="close-review-panel" aria-label="Close record panel"><svg class="i" data-i="x"></svg></button>
+    </div>
+  </header>
+  <div class="review-panel-content" id="review-panel-content"></div>
+</aside>
+
+<!-- Export conversation (chat-export.js): from the chat header's Export button or a conversation's ⋯ menu. -->
+<div class="export-pop" id="export-pop" role="dialog" aria-labelledby="export-pop-title" hidden>
+  <div class="export-title" id="export-pop-title">Export conversation</div>
+  <p class="export-note">Finished messages only, with the sources each answer used. Replies still being written and attachments are left out.</p>
+  <div class="export-formats">
+    <button class="export-format" type="button" data-export="txt">Plain text (.txt)</button>
+    <button class="export-format" type="button" data-export="md">Markdown (.md)</button>
+  </div>
+</div>
+
+<!-- Account menu (Gina's #pop-user styles): who you are, what the assistant may read, the daily brief, sign out. -->
+<div class="popover" id="pop-user" role="menu" aria-label="Account">
+  <div class="acct-head"><img src="assets/gen/avatar-sheldon.webp" alt=""><div><b>Sheldon Cooper</b><small>Sales · Middle East</small><small>Signed in with OneLogin</small></div></div>
+  <div class="menu-sep"></div>
+  <div class="menu-label acct-label">The assistant can read</div>
+  <div class="menu-item menu-switch"><svg class="i" data-i="mail"></svg><span class="menu-switch-text"><b>Outlook mail</b><small data-src-state="outlook">Connected</small></span><button class="switch" role="switch" aria-checked="true" aria-label="Outlook mail" data-action="toggle-source" data-src="outlook"><span></span></button></div>
+  <div class="menu-item menu-switch"><svg class="i" data-i="calendar"></svg><span class="menu-switch-text"><b>Teams calendar</b><small data-src-state="teams">Connected</small></span><button class="switch" role="switch" aria-checked="true" aria-label="Teams calendar" data-action="toggle-source" data-src="teams"><span></span></button></div>
+  <div class="menu-item menu-switch"><svg class="i" data-i="file-text"></svg><span class="menu-switch-text"><b>SharePoint files</b><small data-src-state="files">Not connected</small></span><button class="switch" role="switch" aria-checked="false" aria-label="SharePoint files" data-action="toggle-source" data-src="files"><span></span></button></div>
+  <div class="menu-sep"></div>
+  <div class="menu-item menu-switch"><svg class="i" data-i="sparkle"></svg><span class="menu-switch-text"><b>Daily brief</b><small data-src-state="brief">Weekdays at 06:00</small></span><button class="switch" role="switch" aria-checked="true" aria-label="Daily brief" data-action="toggle-source" data-src="brief"><span></span></button></div>
+  <button class="menu-item" role="menuitem" data-action="acct-help"><svg class="i" data-i="info"></svg>Help and shortcuts</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item danger" role="menuitem" data-action="acct-signout"><svg class="i" data-i="logout"></svg>Sign out</button>
+</div>
+
+<!-- Conversation ⋯ menu -->
+<div class="popover" id="pop-hist" role="menu" aria-label="Conversation options">
+  <button class="menu-item" role="menuitem" data-action="hist-rename"><svg class="i" data-i="pencil"></svg>Rename</button>
+  <button class="menu-item" role="menuitem" data-action="hist-pin"><svg class="i" data-i="pin"></svg><span id="hist-pin-label">Pin</span></button>
+  <button class="menu-item" role="menuitem" data-action="hist-export"><svg class="i" data-i="download"></svg>Export conversation</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item danger" role="menuitem" data-action="hist-delete"><svg class="i" data-i="trash"></svg>Delete</button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="crm.js?v=20261028zp"></script>
+<script src="views.js?v=20261028zp"></script>
+<script src="page-ask.js?v=20261028zp"></script>
+<script src="chat-export.js?v=20261028zp"></script>
+<script src="ai-face-motion.js?v=20261028zp"></script>
+<script>AIFace.mount(document.querySelector('.hero-avatar .ai-face'));</script>
+<script src="home-motion.js?v=20261028zp"></script>
+</body>
+</html>

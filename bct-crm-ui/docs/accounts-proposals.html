@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Accounts 提案</title>
+<link rel="icon" type="image/svg+xml" href="../assets/fav.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* Proposal page only — not part of the prototype. Three directions for the Accounts page (2026-10-28),
+   drawn with the same tokens as Pipeline and Reports: Midnight / Deep Blue ink, BCT cyan as the one accent,
+   20px white cards, light big numbers, illustrated contacts, the 60-day activity barcode. */
+:root{
+  --mid:#052870; --deep:#0042B7; --cyan:#00A0E4; --ink:#10182a;
+  --canvas:#f6f8fb; --surface:#fff; --field:#f4f6f9; --line:#e1e6ef; --line2:#e9edf4;
+  --tx:#172033; --tx2:#344258; --tx3:#56657a; --tick:#cfd6e0;
+  --warn-bg:#fff3cf; --warn:#7a4f00; --red-bg:#fde8e3; --red:#a33a00; --ok-bg:#e3f3e8; --ok:#1f6b3a;
+  --tint:#e8effb;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#e9edf3;color:var(--tx);font-family:Inter,"Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.nb{display:inline-block}
+
+/* ---------- Proposal chrome (same as classic-views-proposals.html) ---------- */
+.pp-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;max-width:1360px;margin:0 auto;padding:28px 24px 16px}
+.pp-top h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em}
+.pp-top p{margin:6px 0 0;font-size:14px;color:var(--tx3)}
+.pp-ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:#fff;border:1px solid var(--line)}
+.seg button{height:36px;padding:0 16px;border:0;border-radius:999px;background:none;font-size:14px;font-weight:500;color:var(--tx2);cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--mid);color:#fff}
+.replay{height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:14px;cursor:pointer}
+.replay:hover{border-color:#aeb9c8}
+.note{max-width:1360px;margin:0 auto 18px;padding:0 24px}
+.note-card{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 24px;padding:16px 20px;border-radius:14px;background:#fff;border:1px solid var(--line)}
+.note-card h3{grid-column:1/-1;margin:0;font-size:16px;font-weight:600}
+.note-card h3 small{margin-left:8px;font-size:13px;font-weight:500;color:var(--tx3)}
+.note-card dt{font-size:12px;font-weight:600;color:var(--tx3);letter-spacing:.04em}
+.note-card dd{margin:4px 0 0;font-size:13.5px;line-height:1.65;color:var(--tx2)}
+.frame-wrap{padding:0 24px 48px;overflow-x:auto}
+.frame{display:grid;grid-template-columns:200px minmax(0,1fr);min-width:1140px;max-width:1312px;min-height:800px;margin:0 auto;background:var(--canvas);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgb(23 32 51/10%)}
+
+/* Sidebar stub: same order as the prototype (Workspace = Pipeline · Accounts · Reports) */
+.sb{background:#fff;border-right:1px solid var(--line2);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+.brand{display:flex;align-items:center;gap:8px;padding:2px 8px 18px}
+.brand img{height:20px}
+.brand span{padding-left:8px;border-left:1px solid var(--line);font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--tx3)}
+.sb-lbl{padding:6px 10px;font-size:12px;color:var(--tx3)}
+.sb-item{display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;border-radius:6px;font-size:13px;font-weight:500;color:var(--tx2)}
+.sb-item.on{background:var(--tint);color:var(--tx)}
+.sb-item i{display:grid;place-items:center;width:24px;height:24px;border-radius:6px;background:var(--field);color:var(--tx3);flex:0 0 auto}
+.sb-item.on i{background:#d9e5f9;color:var(--deep)}
+.sb-item svg{width:14px;height:14px}
+.sb-user{margin-top:auto;display:flex;align-items:center;gap:10px;padding:10px 8px 0;border-top:1px solid var(--line2);font-size:12.5px}
+.sb-user small{display:block;color:var(--tx3);font-size:11.5px}
+
+/* ---------- Shared bits ---------- */
+.mn{padding:28px 32px 32px;min-width:0}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;font-size:14px}
+.top-bar b{font-weight:500}
+.top-bar .sync{color:var(--tx3);margin-left:8px}
+.ask-btn{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px 0 6px;border:0;border-radius:9px;background:var(--ink);color:#fff;font-size:13px;font-weight:500;cursor:pointer}
+.ask-btn img{width:24px;height:24px}
+.eyebrow{font-size:12.5px;color:var(--tx3)}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px 32px;flex-wrap:wrap;margin-bottom:18px}
+.head h2{margin:6px 0 14px;font-size:34px;font-weight:400;letter-spacing:-.03em;color:var(--ink)}
+.heads{display:flex;gap:30px}
+.hd .lbl{margin-top:6px;font-size:12.5px;color:var(--tx3)}
+.pills{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pill{height:30px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12.5px;color:var(--tx2);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.pill.on{background:var(--mid);border-color:var(--mid);color:#fff}
+.pill .n{color:var(--tx3);font-variant-numeric:tabular-nums}
+.pill.on .n{color:rgba(255,255,255,.75)}
+.vsep{width:1px;height:18px;background:var(--line);margin:0 4px}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 1px 2px rgb(28 42 61/4%)}
+.big{font-weight:300;letter-spacing:-.035em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.big sup{font-size:.4em;font-weight:500;letter-spacing:0;vertical-align:.9em;margin-left:2px;color:var(--tx3)}
+.hd .big{font-size:40px}
+.muted{color:var(--tx3)}
+.flag{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:5px;font-size:11.5px;font-weight:500;white-space:nowrap}
+.flag.warn{background:var(--warn-bg);color:var(--warn)}
+.flag.red{background:var(--red-bg);color:var(--red)}
+.flag.ok{background:var(--ok-bg);color:var(--ok)}
+.flag.grey{background:var(--field);color:var(--tx2)}
+.btn{height:34px;padding:0 14px;border:0;border-radius:999px;background:var(--ink);color:#fff;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--tx);border:1px solid var(--line)}
+.btn svg{width:14px;height:14px}
+.mono{display:grid;place-items:center;flex:0 0 auto;width:40px;height:40px;border-radius:12px;color:#fff;font-size:13px;font-weight:600;letter-spacing:.02em}
+.mono.sm{width:32px;height:32px;border-radius:10px;font-size:11.5px}
+.av{width:28px;height:28px;border-radius:50%;object-fit:cover;background:#dfe6f1;flex:0 0 auto;border:2px solid #fff}
+.av-i{display:inline-grid;place-items:center;font-size:10.5px;font-weight:600;color:var(--deep);background:var(--tint)}
+.av-stack{display:flex}
+.av-stack .av+.av{margin-left:-8px}
+.bc{display:block;width:100%;height:24px}
+/* Stage split: discovery / proposal / negotiation share of open value */
+.split{display:flex;gap:3px;height:8px}
+.split i{display:block;border-radius:3px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--tx3)}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:2px;background:var(--c)}
+/* AI insight strip */
+.ins{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding:14px 18px;border-radius:18px;background:linear-gradient(155deg,#eef4ff 0%,#dfeafb 100%);border:1px solid rgba(255,255,255,.9);box-shadow:0 10px 26px rgb(0 66 183/10%)}
+.ins img{width:34px;height:34px;flex:0 0 auto}
+.ins p{margin:0;flex:1;font-size:14.5px;line-height:1.5;color:var(--mid)}
+.ins p b{font-weight:600}
+.ins .lnk{border:0;background:none;padding:0;color:var(--deep);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+
+/* ---------- A. Card wall ---------- */
+.a-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.ac{padding:18px 20px;display:flex;flex-direction:column;gap:14px;cursor:pointer;text-align:left;transition:border-color .15s, box-shadow .15s}
+.ac:hover{border-color:#c4d4ee;box-shadow:0 10px 22px -12px rgb(0 66 183/28%)}
+.ac-top{display:flex;align-items:center;gap:12px}
+.ac-top .nm{flex:1;min-width:0}
+.ac-top b{display:block;font-size:15px;font-weight:600}
+.ac-top small{display:block;margin-top:2px;font-size:12.5px;color:var(--tx3)}
+.ac-num{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.ac-num .big{font-size:42px}
+.ac-num .lbl{margin-top:6px;font-size:12.5px;color:var(--tx3)}
+.ac-num .won{text-align:right;font-size:12.5px;color:var(--tx3)}
+.ac-num .won b{display:block;font-size:15px;font-weight:600;color:var(--tx)}
+.ac-foot{display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--line2);font-size:12.5px;color:var(--tx2)}
+.ac-foot .nx{margin-left:auto;color:var(--tx3);text-align:right}
+.ac-foot .nx b{color:var(--tx);font-weight:500}
+
+/* ---------- B. Refined table ---------- */
+.tbl{overflow:hidden}
+.tbl table{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{padding:12px 16px;text-align:left;font-size:12px;font-weight:500;color:var(--tx3);border-bottom:1px solid var(--line2);white-space:nowrap}
+.tbl td{padding:14px 16px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{cursor:pointer;transition:background .15s}
+.tbl tbody tr:hover{background:#f9fbfe}
+.tbl tbody tr.sel{background:#f2f6fd}
+.tbl .r{text-align:right}
+.cell{display:flex;align-items:center;gap:10px}
+.cell b{display:block;font-weight:600;font-size:13.5px}
+.cell small{display:block;margin-top:2px;font-size:12px;color:var(--tx3)}
+.tbl .amt{font-size:22px}
+.tbl .bc{width:150px}
+.owner{display:inline-block;margin-left:6px;padding:0 6px;border-radius:4px;background:var(--field);font-size:11px;font-weight:500;color:var(--tx2);vertical-align:1px}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:340px;background:#fff;border-left:1px solid var(--line);box-shadow:-18px 0 40px rgb(23 32 51/10%);padding:22px;transform:translateX(105%);transition:transform .3s cubic-bezier(.2,.7,.2,1);overflow:auto}
+.drawer.open{transform:none}
+.drawer #drawer-in{display:flex;flex-direction:column;gap:12px}
+.drawer .x{position:absolute;top:14px;right:14px;width:30px;height:30px;border:0;border-radius:8px;background:var(--field);cursor:pointer}
+
+/* ---------- C. List + brief ---------- */
+.c-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.c-list{display:flex;flex-direction:column;gap:8px}
+.cl{display:grid;grid-template-columns:auto minmax(0,1.3fr) minmax(0,1fr) auto;align-items:center;gap:16px;padding:14px 18px;border:1px solid var(--line);border-radius:16px;background:#fff;text-align:left;cursor:pointer;transition:border-color .15s, box-shadow .15s}
+.cl:hover{border-color:#c4d4ee}
+.cl.sel{border-color:var(--deep);box-shadow:0 0 0 3px rgb(0 66 183/14%)}
+.cl b{display:block;font-size:14px;font-weight:600}
+.cl small{display:block;margin-top:2px;font-size:12px;color:var(--tx3)}
+.cl .bcw small{margin:3px 0 0}
+.cl .amt{text-align:right}
+.cl .amt .big{font-size:26px}
+.cl .amt small{text-align:right}
+.brief{position:sticky;top:0;padding:18px;display:flex;flex-direction:column;gap:12px}
+.brief-hi{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line2)}
+.brief-hi img{width:46px;height:46px}
+.brief-hi b{display:block;font-size:14px;font-weight:600}
+.brief-hi small{display:block;font-size:12px;color:var(--tx3)}
+.brief p{margin:0;font-size:13.5px;line-height:1.6;color:var(--tx2)}
+.brief p b{color:var(--tx);font-weight:600}
+.back{align-self:flex-start;display:inline-flex;align-items:center;gap:2px;padding:0;border:0;background:none;color:var(--deep);font-size:12.5px;font-weight:500;cursor:pointer}
+.back svg{width:14px;height:14px}
+.sec-h{font-size:12px;font-weight:600;color:var(--tx3);letter-spacing:.02em}
+.people{display:flex;flex-direction:column;gap:8px}
+.person{display:flex;align-items:center;gap:10px;font-size:13px}
+.person .av{width:32px;height:32px}
+.person small{display:block;font-size:11.5px;color:var(--tx3)}
+.deal{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line2);font-size:13px}
+.deal:last-child{border-bottom:0}
+.deal span{flex:1;min-width:0}
+.deal em{font-style:normal;font-weight:600;font-variant-numeric:tabular-nums}
+.todo{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+.todo i{width:18px;height:18px;border-radius:5px;border:1.5px solid #aeb9c8;flex:0 0 auto}
+.todo small{display:block;font-size:11.5px;color:var(--tx3)}
+.sum-list{display:flex;flex-direction:column;gap:6px}
+.sum-list button{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:left;font-size:13px;cursor:pointer}
+.sum-list button:hover{border-color:#c4d4ee}
+.sum-list button span{flex:1}
+.sum-list svg{width:14px;height:14px;color:var(--tx3)}
+.src{font-size:11.5px;color:var(--tx3)}
+
+@media (prefers-reduced-motion: reduce){ .drawer{transition:none} }
+@media (max-width:760px){ .note-card{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+
+<header class="pp-top">
+  <div>
+    <h1>Accounts 提案</h1>
+    <p>同一組四個客戶，三種做法。頁首三案共用，改成和 Reports 一樣的大數字與細字標題。</p>
+  </div>
+  <div class="pp-ctrl">
+    <div class="seg" role="tablist" aria-label="提案">
+      <button role="tab" data-opt="A" aria-selected="true">A 客戶卡片牆</button>
+      <button role="tab" data-opt="B" aria-selected="false">B 精修表格</button>
+      <button role="tab" data-opt="C" aria-selected="false">C 清單加簡報</button>
+    </div>
+    <button class="replay" id="replay" type="button">重播動態</button>
+  </div>
+</header>
+
+<section class="note" aria-live="polite"><div class="note-card" id="note"></div></section>
+
+<div class="frame-wrap">
+  <div class="frame">
+    <aside class="sb" aria-label="Workspace">
+      <div class="brand"><img src="../assets/bct-logo.svg" alt="BCT" /><span>CRM</span></div>
+      <div class="sb-lbl">Workspace</div>
+      <div class="sb-item"><i data-ic="chart"></i>Pipeline</div>
+      <div class="sb-item on"><i data-ic="users"></i>Accounts</div>
+      <div class="sb-item"><i data-ic="list"></i>Reports</div>
+      <div class="sb-user"><img class="av" src="../assets/gen/avatar-sheldon.webp" alt=""><span><b>Sheldon Cooper</b><small>Sales · Middle East</small></span></div>
+    </aside>
+    <main class="mn" id="mn" style="position:relative"></main>
+  </div>
+</div>
+
+<script>
+const IC = {
+  chart:'<path d="M4 20h16"/><path d="M8 16v-4"/><path d="M12 16V7"/><path d="M16 16v-6"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  list:'<rect width="18" height="16" x="3" y="4" rx="2"/><path d="M7 9h.01"/><path d="M7 15h.01"/><path d="M11 9h6"/><path d="M11 15h6"/>',
+  next:'<path d="m9 18 6-6-6-6"/>', prev:'<path d="m15 18-6-6 6-6"/>',
+  mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'
+};
+const svg = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+document.querySelectorAll('[data-ic]').forEach(el => el.innerHTML = svg(el.dataset.ic));
+const $ = s => document.querySelector(s);
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FACE = '../assets/ai/ai-face.webp';
+const AV = { hana:'avatar-hana.webp', omar:'avatar-omar.webp', rajesh:'avatar-rajesh.webp' };
+const av = (p, cls='av') => AV[p[2]] ? `<img class="${cls}" src="../assets/gen/${AV[p[2]]}" alt="">` : `<span class="${cls} av-i">${p[0]}</span>`;
+
+/* Same fictional data as the prototype (crm.js / views.js). */
+const ACC = [
+  { k:'qamar', mono:'QE', bg:'linear-gradient(140deg,#052870,#0042B7)', name:'Qamar Energy', sub:'Oman · Oil & gas', open:1.54, won:'$640K', status:['ok','Active today'],
+    split:[[310,'var(--tick)'],[820,'var(--ink)'],[410,'var(--cyan)']], deals:3, bc:[34,40,50,56], last:'Today · website lead',
+    people:[['HA','Hana Al-Rashdi','hana','Head of IT · main contact'],['SB','Salim Al-Busaidi','','Operations Director'],['ML','Maryam Al-Lawati','','Finance Ops Manager'],['KR','Khalid Al-Riyami','','Procurement Lead']],
+    dl:[['Data Lake modernisation','Proposal','$820K',['warn','Quiet 31 days']],['Field Ops mobile app','Negotiation','$410K'],['AI document processing','Discovery','$310K']],
+    todo:[['Prepare Field Ops demo','Today 16:00'],['Send phased proposal to Hana','Fri 23 Oct']],
+    brief:'Your biggest account and the busiest this month. <b>Data Lake</b> has gone quiet for 31 days after the workshop, and Khalid in procurement just asked for <b>AI document processing</b> pricing on the website.',
+    next:['Prepare Field Ops demo','today 16:00'] },
+  { k:'gulf', mono:'GH', bg:'linear-gradient(140deg,#0077b6,#00A0E4)', name:'Gulf Harbor Logistics', sub:'UAE · Logistics', open:.54, won:'—', status:['red','Closes Monday'],
+    split:[[0,'var(--tick)'],[540,'var(--ink)'],[0,'var(--cyan)']], deals:1, bc:[38,44], last:'14 Oct · proposal v2 sent',
+    people:[['OH','Omar Haddad','omar','COO · main contact'],['LK','Lina Khoury','','Finance Manager']],
+    dl:[['Warehouse management system','Proposal','$540K',['red','Closes Monday']]],
+    todo:[['Send revised pricing to Omar','Overdue by 1 day'],['Prepare contract draft','Mon 26 Oct']],
+    brief:'One deal, and it closes <b>Monday</b>. Finance pushed back on price and Omar asked for a <b>phased licence</b>. The revised pricing is a day overdue and there has been no reply since <span class="nb">14 Oct.</span>',
+    next:['Send revised pricing','overdue'] },
+  { k:'sahyadri', mono:'SB', bg:'linear-gradient(140deg,#10182a,#344258)', name:'Sahyadri Bank', sub:'India · Banking', open:.28, won:'$120K', status:['grey','Call today 11:00'],
+    split:[[280,'var(--tick)'],[0,'var(--ink)'],[0,'var(--cyan)']], deals:1, bc:[44,48], last:'15 Oct · email',
+    people:[['RK','Rajesh Kulkarni','rajesh','CISO · main contact'],['PD','Priya Deshmukh','','Head of Infrastructure'],['AS','Anil Shetty','','Procurement']],
+    dl:[['Core banking security review','Discovery','$280K']],
+    todo:[['Call Rajesh about review scope','Today 11:00']],
+    brief:'Rajesh asked for <b>scope options</b> on 15 Oct. Today’s call at 11:00 is the moment to agree the scope and move this to <span class="nb">Proposal.</span>',
+    next:['Call Rajesh','today 11:00'] },
+  { k:'muscat', mono:'MM', bg:'linear-gradient(140deg,#3d63b8,#7aa5e8)', name:'Muscat Municipality', sub:'Oman · Public sector', owner:'Priya Nair', open:.19, won:'$310K', status:['warn','Quiet 18 days'],
+    split:[[190,'var(--tick)'],[0,'var(--ink)'],[0,'var(--cyan)']], deals:1, bc:[20,26], last:'10 Oct · workshop',
+    people:[['SH','Said Al-Hinai','','Director of IT · main contact'],['FB','Fatma Al-Balushi','','PMO Lead'],['HM','Hamed Al-Maskari','','Procurement']],
+    dl:[['Citizen services portal — phase 2','Discovery','$190K']],
+    todo:[['Quarterly review','05 Nov']],
+    brief:'Phase 1 went live in September. Phase 2 was scoped on 10 Oct and nothing has happened since. Priya Nair owns it; a nudge from you to Said would <span class="nb">help her.</span>',
+    next:['Quarterly review','05 Nov'] }
+];
+const fmt = v => v>=1 ? ['$',v,'M',2] : ['$',Math.round(v*1000),'K',0];
+function big(v,cls=''){ const [p,n,u,d]=fmt(v); return `<span class="big ${cls}"><span data-count="${n}" data-dec="${d}" data-pre="${p}">${p}${n.toFixed(d)}</span><sup>${u}</sup></span>`; }
+
+/* 60-day activity barcode, as on Pipeline: dark ticks where there was two-way contact, cyan = today */
+function rnd(seed){ let s=seed; return () => (s = (s*16807) % 2147483647) / 2147483647; }
+function barcode(seed, runs, n=60){
+  const r=rnd(seed); let x=0, out='';
+  for(let i=0;i<n;i++){
+    const on = runs.some((v,j)=>j%2===0 && i>=v && i<(runs[j+1]||v+4));
+    const h = i===n-1 ? 24 : 8 + Math.round(r()*12);
+    const c = i===n-1 ? 'var(--cyan)' : on ? 'var(--ink)' : 'var(--tick)';
+    out += `<rect x="${x}" y="${24-h}" width="2" height="${h}" rx="1" fill="${c}"/>`; x+=4;
+  }
+  return `<svg class="bc" viewBox="0 0 ${n*4} 24" preserveAspectRatio="none" aria-hidden="true">${out}</svg>`;
+}
+const split = a => { const t=a.split.reduce((s,x)=>s+x[0],0); return `<div class="split" role="img" aria-label="Open value by stage">${a.split.filter(x=>x[0]).map(x=>`<i style="flex:${x[0]/t};background:${x[1]}"></i>`).join('')}</div>`; };
+const mono = (a, cls='') => `<span class="mono ${cls}" style="background:${a.bg}">${a.mono}</span>`;
+
+/* Shared header: same type and numbers as Reports */
+function head(){
+  return `<div class="top-bar"><span><b>Accounts</b><span class="sync">· Synced 2 min ago</span></span><button class="ask-btn"><img src="${FACE}" alt="">Ask about this page</button></div>
+  <div class="head">
+    <div><div class="eyebrow">My accounts · figures as of today 06:00</div><h2>Accounts</h2>
+      <div class="pills"><button class="pill on">All <span class="n">4</span></button><button class="pill">Oman <span class="n">2</span></button><button class="pill">UAE <span class="n">1</span></button><button class="pill">India <span class="n">1</span></button><span class="vsep"></span><button class="pill">Needs attention <span class="n">2</span></button></div></div>
+    <div class="heads">
+      <div class="hd">${big(2.55)}<div class="lbl">Open pipeline</div></div>
+      <div class="hd">${big(1.07)}<div class="lbl">Won this year</div></div>
+      <div class="hd"><span class="big"><span data-count="14" data-dec="0" data-pre="">14</span></span><div class="lbl">Contacts</div></div>
+    </div>
+  </div>`;
+}
+const insight = (lnk) => `<div class="ins"><img src="${FACE}" alt=""><p><b>2 accounts need you.</b> Gulf Harbor closes Monday with pricing still open, and Muscat Municipality has been quiet for <span class="nb">18 days.</span></p>${lnk?`<button class="lnk" data-filter="attn">Show them</button>`:''}</div>`;
+
+/* ---------- A ---------- */
+function viewA(){
+  return head() + insight(true) + `<div class="a-grid">${ACC.map(a=>`<button class="card ac" data-acc="${a.k}">
+    <div class="ac-top">${mono(a)}<span class="nm"><b>${a.name}</b><small>${a.sub}${a.owner?` · owner ${a.owner}`:''}</small></span><span class="flag ${a.status[0]}">${a.status[1]}</span></div>
+    <div class="ac-num"><div>${big(a.open)}<div class="lbl">Open · ${a.deals} deal${a.deals>1?'s':''}</div></div><div class="won">Won this year<b>${a.won}</b></div></div>
+    <div>${split(a)}<div class="legend"><span style="--c:var(--tick)">Discovery</span><span style="--c:var(--ink)">Proposal</span><span style="--c:var(--cyan)">Negotiation</span></div></div>
+    <div class="ac-foot"><span class="av-stack">${a.people.slice(0,3).map(p=>av(p)).join('')}</span><span>${a.people[0][1]}</span><span class="nx">Next: <b>${a.next[0]}</b> · ${a.next[1]}</span></div>
+  </button>`).join('')}</div>`;
+}
+
+/* ---------- B ---------- */
+function viewB(){
+  return head() + insight(true) + `<div class="card tbl"><table>
+    <thead><tr><th>Account</th><th>Main contact</th><th class="r">Open</th><th>Last 60 days</th><th>Next</th><th></th></tr></thead>
+    <tbody>${ACC.map(a=>`<tr data-acc="${a.k}">
+      <td><div class="cell">${mono(a,'sm')}<span><b>${a.name}${a.owner?`<span class="owner">${a.owner}</span>`:''}</b><small>${a.sub}</small></span></div></td>
+      <td><div class="cell">${av(a.people[0])}<span>${a.people[0][1]}<small>${a.people[0][3].replace(' · main contact','')}</small></span></div></td>
+      <td class="r">${big(a.open,'amt')}<small class="muted" style="display:block;margin-top:4px;font-size:12px">${a.deals} deal${a.deals>1?'s':''}</small></td>
+      <td>${barcode(a.k.length*17+3, a.bc)}<small class="muted" style="display:block;margin-top:4px;font-size:12px">${a.last}</small></td>
+      <td><span class="flag ${a.status[0]}">${a.status[1]}</span><small class="muted" style="display:block;margin-top:4px;font-size:12px">${a.next[0]} · ${a.next[1]}</small></td>
+      <td class="r muted">${svg('next').replace('<svg','<svg style="width:16px;height:16px"')}</td>
+    </tr>`).join('')}</tbody></table></div>
+    <aside class="drawer" id="drawer" aria-label="Account record"><button class="x" data-close aria-label="Close">×</button><div id="drawer-in"></div></aside>`;
+}
+
+/* ---------- C ---------- */
+let cSel = null;
+function viewC(){
+  return head() + `<div class="c-grid"><div class="c-list">${ACC.map(a=>`<button class="cl ${cSel===a.k?'sel':''}" data-acc="${a.k}">
+      ${mono(a)}<span><b>${a.name}</b><small>${a.sub}${a.owner?` · owner ${a.owner}`:''}</small></span>
+      <span class="bcw">${barcode(a.k.length*17+3, a.bc)}<small>${a.last}</small></span>
+      <span class="amt">${big(a.open)}<small>${a.status[1]}</small></span>
+    </button>`).join('')}</div>
+    <aside class="card brief" id="brief" aria-live="polite">${cSel?briefOf(cSel):briefSum()}</aside></div>`;
+}
+function briefSum(){
+  return `<div class="brief-hi"><img src="${FACE}" alt=""><span><b>Your accounts this week</b><small>Watching 4 accounts and 14 contacts</small></span></div>
+    <p>Two need you:</p>
+    <div class="sum-list"><button data-acc="gulf"><span><b>Gulf Harbor</b> · closes Monday, pricing open</span>${svg('next')}</button><button data-acc="muscat"><span><b>Muscat</b> · quiet for 18 days</span>${svg('next')}</button></div>
+    <p class="muted" style="font-size:12.5px">Pick any account and I'll brief you on it.</p>`;
+}
+function briefOf(k){
+  const a=ACC.find(x=>x.k===k);
+  return `<button class="back" data-back>${svg('prev')}All accounts</button>
+    <div class="brief-hi">${mono(a)}<span><b>${a.name}</b><small>${a.sub} · open ${fmt(a.open)[0]}${fmt(a.open)[1]}${fmt(a.open)[2]}</small></span></div>
+    <p>${a.brief}</p>
+    <div class="sec-h">People</div><div class="people">${a.people.slice(0,3).map(p=>`<div class="person">${av(p)}<span>${p[1]}<small>${p[3]}</small></span></div>`).join('')}</div>
+    <div class="sec-h">Deals</div><div>${a.dl.map(d=>`<div class="deal"><span>${d[0]}<br><small class="muted">${d[1]}</small></span>${d[3]?`<span class="flag ${d[3][0]}" style="flex:0 0 auto">${d[3][1]}</span>`:''}<em>${d[2]}</em></div>`).join('')}</div>
+    <div class="sec-h">To do</div><div>${a.todo.map(t=>`<div class="todo"><i></i><span>${t[0]}<small>${t[1]}</small></span></div>`).join('')}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn">${svg('mail')}Email ${a.people[0][1].split(' ')[0]}</button><button class="btn ghost">Open record</button></div>
+    <div class="src">Based on ${a.deals} deal${a.deals>1?'s':''} · ${a.people.length} contacts · mail and meetings, last 60 days</div>`;
+}
+function swapBrief(html){
+  const b=$('#brief'); if(!b) return;
+  if(REDUCED){ b.innerHTML=html; return; }
+  const out=b.animate([{opacity:0}],{duration:120,fill:'forwards'});
+  out.onfinish=()=>{ out.cancel(); b.innerHTML=html; b.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.7,.2,1)'}); };
+}
+
+/* ---------- Motion (same as Reports: small rise + fade, numbers count up, barcodes grow) ---------- */
+function countUp(root){
+  root.querySelectorAll('[data-count]').forEach(n=>{
+    const t=+n.dataset.count, dec=+n.dataset.dec, pre=n.dataset.pre||'', f=v=>pre+v.toFixed(dec);
+    if(REDUCED){ n.textContent=f(t); return; }
+    const from=t*.62, t0=performance.now()+180, d=900; n.textContent=f(from);
+    const step=now=>{ const k=Math.max(0,Math.min(1,(now-t0)/d)), e=1-Math.pow(1-k,3); n.textContent=k<1?f(from+(t-from)*e):f(t); if(k<1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+function enter(){
+  const mn=$('#mn'); countUp(mn); if(REDUCED) return;
+  const ease='cubic-bezier(.2,.7,.2,1)';
+  [...mn.querySelectorAll('.head, .ins, .ac, .tbl tbody tr, .cl, .brief')].forEach((el,i)=>
+    el.animate([{opacity:0, transform:'translateY(8px)'},{opacity:1, transform:'none'}],{duration:320, delay:Math.min(i,10)*60, easing:ease, fill:'backwards'}));
+  mn.querySelectorAll('.bc rect').forEach((r,i)=>{ r.style.transformBox='fill-box'; r.style.transformOrigin='bottom'; r.animate([{transform:'scaleY(0)'},{transform:'none'}],{duration:420, delay:200+(i%60)*5, easing:ease, fill:'backwards'}); });
+  mn.querySelectorAll('.split i').forEach((b,i)=>{ b.style.transformOrigin='left'; b.animate([{transform:'scaleX(0)'},{transform:'none'}],{duration:560, delay:300+i*70, easing:ease, fill:'backwards'}); });
+}
+
+/* ---------- Notes ---------- */
+const NOTES = {
+  A:{t:'A · 客戶卡片牆', s:'每個客戶一張卡',
+     how:'每張卡放公司色塊、國家與產業、狀態標籤、細字大數字（open pipeline）、各階段比例條、聯絡人頭像和<span class="nb">下一個待辦。</span>點卡片開紀錄面板。',
+     fit:'精緻感最強，和 Reports 的 bento 卡<span class="nb">最一致。</span><span class="nb">客戶少的業務</span>一眼就看完。',
+     cost:'客戶一多（20 到 50 個）就變成很長的牆，難以掃讀和比較。要排序或比金額時<span class="nb">不如表格。</span>',
+     ai:'上方一條 AI 洞察，「Show them」<span class="nb">直接篩出需要處理的客戶。</span>'},
+  B:{t:'B · 精修表格', s:'保留表格，換外框和欄位',
+     how:'表格放進 20px 圓角白卡。欄位換成客戶色塊、<span class="nb">聯絡人頭像</span>、細字大數字金額、60 天活動條碼和<span class="nb">下一步。</span>負責人<span class="nb">不是自己才顯示，</span>整列可點，<span class="nb">右側滑出紀錄。</span>',
+     fit:'筆數多也好用，排序、比較最直接。改動最小，<span class="nb">工程最容易做。</span>',
+     cost:'精緻感提升有限，本質還是一張表。和 Pipeline「點了就簡報」的<span class="nb">操作不同。</span>',
+     ai:'同 A 的洞察條。紀錄面板裡沒有 AI 摘要，<span class="nb">要問就按標題列。</span>'},
+  C:{t:'C · 清單加簡報', s:'和 Pipeline 同一套操作',
+     how:'左邊是精修過的客戶列：色塊、名稱、活動條碼、金額和狀態。右邊固定一張 AI 簡報卡：沒選時列出需要處理的客戶，點了換成該客戶的摘要、<span class="nb">聯絡人</span>、案子、待辦和<span class="nb">下一步按鈕。</span>',
+     fit:'Workspace 三頁變成同一套語言：Reports <span class="nb">看數字，</span>Pipeline 和 Accounts 都是<span class="nb">「左邊挑、</span><span class="nb">右邊 AI 簡報」。</span>右邊填滿留白，筆數多也能用。',
+     cost:'右邊的簡報和紀錄面板功能重疊，建議 Accounts 改用簡報、拿掉紀錄面板。手機上點了才<span class="nb">從下方滑出。</span>',
+     ai:'AI 是頁面的一部分：簡報、提醒、<span class="nb">「Email Omar」</span>都在右邊。'}
+};
+function renderNote(o){
+  const n=NOTES[o];
+  $('#note').innerHTML=`<h3>${n.t}<small>${n.s}</small></h3>
+    <div><dt>做法</dt><dd>${n.how}</dd></div><div><dt>AI 在哪裡</dt><dd>${n.ai}</dd></div><div><dt>適合</dt><dd>${n.fit}</dd></div><div><dt>代價</dt><dd>${n.cost}</dd></div>`;
+}
+
+/* ---------- Interactions ---------- */
+let current='A';
+function show(o){
+  current=o;
+  document.querySelectorAll('.seg button[data-opt]').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.opt===o)));
+  renderNote(o);
+  $('#mn').innerHTML = o==='A'?viewA():o==='B'?viewB():viewC();
+  enter();
+  try{ localStorage.setItem('acc-proposal', o); }catch(e){}
+}
+document.querySelectorAll('.seg button[data-opt]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.opt)));
+$('#replay').addEventListener('click',()=>show(current));
+$('#mn').addEventListener('click', e=>{
+  const t=e.target;
+  if(t.closest('.ask-btn')){ toast('開一則帶著這一頁資訊的新對話（原型裡已經可以用）'); return; }
+  if(t.closest('[data-filter]')){ toast('篩出 Gulf Harbor 和 Muscat Municipality'); return; }
+  if(t.closest('.pill')){ toast('篩選在提案裡是示意'); return; }
+  if(t.closest('[data-close]')){ $('#drawer').classList.remove('open'); document.querySelectorAll('.tbl tr.sel').forEach(r=>r.classList.remove('sel')); return; }
+  if(t.closest('[data-back]')){ cSel=null; document.querySelectorAll('.cl').forEach(c=>c.classList.remove('sel')); swapBrief(briefSum()); return; }
+  if(t.closest('.brief .btn')){ toast(t.closest('.btn').classList.contains('ghost')?'開完整紀錄':'開一則對話，帶著這個客戶起草信件'); return; }
+  const a=t.closest('[data-acc]'); if(!a) return;
+  const k=a.dataset.acc;
+  if(current==='A'){ toast(`開 ${ACC.find(x=>x.k===k).name} 的紀錄面板`); return; }
+  if(current==='B'){
+    document.querySelectorAll('.tbl tr').forEach(r=>r.classList.toggle('sel', r.dataset.acc===k));
+    $('#drawer-in').innerHTML = briefOf(k).replace(/<button class="back"[\s\S]*?<\/button>/,'').replace(/<p>[\s\S]*?<\/p>/,'');
+    $('#drawer').classList.add('open'); return;
+  }
+  cSel=k; document.querySelectorAll('.cl').forEach(c=>c.classList.toggle('sel', c.dataset.acc===k)); swapBrief(briefOf(k));
+});
+let tt; function toast(m){ let t=$('#pp-toast'); if(!t){ t=document.createElement('div'); t.id='pp-toast'; t.setAttribute('role','status');
+  t.style.cssText='position:fixed;top:18px;left:50%;transform:translateX(-50%);padding:9px 16px;border-radius:8px;background:#052870;color:#fff;font-size:13px;z-index:9;transition:opacity .2s'; document.body.appendChild(t); }
+  t.textContent=m; t.style.opacity=1; clearTimeout(tt); tt=setTimeout(()=>t.style.opacity=0,1800); }
+
+let start='A'; try{ start=localStorage.getItem('acc-proposal')||'A'; }catch(e){}
+show(start);
+</script>
+</body>
+</html>

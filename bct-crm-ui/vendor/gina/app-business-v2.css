@@ -1,0 +1,2432 @@
+/*
+ * Gina business theme
+ * Alternate visual direction for index-business.html. This file intentionally
+ * leaves the existing app.css and production prototype unchanged.
+ */
+
+body.business-theme {
+  --layout-chat-max-width: 900px;
+  --review-panel-width: clamp(320px, 28vw, 440px);
+  --bg-app: #f6f8fb;
+  --bg-canvas: #f6f8fb;
+  --bg-shell-warm: #e4e9ef;
+  --bg-surface: #ffffff;
+  --bg-raised: #ffffff;
+  --bg-field: #f4f6f9;
+  --bg-hover: #e9eef5;
+  --bg-selected: #e7eef9;
+  --border-subtle: #e9edf4;
+  --border-default: #e1e6ef;
+  --border-strong: #aeb9c8;
+  --border-focus: #245bb0;
+  --focus-ring: #245bb0;
+  --text-primary: #172033;
+  --text-secondary: #344258;
+  --text-tertiary: #56657a;
+  --text-placeholder: #8490a1;
+  --icon-default: #4d5b70;
+  --icon-muted: #778397;
+  --accent-blue-bg: #e7effb;
+  --accent-blue-border: #9cb8df;
+  --accent-blue-fg: #24569a;
+  --agent-sales-bg: #f1edfa;
+  --agent-sales-fg: #766493;
+  --agent-test-bg: #f9e9e2; /* L: clay, tuned from #D97757 */
+  --agent-test-fg: #b35f43;
+  --agent-translate-bg: #eaf5f1;
+  --agent-translate-fg: #527b70;
+  --action-primary-bg: #285dd1;
+  --action-primary-bg-hover: #214fba;
+  --action-primary-fg: #ffffff;
+  --action-secondary-bg: #ffffff;
+  --action-secondary-bg-hover: #edf1f6;
+  --action-secondary-border: #e1e6ef;
+  --action-secondary-fg: #344258;
+  --shadow-focus: 0 0 0 3px rgb(36 91 176 / 12%);
+  background: #f6f8fb;
+  color: var(--text-primary);
+  letter-spacing: 0;
+}
+
+/* Agent pages inherit the Agent's identity colour across interactive states. */
+body.business-theme.specialist {
+  --bg-app: #f6f8fb;
+  --bg-canvas: #f6f8fb;
+  --bg-selected: #eee9f7;
+  --border-focus: #806ba1;
+  --focus-ring: #806ba1;
+  --accent-blue-bg: var(--agent-sales-bg);
+  --accent-blue-border: #cfc3e2;
+  --accent-blue-fg: var(--agent-sales-fg);
+  --action-primary-bg: #806ba1;
+  --action-primary-bg-hover: #6f5b90;
+  --shadow-focus: 0 0 0 3px rgb(118 100 147 / 14%);
+}
+
+body.business-theme.specialist[data-agent="test"] {
+  --bg-selected: #f8e5dc;
+  --border-focus: #c4674a;
+  --focus-ring: #c4674a;
+  --accent-blue-bg: var(--agent-test-bg);
+  --accent-blue-border: #efc8b8;
+  --accent-blue-fg: var(--agent-test-fg);
+  --action-primary-bg: #c4674a;
+  --action-primary-bg-hover: #a9553b;
+  --shadow-focus: 0 0 0 3px rgb(179 95 67 / 14%);
+}
+
+body.business-theme.specialist[data-agent="translate"] {
+  --bg-selected: #e4f1ed;
+  --border-focus: #5d897d;
+  --focus-ring: #5d897d;
+  --accent-blue-bg: var(--agent-translate-bg);
+  --accent-blue-border: #bddbd2;
+  --accent-blue-fg: var(--agent-translate-fg);
+  --action-primary-bg: #5d897d;
+  --action-primary-bg-hover: #4d7469;
+  --shadow-focus: 0 0 0 3px rgb(82 123 112 / 14%);
+}
+
+body.business-theme::before {
+  inset: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--bg-canvas);
+  box-shadow: none;
+}
+
+/* App frame — sidebar width is user-adjustable (see #sidebar-resizer) */
+:root { --sidebar-w: 252px; }
+
+body.business-theme .sidebar {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--sidebar-w);
+  padding: 18px 14px;
+  border: 0;
+  border-right: 1px solid var(--border-subtle);
+  border-radius: 0;
+  background: var(--bg-surface);
+  box-shadow: none;
+}
+
+body.business-theme .main {
+  top: 14px;
+  right: 14px;
+  bottom: 14px;
+  left: calc(var(--sidebar-w) + 14px);
+  padding-top: 66px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.business-theme .header {
+  top: 27px;
+  right: 28px;
+  left: calc(var(--sidebar-w) + 28px);
+  padding: 0 8px;
+}
+
+body.business-theme.collapsed .main { left: 14px; }
+body.business-theme.collapsed .header { left: 62px; }
+body.business-theme.collapsed .sidebar {
+  transform: translateX(calc(-100% - 2px));
+  pointer-events: none;
+}
+
+/* Sidebar navigation */
+/* Brand row: panel toggle on the left, wordmark beside it (see Claude sidebar reference). */
+body.business-theme .sidebar-brand {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  margin-bottom: 10px;
+  padding: 0 10px 0 46px;
+}
+
+body.business-theme .sidebar-brand img {
+  display: block;
+  width: auto;
+  height: 15px;
+}
+
+body.business-theme .side-top {
+  display: grid;
+  gap: 0;
+  padding: 0;
+}
+
+/* Plain sidebar rows: Outlook, 新對話, agents, account */
+body.business-theme .side-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  box-shadow: none;
+}
+
+body.business-theme .side-nav-item > span:not(.avatar-d):not(.outlook-tag-dot) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.business-theme .side-nav-item .i {
+  width: 16px;
+  height: 16px;
+  color: var(--icon-muted);
+}
+
+body.business-theme .side-nav-item:hover,
+body.business-theme .side-nav-item.active {
+  border-color: transparent;
+  background: var(--bg-field);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+body.business-theme .side-nav-item:hover .i,
+body.business-theme .side-nav-item.active .i { color: var(--text-primary); }
+
+body.business-theme .side-nav-item.active { background: var(--bg-selected); }
+
+/* 新對話 is an action, not a location: no selected state. */
+body.business-theme .btn-new.active,
+body.business-theme .btn-new.active:hover {
+  background: transparent;
+  color: var(--text-secondary);
+}
+body.business-theme .btn-new:hover { background: var(--bg-field); color: var(--text-primary); }
+
+body.business-theme .side-agents { padding: 4px 0 0; }
+body.business-theme .btn-new,
+body.business-theme .side-agents .side-nav-item {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  column-gap: 10px;
+  padding-left: 6px;
+}
+body.business-theme .btn-new > .i { justify-self: center; }
+body.business-theme .side-agents .side-nav-item > .i {
+  width: 26px;
+  height: 26px;
+  padding: 5px;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+body.business-theme .side-bottom {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+body.business-theme .side-bottom .user-btn {
+  height: 44px;
+  padding: 0 6px;
+}
+
+body.business-theme .side-bottom .avatar-d {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+body.business-theme .side-bottom .chev { margin-left: auto; }
+
+/* Profile menu: connector row with a switch (reference: Claude connectors submenu) */
+body.business-theme #pop-user { width: 264px; }
+body.business-theme .menu-label {
+  padding: 6px 12px 4px;
+  color: #647187;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .07em;
+}
+body.business-theme .menu-switch { cursor: default; }
+body.business-theme .menu-switch:hover { background: transparent; }
+body.business-theme .menu-switch-text { flex: 1; min-width: 0; display: grid; gap: 1px; }
+body.business-theme .menu-switch-text b { font-weight: 500; }
+body.business-theme .menu-switch-text small { font-size: 12px; color: var(--text-tertiary); }
+body.business-theme .locale-trigger-copy { flex: 1; min-width: 0; display: grid; gap: 1px; }
+body.business-theme .locale-trigger-copy small { color: var(--text-tertiary); font-size: 12px; }
+body.business-theme .locale-trigger .locale-chevron { width: 14px; height: 14px; transition: transform 150ms ease-out; }
+body.business-theme .locale-trigger[aria-expanded="true"] .locale-chevron { transform: translateX(2px); }
+body.business-theme .locale-popover {
+  position: fixed;
+  z-index: calc(var(--z-popover) + 1);
+  width: 272px;
+  max-width: calc(100vw - 24px);
+  padding: 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgb(28 42 61 / 14%);
+}
+body.business-theme .locale-popover[hidden] { display: none; }
+body.business-theme .locale-search-wrap { position: relative; margin-bottom: 6px; }
+body.business-theme .locale-search-wrap > .i {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  color: var(--icon-muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+body.business-theme .locale-search-wrap input {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px 0 32px;
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  background: var(--bg-field);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+body.business-theme .locale-search-wrap input:focus {
+  border-color: var(--border-focus);
+  background: #ffffff;
+  box-shadow: var(--shadow-focus);
+}
+body.business-theme .locale-options {
+  max-height: min(312px, calc(100dvh - 112px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+body.business-theme .locale-options .menu-item {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 9px;
+  font-size: 13px;
+}
+body.business-theme .locale-options .menu-item small { color: var(--text-tertiary); font-size: 11px; font-weight: 400; }
+body.business-theme .locale-options .locale-check { width: 15px; height: 15px; visibility: hidden; color: var(--accent-blue-fg); }
+body.business-theme .locale-options .menu-item[aria-checked="true"] { background: var(--bg-field); color: var(--text-primary); font-weight: 600; }
+body.business-theme .locale-options .menu-item[aria-checked="true"] .locale-check { visibility: visible; }
+body.business-theme .locale-empty { padding: 22px 12px; color: var(--text-tertiary); font-size: 13px; text-align: center; }
+body.business-theme .locale-empty[hidden] { display: none; }
+body.business-theme .switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--border-default);
+  transition: background 150ms ease-out;
+}
+body.business-theme .switch > span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(28 42 61 / 25%);
+  transition: transform 150ms ease-out;
+}
+body.business-theme .switch[aria-checked="true"] { background: var(--action-primary-bg); }
+body.business-theme .switch[aria-checked="true"] > span { transform: translateX(14px); }
+
+body.business-theme .side-search {
+  position: relative;
+  margin: 0 6px 8px;
+}
+
+body.business-theme .side-search .i {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  width: 15px;
+  height: 15px;
+  transform: translateY(-50%);
+  color: var(--icon-muted);
+  pointer-events: none;
+}
+
+body.business-theme .side-search input {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px 0 36px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+}
+
+body.business-theme .side-search input::placeholder { color: var(--text-placeholder); }
+body.business-theme .side-search input::-webkit-search-cancel-button { display: none; }
+body.business-theme .side-search input:hover { border-color: var(--border-strong); }
+body.business-theme .side-search input:focus { border-color: var(--accent-blue-border); box-shadow: 0 0 0 3px var(--accent-blue-bg); }
+
+/* History shares the same left edge as the rows above it. */
+body.business-theme .side-scroll { padding: 0 0 12px; scrollbar-gutter: stable; }
+body.business-theme .side-top { position: relative; z-index: 1; padding-bottom: 6px; }
+body.business-theme .side-top::after {
+  content: '';
+  position: absolute;
+  left: -14px;
+  right: -14px;
+  bottom: 0;
+  height: 1px;
+  background: var(--border-subtle);
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+body.business-theme.side-scrolled .side-top::after { opacity: 1; }
+
+/* Collapsible history: the label row is the toggle. */
+body.business-theme .history-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  margin: 14px 0 2px;
+  padding: 0 6px;
+  border-radius: 5px;
+  color: #647187;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+body.business-theme .history-summary::-webkit-details-marker { display: none; }
+body.business-theme .history-summary:hover { background: var(--bg-field); color: var(--text-primary); }
+body.business-theme .history-chevron {
+  width: 13px;
+  height: 13px;
+  color: var(--icon-muted);
+  transition: transform 150ms ease-out;
+}
+body.business-theme .history-group:not([open]) .history-chevron { transform: rotate(-90deg); }
+
+body.business-theme .hist {
+  position: relative;
+  height: 36px;
+  padding: 0 11px 0 14px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+body.business-theme .hist-row { position: relative; }
+body.business-theme .hist-row .hist { padding-right: 34px; }
+body.business-theme .hist { gap: 10px; padding-left: 6px; }
+body.business-theme .spec-only .side-label { margin-left: 6px; margin-right: 0; }
+body.business-theme .spec-only .spec-empty { padding-left: 6px; }
+
+/* Status dot: hollow = idle, filled grey = open, breathing blue = replying, solid blue = new reply unread */
+body.business-theme .hist-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  box-sizing: border-box;
+}
+body.business-theme .hist.active .hist-dot { border-color: var(--text-secondary); background: var(--text-secondary); }
+body.business-theme .hist-dot.is-unread,
+body.business-theme .hist.active .hist-dot.is-unread { border-color: var(--action-primary-bg); background: var(--action-primary-bg); }
+body.business-theme .hist-dot.is-loading,
+body.business-theme .hist.active .hist-dot.is-loading {
+  border-color: var(--action-primary-bg);
+  background: var(--action-primary-bg);
+  animation: hist-breathe 1.6s ease-in-out infinite;
+}
+@keyframes hist-breathe {
+  0%, 100% { opacity: .35; transform: scale(.8); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.business-theme .hist-dot.is-loading { animation: none; opacity: 1; }
+}
+
+body.business-theme .hist-more {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--icon-muted);
+  opacity: 0;
+  transform: translateY(-50%);
+}
+body.business-theme .hist-more .i { width: 15px; height: 15px; }
+body.business-theme .hist-row:hover .hist-more,
+body.business-theme .hist-row:focus-within .hist-more,
+body.business-theme .hist-row.menu-open .hist-more,
+body.business-theme .hist-row.active .hist-more { opacity: 1; }
+body.business-theme .hist-more:hover,
+body.business-theme .hist-row.menu-open .hist-more { background: var(--bg-selected); color: var(--text-primary); }
+body.business-theme .hist-row.menu-open .hist { border-color: var(--border-subtle); background: var(--bg-field); }
+
+body.business-theme .history-group[hidden] { display: none; }
+body.business-theme #pop-hist { width: 180px; }
+
+body.business-theme .hist:hover {
+  border-color: var(--border-subtle);
+  background: var(--bg-field);
+}
+
+body.business-theme .hist.active {
+  border-color: transparent;
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+body.business-theme .hist-row.active .hist:hover { background: var(--bg-hover); }
+
+/* Agent history selection follows each Agent's icon colour. */
+body.business-theme.specialist .spec-only .hist.active,
+body.business-theme.specialist .spec-only .hist-row.active .hist:hover {
+  background: var(--agent-sales-bg);
+  color: var(--agent-sales-fg);
+}
+body.business-theme.specialist .spec-only .hist.active .hist-dot {
+  border-color: var(--agent-sales-fg);
+  background: var(--agent-sales-fg);
+}
+body.business-theme.specialist[data-agent="test"] .spec-only .hist.active,
+body.business-theme.specialist[data-agent="test"] .spec-only .hist-row.active .hist:hover {
+  background: var(--agent-test-bg);
+  color: var(--agent-test-fg);
+}
+body.business-theme.specialist[data-agent="test"] .spec-only .hist.active .hist-dot {
+  border-color: var(--agent-test-fg);
+  background: var(--agent-test-fg);
+}
+body.business-theme.specialist[data-agent="translate"] .spec-only .hist.active,
+body.business-theme.specialist[data-agent="translate"] .spec-only .hist-row.active .hist:hover {
+  background: var(--agent-translate-bg);
+  color: var(--agent-translate-fg);
+}
+body.business-theme.specialist[data-agent="translate"] .spec-only .hist.active .hist-dot {
+  border-color: var(--agent-translate-fg);
+  background: var(--agent-translate-fg);
+}
+
+body.business-theme .collapse-btn {
+  top: 22px;
+  left: 20px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--icon-muted);
+  box-shadow: none;
+  transform: none;
+}
+
+body.business-theme .collapse-btn:hover {
+  border-color: var(--accent-blue-border);
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue-fg);
+}
+
+body.business-theme .collapse-btn .i { width: 15px; height: 15px; }
+
+body.business-theme.collapsed .collapse-btn {
+  top: 22px;
+  left: 20px;
+  transform: none;
+}
+
+/* Header controls */
+body.business-theme .agents-menu-btn,
+body.business-theme .outlook-tag {
+  height: 30px;
+  border-color: var(--border-default);
+  border-radius: 5px;
+  background: #ffffff;
+  color: var(--text-secondary);
+}
+
+body.business-theme .agents-menu-btn:hover,
+body.business-theme .agents-menu-btn.active,
+body.business-theme .outlook-tag:hover,
+body.business-theme .outlook-tag.active {
+  border-color: var(--accent-blue-border);
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue-fg);
+}
+
+body.business-theme .avatar-d { border-radius: 4px; background: #e8ecf2; }
+
+/* Home */
+body.business-theme .hero { padding-top: clamp(38px, 8vh, 86px); }
+
+body.business-theme .hero-title { display: flex; align-items: center; gap: 14px; }
+body.business-theme .hero-avatar {
+  position: relative;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+/* The home orb doubles as the visual style switcher. */
+body.business-theme .hero-avatar[role="button"] {
+  cursor: pointer;
+  transition: transform 180ms ease-out, filter 180ms ease-out;
+}
+body.business-theme .hero-avatar[role="button"]:hover {
+  transform: translateY(-2px) scale(1.035);
+  filter: saturate(1.12);
+}
+body.business-theme .hero-avatar[role="button"]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.business-theme .hero-avatar[role="button"] {
+    transition: none;
+  }
+  body.business-theme .hero-avatar[role="button"]:hover {
+    transform: none;
+  }
+}
+body.business-theme .hero h1 {
+  margin: 0;
+  color: #10182a;
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -.025em;
+}
+
+body.business-theme .hero .desc {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--text-secondary);
+  white-space: normal;
+  overflow: visible;
+}
+
+body.business-theme .chip,
+body.business-theme .reply-option {
+  min-height: 36px;
+  padding-right: 14px;
+  padding-left: 14px;
+  border-color: var(--border-default);
+  border-radius: 5px;
+  background: #ffffff;
+  color: var(--text-secondary);
+  box-shadow: 0 1px 2px rgb(28 42 61 / 4%);
+}
+
+body.business-theme .chip:hover,
+body.business-theme .reply-option:hover {
+  border-color: var(--accent-blue-border);
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue-fg);
+}
+
+/* Composer and chat */
+body.business-theme .bottom { padding-bottom: 0; }
+
+/* Writing area above; tools, Agent and actions share the lower row. */
+body.business-theme .composer {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-height: 96px;
+  padding: 14px 10px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgb(28 42 61 / 6%);
+}
+/* Text starts on the same line as the + glyph (36px button, 20px icon → 8px inset). */
+body.business-theme .composer textarea {
+  width: 100%;
+  min-height: 30px;
+  margin: 0;
+  padding: 0 8px;
+}
+body.business-theme .composer-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 36px;
+}
+body.business-theme .toolbar-spacer { display: block; flex: 1 1 auto; }
+body.business-theme .composer .active-tools {
+  flex: 0 1 auto;
+  min-height: 30px;
+  align-items: center;
+}
+body.business-theme .composer .usage-ring-wrap { height: 36px; }
+
+body.business-theme .composer:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 2px 8px rgb(28 42 61 / 8%);
+}
+
+body.business-theme .composer:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+/* "+" button and the menu it opens (reference: add/tools menu above the composer) */
+body.business-theme .cbtn.plus { width: 36px; height: 36px; border: 0; border-radius: 999px; background: transparent; color: var(--text-secondary); }
+body.business-theme .cbtn.plus .i { width: 20px; height: 20px; }
+body.business-theme .cbtn.plus:hover, body.business-theme .cbtn.plus.open { background: var(--bg-field); color: var(--text-primary); }
+body.business-theme .cbtn.plus .i { transition: transform 150ms ease-out; }
+body.business-theme .cbtn.plus.open .i { transform: rotate(45deg); }
+
+body.business-theme .composer-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 8px);
+  padding: 10px 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgb(28 42 61 / 14%);
+  z-index: 21;
+}
+body.business-theme .composer-menu[hidden] { display: none; }
+body.business-theme .composer-menu-label { padding: 6px 10px 4px; color: var(--text-tertiary); font-size: 12px; }
+body.business-theme .composer-menu-item + .composer-menu-label { margin-top: 6px; }
+body.business-theme .composer-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  text-align: left;
+}
+body.business-theme .composer-menu-item:hover { background: var(--bg-field); }
+body.business-theme .composer-menu-item .i { width: 16px; height: 16px; color: var(--icon-muted); flex-shrink: 0; }
+body.business-theme .composer-menu-item small { flex: 1; min-width: 0; color: var(--text-tertiary); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.business-theme .composer-menu-item .ck { display: none; color: var(--accent-blue-fg); }
+body.business-theme .composer-menu-item[aria-checked="true"] .ck { display: block; }
+body.business-theme .composer-menu-item[aria-checked="true"] > .i:first-child { color: var(--accent-blue-fg); }
+
+/* Enabled tools sit beside the "+" as removable chips (reference: "⊗ Goal") */
+body.business-theme .active-tools { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
+body.business-theme .active-tools:empty { display: none; }
+body.business-theme .tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--accent-blue-border);
+  border-radius: 999px;
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue-fg);
+  font-size: 13px;
+  white-space: nowrap;
+}
+body.business-theme .tool-chip > .i { width: 14px; height: 14px; }
+body.business-theme .tool-chip button {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+}
+body.business-theme .tool-chip button:hover { background: #ffffff; }
+body.business-theme .tool-chip button .i { width: 12px; height: 12px; }
+body.business-theme .tool-chip button:hover .tip { display: block; }
+
+body.business-theme .cbtn { border-radius: 5px; }
+
+/* Mic: plain icon button; pressed = recording */
+body.business-theme .cbtn.mic { color: var(--text-secondary); }
+body.business-theme .cbtn.mic[aria-pressed="true"] { background: var(--accent-blue-bg); color: var(--accent-blue-fg); }
+body.business-theme .cbtn.mic[aria-pressed="true"] .i { animation: mic-breathe 1.4s ease-in-out infinite; }
+@keyframes mic-breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+/* Send: round, blue when there is something to send */
+body.business-theme .cbtn.send,
+body.business-theme .cbtn.send.ready {
+  width: 30px;
+  height: 30px;
+  margin: 3px;
+  border: 0;
+  border-radius: 999px;
+}
+body.business-theme .cbtn.send {
+  background: var(--action-disabled-bg);
+  color: var(--action-disabled-fg);
+}
+body.business-theme .cbtn.send .i { width: 16px; height: 16px; stroke-width: 2.4; }
+body.business-theme .cbtn.send.ready {
+  background: var(--action-primary-bg);
+  color: #ffffff;
+}
+body.business-theme .cbtn.send.ready:hover { background: var(--action-primary-bg-hover); color: #ffffff; }
+@media (prefers-reduced-motion: reduce) {
+  body.business-theme .cbtn.mic[aria-pressed="true"] .i { animation: none; }
+}
+
+body.business-theme .thread { padding-top: 28px; }
+
+/* Replies have no avatar; the column takes the full reading width. */
+body.business-theme .ai-avatar { display: none; }
+body.business-theme .msg-ai { gap: 0; }
+
+/* Replies read as plain text on the canvas (reference: no bubble); user messages keep a light card. */
+body.business-theme .bubble-ai {
+  padding: 2px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+body.business-theme .response-section > p { color: var(--text-secondary); }
+
+body.business-theme .bubble-user {
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgb(28 42 61 / 4%);
+}
+
+/* Follow-up options: no card either, just the question and the choices */
+body.business-theme .clarification-options {
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Loading stays text-only on the workspace canvas. */
+body.business-theme .msg-ai.loading-message .bubble-ai {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Execution details: compact summary, then unboxed resource details with separators. */
+body.business-theme .execution-details { margin: 0 0 10px; font-size: 13px; color: var(--text-secondary); }
+body.business-theme .execution-details summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 0 6px 0 2px;
+  border-radius: 5px;
+  list-style: none;
+  cursor: pointer;
+}
+body.business-theme .execution-details summary::-webkit-details-marker { display: none; }
+body.business-theme .execution-details summary:hover { color: var(--text-primary); }
+body.business-theme .execution-details summary .i { width: 14px; height: 14px; }
+body.business-theme .execution-summary-icon { display: inline-flex; color: var(--status-success-fg); }
+body.business-theme .execution-expand { display: inline-flex; color: var(--icon-muted); }
+body.business-theme .execution-expand .i { transition: transform 150ms ease-out; }
+body.business-theme .execution-details[open] .execution-expand .i { transform: rotate(180deg); }
+body.business-theme .execution-list {
+  width: min(100%, 760px);
+  margin-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+body.business-theme .execution-resource {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+body.business-theme .execution-resource header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 260px;
+  min-width: 0;
+  color: var(--text-primary);
+}
+body.business-theme .execution-resource header strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body.business-theme .execution-status { display: inline-flex; color: var(--status-success-fg); }
+body.business-theme .execution-resource-icon { display: inline-flex; color: var(--icon-muted); }
+body.business-theme .execution-status .i,
+body.business-theme .execution-resource-icon .i { width: 15px; height: 15px; }
+body.business-theme .execution-resource dl { display: flex; flex: 0 1 auto; flex-wrap: wrap; gap: 6px 16px; margin: 0; }
+body.business-theme .execution-resource dl div { display: flex; align-items: baseline; gap: 5px; }
+body.business-theme .execution-resource dt { color: var(--text-tertiary); font-size: 12px; }
+body.business-theme .execution-resource dt::after { content: '：'; }
+body.business-theme .execution-resource dd { margin: 0; color: var(--text-secondary); font-size: 12px; }
+
+body.business-theme .total-badge,
+body.business-theme .tool-count {
+  border-radius: 4px;
+  background: #edf1f6;
+  color: var(--text-secondary);
+}
+
+body.business-theme .document-outline,
+body.business-theme .review-card,
+body.business-theme .response-qa > div {
+  border-color: #e8edf3;
+  border-radius: 6px;
+  background: #fafbfd;
+}
+
+body.business-theme .action-card {
+  border-color: var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-field);
+}
+
+body.business-theme .response-table th {
+  color: #35435a;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+
+body.business-theme .review-card-actions button,
+body.business-theme .review-panel-actions button {
+  border-radius: 4px;
+}
+
+/* Menus, panels and forms */
+body.business-theme .popover,
+body.business-theme #pop-user,
+body.business-theme #pop-agents,
+body.business-theme .skill-add-menu {
+  border-color: var(--border-default);
+  border-radius: 7px;
+  box-shadow: 0 12px 30px rgb(28 42 61 / 14%);
+}
+
+body.business-theme .menu-item,
+body.business-theme .skill-add-option,
+body.business-theme .icon-tile,
+body.business-theme .ok-dot,
+body.business-theme .dropzone,
+body.business-theme .skill-card,
+body.business-theme .skill-form input,
+body.business-theme .skill-form textarea,
+body.business-theme .skill-editor-close,
+body.business-theme .skill-version-control,
+body.business-theme .skill-editor-delete,
+body.business-theme .action-card textarea {
+  border-radius: 5px;
+}
+
+body.business-theme .drawer,
+body.business-theme .review-panel {
+  border-color: var(--border-default);
+  border-radius: 9px;
+  box-shadow: 0 14px 36px rgb(28 42 61 / 14%);
+}
+
+body.business-theme .skill-editor-dialog { background: #f6f8fb; }
+
+body.business-theme .skill-editor-form {
+  border-color: var(--border-default);
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgb(28 42 61 / 5%);
+}
+
+body.business-theme .btn-primary,
+body.business-theme .btn-confirm {
+  border-color: #214fba;
+  border-radius: 5px;
+  background: var(--action-primary-bg);
+  color: #ffffff;
+}
+
+body.business-theme .btn-primary:hover,
+body.business-theme .btn-confirm:hover {
+  border-color: #184888;
+  background: var(--action-primary-bg-hover);
+  color: #ffffff;
+}
+
+body.business-theme .btn-outline,
+body.business-theme .btn-cancel,
+body.business-theme .skill-add-button,
+body.business-theme .btn-danger-outline {
+  border-radius: 5px;
+}
+
+body.business-theme .loading-dots i { background: var(--action-primary-bg); }
+
+@media (max-width: 900px) {
+  :root { --sidebar-w: 220px; }
+}
+
+@media (max-width: 640px) {
+  body.business-theme .sidebar {
+    top: 58px;
+    right: auto;
+    bottom: 10px;
+    left: 10px;
+    width: min(280px, calc(100vw - 20px));
+    padding: 14px;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    background: var(--bg-surface);
+  }
+
+  body.business-theme .main,
+  body.business-theme.collapsed .main {
+    top: 68px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 0;
+    padding-top: 0;
+  }
+
+  body.business-theme .header,
+  body.business-theme.collapsed .header {
+    top: 14px;
+    right: 12px;
+    left: 54px;
+  }
+
+  body.business-theme .collapse-btn,
+  body.business-theme.collapsed .collapse-btn {
+    top: 18px;
+    left: 14px;
+  }
+
+  body.business-theme .drawer,
+  body.business-theme .review-panel,
+  body.business-theme .skill-editor-form { border-radius: 7px; }
+}
+
+/* Preserve the shared push-panel layout with the themed frame selectors. */
+@media (min-width: 641px) {
+  body.business-theme.drawer-panel-open .main,
+  body.business-theme.drawer-panel-open .header {
+    right: calc(var(--layout-drawer-width) + 42px);
+  }
+  body.business-theme.review-panel-open .main,
+  body.business-theme.review-panel-open .header {
+    right: var(--review-panel-width);
+  }
+}
+
+/* Long-form review is a full-height side panel, not a floating card. */
+body.business-theme .review-panel {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--review-panel-width);
+  border: 0;
+  border-left: 1px solid var(--border-default);
+  border-radius: 0;
+  box-shadow: -10px 0 30px rgb(28 42 61 / 8%);
+}
+body.business-theme .review-panel-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 12px;
+  cursor: col-resize;
+  touch-action: none;
+}
+body.business-theme .review-panel-resizer::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1px;
+  width: 2px;
+  background: var(--accent-blue-border);
+  content: '';
+  opacity: .28;
+  transition: opacity 140ms ease-out;
+}
+body.business-theme .review-panel-resizer:hover::after,
+body.business-theme .review-panel-resizer:focus-visible::after,
+body.business-theme.review-panel-resizing .review-panel-resizer::after { opacity: 1; }
+body.business-theme .review-panel-resizer:focus-visible { outline: none; }
+body.business-theme.review-panel-resizing { cursor: col-resize; user-select: none; }
+body.business-theme.review-panel-resizing .review-panel,
+body.business-theme.review-panel-resizing .main,
+body.business-theme.review-panel-resizing .header { transition: none; }
+
+body.business-theme .review-download-control { position: relative; }
+body.business-theme .review-download-menu {
+  top: 36px;
+  right: 0;
+  bottom: auto;
+  z-index: 3;
+}
+body.business-theme .review-download-menu .download-option {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: var(--component-menu-item-height);
+  padding: 0 var(--space-3);
+  text-align: left;
+}
+/* Review panel header: every action is a 32px button with an 18px icon. */
+body.business-theme .review-panel-actions button .i { width: 18px; height: 18px; }
+/* Copy's two squares fill more of the box than the other glyphs; 17px evens out the visual weight. */
+body.business-theme .review-panel-actions [data-action="copy-review"] .i { width: 17px; height: 17px; }
+@media (max-width: 640px) {
+  body.business-theme .review-panel { width: 100vw; border-left: 0; border-radius: 0; }
+  body.business-theme .review-panel-resizer { display: none; }
+}
+
+/* Outlook not connected: hint above the composer with the connect entry point */
+body.business-theme .connect-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--accent-blue-border);
+  border-radius: 7px;
+  background: var(--accent-blue-bg);
+  font-size: 13px;
+}
+body.business-theme .connect-hint[hidden] { display: none; }
+body.business-theme .connect-hint .icon-tile { width: 34px; height: 34px; background: #ffffff; color: var(--accent-blue-fg); }
+body.business-theme .connect-hint > div { flex: 1; min-width: 0; display: grid; gap: 2px; }
+body.business-theme .connect-hint b { font-weight: 600; color: var(--text-primary); }
+body.business-theme .connect-hint > div > span { font-size: 12px; color: var(--text-secondary); }
+body.business-theme .connect-hint .btn-primary { flex: none; height: 32px; padding: 0 12px; font-size: 13px; }
+body.business-theme .hint-close {
+  width: 28px; height: 28px; display: grid; place-items: center; padding: 0;
+  border: 0; border-radius: 5px; background: transparent; color: var(--icon-muted);
+}
+body.business-theme .hint-close:hover { background: #ffffff; color: var(--text-primary); }
+body.business-theme .hint-close .i { width: 14px; height: 14px; }
+
+/* Sidebar resize handle: 8px hit area straddling the right border */
+body.business-theme .sidebar-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 2;
+}
+body.business-theme .sidebar-resizer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 2px;
+  background: var(--accent-blue-border);
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+body.business-theme .sidebar-resizer:hover::after,
+body.business-theme .sidebar-resizer:focus-visible::after,
+body.business-theme.sidebar-resizing .sidebar-resizer::after { opacity: 1; }
+body.business-theme .sidebar-resizer:focus-visible { outline: none; }
+body.business-theme.sidebar-resizing { cursor: col-resize; user-select: none; }
+body.business-theme.sidebar-resizing .sidebar,
+body.business-theme.sidebar-resizing .main,
+body.business-theme.sidebar-resizing .header { transition: none; }
+body.business-theme.collapsed .sidebar-resizer { display: none; }
+@media (max-width: 640px) {
+  body.business-theme .sidebar-resizer { display: none; }
+}
+
+/* Usage ring: context fill, with a dark tooltip on hover/focus */
+body.business-theme .usage-ring-wrap { position: relative; display: flex; align-items: center; margin-right: 2px; }
+body.business-theme .usage-ring {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  cursor: default;
+}
+body.business-theme .usage-ring:hover { background: var(--bg-field); }
+body.business-theme .usage-ring svg { width: 16px; height: 16px; transform: rotate(-90deg); }
+body.business-theme .usage-ring circle { fill: none; stroke-width: 3; }
+body.business-theme .usage-ring .track { stroke: var(--border-default); }
+body.business-theme .usage-ring .value {
+  stroke: var(--action-primary-bg);
+  stroke-linecap: round;
+  stroke-dasharray: var(--pct, 0) 100;
+  transition: stroke-dasharray 300ms ease-out;
+}
+body.business-theme .usage-ring[data-level="mid"] .value { stroke: var(--accent-amber-fg, #94600f); }
+body.business-theme .usage-ring[data-level="high"] .value { stroke: var(--status-danger-fg); }
+body.business-theme .usage-tip {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  display: none;
+  min-width: max-content;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #1b1f24;
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgb(28 42 61 / 22%);
+  z-index: 3;
+}
+body.business-theme .usage-tip b { display: block; font-size: 14px; font-weight: 600; }
+body.business-theme .usage-tip span { display: block; color: #b4bac3; font-size: 12px; }
+body.business-theme .usage-ring-wrap:hover .usage-tip,
+body.business-theme .usage-ring:focus-visible + .usage-tip { display: block; }
+
+/* Home: today's cards are the entry points; generic chips sit quietly below */
+body.business-theme .today {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 720px;
+  margin-top: 28px;
+}
+body.business-theme .today-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--text-primary);
+  text-align: left;
+  box-shadow: 0 1px 2px rgb(28 42 61 / 4%);
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+body.business-theme .today-card:hover {
+  border-color: var(--accent-blue-border);
+  box-shadow: 0 4px 14px rgb(0 20 136 / 8%);
+  transform: translateY(-1px);
+}
+body.business-theme .today-icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue-fg);
+}
+body.business-theme .today-icon .i { width: 16px; height: 16px; }
+body.business-theme .today-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+body.business-theme .today-text b { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.business-theme .today-text small { font-size: 12px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.business-theme .today-go { width: 14px; height: 14px; color: var(--icon-muted); flex: 0 0 auto; }
+body.business-theme .hero .chips { margin-top: 18px; }
+body.business-theme .hero .chip { min-height: 32px; padding: 0 12px; font-size: 13px; box-shadow: none; }
+@media (max-width: 900px) {
+  body.business-theme .today { grid-template-columns: 1fr; max-width: 480px; }
+}
+
+/* Home (no conversation yet): the whole cluster sits in the middle of the canvas, composer included */
+body.business-theme:not(.chatting) .main { padding-top: 0; }
+body.business-theme:not(.chatting) .scroll { display: flex; flex-direction: column; justify-content: center; }
+body.business-theme:not(.chatting) .hero,
+body.business-theme:not(.chatting) .spec-hero { padding-top: 0; padding-bottom: 0; }
+body.business-theme:not(.chatting) .today { margin-top: 24px; }
+body.business-theme:not(.chatting) .hero .chips { margin-top: 14px; }
+
+/* Agent home uses the same hierarchy and template controls as the Gina home. */
+body.business-theme .spec-hero {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+}
+body.business-theme .spec-title { gap: 14px; text-align: left; }
+body.business-theme .spec-title > div {
+  display: flex;
+  min-height: 56px;
+  flex-direction: column;
+  justify-content: center;
+}
+body.business-theme .spec-big {
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue-fg);
+}
+body.business-theme .spec-big .i { width: 22px; height: 22px; }
+body.business-theme.specialist .today-card:hover { box-shadow: 0 4px 14px rgb(118 100 147 / 10%); }
+body.business-theme.specialist[data-agent="test"] .today-card:hover { box-shadow: 0 4px 14px rgb(179 95 67 / 10%); }
+body.business-theme.specialist[data-agent="translate"] .today-card:hover { box-shadow: 0 4px 14px rgb(82 123 112 / 10%); }
+body.business-theme .spec-title h1 { color: var(--text-primary); font-size: 34px; font-weight: 600; letter-spacing: -.025em; }
+body.business-theme .spec-title .s { margin-top: 3px; color: var(--text-tertiary); font-size: 13px; }
+body.business-theme .spec-hero .desc { max-width: 620px; margin-top: 14px; color: var(--text-secondary); font-size: 14px; }
+body.business-theme .spec-hero .today { margin-top: 24px; }
+body.business-theme .spec-hero .chips { margin-top: 14px; }
+body.business-theme .spec-hero .chip { min-height: 32px; padding: 0 12px; font-size: 13px; box-shadow: none; }
+
+/* 新對話: the plus sits in a faint round badge (reference: Claude "+ New") */
+body.business-theme .btn-new .i {
+  width: 24px;
+  height: 24px;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  box-sizing: border-box;
+}
+body.business-theme .btn-new { gap: 10px; padding-left: 6px; }
+body.business-theme .btn-new:hover .i { background: var(--bg-selected); color: var(--text-primary); }
+
+/* ---------- Option A: sidebar stays the same inside an Agent ---------- */
+/* The sidebar never switches mode; only the main area changes. */
+body.business-theme.specialist .sidebar .main-only { display: revert; }
+/* One selected colour for agent rows and chat rows, a step lighter than before (#e9eef5). Stays neutral inside an Agent. */
+body.business-theme { --bg-nav-active: #f1f4f8; }
+body.business-theme .side-agents .side-nav-item.active,
+body.business-theme .side-agents .side-nav-item.active:hover,
+body.business-theme .sidebar .hist.active,
+body.business-theme .sidebar .hist-row.active .hist:hover { background: var(--bg-nav-active); }
+
+/* Agent chats in Recents: a small icon tile in the Agent's colour replaces the status dot. */
+body.business-theme .hist-agent {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-left: -5px;
+  margin-right: -3px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--agent-sales-bg);
+  color: var(--agent-sales-fg);
+}
+body.business-theme .hist-agent .i { width: 12px; height: 12px; }
+body.business-theme .hist-agent[data-agent-key="test"] { background: var(--agent-test-bg); color: var(--agent-test-fg); }
+body.business-theme .hist-agent[data-agent-key="translate"] { background: var(--agent-translate-bg); color: var(--agent-translate-fg); }
+body.business-theme .agent-hist .hist { padding-right: 8px; }
+
+
+/* Chat rows: chat icon on the left; a blue dot on the right only when there is something new (cf. Claude). */
+body.business-theme .hist-ico {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-left: -5px;
+  margin-right: -3px;
+  display: grid;
+  place-items: center;
+  color: var(--icon-muted);
+}
+body.business-theme .hist-ico .i { width: 15px; height: 15px; }
+body.business-theme .hist.active .hist-ico,
+body.business-theme .hist:hover .hist-ico { color: var(--text-secondary); }
+body.business-theme .hist-status {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #3a6fd8; /* same blue on every page, also inside an Agent */
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+body.business-theme .hist-status.is-loading { animation: hist-breathe 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { body.business-theme .hist-status.is-loading { animation: none; } }
+/* The ⋯ button takes the same spot on hover, focus, open menu or the active row. */
+/* Status dot and ⋯ share one spot, never both.
+   Row with a dot: the dot shows (selected or not); hover, keyboard focus or an open menu swaps it for ⋯.
+   visibility (not opacity) so the breathing animation can't bring the dot back. */
+body.business-theme .hist-row:hover .hist-status,
+body.business-theme .hist-row:has(:focus-visible) .hist-status,
+body.business-theme .hist-row.menu-open .hist-status { visibility: hidden; }
+body.business-theme .hist-row:has(.hist-status):not(:hover):not(:has(:focus-visible)):not(.menu-open) .hist-more { opacity: 0; }
+
+/* Recents: every row has a tinted tile. Gina chats in Gina blue, Agent chats in the Agent's colour.
+   Fixed values (not --accent-blue-*) so the Gina tile stays blue inside Agent pages. */
+body.business-theme .hist-ico {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: #eaf1fb;
+  color: #3d6aa8;
+}
+body.business-theme .hist-ico .i { width: 12px; height: 12px; }
+body.business-theme .hist.active .hist-ico,
+body.business-theme .hist:hover .hist-ico { color: #24569a; }
+
+/* 新對話: same rounded-square tile as the Agent rows, in the Gina chat blue. */
+body.business-theme .btn-new .i {
+  width: 26px;
+  height: 26px;
+  padding: 5px;
+  border-radius: 6px;
+  background: #eaf1fb;
+  color: #3d6aa8;
+}
+body.business-theme .side-top .btn-new .i,
+body.business-theme .side-top .btn-new.active .i { color: #3d6aa8; }
+body.business-theme .side-top .btn-new:hover .i { background: #dde8f8; color: #24569a; }
+
+/* 新對話 and the Agents read as one list: no extra gap between them. */
+body.business-theme .side-top { padding-bottom: 0; }
+body.business-theme .side-agents { padding-top: 0; }
+
+/* Chat icons sit inside the hover/selected block with breathing room,
+   centred under the Agent tiles above, titles lined up with the Agent names. */
+body.business-theme .hist-ico,
+body.business-theme .hist-agent { margin-left: 4px; margin-right: 4px; }
+
+/* ---------- Agent home: intro, composer, templates, then this Agent's chats ---------- */
+body.business-theme.specialist:not(.chatting) .scroll { justify-content: flex-start; padding-top: clamp(40px, 12vh, 120px); padding-bottom: 48px; }
+body.business-theme.specialist:not(.chatting) .bottom { display: none; }
+
+body.business-theme .agent-recents { width: 100%; margin-top: 36px; text-align: left; }
+body.business-theme .agent-recents[hidden] { display: none; }
+body.business-theme .agent-recents-list { border-top: 1px solid var(--border-subtle); }
+body.business-theme .agent-recent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+body.business-theme .agent-recent:hover { background: var(--bg-field); }
+body.business-theme .agent-recent-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.business-theme .agent-recent-time { flex: 0 0 auto; color: var(--text-tertiary); font-size: 13px; }
+
+/* ---------- Agent home v2: header + button, examples, empty state (ref: Claude Scheduled tasks / Customize) ---------- */
+body.business-theme .spec-hero { max-width: 880px; align-items: stretch; text-align: left; }
+body.business-theme .agent-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+body.business-theme .spec-hero .desc { max-width: 620px; margin: 14px 0 0; text-align: left; }
+
+/* Primary action: near-black (text-primary navy), white text */
+body.business-theme .agent-new {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  margin-top: 10px;
+  padding: 0 14px 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #172033;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+body.business-theme .agent-new:hover { background: #0b1222; }
+body.business-theme .agent-new .i { width: 16px; height: 16px; color: #fff; }
+
+body.business-theme .agent-section-label { padding: 0 12px 10px; color: var(--text-tertiary); font-size: 13px; font-weight: 500; }
+body.business-theme .agent-examples-wrap { margin-top: 32px; }
+body.business-theme .agent-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 20px; }
+@media (max-width: 760px) { body.business-theme .agent-examples { grid-template-columns: 1fr; } }
+
+/* Empty state: illustration + note, then examples */
+body.business-theme .agent-empty { display: grid; justify-items: center; gap: 14px; margin-top: 40px; padding-bottom: 36px; }
+body.business-theme .agent-empty[hidden] { display: none; }
+body.business-theme .agent-empty-art { width: 120px; height: 96px; }
+body.business-theme .agent-empty-text { margin: 0; color: var(--text-tertiary); font-size: 14px; }
+body.business-theme .agent-examples-wrap.is-empty-state { margin-top: 0; padding-top: 8px; } /* no divider under the empty note */
+body.business-theme .agent-examples-wrap.is-empty-state .agent-section-label { display: none; }
+
+/* Example card base (final look is set further down to match the Gina home cards) */
+body.business-theme .ex-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+body.business-theme .ex-card:hover { background: #eef2f7; }
+body.business-theme .ex-ico {
+  position: relative;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue-fg);
+}
+body.business-theme .ex-ico .i { width: 18px; height: 18px; }
+body.business-theme .ex-text { display: grid; gap: 3px; min-width: 0; }
+body.business-theme .ex-text b { font-size: 15px; font-weight: 600; }
+body.business-theme .ex-desc { color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
+body.business-theme .ex-meta { margin-top: 2px; color: var(--text-tertiary); font-size: 13px; }
+
+/* Drop zone card: dashed outline, lights up while a file is dragged over it */
+body.business-theme .ex-card.ex-drop { border: 1.5px dashed var(--border-strong); background: rgb(255 255 255 / 60%); }
+body.business-theme .ex-card.ex-drop:hover,
+body.business-theme .ex-card.ex-drop.is-dragover { border-color: var(--accent-blue-fg); background: var(--accent-blue-bg); }
+
+/* New Agent chat before the first message */
+body.business-theme .agent-blank { display: grid; justify-items: center; gap: 10px; padding: 18vh 24px 0; text-align: center; }
+body.business-theme .agent-blank-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 10px; background: var(--accent-blue-bg); color: var(--accent-blue-fg); }
+body.business-theme .agent-blank-icon .i { width: 20px; height: 20px; }
+body.business-theme .agent-blank h2 { margin: 6px 0 0; font-size: 22px; font-weight: 600; color: var(--text-primary); }
+body.business-theme .agent-blank p { max-width: 460px; margin: 0; color: var(--text-tertiary); font-size: 14px; line-height: 1.6; }
+
+/* Attached file: chip in the composer, pill on the sent message */
+body.business-theme .file-chip .i { width: 14px; height: 14px; }
+body.business-theme .msg-file { display: inline-flex; align-items: center; gap: 6px; align-self: flex-end; margin-bottom: 6px; padding: 6px 10px; border: 1px solid var(--border-subtle); border-radius: 8px; background: #fff; color: var(--text-secondary); font-size: 13px; }
+body.business-theme .msg-file .i { width: 15px; height: 15px; }
+
+/* Agent chats in the sidebar now have the ⋯ menu too. */
+body.business-theme .agent-hist .hist { padding-right: 34px; }
+
+/* Agent home Pinned / Recents rows: title + time, ⋮ menu on the right. The section label marks pinned rows. */
+body.business-theme #agent-pinned + #agent-recents { margin-top: 28px; }
+body.business-theme .agent-recent-row { position: relative; }
+body.business-theme .agent-recent-row .agent-recent { padding-right: 52px; }
+body.business-theme .agent-recent-title { flex: 1 1 auto; }
+body.business-theme .agent-more {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--icon-muted);
+  opacity: 0;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+body.business-theme .agent-more .i { width: 18px; height: 18px; }
+body.business-theme .agent-recent-row:hover .agent-more,
+body.business-theme .agent-recent-row:focus-within .agent-more,
+body.business-theme .agent-recent-row.menu-open .agent-more { opacity: 1; }
+body.business-theme .agent-more:hover,
+body.business-theme .agent-recent-row.menu-open .agent-more { background: #e4e9f1; color: var(--text-primary); }
+body.business-theme .agent-recent-row:hover .agent-recent,
+body.business-theme .agent-recent-row.menu-open .agent-recent { background: var(--bg-field); }
+
+/* ---------- Example cards match the Gina home cards: white, hairline border, chevron ---------- */
+body.business-theme .agent-examples { gap: 12px; align-items: stretch; }
+body.business-theme .ex-card {
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(28 42 61 / 4%);
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+body.business-theme .ex-card:hover {
+  background: #ffffff;
+  border-color: var(--accent-blue-border);
+  box-shadow: 0 4px 14px rgb(0 20 136 / 8%);
+  transform: translateY(-1px);
+}
+body.business-theme.specialist .ex-card:hover { box-shadow: 0 4px 14px rgb(118 100 147 / 10%); }
+body.business-theme.specialist[data-agent="test"] .ex-card:hover { box-shadow: 0 4px 14px rgb(179 95 67 / 10%); }
+body.business-theme.specialist[data-agent="translate"] .ex-card:hover { box-shadow: 0 4px 14px rgb(82 123 112 / 10%); }
+body.business-theme .ex-ico { width: 34px; height: 34px; }
+body.business-theme .ex-ico .i { width: 16px; height: 16px; }
+body.business-theme .ex-text { flex: 1; gap: 2px; }
+body.business-theme .ex-text b { font-size: 14px; }
+body.business-theme .ex-desc { color: var(--text-tertiary); font-size: 12px; line-height: 1.5; }
+body.business-theme .ex-meta { margin-top: 2px; font-size: 12px; }
+body.business-theme .ex-go { flex: 0 0 auto; width: 14px; height: 14px; color: var(--icon-muted); }
+@media (prefers-reduced-motion: reduce) { body.business-theme .ex-card, body.business-theme .ex-card:hover { transition: none; transform: none; } }
+
+/* Drop zone: same card, dashed outline = "you can drop a file here" */
+body.business-theme .ex-card.ex-drop { border: 1.5px dashed var(--border-strong); background: #ffffff; }
+body.business-theme .ex-card.ex-drop:hover { border-color: var(--accent-blue-fg); background: #ffffff; }
+body.business-theme .ex-card.ex-drop.is-dragover { border-color: var(--accent-blue-fg); background: var(--accent-blue-bg); transform: none; }
+
+/* ---------- Two-line greeting (used by the face style) ---------- */
+body.business-theme .hero-ask { display: none; }
+body.business-theme .hero-ask-grad { color: inherit; } /* was a blue gradient; now the same dark as the rest of the line */
+
+/* ---------- Menu spacing, one rule set ----------
+   popover inset 6px · single-line row 40px · two-line row (label + note) 8px top/bottom, ~54px
+   separator 6px above and below · label 14px / note 12px · icon 17px, 12px gap */
+body.business-theme #pop-user { padding: 6px; }
+body.business-theme #pop-user .menu-sep { margin: 6px 0; }
+body.business-theme #pop-user .menu-item { min-height: 40px; gap: 12px; padding-left: 12px; padding-right: 12px; font-size: 14px; }
+body.business-theme #pop-user .menu-switch,
+body.business-theme #pop-user .locale-trigger { padding-top: 8px; padding-bottom: 8px; }
+body.business-theme #pop-user .menu-switch-text,
+body.business-theme #pop-user .locale-trigger-copy { gap: 2px; line-height: 1.35; }
+body.business-theme #pop-user .menu-switch-text b,
+body.business-theme #pop-user .locale-trigger-copy > span { font-size: 14px; font-weight: 400; }
+body.business-theme #pop-user .menu-switch-text small,
+body.business-theme #pop-user .locale-trigger-copy small { font-size: 12px; }
+
+/* Inline rename: the field sits over the row; the row's own button and ⋯ hide meanwhile. */
+body.business-theme .hist-row.renaming .hist,
+body.business-theme .hist-row.renaming .hist-more,
+body.business-theme .agent-recent-row.renaming .agent-recent,
+body.business-theme .agent-recent-row.renaming .agent-more { visibility: hidden; }
+body.business-theme .rename-input {
+  position: absolute;
+  inset: 2px 0;
+  width: 100%;
+  padding: 0 10px;
+  border: 1px solid var(--border-focus, #2f67d5);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(47 103 213 / 12%);
+}
+
+/* Reply readability: one darker body colour for all running text (was #344258 on paragraphs,
+   #172033 on lists/tables). Headings and bold stay #172033; quote attribution stays secondary. */
+body.business-theme { --text-reply: #1f2a3d; }
+body.business-theme .bubble-ai p,
+body.business-theme .bubble-ai li,
+body.business-theme .bubble-ai td,
+body.business-theme .bubble-ai th,
+body.business-theme .bubble-ai dd,
+body.business-theme .bubble-ai blockquote,
+body.business-theme .bubble-ai blockquote p,
+body.business-theme .rich-response > p:first-child,
+body.business-theme .review-card-content,
+body.business-theme .review-card pre,
+body.business-theme .review-panel-content,
+body.business-theme .review-panel-content p,
+body.business-theme .review-panel-content pre { color: var(--text-reply); }
+
+/* Tables sit in a white frame like the code / long-form cards: clearer row lines on the grey canvas,
+   a tinted header row, and an obvious edge when a wide table scrolls sideways inside the frame. */
+body.business-theme .response-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: #ffffff;
+}
+body.business-theme .response-table th {
+  background: #f4f6f9;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+body.business-theme .response-table th,
+body.business-theme .response-table td { padding: 10px 14px; }
+body.business-theme .response-table tbody tr:last-child td { border-bottom: 0; }
+
+/* Step check: one size below the step's own icon (12px vs 15px), heavier stroke so it stays legible.
+   Keeps the deep success green; running / failed states can reuse this slot later. */
+body.business-theme .execution-status { width: 15px; justify-content: center; }
+body.business-theme .execution-status .i { width: 12px; height: 12px; stroke-width: 2.5; }
+
+
+/* ---------- Home Style 3: face sphere above the two-line greeting ---------- */
+body.business-theme .hero-orb3 { display: none; }
+body.business-theme.hero-style-3 .hero-avatar { display: none; }
+body.business-theme.hero-style-3 .hero-title { flex-direction: column; gap: 14px; text-align: center; }
+body.business-theme.hero-style-3 .hero-orb3 {
+  position: relative;
+  display: block;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+body.business-theme.hero-style-3 .hero-orb3:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 4px; }
+body.business-theme .face-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+body.business-theme .face-body { transform-origin: 60px 60px; animation: face-breathe 3.6s ease-in-out infinite; }
+@keyframes face-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.022); } }
+body.business-theme .hero-orb3 .face-svg { transition: transform 180ms ease-out; }
+body.business-theme .hero-orb3.is-hover .face-svg { transform: scale(1.04); }
+body.business-theme .hero-orb3.is-poked .face-svg { animation: face-poke 420ms cubic-bezier(.3, 1.5, .5, 1); }
+/* Happy eyes after a click: curved crescents replace the round eyes for a moment. */
+body.business-theme .face-svg .eye-happy { opacity: 0; }
+body.business-theme .face-svg.is-happy .eye-happy { opacity: 1; }
+body.business-theme .face-svg.is-happy .eye-ball,
+body.business-theme .face-svg.is-happy .eye-glint { opacity: 0; }
+@keyframes face-poke { 0% { transform: scale(1); } 35% { transform: scale(.9); } 70% { transform: scale(1.05); } 100% { transform: scale(1); } }
+body.business-theme.hero-style-3 .hero h1 { display: grid; gap: 2px; font-size: 32px; font-weight: 500; line-height: 1.3; letter-spacing: -.02em; }
+body.business-theme.hero-style-3 .hero-ask { display: block; }
+
+/* Sparks: four-point stars that fly out from the sphere's edge and fade */
+body.business-theme .spark-layer { position: absolute; inset: 0; pointer-events: none; }
+body.business-theme .spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  opacity: 0;
+  animation: spark-fly 720ms cubic-bezier(.2, .7, .3, 1) var(--delay) forwards;
+}
+@keyframes spark-fly {
+  0% { opacity: 0; transform: translate(calc(var(--dx) * .55), calc(var(--dy) * .55)) scale(.3) rotate(0deg); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--spin)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.business-theme .hero-orb3.is-poked .face-svg,
+  body.business-theme .face-body { animation: none; }
+}
+
+/* ---------- Home avatar: customer-service illustration (Appearance → 客服) ---------- */
+body.business-theme .hero-cs { display: none; }
+body.business-theme.hero-style-cs .hero-avatar { display: none; }
+body.business-theme.hero-style-cs .hero-title { flex-direction: column; gap: 14px; text-align: center; }
+body.business-theme.hero-style-cs .hero-cs {
+  position: relative; /* anchors the eye overlay */
+  display: block;
+  width: 88px;
+  height: 88px;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #f3f3f1;
+}
+body.business-theme .hero-cs img { display: block; width: 100%; height: 100%; object-fit: cover; }
+body.business-theme.hero-style-cs .hero h1 { display: grid; gap: 2px; font-size: 32px; font-weight: 500; line-height: 1.3; letter-spacing: -.02em; }
+body.business-theme.hero-style-cs .hero-ask { display: block; }
+
+/* ---------- All three avatars share one home layout: avatar on top, two-line greeting below ---------- */
+body.business-theme .hero-title { flex-direction: column; gap: 14px; text-align: center; }
+body.business-theme .hero h1 { display: grid; gap: 2px; font-size: 32px; font-weight: 500; line-height: 1.3; letter-spacing: -.02em; }
+body.business-theme .hero-ask { display: block; }
+body.business-theme .hero-avatar { width: 72px; height: 72px; }
+
+/* ---------- Same visible size for all three avatars on the home page ----------
+   The orb's drawing fills ~80% of its canvas and the face sphere ~77% of its box, while the customer-service
+   tile fills 100%, so each box is sized to make the visible shape equal, and the negative margin cancels the
+   transparent edge so the gap to the greeting matches too. */
+body.business-theme .hero-avatar { width: 100px; height: 100px; margin: -10px 0; }
+body.business-theme.hero-style-3 .hero-orb3 { width: 104px; height: 104px; margin: -12px 0; }
+body.business-theme.hero-style-cs .hero-cs { width: 80px; height: 80px; border-radius: 20px; }
+
+
+/* Home avatar, tuned: visible size 64px (was 80) and a 22px gap to the greeting (was 14) for all three. */
+body.business-theme .hero-title,
+body.business-theme.hero-style-3 .hero-title,
+body.business-theme.hero-style-cs .hero-title { gap: 22px; }
+body.business-theme .hero-avatar { width: 80px; height: 80px; margin: -8px 0; }
+body.business-theme.hero-style-3 .hero-orb3 { width: 84px; height: 84px; margin: -10px 0; }
+body.business-theme.hero-style-cs .hero-cs { width: 64px; height: 64px; border-radius: 16px; }
+
+/* ---------- Gina Avatar submenu (account menu → Gina Avatar ›): three small cards ---------- */
+body.business-theme .avatar-popover { width: auto; padding: 12px; }
+body.business-theme .av-cards { display: grid; grid-template-columns: repeat(3, 64px); gap: 10px; }
+body.business-theme .av-card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+body.business-theme .av-tile {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  background: #f6f8fb;
+  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+body.business-theme .av-card:hover .av-tile { border-color: var(--border-strong); }
+body.business-theme .av-card[aria-checked="true"] { color: var(--text-primary); font-weight: 600; }
+body.business-theme .av-card[aria-checked="true"] .av-tile { border-color: #172033; box-shadow: 0 0 0 1px #172033; }
+body.business-theme .av-card:focus { outline: none; }
+body.business-theme .av-card:focus-visible .av-tile { box-shadow: 0 0 0 3px rgb(47 103 213 / 28%); }
+body.business-theme .av-card[aria-checked="true"]:focus-visible .av-tile { box-shadow: 0 0 0 1px #172033, 0 0 0 4px rgb(47 103 213 / 28%); }
+/* Previews at the same ~40px visible size: orb drawing is ~80% of its canvas, face sphere ~77% of its box. */
+body.business-theme .av-thumb { position: relative; display: grid; place-items: center; }
+body.business-theme #av-thumb-orb canvas { width: 50px !important; height: 50px !important; }
+body.business-theme .av-thumb .face-mini { width: 52px; height: 52px; }
+body.business-theme .av-thumb-cs { width: 40px; height: 40px; overflow: hidden; border-radius: 10px; background: #f3f3f1; }
+body.business-theme .av-thumb-cs img { display: block; width: 100%; height: 100%; object-fit: cover; }
+body.business-theme .face-mini .eye-happy { opacity: 0; }
+body.business-theme .face-mini .eye-ball { transform-box: fill-box; transform-origin: center; animation: mini-blink 4.2s infinite; }
+@keyframes mini-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@media (prefers-reduced-motion: reduce) { body.business-theme .face-mini .eye-ball { animation: none; } }
+/* Longer names (e.g. Thought-orb, bold when selected) stay on one line; columns may grow past the 64px tile. */
+body.business-theme .av-cards { grid-template-columns: repeat(3, minmax(64px, auto)); column-gap: 12px; }
+body.business-theme .av-name { white-space: nowrap; }
+
+/* Greeting trial: 28px (was 32) so the heading doesn't outweigh the cards. Local only, not pushed. */
+body.business-theme .hero h1,
+body.business-theme.hero-style-3 .hero h1,
+body.business-theme.hero-style-cs .hero h1 { font-size: 28px; }
+
+/* ---------- Composer tools on the bar (no "+" menu): attach + three toggles ----------
+   Quiet at rest (no border, secondary text), blue tint when on. Labels hide on narrow screens. */
+body.business-theme .cbtn.attach { width: 36px; height: 36px; border: 0; border-radius: 999px; background: transparent; color: var(--text-secondary); }
+body.business-theme .cbtn.attach .i { width: 19px; height: 19px; }
+body.business-theme .cbtn.attach:hover { background: var(--bg-field); color: var(--text-primary); }
+body.business-theme .tool-toggles { display: flex; align-items: center; gap: 2px; min-width: 0; }
+body.business-theme .tool-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+body.business-theme .tool-toggle .i { width: 15px; height: 15px; flex: 0 0 auto; }
+body.business-theme .tool-toggle:hover { background: var(--bg-field); color: var(--text-primary); }
+body.business-theme .tool-toggle[aria-pressed="true"] { background: var(--accent-blue-bg); color: var(--accent-blue-fg); }
+body.business-theme .tool-toggle[aria-pressed="true"]:hover { background: var(--accent-blue-bg); }
+body.business-theme .tool-toggle:focus-visible,
+body.business-theme .cbtn.attach:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+@media (max-width: 760px) {
+  body.business-theme .tool-toggle { width: 32px; padding: 0; justify-content: center; }
+  body.business-theme .tool-toggle span { display: none; }
+}
+/* Inside the Translate Agent the whole chat is already translation, so its toggle is hidden there. */
+body.business-theme.specialist[data-agent="translate"] [data-tool-toggle="translate"] { display: none; }
+
+/* ---------- Multi-Agent chat: who is speaking ---------- */
+/* Speaker line above a reply: 20px avatar + name. A run of replies from the same speaker shows it once. */
+body.business-theme .ai-speaker { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; color: var(--text-primary); font-size: 13px; }
+body.business-theme .ai-speaker b { font-weight: 600; }
+body.business-theme .sp-ico {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--agent-sales-bg);
+  color: var(--agent-sales-fg);
+}
+body.business-theme .sp-ico .i { width: 12px; height: 12px; }
+body.business-theme .sp-ico[data-agent-key="test"] { background: var(--agent-test-bg); color: var(--agent-test-fg); }
+body.business-theme .sp-ico[data-agent-key="translate"] { background: var(--agent-translate-bg); color: var(--agent-translate-fg); }
+/* Gina's avatar in chat follows 外觀 → Gina: Thought (default), Buddy (hero-style-3) or Host (hero-style-cs). */
+body.business-theme .sp-ico.sp-gina { background: center / contain no-repeat url("assets/gina-thought-96.webp"); }
+body.business-theme.hero-style-3 .sp-ico.sp-gina { background-image: url("assets/gina-buddy-96.webp"); }
+body.business-theme.hero-style-cs .sp-ico.sp-gina { background: #fdf3ea center / cover no-repeat url("assets/gina-avatar-cs-240.png"); }
+body.business-theme .msg-ai.is-continued { margin-top: -8px; }
+
+/* @mentions use the mentioned Agent's colours. */
+body.business-theme .mention { padding: 0 4px; border-radius: 4px; background: var(--agent-sales-bg); color: var(--agent-sales-fg); font-weight: 500; white-space: nowrap; }
+body.business-theme .mention[data-agent-key="test"] { background: var(--agent-test-bg); color: var(--agent-test-fg); }
+body.business-theme .mention[data-agent-key="translate"] { background: var(--agent-translate-bg); color: var(--agent-translate-fg); }
+
+/* Hand-off line between speakers: quiet, centred, hairlines on both sides. */
+
+/* ---------- Chat header: conversation name ⌄ · Agent(s) ---------- */
+body.business-theme .chat-head {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(calc(100% - 40px), var(--layout-chat-max-width));
+  min-width: 0;
+  transform: translateX(-50%);
+  font-size: 14px;
+}
+body.business-theme .chat-head[hidden] { display: none; }
+body.business-theme .ch-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 55%;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+body.business-theme .ch-title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.business-theme .ch-title .i { flex: 0 0 auto; width: 14px; height: 14px; color: var(--icon-muted); }
+body.business-theme .ch-title:hover,
+body.business-theme .ch-title.active { background: var(--bg-field); }
+body.business-theme .ch-sep { color: var(--text-tertiary); }
+body.business-theme .ch-sep[hidden] { display: none; }
+body.business-theme .ch-agents { display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto; color: var(--text-secondary); font-size: 13px; }
+body.business-theme .ch-stack { display: inline-flex; }
+body.business-theme .ch-stack .sp-ico { box-shadow: 0 0 0 2px #f6f8fb; }
+body.business-theme .ch-stack .sp-ico + .sp-ico { margin-left: -5px; }
+body.business-theme .ch-agent-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+body.business-theme .ch-agent-link:hover { color: var(--text-primary); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Agents from data: every Agent-tagged element reads --ag-bg / --ag-fg (set per Agent in #agent-colours) ---------- */
+body.business-theme .side-agents .side-nav-item > .i { background: var(--ag-bg); color: var(--ag-fg); }
+body.business-theme .side-agents .side-nav-item:hover > .i,
+body.business-theme .side-agents .side-nav-item.active > .i { color: var(--ag-fg); }
+body.business-theme .agent-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.business-theme .agent-label small { color: var(--text-tertiary); font-size: 13px; font-weight: 400; }
+body.business-theme .hist-agent,
+body.business-theme .sp-ico[data-agent-key],
+body.business-theme .mention[data-agent-key] { background: var(--ag-bg); color: var(--ag-fg); }
+body.business-theme .sp-role { color: var(--text-tertiary); font-size: 12px; font-weight: 400; }
+
+/* ---------- Agent photo: always-visible pencil badge, stronger on hover; click opens the file picker ---------- */
+body.business-theme .spec-big { position: relative; cursor: pointer; overflow: visible; }
+body.business-theme .spec-big::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: rgb(23 32 51 / 45%) center / 22px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/svg%3E");
+  opacity: 0;
+  transition: opacity 140ms ease-out;
+  pointer-events: none;
+}
+body.business-theme .spec-big:hover::after,
+body.business-theme .spec-big.active::after { opacity: 1; }
+body.business-theme .spec-big:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+body.business-theme .photo-badge {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--text-secondary);
+  box-shadow: 0 1px 3px rgb(28 42 61 / 14%);
+}
+body.business-theme .photo-badge .i { width: 12px; height: 12px; }
+
+/* Crop dialog */
+body.business-theme .photo-crop { width: min(340px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--border-default); border-radius: 12px; background: #ffffff; box-shadow: 0 20px 50px rgb(28 42 61 / 20%); }
+body.business-theme .photo-crop::backdrop { background: rgb(23 32 51 / 35%); }
+body.business-theme .photo-crop-body { display: grid; justify-items: center; gap: 12px; padding: 20px; }
+body.business-theme .photo-crop h2 { margin: 0; justify-self: start; font-size: 16px; font-weight: 600; }
+body.business-theme .photo-crop-note { margin: -6px 0 0; justify-self: start; color: var(--text-tertiary); font-size: 12px; }
+body.business-theme .crop-frame { position: relative; width: 240px; height: 240px; overflow: hidden; border-radius: 24px; background: #f3f5f8; cursor: grab; touch-action: none; }
+body.business-theme .crop-frame.is-dragging { cursor: grabbing; }
+body.business-theme .crop-frame img { position: absolute; top: 0; left: 0; max-width: none; user-select: none; pointer-events: none; }
+body.business-theme .crop-zoom { display: flex; align-items: center; gap: 8px; width: 240px; color: var(--icon-muted); }
+body.business-theme .crop-zoom .i { width: 14px; height: 14px; flex: 0 0 auto; }
+body.business-theme .crop-zoom input { flex: 1; accent-color: var(--action-primary-bg); }
+body.business-theme .photo-crop-actions { display: flex; justify-content: flex-end; gap: 8px; width: 100%; }
+body.business-theme .photo-crop-actions button { height: 36px; padding: 0 16px; border-radius: 8px; font: inherit; font-size: 14px; cursor: pointer; }
+/* Header title is plain text now (no menu). */
+body.business-theme .ch-title { cursor: default; padding: 0 2px 0 0; }
+body.business-theme .ch-title:hover { background: transparent; }
+/* Role in full-width parentheses sits right after the name. */
+body.business-theme .agent-label small { margin-left: 1px; }
+body.business-theme .ai-speaker .sp-role { margin-left: -6px; }
+/* On narrow screens content scrolls under the header: give it the canvas colour so the two never overlap. */
+body.business-theme .chat-head { padding-block: 4px; background: var(--bg-canvas, #f6f8fb); box-shadow: 0 8px 8px -8px var(--bg-canvas, #f6f8fb); }
+/* Phones: the header sits in the normal flow above the conversation (so nothing scrolls past it) and keeps
+   only the avatars after the name, leaving room for the conversation title. */
+@media (max-width: 640px) {
+  body.business-theme .chat-head { position: static; transform: none; width: auto; margin: 0 16px 6px; padding-block: 6px; box-shadow: none; }
+  body.business-theme .ch-title { flex: 1 1 auto; max-width: none; }
+  body.business-theme .ch-names { display: none; }
+}
+
+/* Role tag (top bar + speaker labels): neutral grey, no parentheses; the Agent colour stays on the avatar. */
+body.business-theme .role-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: #eef1f5;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+body.business-theme .ai-speaker .role-tag { margin-left: -2px; }
+body.business-theme .ch-names { display: inline-flex; align-items: center; flex-wrap: nowrap; }
+body.business-theme .ch-agent-link { display: inline-flex; align-items: center; }
+body.business-theme .ch-names { gap: 12px; }
+body.business-theme .ch-agent { display: inline-flex; align-items: center; }
+
+/* ---------- Agent 頭像 submenu (圖示 / 人物): previews show three Agents in each style ---------- */
+body.business-theme .av-cards-2 { grid-template-columns: repeat(2, minmax(76px, auto)); }
+body.business-theme .av-cards-2 .av-tile { width: 76px; }
+body.business-theme .as-preview { display: flex; align-items: center; }
+body.business-theme .as-chip {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background-position: center;
+  background-size: cover;
+  box-shadow: 0 0 0 2px #f6f8fb;
+}
+body.business-theme .as-chip + .as-chip { margin-left: -3px; }
+body.business-theme .as-chip .i { width: 12px; height: 12px; }
+/* Role tag, option A: white with a hairline, so it reads on the #f6f8fb canvas like the white cards do. */
+body.business-theme .role-tag { background: #ffffff; border: 1px solid #e1e6ee; height: 20px; box-sizing: border-box; }
+
+/* Agent home: role tag beside the name (hidden for Agents without a role, e.g. 翻譯). */
+body.business-theme .spec-name-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+body.business-theme .spec-name-row .role-tag { margin-left: 0; height: 24px; padding: 0 8px; font-size: 13px; }
+body.business-theme .spec-name-row .role-tag[hidden] { display: none; }
+
+
+/* Fixed tools above the account (翻譯): always visible, same rows as the Agent list. */
+body.business-theme .side-dock { padding: 0 0 6px; }
+body.business-theme .side-dock:empty { display: none; }
+
+/* ---------- 翻譯 tool page (document translation): not an Agent, so no chats, no examples, no photo ---------- */
+body.business-theme.tool-page .agent-new,
+body.business-theme.tool-page .agent-empty,
+body.business-theme.tool-page .agent-examples-wrap,
+body.business-theme.tool-page .agent-recents { display: none !important; }
+body.business-theme.tool-page .spec-big { cursor: default; }
+body.business-theme.tool-page .spec-big::after { display: none; }
+body.business-theme .spec-title .s[hidden] { display: none; }
+body.business-theme .tr-tool[hidden] { display: none; }
+body.business-theme .tr-tool { margin-top: 24px; }
+
+/* One card: drop zone, the picked files, then 翻譯成 [語言] · 開始翻譯 on one row. */
+body.business-theme .tr-card {
+  padding: 16px;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: #ffffff;
+}
+body.business-theme .tr-files { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+body.business-theme .tr-files[hidden] { display: none; }
+body.business-theme .tr-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-field);
+  font-size: 13px;
+}
+body.business-theme .tr-file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); }
+body.business-theme .tr-file-size { flex: 0 0 auto; color: var(--text-tertiary); font-size: 12px; }
+body.business-theme .tr-x { width: 26px; height: 26px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--icon-muted); cursor: pointer; }
+body.business-theme .tr-x:hover { background: var(--bg-selected); color: var(--text-primary); }
+body.business-theme .tr-x .i { width: 14px; height: 14px; }
+
+/* File-type badge, used in the picked list and the log. */
+body.business-theme .tr-ext {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: #eef1f5;
+  color: var(--text-secondary);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+body.business-theme .tr-ext[data-ext="pdf"] { background: #fbe9e9; color: #b54848; }
+body.business-theme .tr-ext[data-ext="doc"], body.business-theme .tr-ext[data-ext="docx"] { background: #e7ecfb; color: #3d5bc4; }
+body.business-theme .tr-ext[data-ext="ppt"], body.business-theme .tr-ext[data-ext="pptx"] { background: #fbeee3; color: #b8692a; }
+
+body.business-theme .tr-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+body.business-theme .tr-lang { display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 13px; }
+body.business-theme .tr-start {
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--action-primary-bg);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+body.business-theme .tr-start:hover:not(:disabled) { background: var(--action-primary-bg-hover); }
+body.business-theme .tr-start:disabled { background: #e5e9ef; color: var(--text-tertiary); cursor: not-allowed; }
+
+/* 翻譯紀錄: one row per file — name + language/size, then progress, failure + 重試, or date + 下載. */
+body.business-theme .tr-log { margin-top: 32px; }
+body.business-theme .tr-list { border-top: 1px solid var(--border-subtle); }
+body.business-theme .tr-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background .6s;
+}
+body.business-theme .tr-row.is-new { animation: tr-flash 1.6s ease-out; }
+@keyframes tr-flash { 0% { background: var(--accent-blue-bg); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { body.business-theme .tr-row.is-new { animation: none; } }
+body.business-theme .tr-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+body.business-theme .tr-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-size: 14px; }
+body.business-theme .tr-row-meta { color: var(--text-tertiary); font-size: 12px; }
+body.business-theme .tr-row-status { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; color: var(--text-tertiary); font-size: 13px; }
+body.business-theme .tr-progress { width: 96px; height: 6px; border-radius: 99px; background: #eef1f5; overflow: hidden; }
+body.business-theme .tr-progress > span { display: block; height: 100%; border-radius: inherit; background: var(--action-primary-bg); transition: width .6s ease; }
+body.business-theme .tr-pct { width: 34px; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+body.business-theme .tr-failed { display: inline-flex; align-items: center; gap: 4px; color: #b54848; }
+body.business-theme .tr-failed .i { width: 14px; height: 14px; }
+body.business-theme .tr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+body.business-theme .tr-btn:hover { background: var(--bg-field); }
+body.business-theme .tr-btn .i { width: 14px; height: 14px; }
+body.business-theme .tr-more {
+  display: block;
+  margin: 10px auto 0;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+body.business-theme .tr-more:hover { background: var(--bg-field); color: var(--text-primary); }
+body.business-theme .tr-more[hidden] { display: none; }
+body.business-theme .tr-empty { padding: 20px 12px; color: var(--text-tertiary); font-size: 13px; }
+
+@media (max-width: 640px) {
+  body.business-theme .tr-actions { flex-wrap: wrap; }
+  body.business-theme .tr-start { flex: 1 1 100%; }
+  body.business-theme .tr-progress { width: 56px; }
+  body.business-theme .tr-dl span { display: none; }
+}
+
+body.business-theme .tr-stopped { color: var(--text-tertiary); }
+
+/* Menu items switched off with the hidden attribute (e.g. Agent 頭像) stay hidden despite display:flex. */
+body.business-theme .menu-item[hidden] { display: none; }
+
+/* 文件翻譯 drop zone: one fixed size. Files list from the top; the pick area fills what is left (min one line). */
+body.business-theme .tr-drop {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 10px;
+  box-sizing: border-box;
+  transition: background .15s, border-color .15s;
+}
+body.business-theme .tr-drop.is-dragover { border-color: var(--accent-blue-fg); background: var(--accent-blue-bg); }
+body.business-theme .tr-drop .tr-files { flex: 0 1 auto; min-height: 0; margin: 0; overflow-y: auto; overscroll-behavior: contain; }
+body.business-theme .tr-pick {
+  position: relative;
+  flex: 1 0 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+}
+body.business-theme .tr-pick input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+body.business-theme .tr-pick:hover { background: var(--accent-blue-bg); }
+body.business-theme .tr-drop:not(.has-files) .tr-pick:hover { background: none; }
+body.business-theme .tr-drop:not(.has-files):hover { border-color: var(--accent-blue-fg); background: var(--accent-blue-bg); }
+body.business-theme .tr-pick:has(input:focus-visible) { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+body.business-theme .tr-drop-ico { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; background: var(--accent-blue-bg); color: var(--accent-blue-fg); }
+body.business-theme .tr-drop-ico .i { width: 18px; height: 18px; }
+body.business-theme .tr-drop-title { color: var(--text-primary); font-size: 14px; font-weight: 500; }
+body.business-theme .tr-drop-title u { color: var(--accent-blue-fg); text-underline-offset: 3px; }
+body.business-theme .tr-drop-hint { color: var(--text-tertiary); font-size: 12px; }
+/* With files: the add line is a single row with a small icon, centred in the space left. */
+body.business-theme .tr-drop.has-files .tr-pick { flex-direction: row; gap: 8px; }
+body.business-theme .tr-drop.has-files .tr-drop-ico { width: 20px; height: 20px; background: none; }
+body.business-theme .tr-drop.has-files .tr-drop-title { font-size: 13px; color: var(--text-secondary); }
+body.business-theme .tr-drop.has-files .tr-drop-hint { display: none; }
+
+/* 翻譯成 language picker: a button + listbox in the same style as the other Gina menus. */
+body.business-theme .tr-select { position: relative; }
+body.business-theme .tr-select-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 156px;
+  height: 34px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+body.business-theme .tr-select-btn:hover { border-color: var(--border-strong); }
+body.business-theme .tr-select-btn[aria-expanded="true"] { border-color: var(--action-primary-bg); box-shadow: var(--shadow-focus); }
+body.business-theme .tr-select-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+body.business-theme .tr-select-btn .i { width: 14px; height: 14px; color: var(--icon-muted); transition: transform .15s; }
+body.business-theme .tr-select-btn[aria-expanded="true"] .i { transform: rotate(180deg); }
+body.business-theme .tr-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  min-width: 100%;
+  width: 232px;
+  max-height: 296px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgb(15 23 42 / 12%), 0 2px 6px rgb(15 23 42 / 6%);
+  box-sizing: border-box;
+  outline: none;
+}
+body.business-theme .tr-select-menu[hidden] { display: none; }
+body.business-theme .tr-select-menu.is-up { top: auto; bottom: calc(100% + 6px); }
+body.business-theme .tr-select-menu li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+body.business-theme .tr-select-menu li.is-active { background: var(--bg-field); }
+body.business-theme .tr-select-menu li[aria-selected="true"] { background: var(--accent-blue-bg); }
+body.business-theme .tr-opt-name { white-space: nowrap; }
+body.business-theme .tr-opt-zh { color: var(--text-tertiary); font-size: 12px; white-space: nowrap; }
+body.business-theme .tr-select-menu li .i { width: 15px; height: 15px; margin-left: auto; color: var(--accent-blue-fg); visibility: hidden; }
+body.business-theme .tr-select-menu li[aria-selected="true"] .i { visibility: visible; }
+
+/* Toasts at the top (centre), sliding down; app.css (shared with other pages) keeps them at the bottom. */
+body.business-theme .toast { top: 20px; bottom: auto; width: max-content; max-width: calc(100vw - 32px); box-sizing: border-box; transform: translateX(-50%) translateY(-12px); }
+body.business-theme .toast.show { transform: translateX(-50%); }
+@media (prefers-reduced-motion: reduce) { body.business-theme .toast { transform: translateX(-50%); } }
+
+/* 翻譯 in the sidebar dock: status dot on the right (running / finished while away), like Recents rows. */
+body.business-theme .side-dock .side-nav-item { position: relative; }
+body.business-theme .side-status[hidden] { display: none; }
+
+/* ---------- 外觀 submenu: 主題 row (two wide cards) above the Gina row ---------- */
+body.business-theme .ap-label { padding: 0 2px 8px; color: var(--text-tertiary); font-size: 12px; font-weight: 500; }
+body.business-theme .ap-sep { height: 1px; margin: 12px 0; background: var(--border-subtle); }
+body.business-theme .av-themes { grid-template-columns: repeat(2, 1fr); }
+body.business-theme .av-themes .av-tile { width: 100%; overflow: hidden; }
+body.business-theme .ap-theme { position: relative; display: block; width: 100%; height: 100%; }
+/* Minimalism preview: white sidebar, grey canvas, one card. */
+body.business-theme .ap-minimal { background: #f6f8fb; }
+body.business-theme .ap-minimal::before { content: ""; position: absolute; inset: 0 64% 0 0; background: #ffffff; border-right: 1px solid #e1e6ef; }
+body.business-theme .ap-minimal::after { content: ""; position: absolute; left: 46%; right: 12%; top: 36%; height: 24%; border: 1px solid #e1e6ef; border-radius: 4px; background: #ffffff; }
+/* Aurora preview: white with colour in the corners, a frosted panel. */
+body.business-theme .ap-aurora {
+  background:
+    radial-gradient(60% 70% at 100% 0%, #e2c9f5, transparent 70%),
+    radial-gradient(60% 70% at 100% 100%, #f7cde4, transparent 70%),
+    radial-gradient(50% 60% at 0% 0%, #d6e6fa, transparent 70%),
+    #fbfbfd;
+}
+body.business-theme .ap-aurora::after { content: ""; position: absolute; left: 34%; right: 8%; top: 12%; bottom: 12%; border: 1px solid rgb(255 255 255 / 95%); border-radius: 8px; background: rgb(255 255 255 / 70%); box-shadow: 0 4px 10px rgb(80 70 160 / 14%); }
+
+/* Gina's latest reply: a live avatar (gina-speaker.js) in place of the still picture. Orb and face are drawn
+   with some empty margin, so they sit a little larger than the 20px tile and are not clipped. */
+body.business-theme .sp-ico.sp-gina.is-live { position: relative; overflow: visible; background: none; }
+body.business-theme .sp-gina .sp-live-orb { display: block; width: 26px; height: 26px; flex: 0 0 auto; }
+body.business-theme .sp-gina .face-mini { width: 26px; height: 26px; flex: 0 0 auto; }
+body.business-theme .sp-ico.sp-gina[data-live="host"] { overflow: hidden; background: #fdf3ea; }
+body.business-theme .sp-gina[data-live="host"] img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- 匯出對話: header button + format panel (chat-export.js) ---------- */
+body.business-theme .ch-export {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  margin-left: auto;
+  padding: 0 12px 0 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+body.business-theme .ch-export:hover,
+body.business-theme .ch-export.active { border-color: var(--border-strong); color: var(--text-primary); }
+body.business-theme .ch-export:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+body.business-theme .ch-export .i { width: 15px; height: 15px; }
+@media (max-width: 640px) {
+  body.business-theme .ch-export { width: 30px; padding: 0; justify-content: center; }
+  body.business-theme .ch-export span { display: none; }
+}
+body.business-theme .export-pop {
+  position: fixed;
+  z-index: 60;
+  width: 300px;
+  padding: 14px;
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgb(28 42 61 / 14%);
+  box-sizing: border-box;
+}
+body.business-theme .export-pop[hidden] { display: none; }
+body.business-theme .export-title { color: var(--text-primary); font-size: 14px; font-weight: 600; }
+body.business-theme .export-note { margin: 6px 0 12px; color: var(--text-tertiary); font-size: 13px; line-height: 1.55; }
+body.business-theme .export-formats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+body.business-theme .export-format {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+body.business-theme .export-format:hover { border-color: var(--border-strong); background: var(--bg-field); }
+body.business-theme .export-format:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+/* The fixed app header is empty in this prototype but sits over the chat header: let clicks through
+   (it was blocking the 匯出 button and the Agent name link). */
+body.business-theme .header:empty { pointer-events: none; }
+
+/* Agent home avatar without photo editing (no role=button): a plain picture, no pencil overlay on hover. */
+body.business-theme .spec-big:not([role]) { cursor: default; }
+body.business-theme .spec-big:not([role])::after { display: none; }
