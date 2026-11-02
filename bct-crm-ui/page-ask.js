@@ -40,7 +40,7 @@
     'pa-pv-slipped': ['Which deals slipped?', () => ({
       sources:[['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago']],
       html:`<p><b>Two deals slipped</b> this month. Together they are worth $1.36M.</p>
-        <div class="crm-card"><div class="crm-group">${row('datalake','No activity since 20 Sep','Quiet 32 days')}${row('gulf','Pricing promised 26 Oct, not sent','Overdue')}</div></div>`,
+        <div class="crm-card"><div class="crm-group">${row('datalake','No activity since 9 Nov','Quiet 32 days')}${row('gulf','Pricing promised 10 Dec, not sent','Overdue')}</div></div>`,
       optionsLabel:'Next', options:[['Draft a follow-up to Hana','draft-hana'],['Draft the Gulf Harbor pricing email','draft-gulf']] })],
     'pa-pv-type': ['Forecast by deal type', () => ({
       html:`<p>Open pipeline by deal type, <b>$2.55M</b> in total. Services and Services + IP carry two thirds of it.</p>
@@ -57,21 +57,21 @@
       sources:[['5 accounts','users','CRM · owned by you','synced 2 min ago'],['Mail and meetings','mail','Outlook · Teams','synced 2 min ago']],
       html:`<p><b>2 accounts</b> have had no two-way contact for two weeks or more. At Qamar Energy, you haven't spoken to Khalid in procurement <span class="nb">since July.</span></p>
         <div class="crm-card"><div class="crm-group">
-          ${arow('acc_gulf','Gulf Harbor Logistics','Proposal v2 sent 14 Oct · no reply')}
-          ${arow('acc_muscat','Muscat Municipality','Workshop 10 Oct · no follow-up')}
+          ${arow('acc_gulf','Gulf Harbor Logistics','Proposal v2 sent 3 Dec · no reply')}
+          ${arow('acc_muscat','Muscat Municipality','Workshop 23 Nov · no follow-up')}
           ${arow('contacts','Qamar Energy · Khalid Al-Riyami','Procurement · last call in July')}</div></div>`,
       optionsLabel:'Next', options:[['Draft the Gulf Harbor pricing email','draft-gulf'],['Draft a check-in to Khalid','draft-khalid']] })],
     // Tasks
     'pa-tasks-add': ['Add a task: call Faisal on Thursday', () => ({
       html:`<p>Here's the task. It goes on Faisal's lead, so you'll see it in the lead's brief and record.</p>
-        <div class="crm-card"><div class="crm-change"><span class="lbl">Task</span><div><b>${esc(NEW_TASK.title)}</b><br><span class="muted">Due Thu 29 Oct · Owner: Gaurav Shrotriya · Linked to LEAD-0311</span></div></div></div>
+        <div class="crm-card"><div class="crm-change"><span class="lbl">Task</span><div><b>${esc(NEW_TASK.title)}</b><br><span class="muted">Due Thu 17 Dec · Owner: Gaurav Shrotriya · Linked to LEAD-0311</span></div></div></div>
         ${applyBtn('tasks-add',"Add to Faisal's lead")}`,
       optionsLabel:'Anything else?', options:[['Draft a reply to Faisal','draft-faisal']] })],
     // Reports
     'pa-rp-gap': ['Why are we behind target?', () => ({
       ack:'Looking at the forecast, commit and best case.',
       sources:[['Q4 forecast','gauge','CRM · commit and best case','synced 2 min ago'],['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago']],
-      html:`<p>You're at <b>73% of target</b> with nine weeks to go, a gap of <b>$400K</b>. Two things explain most of it:</p>
+      html:`<p>You're at <b>73% of target</b> with three weeks to go, a gap of <b>$400K</b>. Two things explain most of it:</p>
         <div class="crm-card"><div class="crm-group">${row('datalake','Proposal · quiet for 32 days','Needs attention')}${row('gulf','Closes Monday · pricing still open','Overdue')}</div></div>
         <p>Data Lake alone would close the gap. Gulf Harbor is the one that can move <span class="nb">this week.</span></p>`,
       optionsLabel:'Next', options:[['Draft a follow-up to Hana','draft-hana'],['Add pipeline by region','pa-rp-region']] })],
@@ -85,7 +85,7 @@
         ${applyBtn('reports-region','Add to Reports')}`,
       optionsLabel:'Anything else?', options:[['Why are we behind target?','pa-rp-gap']] })]
   };
-  const NEW_TASK = { id:'n1', title:'Call Faisal Al-Mazrouei about the field service demo', meta:'Al Dhafra Facilities Management · Thu 29 Oct', src:'lead1', group:'week', isNew:true };
+  const NEW_TASK = { id:'n1', title:'Call Faisal Al-Mazrouei about the field service demo', meta:'Al Dhafra Facilities Management · Thu 17 Dec', src:'lead1', group:'week', isNew:true };
   function lrow(rec, title, meta){ return `<div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">${esc(title)}</div><div class="crm-row-meta"><span>${keepIds(esc(meta))}</span></div></div><div class="crm-row-side">${rec?srcChip(rec):''}</div></div>`; }
   function arow(rec, title, meta){ return `<div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">${esc(title)}</div><div class="crm-row-meta"><span>${esc(meta)}</span></div></div><div class="crm-row-side">${srcChip(rec,'Open')}</div></div>`; }
 
@@ -176,7 +176,7 @@
       if(!TASKS_MORE.includes(NEW_TASK)) TASKS_MORE.unshift(NEW_TASK);
       pvSel='lead:0'; openView('pipeline', { keep:true });
       setTimeout(()=>flash(document.querySelector('#pv-body [data-task="n1"]')), 60);
-      toast("Added to Faisal's lead · Thu 29 Oct", { label:'Undo', run:()=>{ const i=TASKS_MORE.indexOf(NEW_TASK); if(i>-1) TASKS_MORE.splice(i,1); renderTaskLists(); } });
+      toast("Added to Faisal's lead · Thu 17 Dec", { label:'Undo', run:()=>{ const i=TASKS_MORE.indexOf(NEW_TASK); if(i>-1) TASKS_MORE.splice(i,1); renderTaskLists(); } });
     } else if(id==='reports-region'){
       rpRegion=true; openView('reports'); flash($('#rp-region'));
       toast('Added “Pipeline by region” to Reports', { label:'Undo', run:removeRegion });

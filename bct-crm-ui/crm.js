@@ -57,9 +57,9 @@ hydrateIcons();
 /* ---------- Helpers ---------- */
 /* Illustrated contacts generated for BCT (assets/gen). Anyone else gets initials. */
 /* People photos. Customers: free Unsplash photos (Unsplash License), chosen 2026-10-28 from
-   docs/customer-photo-candidates.html; originals and sources in assets/people/src and the README.
+   docs/customer-photo-candidates.html; originals are in assets/people/src, not published.
    BCT colleagues: illustrations drawn from their photos (2026-11-02), originals in assets/people/src, not published.
-   The signed-in demo user is Gaurav Shrotriya (2026-10-28, was Sheldon Cooper). */
+   The signed-in demo user is Gaurav Shrotriya. */
 const AVATARS = {
   hana:'people/hana-al-rashdi.webp', maryam:'people/maryam-al-lawati.webp', noura:'people/noura-al-shamsi.webp',
   omar:'people/omar-haddad.webp', khalid:'people/khalid-al-riyami.webp', faisal:'people/faisal-al-mazrouei.webp',
@@ -87,41 +87,41 @@ const REPLY_DELAY = 900;
 /* ---------- Fictional data ---------- */
 const STAGES = ['Discovery','Proposal','Negotiation','Won'];
 const RECORDS = {
-  erp:      { kind:'Opportunity', ref:'OPP-0988', name:'ERP Managed Services — renewal', account:'Qamar Energy', country:'Oman', amount:'$640K', close:'Closed 12 Aug 2026', type:'Services', contact:'Hana Al-Rashdi, Head of IT', stage:3,
-              activity:[['12 Aug · PO','PO received (QE-PO-22817)'],['05 Aug · contract','Contract signed by both parties'],['29 Jul · call','Final pricing call with procurement']] },
-  datalake: { kind:'Opportunity', ref:'OPP-1042', name:'Data Lake modernisation', account:'Qamar Energy', country:'Oman', amount:'$820K', close:'15 Dec 2026', type:'Services + IP', contact:'Hana Al-Rashdi, Head of IT', stage:1,
-              team:[['Sundara Balaji','Pre-sales · co-ran the 20 Sep workshop']],
-              activity:[['20 Sep · meeting','Solution workshop with the IT team (with Sundara Balaji)'],['18 Sep · email','Shared reference architecture'],['09 Sep · call','Discovery call with Hana']] },
-  fieldops: { kind:'Opportunity', ref:'OPP-1017', name:'Field Ops mobile app', account:'Qamar Energy', country:'Oman', amount:'$410K', close:'30 Nov 2026', type:'Services', contact:'Salim Al-Busaidi, Operations Director', stage:2,
-              activity:[['16 Oct · email','Revised SOW sent'],['14 Oct · call','Negotiation call with procurement'],['02 Oct · meeting','Demo to field supervisors']] },
+  erp:      { kind:'Opportunity', ref:'OPP-0988', name:'ERP Managed Services — renewal', account:'Qamar Energy', country:'Oman', amount:'$640K', close:'Closed 1 Oct 2026', type:'Services', contact:'Hana Al-Rashdi, Head of IT', stage:3,
+              activity:[['1 Oct · PO','PO received (QE-PO-22817)'],['24 Sep · contract','Contract signed by both parties'],['17 Sep · call','Final pricing call with procurement']] },
+  datalake: { kind:'Opportunity', ref:'OPP-1042', name:'Data Lake modernisation', account:'Qamar Energy', country:'Oman', amount:'$820K', close:'30 Dec 2026', type:'Services + IP', contact:'Hana Al-Rashdi, Head of IT', stage:1,
+              team:[['Sundara Balaji','Pre-sales · co-ran the 9 Nov workshop']],
+              activity:[['9 Nov · meeting','Solution workshop with the IT team (with Sundara Balaji)'],['7 Nov · email','Shared reference architecture'],['29 Oct · call','Discovery call with Hana']] },
+  fieldops: { kind:'Opportunity', ref:'OPP-1017', name:'Field Ops mobile app', account:'Qamar Energy', country:'Oman', amount:'$410K', close:'23 Dec 2026', type:'Services', contact:'Salim Al-Busaidi, Operations Director', stage:2,
+              activity:[['5 Dec · email','Revised SOW sent'],['3 Dec · call','Negotiation call with procurement'],['21 Nov · meeting','Demo to field supervisors']] },
   kpo:      { kind:'Opportunity', ref:'OPP-1066', name:'AI document processing', account:'Qamar Energy', country:'Oman', amount:'$310K', close:'Q1 2027', type:'KPO / BPO', contact:'Maryam Al-Lawati, Finance Ops Manager', stage:0,
-              activity:[['19 Oct · meeting','Intro meeting with Finance Ops'],['12 Oct · email','Inbound enquiry via website']] },
-  gulf:     { kind:'Opportunity', ref:'OPP-1031', name:'Warehouse management system', account:'Gulf Harbor Logistics', country:'UAE', amount:'$540K', close:'26 Oct 2026', type:'Resell + Services', contact:'Omar Haddad, COO', stage:1,
-              activity:[['14 Oct · email','Proposal v2 sent'],['08 Oct · meeting','Pricing objections from finance'],['24 Sep · meeting','Site visit, Jebel Ali warehouse']] },
-  sahyadri: { kind:'Opportunity', ref:'OPP-1058', name:'Core banking security review', account:'Sahyadri Bank', country:'India', amount:'$280K', close:'31 Jan 2027', type:'Services', contact:'Rajesh Kulkarni, CISO', stage:0,
-              activity:[['15 Oct · email','Asked for scope options'],['07 Oct · call','Intro call with CISO office']] },
+              activity:[['8 Dec · meeting','Intro meeting with Finance Ops'],['1 Dec · email','Inbound enquiry via website']] },
+  gulf:     { kind:'Opportunity', ref:'OPP-1031', name:'Warehouse management system', account:'Gulf Harbor Logistics', country:'UAE', amount:'$540K', close:'14 Dec 2026', type:'Resell + Services', contact:'Omar Haddad, COO', stage:1,
+              activity:[['3 Dec · email','Proposal v2 sent'],['27 Nov · meeting','Pricing objections from finance'],['13 Nov · meeting','Site visit, Jebel Ali warehouse']] },
+  sahyadri: { kind:'Opportunity', ref:'OPP-1058', name:'Core banking security review', account:'Sahyadri Bank', country:'India', amount:'$280K', close:'22 Mar 2027', type:'Services', contact:'Rajesh Kulkarni, CISO', stage:0,
+              activity:[['4 Dec · email','Asked for scope options'],['26 Nov · call','Intro call with CISO office']] },
   lead1:    { kind:'Lead', ref:'LEAD-0311', lead:true, name:'Al Dhafra Facilities Management', account:'Faisal Al-Mazrouei, Head of Operations', country:'UAE',
-              email:'f.almazrouei@aldhafra-fm.example', phone:'+971 2 555 0147', interest:'Field service management for ~400 technicians across Abu Dhabi. Currently on spreadsheets and WhatsApp. Wants a demo before December budget round.',
+              email:'f.almazrouei@aldhafra-fm.example', phone:'+971 2 555 0147', interest:'Field service management for ~400 technicians across Abu Dhabi. Currently on spreadsheets and WhatsApp. Wants a demo before January budget round.',
               page:'/services/field-operations', submitted:'Today 02:14', match:null,
               activity:[['Today 02:14 · website','Form submitted from /services/field-operations'],['Today 02:14 · system','No match in Accounts or Contacts — created as new lead']] },
   lead2:    { kind:'Lead', ref:'LEAD-0312', lead:true, name:'Qamar Energy', account:'Khalid Al-Riyami, Procurement Lead', country:'Oman',
               email:'k.alriyami@qamarenergy.example', phone:'+968 24 555 0190', interest:'Request for pricing on AI document processing for the finance team.',
               page:'/contact', submitted:'Today 06:40', match:{ account:'contacts', opp:'kpo' },
-              activity:[['Today 06:40 · website','Form submitted from /contact'],['Today 06:40 · system','Matched existing account ACC-0214 and contact Khalid Al-Riyami'],['19 Oct · meeting','Related: intro meeting with Finance Ops (OPP-1066)']] },
-  muscat:   { kind:'Opportunity', ref:'OPP-1049', name:'Citizen services portal — phase 2', account:'Muscat Municipality', country:'Oman', amount:'$190K', close:'20 Dec 2026', type:'Services', contact:'Said Al-Hinai, Director of IT', stage:0, owner:'Sundara Balaji',
-              activity:[['10 Oct · meeting','Scoping workshop for phase 2'],['08 Oct · referral','Introduced by phase 1 sponsor']] },
+              activity:[['Today 06:40 · website','Form submitted from /contact'],['Today 06:40 · system','Matched existing account ACC-0214 and contact Khalid Al-Riyami'],['8 Dec · meeting','Related: intro meeting with Finance Ops (OPP-1066)']] },
+  muscat:   { kind:'Opportunity', ref:'OPP-1049', name:'Citizen services portal — phase 2', account:'Muscat Municipality', country:'Oman', amount:'$190K', close:'29 Dec 2026', type:'Services', contact:'Said Al-Hinai, Director of IT', stage:0, owner:'Sundara Balaji',
+              activity:[['23 Nov · meeting','Scoping workshop for phase 2'],['20 Nov · referral','Introduced by phase 1 sponsor']] },
   acc_gulf: { kind:'Account', ref:'ACC-0231', name:'Gulf Harbor Logistics', account:'2 contacts', country:'UAE', contacts:true,
               people:[['OH','Omar Haddad','COO · main contact'],['LK','Lina Khoury','Finance Manager']],
-              activity:[['14 Oct','Proposal v2 sent to Omar Haddad'],['08 Oct','Pricing objections raised by finance']] },
+              activity:[['3 Dec','Proposal v2 sent to Omar Haddad'],['27 Nov','Pricing objections raised by finance']] },
   acc_sahyadri: { kind:'Account', ref:'ACC-0258', name:'Sahyadri Bank', account:'3 contacts', country:'India', contacts:true,
               people:[['RK','Rajesh Kulkarni','CISO · main contact'],['PD','Priya Deshmukh','Head of Infrastructure'],['AS','Anil Shetty','Procurement']],
-              activity:[['15 Oct','Rajesh asked for scope options'],['07 Oct','Intro call with CISO office']] },
+              activity:[['4 Dec','Rajesh asked for scope options'],['26 Nov','Intro call with CISO office']] },
   acc_muscat: { kind:'Account', ref:'ACC-0201', name:'Muscat Municipality', account:'5 contacts', country:'Oman', contacts:true,
               people:[['SH','Said Al-Hinai','Director of IT · main contact'],['FB','Fatma Al-Balushi','PMO Lead'],['HM','Hamed Al-Maskari','Procurement']],
-              activity:[['10 Oct','Scoping workshop for portal phase 2'],['22 Sep','Phase 1 go-live sign-off']] },
+              activity:[['23 Nov','Scoping workshop for portal phase 2'],['11 Nov','Phase 1 go-live sign-off']] },
   contacts: { kind:'Account', ref:'ACC-0214', name:'Qamar Energy', account:'4 contacts', country:'Oman', contacts:true,
               people:[['HA','Hana Al-Rashdi','Head of IT · main contact'],['SB','Salim Al-Busaidi','Operations Director'],['ML','Maryam Al-Lawati','Finance Ops Manager'],['KR','Khalid Al-Riyami','Procurement Lead']],
-              activity:[['19 Oct','Met Maryam Al-Lawati (AI document processing)'],['16 Oct','Emailed Salim Al-Busaidi (Field Ops SOW)']] }
+              activity:[['8 Dec','Met Maryam Al-Lawati (AI document processing)'],['5 Dec','Emailed Salim Al-Busaidi (Field Ops SOW)']] }
 };
 const TASKS = [
   { id:'t2', title:'Send revised pricing to Omar Haddad', meta:'Gulf Harbor Logistics · overdue by 1 day', overdue:true, src:'gulf' },
@@ -312,7 +312,7 @@ function pinStripHTML(){
     <button class="ps-main" data-view="reports" aria-label="Pinned Q4 numbers. Open Reports"><span class="ps-l">Q4</span>
       <span class="ps-n" data-tip-h="Open pipeline" data-tip="All your open deals, at full value. Up 12% from the end of Q3.">${n('$',2.55,'M',2)}open <span class="rp-delta up">+12%</span></span>
       <span class="ps-n" data-tip-h="Q4 forecast" data-tip="Committed $540K plus best case $560K. 73% of the $1.5M target.">${n('$',1.10,'M',2)}forecast · 73%</span>
-      <span class="ps-n" data-tip-h="Won, last 90 days" data-tip="Three deals signed since 29 Jul.">${n('$',1.07,'M',2)}won</span>
+      <span class="ps-n" data-tip-h="Won, last 90 days" data-tip="Three deals signed since 12 Sep.">${n('$',1.07,'M',2)}won</span>
       <span class="ps-n" data-tip-h="New leads this week" data-tip="Al Dhafra and Qamar Energy, both from the website.">${n('',2,'',0)}new leads</span></button>
     <button class="snap-btn" data-action="pin-snapshot" aria-pressed="true" aria-label="Unpin from home" title="Unpin from home">${svg('pin')}</button>
     <button class="snap-btn" data-view="reports" aria-label="Open in Reports" title="Open in Reports">${svg('arrow-ur')}</button>
@@ -334,7 +334,7 @@ function replyQuarter(){
     sources: [['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago'],['Q4 forecast','gauge','CRM · commit and best case','synced 2 min ago'],['2 website leads','globe','Website form','synced 2 min ago'],['Calendar','calendar','Teams · Q4','synced 5 min ago']],
     html: `<p>Here's your Q4 snapshot. Pin it and I'll refresh it every morning at 06:00.</p>
       ${snapshotHTML('chat')}
-      <p>You're at <b>73% of target</b> with nine weeks to go. The gap is <b>$400K</b>, and ${srcChip('datalake','Data Lake')} alone would cover it. It has been quiet for 32 days, so that's the deal to unstick.</p>`,
+      <p>You're at <b>73% of target</b> with three weeks to go. The gap is <b>$400K</b>, and ${srcChip('datalake','Data Lake')} alone would cover it. It has been quiet for 32 days, so that's the deal to unstick.</p>`,
     optionsLabel: 'Next',
     options: [['Draft a follow-up to Hana','draft-hana'],['Open the pipeline','view-pipeline'],['What should I focus on today?','today']]
   };
@@ -347,11 +347,11 @@ function replyPipeline(){
     sources: [['4 opportunities','briefcase','CRM · Qamar Energy','synced 2 min ago'],['23 emails','mail','Outlook · last 90 days','synced 2 min ago'],['6 meetings','calendar','Teams calendar','today 09:00']],
     html: `<p>Qamar Energy has <b>4 opportunities worth $2.18M</b>. One is signed, two are in progress and one is still in discussion. The <b>Data Lake</b> deal needs attention: no activity for 32 days.</p>
       <div class="crm-card">
-        <div class="crm-group"><div class="crm-group-head"><span class="lbl">Signed</span><small>1 · $640K</small></div>${row('erp','Closed 12 Aug · PO received')}</div>
-        <div class="crm-group"><div class="crm-group-head"><span class="lbl">In progress</span><small>2 · $1.23M</small></div>${row('datalake','Proposal · last activity 32 days ago','Needs attention')}${row('fieldops','Negotiation · revised SOW sent 16 Oct')}</div>
-        <div class="crm-group"><div class="crm-group-head"><span class="lbl">Still in discussion</span><small>1 · $310K</small></div>${row('kpo','Discovery · intro meeting 19 Oct')}</div>
+        <div class="crm-group"><div class="crm-group-head"><span class="lbl">Signed</span><small>1 · $640K</small></div>${row('erp','Closed 1 Oct · PO received')}</div>
+        <div class="crm-group"><div class="crm-group-head"><span class="lbl">In progress</span><small>2 · $1.23M</small></div>${row('datalake','Proposal · last activity 32 days ago','Needs attention')}${row('fieldops','Negotiation · revised SOW sent 5 Dec')}</div>
+        <div class="crm-group"><div class="crm-group-head"><span class="lbl">Still in discussion</span><small>1 · $310K</small></div>${row('kpo','Discovery · intro meeting 8 Dec')}</div>
       </div>
-      <div class="crm-next" id="next-datalake"><p><b>Suggested next step.</b> Data Lake has been quiet since the solution workshop on 20 Sep. Send Hana Al-Rashdi a follow-up?</p>
+      <div class="crm-next" id="next-datalake"><p><b>Suggested next step.</b> Data Lake has been quiet since the solution workshop on 9 Nov. Send Hana Al-Rashdi a follow-up?</p>
         <div class="crm-actions"><button class="btn-bct" data-action="draft-followup">${svg('mail')}Draft follow-up email</button><button class="btn-bct secondary" data-action="remind">Remind me Monday</button></div>
       </div>`,
     optionsLabel: 'Want to see this as a chart?',
@@ -375,11 +375,11 @@ function replyChartStage(){
 function replyChartTrend(){
   return {
     html: `<p>Pipeline with Qamar grew from <b>$0.64M in June to $2.18M in October</b>, mostly from Field Ops and Data Lake entering in August and September.</p>
-      <div class="crm-card crm-chart"><div class="crm-chart-head"><span>Qamar Energy — total pipeline, Jun–Oct 2026</span>${srcChip('datalake','4 opportunities')}</div>
+      <div class="crm-card crm-chart"><div class="crm-chart-head"><span>Qamar Energy — total pipeline, Aug–Dec 2026</span>${srcChip('datalake','4 opportunities')}</div>
       <svg viewBox="0 0 600 200" role="img" aria-label="Line chart: pipeline grew from 0.64M in June to 2.18M in October">
         <g stroke="#e9edf4" stroke-width="1"><line x1="50" y1="30" x2="580" y2="30"/><line x1="50" y1="88" x2="580" y2="88"/><line x1="50" y1="146" x2="580" y2="146"/></g>
         <g fill="#56657a" font-size="12" font-family="Inter, sans-serif"><text x="8" y="34">$2.4M</text><text x="8" y="92">$1.2M</text><text x="22" y="150">$0</text>
-        <text x="70" y="172" text-anchor="middle">Jun</text><text x="190" y="172" text-anchor="middle">Jul</text><text x="310" y="172" text-anchor="middle">Aug</text><text x="430" y="172" text-anchor="middle">Sep</text><text x="550" y="172" text-anchor="middle">Oct</text></g>
+        <text x="70" y="172" text-anchor="middle">Aug</text><text x="190" y="172" text-anchor="middle">Sep</text><text x="310" y="172" text-anchor="middle">Oct</text><text x="430" y="172" text-anchor="middle">Nov</text><text x="550" y="172" text-anchor="middle">Dec</text></g>
         <polyline points="70,115 190,115 310,95 430,56 550,41" fill="none" stroke="#0042B7" stroke-width="3" stroke-linejoin="round"/>
         <g fill="#0042B7"><circle cx="70" cy="115" r="4"/><circle cx="190" cy="115" r="4"/><circle cx="310" cy="95" r="4"/><circle cx="430" cy="56" r="4"/><circle cx="550" cy="41" r="5"/></g>
         <text x="550" y="26" text-anchor="middle" font-size="13" font-weight="600" fill="#052870" font-family="Inter, sans-serif">$2.18M</text>
@@ -414,7 +414,7 @@ function replyLog(){
         <div class="crm-change"><span class="lbl">Activity</span><div><b>Meeting with Hana Al-Rashdi</b> · today<br><span class="muted">Wants a 3-phase rollout. Budget approved for phase 1. Expects a phased proposal by Friday.</span></div></div>
         <div class="crm-change"><span class="lbl">Next step</span><div><span class="old">Follow up after workshop</span><span class="arrow">→</span><b>Send phased proposal</b></div></div>
         <div class="crm-change"><span class="lbl">Budget</span><div><span class="old">Unconfirmed</span><span class="arrow">→</span><b>Approved for phase 1</b></div></div>
-        <div class="crm-change"><span class="lbl">New task</span><div><b>Send phased proposal to Hana</b><br><span class="muted">Due Fri 23 Oct · Gaurav Shrotriya</span></div></div>
+        <div class="crm-change"><span class="lbl">New task</span><div><b>Send phased proposal to Hana</b><br><span class="muted">Due Fri 18 Dec · Gaurav Shrotriya</span></div></div>
       </div>
       <div id="log-state"><div class="crm-actions"><button class="btn-bct" data-action="log-save">${svg('check')}Confirm all 4</button><button class="btn-bct secondary" data-action="log-edit">Edit</button><button class="btn-bct secondary" data-action="log-discard">Discard</button></div></div>`,
     optionsLabel: "While you're here",
@@ -429,7 +429,7 @@ const LOG_STATES = {
   undone: `<div class="crm-banner muted"><span><b>Undone.</b> 4 updates reverted. Data Lake is back to next step <b>Follow up after workshop</b> · budget <b>Unconfirmed</b>.</span><span class="acts"><button class="src" data-action="log-restore">${svg('undo')}Review again</button></span></div>`
 };
 const LEAD_STATES = {
-  pending: `<p><b>Looks like a duplicate.</b> Khalid's enquiry matches the AI document processing deal you opened on 19 Oct. Link this lead to ${srcChip('kpo')} instead of creating a second one?</p>
+  pending: `<p><b>Looks like a duplicate.</b> Khalid's enquiry matches the AI document processing deal you opened on 8 Dec. Link this lead to ${srcChip('kpo')} instead of creating a second one?</p>
     <div class="crm-actions"><button class="btn-bct" data-action="lead-link">${svg('check')}Link to OPP-1066</button><button class="btn-bct secondary" data-action="lead-keep">Keep as a new lead</button></div>`,
   linked: `<div class="crm-banner ok" style="margin-top:0"><span>${AI_FACE_HAPPY}<b>Linked.</b> LEAD-0312 attached to AI document processing as a pricing request.</span><span class="acts">${srcChip('kpo','View deal')}<button class="src" data-action="lead-undo">${svg('undo')}Undo</button></span></div>`,
   kept: `<div class="crm-banner muted" style="margin-top:0"><span>Kept as a new lead. You can link it later from the lead record.</span><span class="acts"><button class="src" data-action="lead-undo">${svg('undo')}Undo</button></span></div>`
@@ -453,13 +453,13 @@ function replyToday(){
         <div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">Al Dhafra Facilities Management · Faisal Al-Mazrouei</div><div class="crm-row-meta"><span>Field service for ~400 technicians · 02:14 · Services page</span><span class="flag new">New company</span></div></div><div class="crm-row-side"><button class="btn-bct secondary" data-next="draft-faisal">Draft reply</button>${srcChip('lead1')}</div></div>
         <div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">Qamar Energy · Khalid Al-Riyami</div><div class="crm-row-meta"><span>AI document processing pricing · 06:40 · Contact page</span><span class="flag match">Matches existing account</span></div></div><div class="crm-row-side">${srcChip('lead2')}</div></div>
       </div></div>
-      <div class="crm-next" id="lead-state"><p><b>Looks like a duplicate.</b> Khalid's enquiry matches the AI document processing deal you opened on 19 Oct. Link this lead to ${srcChip('kpo')} instead of creating a second one?</p>
+      <div class="crm-next" id="lead-state"><p><b>Looks like a duplicate.</b> Khalid's enquiry matches the AI document processing deal you opened on 8 Dec. Link this lead to ${srcChip('kpo')} instead of creating a second one?</p>
         <div class="crm-actions"><button class="btn-bct" data-action="lead-link">${svg('check')}Link to OPP-1066</button><button class="btn-bct secondary" data-action="lead-keep">Keep as a new lead</button></div>
       </div>
       <div class="crm-card" id="task-card"><div class="crm-group" style="padding-bottom:4px"><div class="crm-group-head"><span class="lbl">Tasks</span><small id="task-count">0 of 3 done</small></div></div><div id="task-list">${TASKS.map(taskRow).join('')}</div></div>
       <div class="crm-card"><div class="crm-group"><div class="crm-group-head"><span class="lbl">Needs attention</span></div>
         <div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">Data Lake modernisation · Qamar Energy</div><div class="crm-row-meta"><span>No activity for 32 days · $820K</span></div></div><div class="crm-row-side"><button class="btn-bct secondary" data-next="pipeline">Draft follow-up</button></div></div>
-        <div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">Warehouse management system · Gulf Harbor</div><div class="crm-row-meta"><span>Close date Mon 26 Oct, still in Proposal · $540K</span></div></div><div class="crm-row-side"><button class="btn-bct secondary" data-record="gulf">Open record</button></div></div>
+        <div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">Warehouse management system · Gulf Harbor</div><div class="crm-row-meta"><span>Close date Mon 14 Dec, still in Proposal · $540K</span></div></div><div class="crm-row-side"><button class="btn-bct secondary" data-record="gulf">Open record</button></div></div>
       </div></div>`,
     optionsLabel: 'Anything else?',
     options: [['Draft a reply to Faisal','draft-faisal'],['Draft the Gulf Harbor pricing email','draft-gulf'],['Show my week','week']]
@@ -504,7 +504,7 @@ function replyDraft(kind){
   const d = {
     followup: ['Hana Al-Rashdi','Data Lake — proposed next steps',"Hi Hana, thanks again for the workshop last month. Based on your team's input, we've outlined a phased approach for the data lake. Could we find 30 minutes next week to walk you through it?"],
     gulf: ['Omar Haddad','Revised pricing — warehouse management system','Hi Omar, as discussed with your finance team, here is the revised pricing with the phased licence option. Happy to walk through it before Monday if that helps.'],
-    faisal: ['Faisal Al-Mazrouei','Field service management — next step',"Hi Faisal, thanks for reaching out through our website. We've helped operations teams of a similar size move off spreadsheets with a phased field-service rollout. Would a 30-minute demo next week suit you, ahead of your December budget round?"],
+    faisal: ['Faisal Al-Mazrouei','Field service management — next step',"Hi Faisal, thanks for reaching out through our website. We've helped operations teams of a similar size move off spreadsheets with a phased field-service rollout. Would a 30-minute demo next week suit you, ahead of your January budget round?"],
     khalid: ['Khalid Al-Riyami','Checking in',"Hi Khalid, it's been a while since the ERP renewal closed. With two new projects in motion at Qamar, I'd like to make sure procurement has what it needs early. Could we catch up this week?"],
     outline: ['', 'Phased proposal outline', 'Phase 1 — Foundation (budget approved): landing zone, ingestion for the 3 priority sources, governance baseline.\nPhase 2 — Expansion: remaining sources, self-service analytics, data quality monitoring.\nPhase 3 — Advanced: ML-ready datasets, real-time pipelines, cost optimisation.']
   }[kind];
@@ -532,10 +532,10 @@ function replyAttention(){
     sources: [['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago'],['Tasks','circle-check','CRM · your task list','synced 2 min ago']],
     html: `<p><b>4 deals</b> need you this week. Start with <b>Gulf Harbor</b>: the pricing is a day late and they close on Monday.</p>
       <div class="crm-card"><div class="crm-group"><div class="crm-group-head"><span class="lbl">Needs attention</span><small>4 deals · $2.05M</small></div>
-        ${attnRow('gulf',[['overdue','1 day late'],['ink','Closes Monday']],'Send revised pricing to Omar Haddad · was due Wed 21 Oct','Draft pricing email','draft-gulf')}
+        ${attnRow('gulf',[['overdue','1 day late'],['ink','Closes Monday']],'Send revised pricing to Omar Haddad · was due Thu 10 Dec','Draft pricing email','draft-gulf')}
         ${attnRow('fieldops',[['due','Due today 16:00']],'Prepare Field Ops demo for Qamar · due today 16:00','Prep checklist','prep-fieldops')}
         ${attnRow('sahyadri',[['due','Due today 11:00']],'Call Rajesh Kulkarni about security review scope · due today 11:00','Prep for the call','prep-rajesh')}
-        ${attnRow('datalake',[['warn','Quiet 32 days']],'Send phased proposal to Hana · due Fri 23 Oct','Draft follow-up to Hana','draft-hana')}
+        ${attnRow('datalake',[['warn','Quiet 32 days']],'Send phased proposal to Hana · due Fri 18 Dec','Draft follow-up to Hana','draft-hana')}
       </div></div>
       <p class="muted" style="margin-top:10px">Can wait: AI document processing.</p>`,
     optionsLabel: 'Next',
@@ -544,8 +544,8 @@ function replyAttention(){
 }
 function replyPrep(k){
   const d = {
-    fieldops: ['Field Ops demo prep · today 16:00', ['Confirm the supervisors attending on Thursday','Load the offline job-sheet demo with Qamar sample data','Bring the revised SOW summary (sent 16 Oct)','Agree the go/no-go criteria with Salim']],
-    rajesh: ['Call with Rajesh Kulkarni · today 11:00', ['Recap: he asked for scope options on 15 Oct','Offer three scopes: core banking only, plus payments, plus cloud','Ask who signs off: Rajesh or Priya Deshmukh','Agree a date for the written proposal']]
+    fieldops: ['Field Ops demo prep · today 16:00', ['Confirm the supervisors attending on Thursday','Load the offline job-sheet demo with Qamar sample data','Bring the revised SOW summary (sent 5 Dec)','Agree the go/no-go criteria with Salim']],
+    rajesh: ['Call with Rajesh Kulkarni · today 11:00', ['Recap: he asked for scope options on 4 Dec','Offer three scopes: core banking only, plus payments, plus cloud','Ask who signs off: Rajesh or Priya Deshmukh','Agree a date for the written proposal']]
   }[k];
   return { html: `<p>${esc(d[0])}:</p><ul>${d[1].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`, optionsLabel:'Anything else?', options:[['Back to deals that need attention','attention']] };
 }
@@ -555,7 +555,7 @@ function replyWeek(){
     sources: [['Calendar','calendar','Teams · this week','synced 5 min ago'],['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago']],
     html: `<p>Two things define your week: <b>Gulf Harbor closes Monday</b> and the <b>Qamar Field Ops demo is Thursday</b>. Everything else can move.</p>
       <div class="crm-card"><div class="crm-group">
-        ${row('gulf','Mon 26 Oct · close date · pricing still open')}${row('fieldops','Thu 29 Oct · demo to field supervisors')}${row('datalake','Fri 23 Oct · phased proposal due')}
+        ${row('gulf','Mon 14 Dec · close date · pricing still open')}${row('fieldops','Thu 17 Dec · demo to field supervisors')}${row('datalake','Fri 18 Dec · phased proposal due')}
       </div></div>`,
     optionsLabel:'Anything else?', options:[['Back to today','today'],['Show the whole Qamar pipeline','pipeline']]
   };

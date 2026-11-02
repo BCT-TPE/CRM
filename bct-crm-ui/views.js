@@ -6,9 +6,9 @@
 const LEADS = [
   { rec:'lead1', company:'Al Dhafra Facilities Management', contact:'Faisal Al-Mazrouei', interest:'Field service management for ~400 technicians', source:'Website · Services page', when:'Today 02:14', status:'new', owner:'Unassigned' },
   { rec:'lead2', company:'Qamar Energy', contact:'Khalid Al-Riyami', interest:'AI document processing pricing', source:'Website · Contact page', when:'Today 06:40', status:'match', owner:'Gaurav Shrotriya', note:'Matches ACC-0214' },
-  { rec:null,   company:'Emirates Steel', contact:'Noura Al-Shamsi', interest:'SAP S/4 migration assessment', source:'Website · Services page', when:'17 Oct', status:'contacted', owner:'Gaurav Shrotriya', note:'Replied 17 Oct · call Thu' },
-  { rec:'muscat', company:'Muscat Municipality', contact:'Said Al-Hinai', interest:'Citizen portal phase 2', source:'Referral', when:'08 Oct', status:'converted', owner:'Sundara Balaji', note:'→ OPP-1049' },
-  { rec:null,   company:'Lulu Group', contact:'Anand Menon', interest:'Retail analytics', source:'Website · Contact page', when:'03 Oct', status:'disqualified', owner:'Gaurav Shrotriya', note:'Not a fit · consumer retail' }
+  { rec:null,   company:'Emirates Steel', contact:'Noura Al-Shamsi', interest:'SAP S/4 migration assessment', source:'Website · Services page', when:'6 Dec', status:'contacted', owner:'Gaurav Shrotriya', note:'Replied 6 Dec · call Thu' },
+  { rec:'muscat', company:'Muscat Municipality', contact:'Said Al-Hinai', interest:'Citizen portal phase 2', source:'Referral', when:'20 Nov', status:'converted', owner:'Sundara Balaji', note:'→ OPP-1049' },
+  { rec:null,   company:'Lulu Group', contact:'Anand Menon', interest:'Retail analytics', source:'Website · Contact page', when:'22 Nov', status:'disqualified', owner:'Gaurav Shrotriya', note:'Not a fit · consumer retail' }
 ];
 const LEAD_STATUS = { new:['New','new'], match:['Matches account','match'], contacted:['Contacted','info'], converted:['Converted','ok'], disqualified:['Disqualified','off'] };
 
@@ -16,17 +16,17 @@ const LEAD_STATUS = { new:['New','new'], match:['Matches account','match'], cont
    two-way contact in the 60-day activity barcode; status = the one flag that matters now. */
 const ACCOUNTS = [
   { rec:'contacts',     mono:'QE', bg:'linear-gradient(140deg,#052870,#0042B7)', name:'Qamar Energy', country:'Oman', industry:'Oil & gas', open:1.54, deals:3, won:'$640K', contacts:4, last:'Today · website lead', owner:'Gaurav Shrotriya', bc:[40,55], status:['ok','Active today'], next:'Prepare Field Ops demo · today 16:00' },
-  { rec:'acc_gulf',     mono:'GH', bg:'linear-gradient(140deg,#0077b6,#00A0E4)', name:'Gulf Harbor Logistics', country:'UAE', industry:'Logistics', open:.54, deals:1, won:'—', contacts:2, last:'14 Oct · proposal v2 sent', owner:'Gaurav Shrotriya', bc:[38,44], status:['overdue','Closes Monday'], next:'Send revised pricing · overdue', attn:true },
-  { rec:'acc_sahyadri', mono:'SB', bg:'linear-gradient(140deg,#10182a,#344258)', name:'Sahyadri Bank', country:'India', industry:'Banking', open:.28, deals:1, won:'$120K', contacts:3, last:'15 Oct · email', owner:'Gaurav Shrotriya', bc:[44,48], status:['muted','Call today 11:00'], next:'Call Rajesh about scope · 11:00' },
-  { rec:'acc_muscat',   mono:'MM', bg:'linear-gradient(140deg,#3d63b8,#7aa5e8)', name:'Muscat Municipality', country:'Oman', industry:'Public sector', open:.19, deals:1, won:'$310K', contacts:5, last:'10 Oct · workshop', owner:'Sundara Balaji', bc:[22,28], status:['warn','Quiet 18 days'], next:'Quarterly review · 05 Nov', attn:true }
+  { rec:'acc_gulf',     mono:'GH', bg:'linear-gradient(140deg,#0077b6,#00A0E4)', name:'Gulf Harbor Logistics', country:'UAE', industry:'Logistics', open:.54, deals:1, won:'—', contacts:2, last:'3 Dec · proposal v2 sent', owner:'Gaurav Shrotriya', bc:[38,44], status:['overdue','Closes Monday'], next:'Send revised pricing · overdue', attn:true },
+  { rec:'acc_sahyadri', mono:'SB', bg:'linear-gradient(140deg,#10182a,#344258)', name:'Sahyadri Bank', country:'India', industry:'Banking', open:.28, deals:1, won:'$120K', contacts:3, last:'4 Dec · email', owner:'Gaurav Shrotriya', bc:[44,48], status:['muted','Call today 11:00'], next:'Call Rajesh about scope · 11:00' },
+  { rec:'acc_muscat',   mono:'MM', bg:'linear-gradient(140deg,#3d63b8,#7aa5e8)', name:'Muscat Municipality', country:'Oman', industry:'Public sector', open:.19, deals:1, won:'$310K', contacts:5, last:'23 Nov · workshop', owner:'Sundara Balaji', bc:[22,28], status:['warn','Quiet 18 days'], next:'Quarterly review · 28 Dec', attn:true }
 ];
 
 const TASKS_MORE = [
-  { id:'w1', title:'Send phased proposal to Hana', meta:'Qamar Energy · Fri 23 Oct', src:'datalake', group:'week' },
-  { id:'w2', title:'Prepare contract draft for Gulf Harbor', meta:'Gulf Harbor Logistics · Mon 26 Oct', src:'gulf', group:'week' },
-  { id:'w3', title:'Reply to Noura (Emirates Steel) with assessment options', meta:'Emirates Steel · Thu 22 Oct', src:'steel', group:'week' },
-  { id:'l1', title:'Quarterly review with Muscat Municipality', meta:'Muscat Municipality · 05 Nov', src:'muscat', group:'later' },
-  { id:'l2', title:'Renewal check-in with Khalid (procurement)', meta:'Qamar Energy · 12 Nov', src:'contacts', group:'later' }
+  { id:'w1', title:'Send phased proposal to Hana', meta:'Qamar Energy · Fri 18 Dec', src:'datalake', group:'week' },
+  { id:'w2', title:'Prepare contract draft for Gulf Harbor', meta:'Gulf Harbor Logistics · Mon 14 Dec', src:'gulf', group:'week' },
+  { id:'w3', title:'Reply to Noura (Emirates Steel) with assessment options', meta:'Emirates Steel · Fri 11 Dec', src:'steel', group:'week' },
+  { id:'l1', title:'Quarterly review with Muscat Municipality', meta:'Muscat Municipality · 28 Dec', src:'muscat', group:'later' },
+  { id:'l2', title:'Renewal check-in with Khalid (procurement)', meta:'Qamar Energy · 05 Jan', src:'contacts', group:'later' }
 ];
 
 
@@ -47,19 +47,19 @@ function keepIds(t){ return t.replace(/\b([A-Z]{3,4}-\d{3,4})\b/g, '<span class=
 const PV_CONTACT = { datalake:'hana', erp:'hana', gulf:'omar', sahyadri:'rajesh', kpo:'maryam', fieldops:'salim', muscat:'said' };
 const PV_DRAFT = { datalake:['Follow-up — Data Lake','Draft a follow-up to Hana','followup'], gulf:['Pricing — Gulf Harbor','Draft the Gulf Harbor pricing email','gulf'], kpo:['Check-in — Khalid','Draft a check-in to Khalid','khalid'] };
 const PV_DETAIL = {
-  datalake:{ bc:[4,30], last:'Last touch 20 Sep · workshop', p:'Quiet for <b>32 days</b> after a good workshop. It is your biggest open deal and would cover the <b>$400K</b> Q4 gap on its own.', src:'Based on OPP-1042 · 9 emails · 3 meetings' },
-  gulf:{ bc:[38,55], last:'Last touch 14 Oct · proposal v2', p:'Closes <b>Monday</b>. Finance pushed back on price on 8 Oct and Omar asked for a <b>phased licence</b>. Revised pricing is overdue by one day.', src:'Based on OPP-1031 · 14 emails · 2 meetings' },
+  datalake:{ bc:[4,30], last:'Last touch 9 Nov · workshop', p:'Quiet for <b>32 days</b> after a good workshop. It is your biggest open deal and would cover the <b>$400K</b> Q4 gap on its own.', src:'Based on OPP-1042 · 9 emails · 3 meetings' },
+  gulf:{ bc:[38,55], last:'Last touch 3 Dec · proposal v2', p:'Closes <b>Monday</b>. Finance pushed back on price on 27 Nov and Omar asked for a <b>phased licence</b>. Revised pricing is overdue by one day.', src:'Based on OPP-1031 · 14 emails · 2 meetings' },
   kpo:{ bc:[46,56], last:'Last touch today · website lead', p:'Khalid from procurement asked for pricing through the website this morning. It was linked to this deal instead of creating a <span class="nb">new lead.</span>', src:'Based on OPP-1066 · LEAD-0312 · 2 meetings' },
-  fieldops:{ bc:[40,54], last:'Last touch 16 Oct · revised SOW', p:'The revised SOW is with procurement. The demo to field supervisors on <b>Thursday</b> is the next moment that can move it.', src:'Based on OPP-1017 · 11 emails · 3 meetings' }
+  fieldops:{ bc:[40,54], last:'Last touch 5 Dec · revised SOW', p:'The revised SOW is with procurement. The demo to field supervisors on <b>Thursday</b> is the next moment that can move it.', src:'Based on OPP-1017 · 11 emails · 3 meetings' }
 };
 let pvSel = null; // an opportunity id, or 'lead:<index in LEADS>'
 /* New leads lane (2026-10-28): open website leads and referrals sit above the stages. */
 const PV_LEADS = () => LEADS.map((l,i)=>[l,i]).filter(([l])=>['new','match','contacted'].includes(l.status));
 const LEAD_FLAG = { new:['New company','new'], match:['Matches ACC-0214','match'], contacted:['Replied · call Thu','muted'] };
 const LEAD_BRIEF = {
-  lead1:{ p:'Asked about field service for <b>~400 technicians</b> through the Services page at 02:14. New company, no match in Accounts. Their budget round is in <b>December</b>, so a reply today keeps you early.', src:'Based on LEAD-0311 · website form', draft:['Draft a reply to Faisal','faisal'] },
-  lead2:{ p:'Khalid from procurement asked for <b>AI document processing pricing</b>. Qamar Energy is already an account and this matches the deal opened on 19 Oct. Link it instead of creating a <span class="nb">second lead.</span>', src:'Based on LEAD-0312 · ACC-0214 · OPP-1066', link:true },
-  steel:{ p:'Noura asked for an <b>SAP S/4 migration assessment</b>. You replied on 17 Oct and the call is on <b>Thursday</b>.', src:'Based on the website form · 2 emails' }
+  lead1:{ p:'Asked about field service for <b>~400 technicians</b> through the Services page at 02:14. New company, no match in Accounts. Their budget round is in <b>January</b>, so a reply today keeps you early.', src:'Based on LEAD-0311 · website form', draft:['Draft a reply to Faisal','faisal'] },
+  lead2:{ p:'Khalid from procurement asked for <b>AI document processing pricing</b>. Qamar Energy is already an account and this matches the deal opened on 8 Dec. Link it instead of creating a <span class="nb">second lead.</span>', src:'Based on LEAD-0312 · ACC-0214 · OPP-1066', link:true },
+  steel:{ p:'Noura asked for an <b>SAP S/4 migration assessment</b>. You replied on 6 Dec and the call is on <b>Thursday</b>.', src:'Based on the website form · 2 emails' }
 };
 // Tasks tied to a record (deal or lead), from today's list and the rest of the week.
 function tasksFor(src){ return [...TASKS, ...TASKS_MORE].filter(t=>t.src===src); }
@@ -113,8 +113,8 @@ const PV_ANSWERS = {
   slipped: () => `<button class="pv-back" data-pv="back">${svg('chevron-left')}Board summary</button>
     <p><b>Two deals slipped</b> this month:</p>
     <div class="pv-list">
-      <button data-pick="datalake"><span><b>Data Lake</b> · no activity since 20 Sep</span>${svg('chevron-right')}</button>
-      <button data-pick="gulf"><span><b>Gulf Harbor</b> · pricing promised 26 Oct, not sent</span>${svg('chevron-right')}</button>
+      <button data-pick="datalake"><span><b>Data Lake</b> · no activity since 9 Nov</span>${svg('chevron-right')}</button>
+      <button data-pick="gulf"><span><b>Gulf Harbor</b> · pricing promised 10 Dec, not sent</span>${svg('chevron-right')}</button>
     </div><div class="pv-src">Based on 6 open opportunities · next-step dates</div>`,
   bytype: () => `<button class="pv-back" data-pv="back">${svg('chevron-left')}Board summary</button>
     <p>Open pipeline by deal type, <b>$2.55M</b> in total:</p>
@@ -311,8 +311,8 @@ function rpGauge(p){
     <circle class="rp-g-dot" cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="7" fill="var(--bct-cyan)" stroke="#fff" stroke-width="3"/></svg>`;
 }
 function rpActivity(){
-  const r=seeded(42), n=60, start=Date.UTC(2026,7,29), EVENTS={22:'Workshop',46:'Proposal v2'};
-  const days=[...Array(n)].map((_,i)=>{ const busy=(i>=18&&i<=23)||(i>=44&&i<=51); const h=Math.round((busy?55:18)+r()*(busy?45:30));
+  const r=seeded(42), n=60, start=Date.UTC(2026,9,13), EVENTS={27:'Workshop',51:'Proposal v2'};
+  const days=[...Array(n)].map((_,i)=>{ const busy=(i>=23&&i<=28)||(i>=49&&i<=56); const h=Math.round((busy?55:18)+r()*(busy?45:30));
     return { h, m: i<n-1 && !!(EVENTS[i] || (busy && r()>.35)) }; });
   // Spread the 142 emails and 31 meetings by bar height, so the day tooltips add up to the card header.
   const spread=(idx,total)=>{ const sum=idx.reduce((t,i)=>t+days[i].h,0), raw=idx.map(i=>total*days[i].h/sum), out=raw.map(Math.floor);
@@ -337,8 +337,8 @@ function rpRegionCard(){
    [rec, name, activity %, touches, pipeline %, last touch, under-served] */
 const RP_ACT_ACC = [
   ['contacts','Qamar Energy',64,111,60,'Today',false],
-  ['acc_gulf','Gulf Harbor Logistics',13,22,21,'14 Oct',true],
-  ['acc_sahyadri','Sahyadri Bank',9,16,11,'15 Oct',false]
+  ['acc_gulf','Gulf Harbor Logistics',13,22,21,'3 Dec',true],
+  ['acc_sahyadri','Sahyadri Bank',9,16,11,'4 Dec',false]
 ];
 function rpActAcc(){
   return `<div class="rp-aa" role="table" aria-label="Activity and open pipeline by account">
@@ -349,9 +349,9 @@ function rpActAcc(){
   <p class="rp-muted rp-aa-f">Gulf Harbor holds 21% of your pipeline but got 13% of <span class="nb">your time.</span></p>`;
 }
 const RP_WL = [
-  ['won','ERP renewal','Qamar Energy · 12 Aug','$640K'],
-  ['won','Citizen portal phase 1','Muscat Municipality · 22 Sep','$310K'],
-  ['won','Security review','Sahyadri Bank · 3 Oct','$120K'],
+  ['won','ERP renewal','Qamar Energy · 1 Oct','$640K'],
+  ['won','Citizen portal phase 1','Muscat Municipality · 11 Nov','$310K'],
+  ['won','Security review','Sahyadri Bank · 22 Nov','$120K'],
   ['lost','Fleet tracking app','Emirates Transport · lost on price','$280K'],
   ['lost','Data audit','Oman Air · lost on price','$150K']
 ];
@@ -362,11 +362,11 @@ function viewReports(){
   return `<div class="rp">
     <div class="rp-head">
       <div><div class="eyebrow">Q4 2026 · figures as of today 06:00</div><h1>Reports</h1>
-        <div class="rp-pills"><button class="chip-f active">Q4 2026</button><button class="chip-f active">Mine</button><button class="chip-f">Middle East</button></div></div>
+        <div class="rp-pills"><button class="chip-f active">Q4 2026</button><button class="chip-f active">Mine</button><button class="chip-f">ACAP</button></div></div>
       <div class="rp-side"><div class="rp-heads">
         <div class="rp-hd">${rpNum('$',2.55,'M',2)}<div class="rp-row"><span class="tip-def" tabindex="0" data-tip="All your open deals, at full value.">Open pipeline</span> <span class="rp-delta up tip-def" tabindex="0" data-tip="Up from $2.28M at the end of Q3.">+12%</span></div></div>
         <div class="rp-hd">${rpNum('$',1.10,'M',2)}<div class="rp-row"><span class="tip-def" tabindex="0" data-tip="Committed $540K plus best case $560K, closing by 31 Dec.">Q4 forecast</span> · 73% of target</div></div>
-        <div class="rp-hd">${rpNum('$',1.07,'M',2)}<div class="rp-row"><span class="tip-def" tabindex="0" data-tip="Three deals signed since 29 Jul: ERP renewal, Citizen portal phase 1 and Security review.">Won, last 90 days</span></div></div>
+        <div class="rp-hd">${rpNum('$',1.07,'M',2)}<div class="rp-row"><span class="tip-def" tabindex="0" data-tip="Three deals signed since 12 Sep: ERP renewal, Citizen portal phase 1 and Security review.">Won, last 90 days</span></div></div>
         <div class="rp-hd">${rpNum('',2,'',0)}<div class="rp-row"><span class="tip-def" tabindex="0" data-tip="Website and referral leads since Monday: Al Dhafra and Qamar Energy.">New leads this week</span></div></div>
       </div>${pin}</div>
     </div>
@@ -374,7 +374,7 @@ function viewReports(){
       ${rpRegion?rpRegionCard():''}
       <section class="rp-card s4"><div class="rp-ct"><span class="tip-def" tabindex="0" data-tip="What is left to reach your Q4 target of $1.5M, after the forecast.">To target</span></div><div data-tip-h="$1.10M of $1.5M" data-tip="Forecast is at 73% of the Q4 target.">${rpGauge(.73)}</div>
         <div class="rp-g-num">${rpNum('$',400,'K',0)}<div>to go · target $1.5M</div></div>
-        <div class="rp-trio"><span><span class="tip-def" tabindex="0" data-tip="Deals the client has agreed to, closing this quarter.">Committed</span><b>$540K</b></span><span><span class="tip-def" tabindex="0" data-tip="Deals likely to close this quarter that are not agreed yet.">Best case</span><b>$560K</b></span><span><span class="tip-def" tabindex="0" data-tip="Until the quarter closes on 31 Dec.">Weeks left</span><b>9</b></span></div></section>
+        <div class="rp-trio"><span><span class="tip-def" tabindex="0" data-tip="Deals the client has agreed to, closing this quarter.">Committed</span><b>$540K</b></span><span><span class="tip-def" tabindex="0" data-tip="Deals likely to close this quarter that are not agreed yet.">Best case</span><b>$560K</b></span><span><span class="tip-def" tabindex="0" data-tip="Until the quarter closes on 31 Dec.">Weeks left</span><b>3</b></span></div></section>
       <section class="rp-card s4"><div class="rp-ct"><span class="tip-def" tabindex="0" data-tip="Your open pipeline split by how BCT delivers. A mixed deal counts under its main type.">Pipeline by deal type</span><button class="rp-go" data-view="pipeline" aria-label="Open the pipeline">${svg('arrow-ur')}</button></div>
         <div class="rp-segs" data-tip-cols role="img" aria-label="Services 35%, Services plus IP 32%, Resell 21%, KPO BPO 12%">
           <div style="flex:35" data-tip-h="Services" data-tip="$880K · 35% of open pipeline"><span>35%</span><i style="background:var(--bct-ink)"></i></div>
@@ -389,7 +389,7 @@ function viewReports(){
           <span class="rp-key" aria-hidden="true"><span class="m">Meeting days</span><span>Email</span><span class="t">Today</span></span></div>
         <div class="rp-act-g"><div>
           <div class="rp-bars" data-tip-cols role="img" aria-label="Activity per day over 60 days, with peaks around the 20 September workshop and the 14 October proposal">${rpActivity()}</div>
-          <div class="rp-axis"><span>29 Aug</span><span>Workshop · 20 Sep</span><span>Proposal v2 · 14 Oct</span><span>Today</span></div></div>
+          <div class="rp-axis"><span>13 Oct</span><span>Workshop · 9 Nov</span><span>Proposal v2 · 3 Dec</span><span>Today</span></div></div>
           <div>${rpActAcc()}</div></div></section>
       <section class="rp-card s4"><div class="rp-ct"><span><span class="tip-def" tabindex="0" data-tip="Your deals that closed in the last 90 days, won or lost.">Won and lost</span> <span class="rp-muted">· last 90 days</span></span></div>
         <div class="rp-wl">${RP_WL.map(r=>`<div class="${r[0]}"><i aria-label="${r[0]==='won'?'Won':'Lost'}">${svg(r[0]==='won'?'check':'x')}</i><span>${esc(r[1])}<small>${esc(r[2])}</small></span><em>${r[3]}</em></div>`).join('')}</div>
@@ -400,9 +400,9 @@ function viewReports(){
         <div class="rp-pc-row"><span>Decides on Data Lake · <span class="nb">3 meetings this quarter</span></span><div class="rp-pc-acts"><button data-rp="call" aria-label="Call Hana">${svg('phone')}</button><button data-rp="mail" aria-label="Email Hana">${svg('mail')}</button></div></div></section>
       <section class="rp-card s4"><div class="rp-ct">Closing this month</div>
         <div class="rp-chk">
-          <button data-record="fieldops"><i class="done">${svg('check')}</i><span>Revised SOW to Qamar procurement<small>Field Ops mobile app · sent 16 Oct</small></span><em>$410K</em></button>
+          <button data-record="fieldops"><i class="done">${svg('check')}</i><span>Revised SOW to Qamar procurement<small>Field Ops mobile app · sent 5 Dec</small></span><em>$410K</em></button>
           <button data-record="gulf"><i></i><span>Send revised pricing to Omar Haddad<small>Gulf Harbor · overdue by 1 day</small></span><em>$540K</em></button>
-          <button data-record="datalake"><i></i><span>Phased proposal to Hana<small>Data Lake · due Fri 23 Oct</small></span><em>$820K</em></button>
+          <button data-record="datalake"><i></i><span>Phased proposal to Hana<small>Data Lake · due Fri 18 Dec</small></span><em>$820K</em></button>
         </div></section>
       <section class="rp-card s4"><div class="rp-ct"><span class="tip-def" tabindex="0" data-tip="How long your open deals have sat in each stage so far.">Average days in stage</span></div>
         <div class="rp-gantt">

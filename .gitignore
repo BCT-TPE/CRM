@@ -1,5 +1,5 @@
 # Goes to GitHub: the web prototype, plus the connector's reply-card page and its download (2026-11-02).
-# Kept local: discussion notes, the BRD, Masood's prototype, the connector source, bct-crm-connector, offline zips, design proposals.
+# Everything else stays local, including design proposals, working notes and the connector source.
 /*
 !/.gitignore
 !/README.md
@@ -9,6 +9,7 @@
 !/bct-crm-mcp/docs/
 !/bct-crm-mcp/dist/
 .DS_Store
+/bct-crm-ui/README.md
 # Design proposals stay local; only the design system is published
 /bct-crm-ui/docs/*
 !/bct-crm-ui/docs/design-system.html
