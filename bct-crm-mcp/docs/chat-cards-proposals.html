@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Connector Reply Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/svg+xml" href="../../bct-crm-ui/assets/fav.svg" />
+<!-- Proposal page (2026-10-28): what each scripted question would look like in Claude with the BCT CRM connector.
+     Every answer = one card (BCT style, MCP Apps) + one or two sentences from Claude. Fictional data; demo day Thu 22 Oct. -->
+<style>
+  :root {
+    --ink: #10182a; --muted: #56657a; --title: #172033; --line: #e1e6ef; --line-soft: #e9edf4; --surface: #fff;
+    --deep: #0042b7; --midnight: #052870; --cyan: #00a3e0; --blue-bg: #e8effb;
+    --up-bg: #e3f3e8; --up-fg: #1f6b3a; --red-bg: #fde8e3; --red-fg: #a33a00; --amber-bg: #fff3cf; --amber-fg: #7a4f00; --violet-bg: #efeafb; --violet-fg: #5a45a3;
+    --page: #f6f6f3; --chat-text: #2b2b29; --bubble: #e9e8e3; --note-bg: #ffffff;
+    --sans: Inter, "Noto Sans TC", -apple-system, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--page); color: var(--title); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  .nb { white-space: nowrap; }
+
+  /* Page header + step nav */
+  .top { position: sticky; top: 0; z-index: 5; background: rgb(246 246 243 / 92%); backdrop-filter: blur(8px); border-bottom: 1px solid #e6e5e0; }
+  .top-in { max-width: 1120px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .top h1 { margin: 0; font-size: 15px; font-weight: 600; }
+  .top h1 small { margin-left: 8px; font-weight: 400; color: var(--muted); font-size: 13px; }
+  .steps { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+  .steps a { display: grid; place-items: center; min-width: 32px; height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid #dcdbd5; background: #fff; color: var(--muted); font-size: 13px; text-decoration: none; }
+  .steps a:hover, .steps a.on { border-color: var(--midnight); background: var(--midnight); color: #fff; }
+  .intro { max-width: 1120px; margin: 0 auto; padding: 28px 24px 6px; }
+  .intro p { margin: 0 0 6px; max-width: 760px; font-size: 14px; line-height: 1.7; color: var(--muted); }
+  .intro b { color: var(--title); font-weight: 600; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 3px; vertical-align: -1px; }
+
+  /* Each question */
+  .step { max-width: 1120px; margin: 0 auto; padding: 28px 24px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; border-top: 1px solid #e6e5e0; }
+  .step:first-of-type { border-top: 0; }
+  .chat { max-width: 700px; }
+  .q-no { margin-bottom: 14px; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: var(--muted); }
+  .you { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+  .you span { max-width: 78%; padding: 10px 16px; border-radius: 18px; background: var(--bubble); font-size: 15px; line-height: 1.5; color: var(--chat-text); }
+  .used { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; font-size: 13px; color: #8a8984; }
+  .used svg { width: 12px; height: 12px; }
+  .say { margin: 14px 0 0; font-size: 15.5px; line-height: 1.65; color: var(--chat-text); }
+  .say b { font-weight: 600; }
+
+  /* Notes */
+  .notes { position: sticky; top: 92px; padding: 18px; border-radius: 14px; background: var(--note-bg); border: 1px solid #e6e5e0; font-size: 13px; line-height: 1.65; color: var(--muted); }
+  .notes h3 { margin: 0 0 10px; font-size: 14px; color: var(--title); }
+  .notes dl { margin: 0; }
+  .notes dt { margin-top: 10px; font-size: 11.5px; font-weight: 600; letter-spacing: .04em; color: var(--title); }
+  .notes dd { margin: 2px 0 0; }
+  .notes code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; padding: 1px 5px; border-radius: 4px; background: #f1f1ee; color: var(--title); }
+  .tag { display: inline-block; margin-bottom: 8px; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; }
+  .tag.done { background: var(--up-bg); color: var(--up-fg); }
+  .tag.todo { background: var(--blue-bg); color: var(--deep); }
+
+  /* ---------- BCT card base (same tokens as the web prototype) ---------- */
+  .card { border: 1px solid var(--line); border-radius: 20px; background: var(--surface); overflow: hidden; font-family: var(--sans); }
+  .c-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px 12px; border-bottom: 1px solid var(--line-soft); }
+  .c-head b { font-size: 14px; font-weight: 600; color: var(--title); }
+  .c-head small { font-size: 12.5px; color: var(--muted); }
+  .c-head .sp { flex: 1; }
+  .c-foot { display: flex; align-items: center; gap: 8px; padding: 10px 14px 10px 18px; border-top: 1px solid var(--line-soft); font-size: 12.5px; color: var(--muted); }
+  .c-foot .sp { flex: 1; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--title); font: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .btn:hover { background: #f2f5fa; }
+  .btn.pri { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .btn.pri:hover { background: #24304a; }
+  .btn svg { width: 14px; height: 14px; }
+  .btn.ghost { border-color: transparent; color: var(--muted); }
+  svg.i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .flag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 5px; font-size: 11.5px; font-weight: 500; white-space: nowrap; }
+  .flag.red { background: var(--red-bg); color: var(--red-fg); } .flag.amber { background: var(--amber-bg); color: var(--amber-fg); }
+  .flag.blue { background: var(--blue-bg); color: var(--deep); } .flag.violet { background: var(--violet-bg); color: var(--violet-fg); }
+  .flag.green { background: var(--up-bg); color: var(--up-fg); } .flag.grey { background: #eef1f5; color: var(--muted); }
+  .stage { font-size: 11.5px; color: var(--muted); }
+  .ini { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--blue-bg); color: var(--midnight); font-size: 9px; font-weight: 600; }
+  .money { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+  /* 1. Q4 snapshot (as built) */
+  .grid4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile { min-width: 0; padding: 18px 20px 16px; }
+  .tile:nth-child(odd) { border-right: 1px solid var(--line-soft); }
+  .tile:nth-child(-n+2) { border-bottom: 1px solid var(--line-soft); }
+  .big { font-size: 40px; font-weight: 300; line-height: 1; letter-spacing: -.035em; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .big sup { margin-left: 2px; font-size: .36em; font-weight: 500; letter-spacing: 0; vertical-align: .95em; color: var(--muted); }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+  .delta { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 600; background: var(--up-bg); color: var(--up-fg); }
+  .cap { margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+  /* 2A. Attention list with a 7-day strip */
+  .days { display: grid; grid-template-columns: 1fr 196px; gap: 14px; padding: 8px 18px 4px; font-size: 11px; color: var(--muted); }
+  .days .ax { display: grid; grid-template-columns: 22px repeat(7, 1fr); text-align: center; }
+  .days .ax span.today { color: var(--deep); font-weight: 600; }
+  .att { display: grid; grid-template-columns: 1fr 196px; gap: 14px; align-items: center; padding: 12px 18px; border-top: 1px solid var(--line-soft); }
+  .att:first-of-type { border-top: 0; }
+  .att-t { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 14px; font-weight: 500; color: var(--title); }
+  .att-m { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 5px; font-size: 12.5px; color: var(--muted); }
+  .att-act { margin-top: 8px; }
+  .strip { position: relative; display: grid; grid-template-columns: 22px repeat(7, 1fr); height: 34px; align-items: center; }
+  .strip::before { content: ""; position: absolute; left: 22px; right: 0; top: 50%; height: 2px; background: var(--line-soft); }
+  .strip .over { position: relative; justify-self: center; width: 18px; height: 18px; border-radius: 50%; background: var(--red-bg); color: var(--red-fg); display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+  .strip .todayline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--deep); opacity: .35; }
+  .mk { position: relative; justify-self: center; width: 12px; height: 12px; border-radius: 50%; background: var(--deep); box-shadow: 0 0 0 3px #fff; }
+  .mk.close { width: 13px; height: 13px; border-radius: 3px; transform: rotate(45deg); background: var(--ink); }
+  .mk.red { background: var(--red-fg); } .mk.amber { background: #d99a00; }
+  .strip .lbl { position: absolute; top: -2px; font-size: 10.5px; color: var(--muted); white-space: nowrap; transform: translateX(-50%); }
+  .later { padding: 10px 18px; border-top: 1px solid var(--line-soft); font-size: 12.5px; color: var(--muted); }
+  .key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); }
+  .key span { display: inline-flex; align-items: center; gap: 6px; }
+  .key .mk { box-shadow: none; width: 9px; height: 9px; } .key .mk.close { width: 9px; height: 9px; }
+
+  /* 2B. Week timeline */
+  .wk { display: grid; grid-template-columns: 150px repeat(7, minmax(0, 1fr)); font-size: 12px; }
+  .wk > div { min-height: 52px; padding: 8px 6px; border-top: 1px solid var(--line-soft); border-left: 1px solid var(--line-soft); }
+  .wk > .h { min-height: 0; padding: 8px 6px; border-top: 0; font-size: 11px; color: var(--muted); text-align: center; }
+  .wk > .h.today { color: var(--deep); font-weight: 600; background: #f3f7fe; }
+  .wk > .d { border-left: 0; padding-left: 18px; }
+  .wk > .d b { display: block; font-size: 13px; font-weight: 500; color: var(--title); }
+  .wk > .d small { color: var(--muted); }
+  .wk > .t { background: #f8fbff; }
+  .ev { display: block; padding: 4px 6px; border-radius: 6px; font-size: 11px; line-height: 1.3; }
+  .ev.red { background: var(--red-bg); color: var(--red-fg); } .ev.ink { background: var(--ink); color: #fff; } .ev.blue { background: var(--blue-bg); color: var(--deep); } .ev.amber { background: var(--amber-bg); color: var(--amber-fg); }
+  .switch { display: inline-flex; padding: 3px; margin-bottom: 14px; border-radius: 999px; background: #eceae4; }
+  .switch button { height: 30px; padding: 0 14px; border: 0; border-radius: 999px; background: none; font: inherit; font-size: 12.5px; color: var(--muted); cursor: pointer; }
+  .switch button[aria-pressed="true"] { background: #fff; color: var(--title); box-shadow: 0 1px 2px rgb(0 0 0 / 8%); }
+  .alt[hidden] { display: none; }
+
+  /* 3. Leads */
+  .funnel { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line-soft); }
+  .funnel > div { padding: 14px 18px; }
+  .funnel > div + div { border-left: 1px solid var(--line-soft); }
+  .funnel .big { font-size: 30px; }
+  .lead { padding: 14px 18px; border-top: 1px solid var(--line-soft); }
+  .lead:first-of-type { border-top: 0; }
+  .lead-t { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; font-weight: 500; }
+  .lead-m { margin-top: 4px; font-size: 12.5px; color: var(--muted); }
+  .match { display: flex; align-items: center; gap: 0; margin: 12px 0 10px; flex-wrap: wrap; row-gap: 8px; }
+  .node { display: inline-flex; flex-direction: column; padding: 7px 11px; border-radius: 10px; border: 1px solid var(--line); background: #fff; font-size: 12px; line-height: 1.35; }
+  .node b { font-weight: 600; color: var(--title); } .node small { color: var(--muted); }
+  .node.hit { border-color: #cbbcf2; background: #faf8ff; }
+  .link { position: relative; width: 46px; height: 2px; background: repeating-linear-gradient(90deg, #a996e6 0 5px, transparent 5px 9px); }
+  .link::after { content: ""; position: absolute; right: -1px; top: -3px; border: 4px solid transparent; border-left-color: #a996e6; }
+  .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* 4. Preview + 5. Saved + 6. Undone */
+  .who { display: flex; align-items: center; gap: 10px; }
+  .who img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: #dfe6f1; }
+  .ch { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 11px 18px; border-top: 1px solid var(--line-soft); font-size: 13px; line-height: 1.5; }
+  .ch:first-of-type { border-top: 0; }
+  .ch .k { font-size: 11.5px; font-weight: 600; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; padding-top: 2px; }
+  .ch .old { color: var(--muted); text-decoration: line-through; text-decoration-color: #b8c1cf; }
+  .ch .arr { margin: 0 6px; color: var(--muted); }
+  .ch .new { font-weight: 600; color: var(--title); }
+  .ch small { display: block; color: var(--muted); }
+  .pill-state { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+  .pill-state.preview { background: var(--amber-bg); color: var(--amber-fg); }
+  .pill-state.saved { background: var(--up-bg); color: var(--up-fg); }
+  .pill-state.undone { background: #eef1f5; color: var(--muted); }
+  .pill-state svg { width: 13px; height: 13px; }
+  .ok-list { margin: 0; padding: 10px 18px 12px; list-style: none; font-size: 13px; line-height: 1.5; }
+  .ok-list li { display: flex; gap: 10px; padding: 4px 0; }
+  .ok-list li svg { flex: 0 0 auto; width: 15px; height: 15px; margin-top: 2px; color: var(--up-fg); }
+  .ok-list.gone li { color: var(--muted); }
+  .ok-list.gone li span { text-decoration: line-through; text-decoration-color: #c3cad6; }
+  .ok-list.gone li svg { color: #9aa5b5; }
+  .host { margin: 0 0 14px; padding: 14px 16px; border-radius: 14px; border: 1px solid #dcdbd5; background: #fff; font-size: 13.5px; box-shadow: 0 6px 18px -10px rgb(0 0 0 / 25%); }
+  .host-h { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--chat-text); }
+  .host-h img { width: 18px; height: 18px; }
+  .host p { margin: 6px 0 10px; color: #6d6c67; font-size: 12.5px; }
+  .host .acts .btn { border-radius: 8px; }
+  .host-tag { margin-bottom: 8px; font-size: 11px; letter-spacing: .04em; color: #8a8984; }
+
+  @media (max-width: 980px) {
+    .step { grid-template-columns: 1fr; gap: 18px; }
+    .notes { position: static; }
+  }
+  @media (max-width: 640px) {
+    .top-in { padding: 10px 14px; }
+    .intro, .step { padding-left: 14px; padding-right: 14px; }
+    .steps { margin-left: 0; }
+    .big { font-size: 30px; }
+    .tile { padding: 14px 14px 12px; }
+    .days, .strip, .c-head .key { display: none; }
+    .att { grid-template-columns: 1fr; gap: 8px; }
+    .wk-wrap { overflow-x: auto; }
+    .wk { min-width: 640px; }
+    .funnel .big { font-size: 24px; }
+    .ch { grid-template-columns: 1fr; gap: 2px; }
+  }
+
+  /* Real connector cards in iframes (2026-10-28 update) */
+  .cardframe { display: block; width: 100%; height: 160px; border: 0; background: transparent; color-scheme: normal; }
+  .sent { margin: 8px 0 0; padding: 8px 12px; border-radius: 10px; background: #eceae4; font-size: 12.5px; color: #55544f; }
+  .sent b { color: var(--chat-text); font-weight: 600; }
+  .theme { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid #dcdbd5; background: #fff; font: inherit; font-size: 13px; color: var(--muted); cursor: pointer; }
+  body.dark { --page: #1f1e1d; --chat-text: #ecebe6; --bubble: #33322e; --note-bg: #262624; }
+  body.dark .top { background: rgb(31 30 29 / 92%); border-color: #3a3935; }
+  body.dark .top h1, body.dark .notes h3, body.dark .notes dt, body.dark .intro b { color: #ecebe6; }
+  body.dark .notes, body.dark .step { border-color: #3a3935; }
+  body.dark .notes code { background: #33322e; color: #ecebe6; }
+  body.dark .steps a, body.dark .theme { background: #2a2927; border-color: #3a3935; color: #b9b7b0; }
+  body.dark .steps a.on, body.dark .steps a:hover { background: #ecebe6; color: #1f1e1d; }
+  body.dark .host { background: #2a2927; border-color: #3a3935; } body.dark .host-h { color: #ecebe6; } body.dark .host p { color: #a9a7a0; }
+  body.dark .host .btn { background: #33322e; border-color: #45443f; color: #ecebe6; } body.dark .host .btn.pri { background: #ecebe6; color: #1f1e1d; }
+  body.dark .sent { background: #2e2d2a; color: #b9b7b0; } body.dark .sent b { color: #ecebe6; }
+  .dl { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 14px 0 11px; border-radius: 999px; background: #10182a; color: #fff; font-size: 13px; font-weight: 500; text-decoration: none; white-space: nowrap; }
+  .dl:hover { background: #24304a; }
+  .dl:focus-visible { outline: 2px solid #0042b7; outline-offset: 2px; }
+  .dl svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .dl small { font-size: 11.5px; font-weight: 400; opacity: .7; }
+  body.dark .dl { background: #ecebe6; color: #1f1e1d; }
+  .dl.ghost { background: #fff; color: #10182a; border: 1px solid #dcdbd5; }
+  .dl.ghost:hover { background: #f1f0eb; }
+  body.dark .dl.ghost { background: #2a2927; color: #ecebe6; border-color: #3a3935; }
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <h1>Connector reply cards<small id="built">BCT CRM in Claude</small></h1>
+  <nav class="steps" aria-label="Questions"><a href="#q1">1</a><a href="#q2">2</a><a href="#q3">3</a><a href="#q4">4</a><a href="#q5">5</a><a href="#q6">6</a></nav>
+  <a class="dl ghost" href="chat-cards-proposals-standalone.html" download="BCT-CRM-connector-reply-cards.html" title="One HTML file with every card inside; opens without a server"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Download page</a>
+  <a class="dl" href="../dist/bct-crm-demo.mcpb" download="bct-crm-demo.mcpb" title="Claude Desktop extension · open Settings › Extensions and drag it in"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Download connector<small>.mcpb · 4 MB</small></a>
+  <button class="theme" id="theme" type="button" aria-pressed="false">Dark</button>
+</div></div>
+
+<div class="intro">
+  <p>How the six scripted questions look in Claude. <b>The cards are the real cards the connector sends</b>, filled with what it actually returns, and every date follows today. The rule: every answer is one card plus one or two sentences.</p>
+  <p>To try it yourself, download the connector with the button at the top and drag it into Claude Desktop under Settings › Extensions. The chat frame around the cards is neutral; Claude decides its real look and fonts. Press a button on a card to see the sentence it would send to Claude. After changing the connector, run <code style="font-size:12px">npm run docs</code> in <code style="font-size:12px">bct-crm-mcp</code> to refresh these cards.</p>
+  <div class="legend"><span><i style="background:var(--red-bg);border:1px solid #f3c5b7"></i>Overdue</span><span><i style="background:var(--amber-bg);border:1px solid #f0dc9c"></i>Quiet too long / not saved yet</span><span><i style="background:var(--blue-bg);border:1px solid #c9d8f4"></i>Due today</span><span><i style="background:var(--violet-bg);border:1px solid #d9cff3"></i>Matches an existing account</span><span><i style="background:var(--up-bg);border:1px solid #bfe2cb"></i>Saved / up</span></div>
+</div>
+
+<section class="step" id="q1">
+  <div class="chat">
+    <div class="q-no">QUESTION 1</div>
+    <div class="you"><span>How's my Q4 looking?</span></div>
+    
+    <div class="used"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>Used BCT CRM</div>
+    <iframe class="cardframe" data-q="q1" title="BCT CRM card" loading="lazy"></iframe><div class="sent" data-sent="q1" hidden></div>
+    <p class="say">You're <b>$400K</b> short with nine weeks to go. Data Lake alone would close the gap, and it has been quiet for a month.</p>
+  </div>
+  <aside class="notes"><span class="tag done">Built into the connector</span><h3>Q4 snapshot card</h3><dl><dt>Card</dt><dd>Four headline numbers. The same card as in the web prototype.</dd><dt>Text</dt><dd>No numbers repeated. Only the gap and the deal to push.</dd><dt>Tool</dt><dd><code>get_forecast</code></dd><dt>Interaction</dt><dd>Open in BCT CRM opens the web prototype.</dd></dl></aside>
+</section>
+
+<section class="step" id="q2">
+  <div class="chat">
+    <div class="q-no">QUESTION 2</div>
+    <div class="you"><span>Which deals need my attention this week?</span></div>
+    
+    <div class="used"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>Used BCT CRM</div>
+    <iframe class="cardframe" data-q="q2" title="BCT CRM card" loading="lazy"></iframe><div class="sent" data-sent="q2" hidden></div>
+    <p class="say">Start with <b>Gulf Harbor</b>: the pricing is a day late and they close on Monday.</p>
+  </div>
+  <aside class="notes"><span class="tag done">Built into the connector</span><h3>Deals that need attention (option A)</h3><dl><dt>Card</dt><dd>Sorted by urgency: overdue, due today, closing this week, then quiet for three weeks or more. Each row has one reason tag, a 7-day strip and one next-step button.</dd><dt>Change from the mock-up</dt><dd>Sahyadri now appears too: there is a call with Rajesh today at 11:00. The web prototype answers this question with the same four deals.</dd><dt>Text</dt><dd>Which deal to start with, and why.</dd><dt>Tool</dt><dd><code>list_opportunities</code></dd><dt>Interaction</dt><dd>Each button sends one sentence to Claude for you, such as asking it to draft the Gulf Harbor pricing email.</dd><dt>Avatars</dt><dd>Customers show initials until real photos are chosen.</dd></dl></aside>
+</section>
+
+<section class="step" id="q3">
+  <div class="chat">
+    <div class="q-no">QUESTION 3</div>
+    <div class="you"><span>Any new website leads? Are any of them duplicates?</span></div>
+    
+    <div class="used"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>Used BCT CRM</div>
+    <iframe class="cardframe" data-q="q3" title="BCT CRM card" loading="lazy"></iframe><div class="sent" data-sent="q3" hidden></div>
+    <p class="say">Khalid's request belongs to a deal you already have. Link it so it isn't tracked twice?</p>
+  </div>
+  <aside class="notes"><span class="tag done">Built into the connector</span><h3>New leads and duplicates</h3><dl><dt>Card</dt><dd>Three counts on top. A lead that matches an existing account is drawn as lead → account → deal.</dd><dt>Text</dt><dd>Only asks whether to link it.</dd><dt>Tools</dt><dd><code>list_leads</code>; linking goes through <code>propose_changes</code> → <code>apply_changes</code></dd><dt>Interaction</dt><dd>Link, Keep and Draft reply each send one sentence to Claude. Changes are still previewed before saving.</dd></dl></aside>
+</section>
+
+<section class="step" id="q4">
+  <div class="chat">
+    <div class="q-no">QUESTION 4</div>
+    <div class="you"><span>Just met Hana at Qamar. They want the data lake in 3 phases, proposal by Friday. Budget is approved for phase 1.</span></div>
+    
+    <div class="used"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>Used BCT CRM</div>
+    <iframe class="cardframe" data-q="q4" title="BCT CRM card" loading="lazy"></iframe><div class="sent" data-sent="q4" hidden></div>
+    <p class="say">Here's what I'll update on the Data Lake deal. Save these?</p>
+  </div>
+  <aside class="notes"><span class="tag done">Built into the connector</span><h3>Change preview card</h3><dl><dt>Card</dt><dd>Old values struck through, new values in bold, additions listed. A yellow "Not saved yet" tag at the top right.</dd><dt>Text</dt><dd>One sentence asking whether to save.</dd><dt>Tools</dt><dd><code>search_records</code> <code>propose_changes</code> (preview only)</dd><dt>Interaction</dt><dd>Pressing Save is the same as replying "Yes, save these changes."</dd></dl></aside>
+</section>
+
+<section class="step" id="q5">
+  <div class="chat">
+    <div class="q-no">QUESTION 5</div>
+    <div class="you"><span>Yes</span></div>
+    <div class="host-tag">CLAUDE'S OWN PERMISSION PROMPT (NOT OUR CARD)</div>
+    <div class="host"><div class="host-h"><img src="../../bct-crm-ui/assets/fav.svg" alt="">Allow BCT CRM to save changes?</div><p>apply_changes will update OPP-1042 Data Lake modernisation.</p>
+      <div class="acts"><button class="btn pri">Allow once</button><button class="btn">Always allow</button><button class="btn ghost">Deny</button></div></div>
+    <div class="used"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>Used BCT CRM</div>
+    <iframe class="cardframe" data-q="q5" title="BCT CRM card" loading="lazy"></iframe><div class="sent" data-sent="q5" hidden></div>
+    <p class="say">Saved. The proposal is due tomorrow. Want me to draft the phased outline?</p>
+  </div>
+  <aside class="notes"><span class="tag done">Built into the connector</span><h3>After saving</h3><dl><dt>Two confirmations</dt><dd>After you reply yes, Claude shows its own permission prompt (Claude decides how it looks). Choose "Always allow" and it stops asking.</dd><dt>Card</dt><dd>The same card turns green, "Saved", with the four changes ticked and an Undo button.</dd><dt>Text</dt><dd>Offers the next step: drafting the proposal outline.</dd><dt>Tool</dt><dd><code>apply_changes</code></dd></dl></aside>
+</section>
+
+<section class="step" id="q6">
+  <div class="chat">
+    <div class="q-no">QUESTION 6</div>
+    <div class="you"><span>Undo that.</span></div>
+    
+    <div class="used"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>Used BCT CRM</div>
+    <iframe class="cardframe" data-q="q6" title="BCT CRM card" loading="lazy"></iframe><div class="sent" data-sent="q6" hidden></div>
+    <p class="say">Done. The deal is back to how it was before the meeting note.</p>
+  </div>
+  <aside class="notes"><span class="tag done">Built into the connector</span><h3>Undo</h3><dl><dt>Card</dt><dd>The same card turns grey, "Undone". The struck-through lines are the changes that were reversed; the last line says what the deal is back to.</dd><dt>Text</dt><dd>One sentence confirming the undo.</dd><dt>Tool</dt><dd><code>undo_changes</code></dd></dl></aside>
+</section>
+
+<script>
+// Step highlight
+const links = [...document.querySelectorAll('.steps a')];
+const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) links.forEach(a => a.classList.toggle('on', a.hash === '#' + en.target.id)); }), { rootMargin: '-40% 0px -55% 0px' });
+document.querySelectorAll('.step').forEach(s => io.observe(s));
+
+/* A tiny stand-in for the host (Claude): loads each real card, answers the MCP Apps handshake,
+   hands it the tool result saved by `npm run docs`, and shows what a button would send. */
+let theme = 'light';
+const frames = [...document.querySelectorAll('.cardframe')];
+const post = (f, m) => f.contentWindow && f.contentWindow.postMessage({ jsonrpc: '2.0', ...m }, '*');
+fetch('cards/results.json', { cache: 'no-cache' }).then(r => r.json()).then(data => {
+  document.getElementById('built').textContent = `BCT CRM in Claude · cards built ${data.built}`;
+  window.addEventListener('message', e => {
+    const f = frames.find(x => x.contentWindow === e.source); if (!f) return;
+    const m = e.data, step = data.steps[f.dataset.q];
+    if (m.method === 'ui/initialize') post(f, { id: m.id, result: { protocolVersion: '2026-01-26', hostInfo: { name: 'proposal-page', version: '1' }, hostCapabilities: { openLinks: {}, message: {} }, hostContext: { theme } } });
+    else if (m.method === 'ui/notifications/initialized') post(f, { method: 'ui/notifications/tool-result', params: step.result });
+    else if (m.method === 'ui/notifications/size-changed') f.style.height = Math.ceil(m.params.height) + 'px';
+    else if (m.method === 'ui/message') {
+      const box = document.querySelector(`[data-sent="${f.dataset.q}"]`);
+      box.innerHTML = `This button sends to Claude: <b>${m.params.content[0].text.replace(/[<&]/g, c => ({ '<': '&lt;', '&': '&amp;' }[c]))}</b>`; box.hidden = false;
+      post(f, { id: m.id, result: {} });
+    }
+    else if (m.method === 'ui/open-link') { window.open(m.params.url, '_blank', 'noopener'); post(f, { id: m.id, result: {} }); }
+    else if (m.id !== undefined && m.method) post(f, { id: m.id, result: {} });
+  });
+  frames.forEach(f => { f.src = 'cards/' + data.steps[f.dataset.q].card; });
+});
+document.getElementById('theme').addEventListener('click', e => {
+  theme = theme === 'light' ? 'dark' : 'light';
+  document.body.classList.toggle('dark', theme === 'dark');
+  e.currentTarget.setAttribute('aria-pressed', String(theme === 'dark')); e.currentTarget.textContent = theme === 'dark' ? 'Light' : 'Dark';
+  frames.forEach(f => post(f, { method: 'ui/notifications/host-context-changed', params: { theme } }));
+});
+</script>
+</body>
+</html>

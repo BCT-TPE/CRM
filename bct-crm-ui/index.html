@@ -4,14 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>BCT CRM</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="vendor/fonts/inter.css" /><!-- local Inter: works offline -->
 <!-- Gina UI base (copied unchanged from gina-ui 2). Do not edit: override in bct-crm.css. -->
 <link rel="stylesheet" href="vendor/gina/tokens.css" />
 <link rel="stylesheet" href="vendor/gina/app.css" />
 <link rel="stylesheet" href="vendor/gina/app-business-v2.css" />
 <!-- BCT CRM: brand tokens + CRM-specific components -->
-<link rel="stylesheet" href="bct-crm.css?v=20261028zp" />
+<link rel="stylesheet" href="bct-crm.css?v=20261028zppqhcfgq" />
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg" />
 <!-- AI assistant faces (neutral / thinking / happy), preloaded so swaps never flash -->
 <link rel="preload" as="image" href="assets/ai/ai-face.webp" />
@@ -53,7 +52,7 @@
     </div>
   </div>
   <div class="side-bottom">
-    <button class="side-nav-item user-btn" aria-haspopup="menu" aria-expanded="false" data-action="user-menu"><img class="avatar-d avatar-img" src="assets/gen/avatar-sheldon.webp" alt=""><span class="user-name">Sheldon Cooper<small>Sales · Middle East</small></span><svg class="i chev" data-i="chevron-down"></svg></button>
+    <button class="side-nav-item user-btn" aria-haspopup="menu" aria-expanded="false" data-action="user-menu"><img class="avatar-d avatar-img" src="assets/people/gaurav-shrotriya.webp" alt=""><span class="user-name">Gaurav Shrotriya<small>Sales · ACAP</small></span><svg class="i chev" data-i="chevron-down"></svg></button>
   </div>
 </aside>
 
@@ -74,7 +73,7 @@
       <div class="hero-title">
         <div class="hero-avatar"><button type="button" class="ai-face bct-orb" aria-label="Say hi to your assistant"><img class="base" src="assets/ai/ai-face.webp" alt=""><img class="wave" src="assets/ai/ai-face.webp" alt="" aria-hidden="true"><i class="lid l"></i><i class="lid r"></i><span class="ripple" aria-hidden="true"></span><span class="drops" aria-hidden="true"></span></button></div>
         <div class="hero-text">
-          <h1 id="hero-greeting"><span id="hero-greeting-line">Good morning, Sheldon</span></h1>
+          <h1 id="hero-greeting"><span id="hero-greeting-line">Good morning, Gaurav</span></h1>
           <p class="hero-brief" id="hero-brief">Three things today: <b>Gulf Harbor’s pricing</b> is a day overdue, you call <b class="nb">Rajesh at 11:00,</b> and <b class="nb">Faisal’s new lead</b> hasn’t had <span class="nb">a reply.</span></p>
         </div>
       </div>
@@ -142,7 +141,7 @@
 
 <!-- Account menu (Gina's #pop-user styles): who you are, what the assistant may read, the daily brief, sign out. -->
 <div class="popover" id="pop-user" role="menu" aria-label="Account">
-  <div class="acct-head"><img src="assets/gen/avatar-sheldon.webp" alt=""><div><b>Sheldon Cooper</b><small>Sales · Middle East</small><small>Signed in with OneLogin</small></div></div>
+  <div class="acct-head"><img src="assets/people/gaurav-shrotriya.webp" alt=""><div><b>Gaurav Shrotriya</b><small>Sales · ACAP</small><small>Signed in with OneLogin</small></div></div>
   <div class="menu-sep"></div>
   <div class="menu-label acct-label">The assistant can read</div>
   <div class="menu-item menu-switch"><svg class="i" data-i="mail"></svg><span class="menu-switch-text"><b>Outlook mail</b><small data-src-state="outlook">Connected</small></span><button class="switch" role="switch" aria-checked="true" aria-label="Outlook mail" data-action="toggle-source" data-src="outlook"><span></span></button></div>
@@ -166,12 +165,13 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="crm.js?v=20261028zp"></script>
-<script src="views.js?v=20261028zp"></script>
-<script src="page-ask.js?v=20261028zp"></script>
-<script src="chat-export.js?v=20261028zp"></script>
-<script src="ai-face-motion.js?v=20261028zp"></script>
+<script src="crm.js?v=20261028zppqhcfgq"></script>
+<script src="views.js?v=20261028zppqhcfgq"></script>
+<script src="page-ask.js?v=20261028zppqhcfgq"></script>
+<script src="chat-export.js?v=20261028zppqhcfgq"></script>
+<script src="ai-face-motion.js?v=20261028zppqhcfgq"></script>
 <script>AIFace.mount(document.querySelector('.hero-avatar .ai-face'));</script>
-<script src="home-motion.js?v=20261028zp"></script>
+<script src="home-motion.js?v=20261028zppqhcfgq"></script>
+<script src="tooltip.js?v=20261028zppqhcfgq"></script>
 </body>
 </html>

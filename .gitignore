@@ -1,9 +1,13 @@
-# Only the web prototype goes to GitHub for now (2026-10-28).
-# Kept local: discussion notes, the BRD, Masood's prototype, the connector work (bct-crm-mcp, bct-crm-connector).
+# Goes to GitHub: the web prototype, plus the connector's reply-card page and its download (2026-11-02).
+# Kept local: discussion notes, the BRD, Masood's prototype, the connector source, bct-crm-connector, offline zips.
 /*
 !/.gitignore
 !/README.md
 !/bct-crm-ui/
+!/bct-crm-mcp/
+/bct-crm-mcp/*
+!/bct-crm-mcp/docs/
+!/bct-crm-mcp/dist/
 .DS_Store
-# Photos not used by any page
-/bct-crm-ui/assets/people/
+# Original photos; the pages use the 256px copies one level up
+/bct-crm-ui/assets/people/src/

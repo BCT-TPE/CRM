@@ -56,9 +56,20 @@ hydrateIcons();
 
 /* ---------- Helpers ---------- */
 /* Illustrated contacts generated for BCT (assets/gen). Anyone else gets initials. */
-const AVATARS = { hana:'avatar-hana.webp', omar:'avatar-omar.webp', rajesh:'avatar-rajesh.webp', sheldon:'avatar-sheldon.webp' };
-const AVATAR_BY_NAME = { 'Hana Al-Rashdi':'hana', 'Omar Haddad':'omar', 'Rajesh Kulkarni':'rajesh' };
-function avatarHTML(key, cls){ return AVATARS[key] ? `<img class="${cls}" src="assets/gen/${AVATARS[key]}" alt="">` : `<span class="${cls} av-i">${esc(key||'')}</span>`; }
+/* People photos. Customers: free Unsplash photos (Unsplash License), chosen 2026-10-28 from
+   docs/customer-photo-candidates.html; originals and sources in assets/people/src and the README.
+   BCT colleagues: real photos supplied by Candace. The signed-in demo user is Gaurav Shrotriya (2026-10-28, was Sheldon Cooper). */
+const AVATARS = {
+  hana:'people/hana-al-rashdi.webp', maryam:'people/maryam-al-lawati.webp', noura:'people/noura-al-shamsi.webp',
+  omar:'people/omar-haddad.webp', khalid:'people/khalid-al-riyami.webp', faisal:'people/faisal-al-mazrouei.webp',
+  salim:'people/salim-al-busaidi.webp', said:'people/said-al-hinai.webp', rajesh:'people/rajesh-kulkarni.webp',
+  gaurav:'people/gaurav-shrotriya.webp', sundara:'people/sundara-balaji.webp' };
+const AVATAR_BY_NAME = { 'Hana Al-Rashdi':'hana', 'Maryam Al-Lawati':'maryam', 'Noura Al-Shamsi':'noura', 'Omar Haddad':'omar',
+  'Khalid Al-Riyami':'khalid', 'Faisal Al-Mazrouei':'faisal', 'Salim Al-Busaidi':'salim', 'Said Al-Hinai':'said', 'Rajesh Kulkarni':'rajesh',
+  'Gaurav Shrotriya':'gaurav', 'Sundara Balaji':'sundara' };
+function avatarHTML(key, cls){ return AVATARS[key] ? `<img class="${cls}" src="assets/${AVATARS[key].includes('/')?'':'gen/'}${AVATARS[key]}" alt="">` : `<span class="${cls} av-i">${esc(key||'')}</span>`; }
+// A colleague's name with their photo (owner, deal team)
+function personHTML(name){ const k=AVATAR_BY_NAME[name]; return `<span class="who-mini">${k?avatarHTML(k,'who-av'):''}${esc(name)}</span>`; }
 const $ = s => document.querySelector(s);
 const body = document.body, thread = $('#thread'), input = $('#input');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -78,7 +89,8 @@ const RECORDS = {
   erp:      { kind:'Opportunity', ref:'OPP-0988', name:'ERP Managed Services — renewal', account:'Qamar Energy', country:'Oman', amount:'$640K', close:'Closed 12 Aug 2026', type:'Services', contact:'Hana Al-Rashdi, Head of IT', stage:3,
               activity:[['12 Aug · PO','PO received (QE-PO-22817)'],['05 Aug · contract','Contract signed by both parties'],['29 Jul · call','Final pricing call with procurement']] },
   datalake: { kind:'Opportunity', ref:'OPP-1042', name:'Data Lake modernisation', account:'Qamar Energy', country:'Oman', amount:'$820K', close:'15 Dec 2026', type:'Services + IP', contact:'Hana Al-Rashdi, Head of IT', stage:1,
-              activity:[['20 Sep · meeting','Solution workshop with the IT team'],['18 Sep · email','Shared reference architecture'],['09 Sep · call','Discovery call with Hana']] },
+              team:[['Sundara Balaji','Pre-sales · co-ran the 20 Sep workshop']],
+              activity:[['20 Sep · meeting','Solution workshop with the IT team (with Sundara Balaji)'],['18 Sep · email','Shared reference architecture'],['09 Sep · call','Discovery call with Hana']] },
   fieldops: { kind:'Opportunity', ref:'OPP-1017', name:'Field Ops mobile app', account:'Qamar Energy', country:'Oman', amount:'$410K', close:'30 Nov 2026', type:'Services', contact:'Salim Al-Busaidi, Operations Director', stage:2,
               activity:[['16 Oct · email','Revised SOW sent'],['14 Oct · call','Negotiation call with procurement'],['02 Oct · meeting','Demo to field supervisors']] },
   kpo:      { kind:'Opportunity', ref:'OPP-1066', name:'AI document processing', account:'Qamar Energy', country:'Oman', amount:'$310K', close:'Q1 2027', type:'KPO / BPO', contact:'Maryam Al-Lawati, Finance Ops Manager', stage:0,
@@ -95,7 +107,7 @@ const RECORDS = {
               email:'k.alriyami@qamarenergy.example', phone:'+968 24 555 0190', interest:'Request for pricing on AI document processing for the finance team.',
               page:'/contact', submitted:'Today 06:40', match:{ account:'contacts', opp:'kpo' },
               activity:[['Today 06:40 · website','Form submitted from /contact'],['Today 06:40 · system','Matched existing account ACC-0214 and contact Khalid Al-Riyami'],['19 Oct · meeting','Related: intro meeting with Finance Ops (OPP-1066)']] },
-  muscat:   { kind:'Opportunity', ref:'OPP-1049', name:'Citizen services portal — phase 2', account:'Muscat Municipality', country:'Oman', amount:'$190K', close:'20 Dec 2026', type:'Services', contact:'Said Al-Hinai, Director of IT', stage:0, owner:'Priya Nair',
+  muscat:   { kind:'Opportunity', ref:'OPP-1049', name:'Citizen services portal — phase 2', account:'Muscat Municipality', country:'Oman', amount:'$190K', close:'20 Dec 2026', type:'Services', contact:'Said Al-Hinai, Director of IT', stage:0, owner:'Sundara Balaji',
               activity:[['10 Oct · meeting','Scoping workshop for phase 2'],['08 Oct · referral','Introduced by phase 1 sponsor']] },
   acc_gulf: { kind:'Account', ref:'ACC-0231', name:'Gulf Harbor Logistics', account:'2 contacts', country:'UAE', contacts:true,
               people:[['OH','Omar Haddad','COO · main contact'],['LK','Lina Khoury','Finance Manager']],
@@ -119,7 +131,8 @@ const SCENARIOS = {
   quarter:  { title:'Q4 at a glance', msg:"How's my quarter looking?" },
   pipeline: { title:'Qamar Energy pipeline', msg:"How's our pipeline with Qamar Energy?" },
   log:      { title:'Meeting notes — Qamar Energy', msg:'Just met Hana at Qamar. They want the data lake in 3 phases, proposal by Friday. Budget is approved for phase 1.' },
-  today:    { title:'Today', msg:'What should I focus on today?' }
+  today:    { title:'Today', msg:'What should I focus on today?' },
+  attention:{ title:'Deals that need attention', msg:'Which deals need my attention this week?' }
 };
 /* Sidebar conversations: only ones that open a real scenario (placeholders were removed 2026-10-28).
    Rename / pin / delete live only for this visit; a reload restores the demo list. */
@@ -275,7 +288,7 @@ function snapshotHTML(where){
   const updated = where==='chat' ? 'Updated now' : 'Updated today 06:00 · <span class="nb">refreshes every morning</span>';
   return `<div class="snap-card">
     <div class="snap-grid">
-      ${tile(big('$',2.55,'M',2),'Open pipeline',['+12%','up'],'6 deals · <span class="nb">1 closing this month</span>')}
+      ${tile(big('$',2.55,'M',2),'Open pipeline',['+12%','up'],'6 deals · <span class="nb">1 closing this week</span>')}
       ${tile(big('$',1.10,'M',2),'Q4 forecast · 73% of target',null,'Target $1.5M · <span class="nb">gap $400K</span>')}
       ${tile(big('$',1.07,'M',2),'Won, last 90 days',null,'3 won · 2 lost · <span class="nb">60% win rate</span>')}
       ${tile(big('',2,'',0),'New leads this week',null,'<span class="nb">1 matches an account</span>')}
@@ -296,10 +309,10 @@ function pinStripHTML(){
   const n=(pre,val,unit,dec)=>`<span class="rp-big"><span data-count="${val}" data-dec="${dec}" data-pre="${pre}" data-suf="">${pre}${val.toFixed(dec)}</span>${unit?`<sup>${unit}</sup>`:''}</span>`;
   return `<div class="pin-strip">
     <button class="ps-main" data-view="reports" aria-label="Pinned Q4 numbers. Open Reports"><span class="ps-l">Q4</span>
-      <span class="ps-n">${n('$',2.55,'M',2)}open <span class="rp-delta up">+12%</span></span>
-      <span class="ps-n">${n('$',1.10,'M',2)}forecast · 73%</span>
-      <span class="ps-n">${n('$',1.07,'M',2)}won</span>
-      <span class="ps-n">${n('',2,'',0)}new leads</span></button>
+      <span class="ps-n" data-tip-h="Open pipeline" data-tip="All your open deals, at full value. Up 12% from the end of Q3.">${n('$',2.55,'M',2)}open <span class="rp-delta up">+12%</span></span>
+      <span class="ps-n" data-tip-h="Q4 forecast" data-tip="Committed $540K plus best case $560K. 73% of the $1.5M target.">${n('$',1.10,'M',2)}forecast · 73%</span>
+      <span class="ps-n" data-tip-h="Won, last 90 days" data-tip="Three deals signed since 29 Jul.">${n('$',1.07,'M',2)}won</span>
+      <span class="ps-n" data-tip-h="New leads this week" data-tip="Al Dhafra and Qamar Energy, both from the website.">${n('',2,'',0)}new leads</span></button>
     <button class="snap-btn" data-action="pin-snapshot" aria-pressed="true" aria-label="Unpin from home" title="Unpin from home">${svg('pin')}</button>
     <button class="snap-btn" data-view="reports" aria-label="Open in Reports" title="Open in Reports">${svg('arrow-ur')}</button>
   </div>`;
@@ -320,7 +333,7 @@ function replyQuarter(){
     sources: [['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago'],['Q4 forecast','gauge','CRM · commit and best case','synced 2 min ago'],['2 website leads','globe','Website form','synced 2 min ago'],['Calendar','calendar','Teams · Q4','synced 5 min ago']],
     html: `<p>Here's your Q4 snapshot. Pin it and I'll refresh it every morning at 06:00.</p>
       ${snapshotHTML('chat')}
-      <p>You're at <b>73% of target</b> with nine weeks to go. The gap is <b>$400K</b>, and ${srcChip('datalake','Data Lake')} alone would cover it. It has been quiet for 31 days, so that's the deal to unstick.</p>`,
+      <p>You're at <b>73% of target</b> with nine weeks to go. The gap is <b>$400K</b>, and ${srcChip('datalake','Data Lake')} alone would cover it. It has been quiet for 32 days, so that's the deal to unstick.</p>`,
     optionsLabel: 'Next',
     options: [['Draft a follow-up to Hana','draft-hana'],['Open the pipeline','view-pipeline'],['What should I focus on today?','today']]
   };
@@ -331,10 +344,10 @@ function replyPipeline(){
   return {
     ack: 'On it. Pulling Qamar Energy from the CRM, plus your Outlook mail and Teams meetings.',
     sources: [['4 opportunities','briefcase','CRM · Qamar Energy','synced 2 min ago'],['23 emails','mail','Outlook · last 90 days','synced 2 min ago'],['6 meetings','calendar','Teams calendar','today 09:00']],
-    html: `<p>Qamar Energy has <b>4 opportunities worth $2.18M</b>. One is signed, two are in progress and one is still in discussion. The <b>Data Lake</b> deal needs attention: no activity for 31 days.</p>
+    html: `<p>Qamar Energy has <b>4 opportunities worth $2.18M</b>. One is signed, two are in progress and one is still in discussion. The <b>Data Lake</b> deal needs attention: no activity for 32 days.</p>
       <div class="crm-card">
         <div class="crm-group"><div class="crm-group-head"><span class="lbl">Signed</span><small>1 · $640K</small></div>${row('erp','Closed 12 Aug · PO received')}</div>
-        <div class="crm-group"><div class="crm-group-head"><span class="lbl">In progress</span><small>2 · $1.23M</small></div>${row('datalake','Proposal · last activity 31 days ago','Needs attention')}${row('fieldops','Negotiation · revised SOW sent 16 Oct')}</div>
+        <div class="crm-group"><div class="crm-group-head"><span class="lbl">In progress</span><small>2 · $1.23M</small></div>${row('datalake','Proposal · last activity 32 days ago','Needs attention')}${row('fieldops','Negotiation · revised SOW sent 16 Oct')}</div>
         <div class="crm-group"><div class="crm-group-head"><span class="lbl">Still in discussion</span><small>1 · $310K</small></div>${row('kpo','Discovery · intro meeting 19 Oct')}</div>
       </div>
       <div class="crm-next" id="next-datalake"><p><b>Suggested next step.</b> Data Lake has been quiet since the solution workshop on 20 Sep. Send Hana Al-Rashdi a follow-up?</p>
@@ -395,21 +408,24 @@ function replyLog(){
   return {
     ack: 'Got it. Matching this to Hana and the Data Lake deal in the CRM.',
     sources: [['1 opportunity','briefcase','CRM · Data Lake modernisation','synced 2 min ago'],['1 contact','users','CRM · Hana Al-Rashdi','synced 2 min ago']],
-    html: `<p>Got it. Here are the <b>3 updates</b> I'll make to <b>Data Lake modernisation</b>. Check them, then confirm.</p>
+    html: `<p>Got it. Here are the <b>4 updates</b> I'll make to <b>Data Lake modernisation</b>. Check them, then confirm.</p>
       <div class="crm-card" id="log-card">
         <div class="crm-change"><span class="lbl">Activity</span><div><b>Meeting with Hana Al-Rashdi</b> · today<br><span class="muted">Wants a 3-phase rollout. Budget approved for phase 1. Expects a phased proposal by Friday.</span></div></div>
-        <div class="crm-change"><span class="lbl">Deal</span><div>Next step: <span class="old">Follow up after workshop</span><span class="arrow">→</span><b>Send phased proposal</b><br>Budget: <span class="old">Unconfirmed</span><span class="arrow">→</span><b>Approved for phase 1</b></div></div>
-        <div class="crm-change"><span class="lbl">Task</span><div><b>Send phased proposal to Hana</b><br><span class="muted">Due Fri 23 Oct · Owner: Sheldon Cooper · Reminder Thu 17:00</span></div></div>
+        <div class="crm-change"><span class="lbl">Next step</span><div><span class="old">Follow up after workshop</span><span class="arrow">→</span><b>Send phased proposal</b></div></div>
+        <div class="crm-change"><span class="lbl">Budget</span><div><span class="old">Unconfirmed</span><span class="arrow">→</span><b>Approved for phase 1</b></div></div>
+        <div class="crm-change"><span class="lbl">New task</span><div><b>Send phased proposal to Hana</b><br><span class="muted">Due Fri 23 Oct · Gaurav Shrotriya</span></div></div>
       </div>
-      <div id="log-state"><div class="crm-actions"><button class="btn-bct" data-action="log-save">${svg('check')}Confirm all 3</button><button class="btn-bct secondary" data-action="log-edit">Edit</button><button class="btn-bct secondary" data-action="log-discard">Discard</button></div></div>`,
+      <div id="log-state"><div class="crm-actions"><button class="btn-bct" data-action="log-save">${svg('check')}Confirm all 4</button><button class="btn-bct secondary" data-action="log-edit">Edit</button><button class="btn-bct secondary" data-action="log-discard">Discard</button></div></div>`,
     optionsLabel: "While you're here",
     options: [['Draft the phased proposal outline','draft-outline'],['Show the whole Qamar pipeline','pipeline']]
   };
 }
 const LOG_STATES = {
-  pending: `<div class="crm-actions"><button class="btn-bct" data-action="log-save">${svg('check')}Confirm all 3</button><button class="btn-bct secondary" data-action="log-edit">Edit</button><button class="btn-bct secondary" data-action="log-discard">Discard</button></div>`,
-  saved: `<div class="crm-banner ok"><span>${AI_FACE_HAPPY}<b>Saved.</b> 3 updates added to Data Lake modernisation.</span><span class="acts">${srcChip('datalake','View record')}<button class="src" data-action="log-undo">${svg('undo')}Undo</button></span></div>`,
-  discarded: `<div class="crm-banner muted"><span>Discarded. Nothing was changed.</span><span class="acts"><button class="src" data-action="log-undo">${svg('undo')}Restore</button></span></div>`
+  pending: `<div class="crm-actions"><button class="btn-bct" data-action="log-save">${svg('check')}Confirm all 4</button><button class="btn-bct secondary" data-action="log-edit">Edit</button><button class="btn-bct secondary" data-action="log-discard">Discard</button></div>`,
+  saved: `<div class="crm-banner ok"><span>${AI_FACE_HAPPY}<b>Saved.</b> 4 updates added to Data Lake modernisation.</span><span class="acts">${srcChip('datalake','View record')}<button class="src" data-action="log-undo">${svg('undo')}Undo</button></span></div>`,
+  discarded: `<div class="crm-banner muted"><span>Discarded. Nothing was changed.</span><span class="acts"><button class="src" data-action="log-restore">${svg('undo')}Restore</button></span></div>`,
+  // Undo (same information as the connector's "Undone" card): what was reversed and what the deal is back to.
+  undone: `<div class="crm-banner muted"><span><b>Undone.</b> 4 updates reverted. Data Lake is back to next step <b>Follow up after workshop</b> · budget <b>Unconfirmed</b>.</span><span class="acts"><button class="src" data-action="log-restore">${svg('undo')}Review again</button></span></div>`
 };
 const LEAD_STATES = {
   pending: `<p><b>Looks like a duplicate.</b> Khalid's enquiry matches the AI document processing deal you opened on 19 Oct. Link this lead to ${srcChip('kpo')} instead of creating a second one?</p>
@@ -441,7 +457,7 @@ function replyToday(){
       </div>
       <div class="crm-card" id="task-card"><div class="crm-group" style="padding-bottom:4px"><div class="crm-group-head"><span class="lbl">Tasks</span><small id="task-count">0 of 3 done</small></div></div><div id="task-list">${TASKS.map(taskRow).join('')}</div></div>
       <div class="crm-card"><div class="crm-group"><div class="crm-group-head"><span class="lbl">Needs attention</span></div>
-        <div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">Data Lake modernisation · Qamar Energy</div><div class="crm-row-meta"><span>No activity for 31 days · $820K</span></div></div><div class="crm-row-side"><button class="btn-bct secondary" data-next="pipeline">Draft follow-up</button></div></div>
+        <div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">Data Lake modernisation · Qamar Energy</div><div class="crm-row-meta"><span>No activity for 32 days · $820K</span></div></div><div class="crm-row-side"><button class="btn-bct secondary" data-next="pipeline">Draft follow-up</button></div></div>
         <div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">Warehouse management system · Gulf Harbor</div><div class="crm-row-meta"><span>Close date Mon 26 Oct, still in Proposal · $540K</span></div></div><div class="crm-row-side"><button class="btn-bct secondary" data-record="gulf">Open record</button></div></div>
       </div></div>`,
     optionsLabel: 'Anything else?',
@@ -500,6 +516,38 @@ function replyDraft(kind){
     options: [['Back to the pipeline','pipeline'],['What should I focus on today?','today']]
   };
 }
+/* Which deals need my attention this week? (2026-10-28) — the same four deals, reasons, next steps and buttons
+   as the connector's "Needs attention" card: overdue, due today, closing this week, quiet for three weeks or more. */
+function attnRow(id, flags, next, label, key){
+  const r=RECORDS[id];
+  return `<div class="crm-row"><div class="crm-row-main"><div class="crm-row-title">${esc(r.name)} · ${esc(r.account)}</div>
+    <div class="crm-row-meta"><span>${esc(STAGES[r.stage])}</span>${flags.map(f=>`<span class="flag ${f[0]}">${esc(f[1])}</span>`).join('')}</div>
+    <div class="crm-row-meta"><span>${esc(next)}</span></div></div>
+    <div class="crm-row-side"><span class="crm-amount">${r.amount}</span><button class="btn-bct secondary" data-next="${key}">${esc(label)}</button></div></div>`;
+}
+function replyAttention(){
+  return {
+    ack: 'Checking your deals, tasks and close dates.',
+    sources: [['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago'],['Tasks','circle-check','CRM · your task list','synced 2 min ago']],
+    html: `<p><b>4 deals</b> need you this week. Start with <b>Gulf Harbor</b>: the pricing is a day late and they close on Monday.</p>
+      <div class="crm-card"><div class="crm-group"><div class="crm-group-head"><span class="lbl">Needs attention</span><small>4 deals · $2.05M</small></div>
+        ${attnRow('gulf',[['overdue','1 day late'],['ink','Closes Monday']],'Send revised pricing to Omar Haddad · was due Wed 21 Oct','Draft pricing email','draft-gulf')}
+        ${attnRow('fieldops',[['due','Due today 16:00']],'Prepare Field Ops demo for Qamar · due today 16:00','Prep checklist','prep-fieldops')}
+        ${attnRow('sahyadri',[['due','Due today 11:00']],'Call Rajesh Kulkarni about security review scope · due today 11:00','Prep for the call','prep-rajesh')}
+        ${attnRow('datalake',[['warn','Quiet 32 days']],'Send phased proposal to Hana · due Fri 23 Oct','Draft follow-up to Hana','draft-hana')}
+      </div></div>
+      <p class="muted" style="margin-top:10px">Can wait: AI document processing.</p>`,
+    optionsLabel: 'Next',
+    options: [['Draft the Gulf Harbor pricing email','draft-gulf'],['What should I focus on today?','today']]
+  };
+}
+function replyPrep(k){
+  const d = {
+    fieldops: ['Field Ops demo prep · today 16:00', ['Confirm the supervisors attending on Thursday','Load the offline job-sheet demo with Qamar sample data','Bring the revised SOW summary (sent 16 Oct)','Agree the go/no-go criteria with Salim']],
+    rajesh: ['Call with Rajesh Kulkarni · today 11:00', ['Recap: he asked for scope options on 15 Oct','Offer three scopes: core banking only, plus payments, plus cloud','Ask who signs off: Rajesh or Priya Deshmukh','Agree a date for the written proposal']]
+  }[k];
+  return { html: `<p>${esc(d[0])}:</p><ul>${d[1].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`, optionsLabel:'Anything else?', options:[['Back to deals that need attention','attention']] };
+}
 function replyWeek(){
   return {
     ack: 'Checking your calendar and open deals for the week.',
@@ -533,7 +581,7 @@ function runScenario(key, text, opts={}){
   const s = SCENARIOS[key], c = chatByKey(key);
   thread.innerHTML=''; closeRecord(); startChat(c?c.title:s.title); activeChat=key; renderHistory();
   userMsg(text||s.msg);
-  aiMsg({quarter:replyQuarter, pipeline:replyPipeline, log:replyLog, today:replyToday}[key], opts);
+  aiMsg({quarter:replyQuarter, pipeline:replyPipeline, log:replyLog, today:replyToday, attention:replyAttention}[key], opts);
 }
 function next(key){
   // Follow-up actions inside a conversation. Some switch scenario; most append to the thread.
@@ -553,7 +601,10 @@ function next(key){
     'draft-faisal': ()=>{ userMsg('Draft a reply to Faisal'); aiMsg(()=>replyDraft('faisal')); },
     'draft-gulf': ()=>{ userMsg('Draft the Gulf Harbor pricing email'); aiMsg(()=>replyDraft('gulf')); },
     'draft-outline': ()=>{ userMsg('Draft the phased proposal outline'); aiMsg(()=>replyDraft('outline')); },
-    'week': ()=>{ userMsg('Show my week'); aiMsg(replyWeek); }
+    'week': ()=>{ userMsg('Show my week'); aiMsg(replyWeek); },
+    'attention': ()=>{ if(activeChat!=='attention'){ runScenario('attention'); } else { userMsg('Which deals need my attention this week?'); aiMsg(replyAttention); } },
+    'prep-fieldops': ()=>{ userMsg('Make a short prep checklist for the Field Ops demo'); aiMsg(()=>replyPrep('fieldops')); },
+    'prep-rajesh': ()=>{ userMsg('Help me prepare for the call with Rajesh'); aiMsg(()=>replyPrep('rajesh')); }
   };
   (map[key]||(()=>{ if(window.PageAsk) PageAsk.next(key); }))();
 }
@@ -570,7 +621,7 @@ function send(){
   const pr = body.classList.contains('chatting') && window.PageAsk ? PageAsk.reply(text) : null;
   if(pr){ userMsg(text); aiMsg(pr); return; }
   const t=text.toLowerCase();
-  const key = /quarter|q4|forecast|how are we doing|dashboard|snapshot/.test(t) ? 'quarter' : /met |meeting|call with|just |log /.test(t) ? 'log' : (/today|focus|task|to-?do/.test(t) ? 'today' : (/pipeline|qamar|deal|opportunit/.test(t) ? 'pipeline' : null));
+  const key = /attention|at risk|slipp|need me/.test(t) ? 'attention' : /quarter|q4|forecast|how are we doing|dashboard|snapshot/.test(t) ? 'quarter' : /met |meeting|call with|just |log /.test(t) ? 'log' : (/today|focus|task|to-?do/.test(t) ? 'today' : (/pipeline|qamar|deal|opportunit/.test(t) ? 'pipeline' : null));
   if(!body.classList.contains('chatting')){
     if(key){ runScenario(key, text); fly(); return; }
     thread.innerHTML=''; startChat(text.length>40?text.slice(0,40)+'…':text); activeChat='new'; renderHistory();
@@ -612,7 +663,8 @@ function openRecord(id){
         <div><div class="k">Amount</div><div class="v strong">${r.amount}</div></div>
         <div><div class="k">Expected close</div><div class="v strong">${esc(r.close)}</div></div>
         <div><div class="k">Deal type</div><div class="v">${esc(r.type)}</div></div>
-        <div><div class="k">Owner</div><div class="v">${esc(r.owner||'Sheldon Cooper')}</div></div>
+        <div><div class="k">Owner</div><div class="v">${personHTML(r.owner||'Gaurav Shrotriya')}</div></div>${r.team?`
+        <div class="span2"><div class="k">Deal team</div><div class="v">${r.team.map(t=>`${personHTML(t[0])} <span class="muted">${esc(t[1])}</span>`).join('<br>')}</div></div>`:''}
         <div class="span2"><div class="k">Main contact</div><div class="v">${esc(r.contact)}</div></div>
       </div>`;
   }
@@ -726,7 +778,7 @@ function histAction(action){
 function setActiveView(key){ document.querySelectorAll('.side-agents [data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===key)); }
 function greet(){
   const h=new Date().getHours();
-  $('#hero-greeting-line').textContent=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+', Sheldon';
+  $('#hero-greeting-line').textContent=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+', Gaurav';
 }
 
 /* ---------- Composer ---------- */
@@ -770,9 +822,10 @@ document.addEventListener('click', e => {
     case 'lead-keep': setLeadState('kept'); break;
     case 'lead-undo': setLeadState('pending'); toast('Reverted'); break;
     case 'pin-snapshot': togglePin(); break;
-    case 'log-save': setLogState('saved'); toast('3 updates saved to Data Lake modernisation'); break;
+    case 'log-save': setLogState('saved'); toast('4 updates saved to Data Lake modernisation'); break;
     case 'log-discard': setLogState('discarded'); break;
-    case 'log-undo': setLogState('pending'); toast('Reverted'); break;
+    case 'log-undo': setLogState('undone'); toast('Undone · 4 updates reverted'); break;
+    case 'log-restore': setLogState('pending'); break;
     case 'log-edit': toast('Editing in place — not in this concept yet'); break;
     case 'close-review-panel': closeRecord(); break;
     case 'open-full-record': toast('Would open the classic record page'); break;

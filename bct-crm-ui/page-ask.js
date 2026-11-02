@@ -18,7 +18,8 @@
   function context(page){
     if(page==='pipeline'){
       if(pvSel && pvSel.startsWith('lead:')) return ['Leads', LEADS[+pvSel.slice(5)].company];
-      return ['My deals', pvSel ? RECORDS[pvSel].name : `6 open deals · ${PV_LEADS().length} leads`];
+      const scope=[pvOwner==='all'?'All deals':'My deals', ...(pvType?[PV_TYPES.find(t=>t[0]===pvType)[1]]:[])].join(', ');
+      return [scope, pvSel ? RECORDS[pvSel].name : `${pvOpps().filter(k=>RECORDS[k].stage<3 && pvMatch(k)).length} open deals · ${PV_LEADS().length} leads`];
     }
     if(page==='accounts'){ const f=ACC_FILTERS.find(x=>x[0]===accFilter); return [f[1], `${ACCOUNTS.filter(f[2]).length} accounts`]; }
     return ['Q4 2026', 'Mine'];
@@ -39,7 +40,7 @@
     'pa-pv-slipped': ['Which deals slipped?', () => ({
       sources:[['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago']],
       html:`<p><b>Two deals slipped</b> this month. Together they are worth $1.36M.</p>
-        <div class="crm-card"><div class="crm-group">${row('datalake','No activity since 20 Sep','Quiet 31 days')}${row('gulf','Pricing promised 26 Oct, not sent','Overdue')}</div></div>`,
+        <div class="crm-card"><div class="crm-group">${row('datalake','No activity since 20 Sep','Quiet 32 days')}${row('gulf','Pricing promised 26 Oct, not sent','Overdue')}</div></div>`,
       optionsLabel:'Next', options:[['Draft a follow-up to Hana','draft-hana'],['Draft the Gulf Harbor pricing email','draft-gulf']] })],
     'pa-pv-type': ['Forecast by deal type', () => ({
       html:`<p>Open pipeline by deal type, <b>$2.55M</b> in total. Services and Services + IP carry two thirds of it.</p>
@@ -63,7 +64,7 @@
     // Tasks
     'pa-tasks-add': ['Add a task: call Faisal on Thursday', () => ({
       html:`<p>Here's the task. It goes on Faisal's lead, so you'll see it in the lead's brief and record.</p>
-        <div class="crm-card"><div class="crm-change"><span class="lbl">Task</span><div><b>${esc(NEW_TASK.title)}</b><br><span class="muted">Due Thu 29 Oct · Owner: Sheldon Cooper · Linked to LEAD-0311</span></div></div></div>
+        <div class="crm-card"><div class="crm-change"><span class="lbl">Task</span><div><b>${esc(NEW_TASK.title)}</b><br><span class="muted">Due Thu 29 Oct · Owner: Gaurav Shrotriya · Linked to LEAD-0311</span></div></div></div>
         ${applyBtn('tasks-add',"Add to Faisal's lead")}`,
       optionsLabel:'Anything else?', options:[['Draft a reply to Faisal','draft-faisal']] })],
     // Reports
@@ -71,7 +72,7 @@
       ack:'Looking at the forecast, commit and best case.',
       sources:[['Q4 forecast','gauge','CRM · commit and best case','synced 2 min ago'],['6 open opportunities','briefcase','CRM · owned by you','synced 2 min ago']],
       html:`<p>You're at <b>73% of target</b> with nine weeks to go, a gap of <b>$400K</b>. Two things explain most of it:</p>
-        <div class="crm-card"><div class="crm-group">${row('datalake','Proposal · quiet for 31 days','Needs attention')}${row('gulf','Closes Monday · pricing still open','Overdue')}</div></div>
+        <div class="crm-card"><div class="crm-group">${row('datalake','Proposal · quiet for 32 days','Needs attention')}${row('gulf','Closes Monday · pricing still open','Overdue')}</div></div>
         <p>Data Lake alone would close the gap. Gulf Harbor is the one that can move <span class="nb">this week.</span></p>`,
       optionsLabel:'Next', options:[['Draft a follow-up to Hana','draft-hana'],['Add pipeline by region','pa-rp-region']] })],
     'pa-rp-region': ['Add pipeline by region', () => ({

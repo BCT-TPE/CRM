@@ -1,6 +1,7 @@
 /* Home page motion (2026-10-28).
      enter   first visit in a session: the bubble lands like a drop (small squish + ripple), the greeting and
-             the cards rise in turn (~0.8 s). Coming back home later: a quick fade only.
+             the cards rise in turn (~0.8 s). Coming back home later: the same rise in turn, shorter, no drop.
+             When it has all landed, the bubble does its click splash once.
      hover   a card lifts, its icon does a small move, and the bubble leans toward it (the water follows).
      leave   picking a card: the bubble thinks, the page fades, and the bubble flies into the conversation,
              landing exactly where the assistant's small face sits. Same image both ends, so the hand-off is seamless.
@@ -17,18 +18,29 @@
   function enter(full) {
     if (REDUCED.matches || !isHome()) return;
     const h = hero(); if (!h) return;
-    if (!full) { h.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' }); return; }
-    const av = $('.hero-avatar');
-    av.animate([
+    const av = $('.hero-avatar'), anims = [];
+    // Once everything has landed, the bubble does its click splash (happy face, wobble, droplets) as a hello.
+    const hello = () => Promise.all(anims.map(a => a.finished)).then(() => {
+      const f = faceEl(); if (f && isHome() && !flying) AIFace.get(f)?.splash();
+    }, () => {});
+    // Coming back home (New chat, logo, deleting the open chat): same rise in turn, shorter, and no drop or ripple.
+    if (!full) {
+      anims.push(av.animate([{ opacity: 0, transform: 'translateY(8px) scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: ease, fill: 'backwards' }));
+      [...h.querySelectorAll('#hero-greeting-line, .hero-brief')].forEach((el, i) => anims.push(el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 80 + i * 80, easing: ease, fill: 'backwards' })));
+      [...h.querySelectorAll('#home-today, .home-chips-l, .home-chip, #home-pinned:not([hidden])')].forEach((el, i) => anims.push(el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 220 + i * 50, easing: ease, fill: 'backwards' })));
+      hello(); return;
+    }
+    anims.push(av.animate([
       { opacity: 0, transform: 'translateY(-18px) scale(.88)' },
       { opacity: 1, transform: 'translateY(0) scale(1.05, .95)', offset: .68 },
       { transform: 'none' }
-    ], { duration: 640, easing: ease, fill: 'backwards' });
+    ], { duration: 640, easing: ease, fill: 'backwards' }));
     setTimeout(() => { const f = faceEl(); if (f) { f.classList.remove('landing'); void f.offsetWidth; f.classList.add('landing'); setTimeout(() => f.classList.remove('landing'), 900); } }, 430);
     const lines = [...h.querySelectorAll('#hero-greeting-line, .hero-brief')];
-    lines.forEach((el, i) => el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay: 220 + i * 110, easing: ease, fill: 'backwards' }));
+    lines.forEach((el, i) => anims.push(el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay: 220 + i * 110, easing: ease, fill: 'backwards' })));
     const blocks = [...h.querySelectorAll('#home-today, .home-chips-l, .home-chip, #home-pinned:not([hidden])')];
-    blocks.forEach((el, i) => el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 340, delay: 420 + i * 60, easing: ease, fill: 'backwards' }));
+    blocks.forEach((el, i) => anims.push(el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 340, delay: 420 + i * 60, easing: ease, fill: 'backwards' })));
+    hello();
   }
 
   /* ---------- hover: lean toward the card ---------- */

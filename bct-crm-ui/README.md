@@ -18,7 +18,10 @@ BCT in-house CRM 的 B 情境原型：BCT 自己的網頁，固定 UI 加內建 
 | Pipeline 頁（2026-10-28，提案 B） | 頁首是簡化的等角插圖，右側是常駐的 deal assistant：點看板卡片，助理換成這筆案子的摘要、60 天活動條碼和下一步，不再滑出紀錄面板。助理自己的輸入框、「Ask me anything」、Quick actions 和上方那排小標都已拿掉；AI 入口只有標題列的「Ask about this page」 |
 | 在頁面上問 AI（`page-ask.js`，2026-10-28） | Workspace 頁沒有底部輸入框。標題列右側「Ask about this page」是頁面上唯一的 AI 入口，會開一則新對話，輸入框上方有藍色 chip「From Reports · Q4 2026 · Mine」（可移除），標題列左邊「‹ Reports」回到原本的頁面。會改到頁面的回答附「Apply to Leads／Add to Tasks／Add to Reports」按鈕，按了才回到頁面套用，變動處閃一圈藍框，toast 可 Undo。示範：在 Pipeline 問「Which new leads need a reply?」→「Add a task: call Faisal on Thursday」→「Add to Faisal's lead」，回到 Pipeline 打開 Al Dhafra 的簡報、新待辦亮框；Reports 加「Open pipeline by region」卡（卡片右上 × 可移除）。對話列在側欄、用該頁圖示，標題是「頁名 · 第一個問題」；開了沒問就離開的對話會自動丟掉 |
 | 側欄寬度 | 拖曳側欄右緣調整（200–420px），雙擊或 Home 鍵還原 252px，方向鍵每次 16px；寬度存在這個瀏覽器（localStorage `bct-crm-sidebar-w`）。手機版不顯示。做法來自 Gina |
-| Reports 頁（2026-10-28，提案 C 版面、B 配色） | 頂部四個大數字和 Q4 snapshot 完全一樣（Open pipeline、Q4 forecast、Won last 90 days、New leads this week），「Pin these numbers to home」釘的就是這四格。下面的卡片只補細節不重複數字：To target 儀表（中間是還差 $400K，下方 Committed／Best case／Weeks left）、案型分段、洞察、60 天活動、Won and lost 清單、本週關鍵聯絡人、本月要結的案子、各階段天數。「Ask for a report」拿掉了；標題從問候語改成「Reports」，問候只留在首頁 |
+| Reports 頁（2026-10-28，提案 C 版面、B 配色） | 頂部四個大數字和 Q4 snapshot 完全一樣（Open pipeline、Q4 forecast、Won last 90 days、New leads this week），「Pin these numbers to home」釘的就是這四格。下面的卡片只補細節不重複數字：To target 儀表（中間是還差 $400K，下方 Committed／Best case／Weeks left）、案型分段、洞察、60 天活動（下方加「Where your time went」：各客戶佔活動 % 對照佔 pipeline %，時間給得比金額少的標紅，點列開客戶紀錄；標題右邊有圖例）、Won and lost 清單、本週關鍵聯絡人、本月要結的案子、各階段天數。「Ask for a report」拿掉了；標題從問候語改成「Reports」，問候只留在首頁 |
+| Tooltip（2026-10-28，`tooltip.js`） | 全站共用一個黑底 tooltip（`.bct-tip`，Gina 已經有 `.tip`）。兩種：數值型掛在圖上（Activity 每一天、案型分段、To target 儀表、各階段天數、Accounts 每列的 60 天條碼、首頁釘選的四個數字）；說明型掛在標題和欄位名（虛線底線，可用 Tab 聚焦）。停 300ms 才出現，滑到下一個直接換、不重淡入；滑走、捲動、Esc 立刻收；手機點一下顯示。Activity 每天的數字加總剛好是 142 emails、31 meetings |
+| 回到首頁的轉場（2026-10-28） | 從 Workspace 或對話按 New chat 回首頁：頭像、問候、Today、建議依序淡入上升（約 0.5 秒），沒有第一次進來的水滴落下和漣漪。不論第一次或回來，全部落定後頭像都會做一次點擊時的動態（笑臉、水波、水滴）當作打招呼 |
+| 設計系統與離線版（2026-10-28） | `docs/design-system.html`：顏色、字體、數字列、按鈕、狀態標籤、AI 助理、Tooltip、卡片、動態、文字規則；直接載入 prototype 的樣式表，範例都是實際元件。Inter 改用本機檔 `vendor/fonts/`（@fontsource/inter 5.3.0，400–700，OFL），不再連 Google Fonts，雙擊 index.html 離線也能看。給外部的 zip 只放 prototype 和設計系統，不含提案頁、原始素材和沒用到的圖。首頁問候改成墨色（黑） |
 | AI 形象與頭像 | AI 是「波浪泡泡」（提案 5，2026-10-28）：`assets/ai/ai-face.webp`（一般）、`ai-face-think.webp`（思考中）、`ai-face-happy.webp`（完成）。首頁（96px）和 Pipeline 助理卡是可以點的按鈕（`ai-face-motion.js`）：閒置時波浪非常慢地起伏、每 2.5 到 5.5 秒眨一次眼；點一下（或鍵盤 Enter）濺水花，波浪晃動約一秒後平息，同時笑臉、漣漪、水滴。只有波浪那一層會扭動，臉不會變形。開啟「減少動態效果」時只換笑臉。對話中開場那句和打字中、「Saved」「Linked」確認都帶小頭像。側欄使用者、看板卡片、聯絡人紀錄用插畫頭像 |
 | `views.js` | Classic views：Leads 清單、Pipeline 看板、Accounts 清單、Tasks 清單、Reports 四張報表。用同一批資料，點列或卡片開右側紀錄面板 |
 | `vendor/gina/` | 從 `gina-ui 2` 原封不動複製的 `tokens.css`、`app.css`、`app-business-v2.css`。**不要改這裡**，要改就在 `bct-crm.css` 覆寫 |
@@ -62,3 +65,46 @@ cd /Users/candace/code/CRM && python3 -m http.server 5394
 ## 更新 Gina 底層
 
 Gina 的 CSS 改版後，重新複製三個檔案到 `vendor/gina/` 即可；BCT 的覆寫都在 `bct-crm.css`，選擇器都掛在 `body.business-theme.bct` 之下。
+
+## 和 connector 對齊的內容（2026-10-28）
+
+網頁原型的對話回覆和 `bct-crm-mcp` connector 的卡片，資訊和內容一致；外觀可以不同（connector 的外框由 Claude 決定，按鈕是黑色膠囊）。
+
+- **Q4 snapshot**：四個數字相同，說明改成「1 closing this week」。
+- **Which deals need my attention this week?**：新的回覆，和 connector 同樣 4 個案子、同樣原因標籤（1 day late、Closes Monday、Due today、Quiet 32 days）和按鈕（Draft pricing email、Prep checklist、Prep for the call、Draft follow-up to Hana）。輸入含 attention、at risk 的問題會走這一則。
+- **記錄會議**：4 筆變更（Activity、Next step、Budget、New task），按鈕「Confirm all 4」；Undo 之後顯示回到什麼狀態，「Review again」回到確認。
+- **Data Lake 安靜天數**：改成 32 天（20 Sep 到示範日 Thu 22 Oct）。
+- **新 lead 查重**：兩邊都寫「Matches existing account」。
+- **還沒對齊**：網頁原型的日期固定在 10/22 的故事；connector 的日期跟著今天走。
+
+## BCT 同事（真人照片）
+
+照片在 `assets/people/`（原檔在 `src/`），由 Candace 提供，只裁切沒有修圖。
+
+- **Sundara Balaji**：Muscat Municipality 的負責人（取代原本的 Priya Nair）。Accounts 表格的負責人標籤和紀錄面板的 Owner 會顯示照片。
+- **Gaurav Shrotriya**：登入的示範使用者（2026-10-28 起，原本是插畫頭像的 Sheldon Cooper）。左下角、帳號選單、首頁問候、Owner、My deals 都是他。
+- 客戶頭像換成免費圖庫的真人照片（不要卡通）。候選頁在 `docs/customer-photo-candidates.html`，用編號挑選，選中才下載。
+- **客戶照片（2026-10-28 全部換完）**：都在 `assets/people/`（256px），原檔在 `src/`。全部來自 Unsplash，採 Unsplash License（可免費使用，不需標註作者）。用臉部自動裁切取得頭肩構圖，並確認沒有同一個人重複出現。
+
+| 客戶 | 候選編號 | Unsplash 攝影師 |
+|---|---|---|
+| Hana Al-Rashdi | W7 | @fzeo |
+| Maryam Al-Lawati | W14 | @ivanbe |
+| Noura Al-Shamsi | W16 | @gemasaputera |
+| Omar Haddad | G7 | @silverkblack |
+| Khalid Al-Riyami | G5 | @silverkblack |
+| Faisal Al-Mazrouei | G15 | @aljannatrakin |
+| Salim Al-Busaidi | G3 | @babak22ir |
+| Said Al-Hinai | G16 | @levimeirclancy |
+| Rajesh Kulkarni | I11 | @silverkblack |
+
+- 原本建議的 Faisal（G14）戴墨鏡、Salim（G9）和 Rajesh 疑似同一位模特兒，所以改用 G15 和 G3。
+- Data Lake 的 Deal team 改成 Sundara Balaji（pre-sales，一起帶 9/20 的 workshop），因為 Gaurav 現在就是負責人。connector 卡片裡的客戶目前還是姓名縮寫；connector（bct-crm-mcp）的示範使用者還是 Sheldon。
+
+## Pipeline 篩選（2026-10-28）
+
+- **My deals / All deals**：二選一。My deals 只顯示 Gaurav 的案子；All deals 會多出 Sundara Balaji 負責的 Muscat 案子，卡片上有負責人照片。
+- **Services / Resell / IP / KPO / BPO**：點一下篩選，再點一次取消。案型包含那個字就算，所以「Resell + Services」兩邊都會出現。
+- 每個按鈕顯示筆數，欄位標題的筆數和金額會重算；空的欄位顯示「No deals」。Leads 那一排不受篩選影響。
+- 離開 Pipeline 再回來，篩選會保留。「Ask about this page」帶過去的頁面資訊也跟著篩選。
+- 已知落差：頁首寫「6 open deals worth $2.55M」，包含 Sundara 的案子；My deals 篩選只顯示 5 筆進行中的案子。

@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BCT CRM 設計系統</title>
+<link rel="icon" type="image/svg+xml" href="../assets/fav.svg" />
+<!-- Same stylesheets as the prototype, so every sample below is the real component. Works offline. -->
+<link rel="stylesheet" href="../vendor/fonts/inter.css" />
+<link rel="stylesheet" href="../vendor/gina/tokens.css" />
+<link rel="stylesheet" href="../vendor/gina/app.css" />
+<link rel="stylesheet" href="../vendor/gina/app-business-v2.css" />
+<link rel="stylesheet" href="../bct-crm.css" />
+<style>
+/* Design-system page only (2026-10-28). Undo Gina's app frame so this reads as a document. */
+html, body { height: auto; }
+body.business-theme.bct { background: #f5f6f8; overflow: auto; }
+body.business-theme.bct::before { display: none; }
+.nb { display: inline-block; }
+.ds { max-width: 1120px; margin: 0 auto; padding: 48px 32px 96px; }
+.ds-top { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.ds-top img { height: 22px; }
+.ds-top span { padding-left: 12px; border-left: 1px solid var(--border-default); font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--text-tertiary); }
+.ds h1 { margin: 18px 0 8px; font-size: 34px; font-weight: 500; letter-spacing: -.02em; color: var(--bct-ink); }
+.ds-lead { max-width: 720px; margin: 0; font-size: 15px; line-height: 1.7; color: var(--text-secondary); }
+.ds-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0 8px; }
+.ds-toc a { padding: 6px 12px; border: 1px solid var(--border-default); border-radius: 999px; background: #fff; font-size: 13px; color: var(--text-secondary); text-decoration: none; }
+.ds-toc a:hover { border-color: var(--border-strong); color: var(--text-primary); }
+.ds section { margin-top: 56px; scroll-margin-top: 24px; }
+.ds h2 { margin: 0 0 6px; font-size: 22px; font-weight: 600; letter-spacing: -.01em; color: var(--bct-ink); }
+.ds h2 + p { max-width: 760px; margin: 0 0 20px; font-size: 14px; line-height: 1.7; color: var(--text-secondary); }
+.ds h3 { margin: 28px 0 12px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.ds code { padding: 1px 6px; border-radius: 5px; background: #eef1f6; font: 12px/1.6 var(--font-family-mono); color: #24304a; }
+.panel { padding: 24px; border: 1px solid var(--border-default); border-radius: 20px; background: #fff; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.cap { margin-top: 10px; font-size: 12.5px; line-height: 1.6; color: var(--text-tertiary); }
+.cap b { color: var(--text-secondary); font-weight: 600; }
+
+/* Swatches */
+.sw { overflow: hidden; border: 1px solid var(--border-default); border-radius: 14px; background: #fff; }
+.sw i { display: block; height: 72px; }
+.sw div { padding: 10px 12px; font-size: 12.5px; line-height: 1.5; }
+.sw b { display: block; font-weight: 600; color: var(--text-primary); }
+.sw span { display: block; color: var(--text-tertiary); font-family: var(--font-family-mono); font-size: 11.5px; }
+.sw small { display: block; margin-top: 4px; color: var(--text-secondary); }
+
+/* Type scale */
+.ty { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--border-subtle); }
+.ty:last-child { border-bottom: 0; }
+.ty dt { font-size: 12px; line-height: 1.6; color: var(--text-tertiary); }
+.ty dt b { display: block; font-size: 13px; color: var(--text-primary); font-weight: 600; }
+
+/* Rules list */
+.rules { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.rules li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 14px; line-height: 1.65; color: var(--text-secondary); }
+.rules li::before { content: ""; width: 8px; height: 8px; margin: 8px 0 0 6px; border-radius: 50%; background: var(--bct-deep); }
+.rules b { color: var(--text-primary); font-weight: 600; }
+.dont li::before { background: #a33a00; }
+
+/* Static tooltip sample (the live one is tooltip.js) */
+.tip-sample { position: relative; display: inline-block; max-width: 240px; padding: 8px 10px; border-radius: 8px; background: var(--bct-ink); color: rgb(255 255 255 / 82%); font-size: 12.5px; line-height: 1.45; }
+.tip-sample b { display: block; margin-bottom: 2px; color: #fff; font-weight: 600; }
+.tip-sample::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--bct-ink); }
+
+/* Motion demo */
+.mo { display: flex; gap: 10px; }
+.mo i { width: 64px; height: 40px; border-radius: 10px; background: var(--accent-blue-bg); border: 1px solid #c9d7f0; }
+body.business-theme.bct .ds .rp-card { grid-column: auto; } /* .rp-card spans 4 of Reports' 12 columns; here it sits in a plain 2-column grid */
+.files { margin: 0; font: 12.5px/1.8 var(--font-family-mono); color: var(--text-secondary); white-space: pre; overflow-x: auto; }
+
+@media (max-width: 860px) { .g3, .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ty { grid-template-columns: 1fr; gap: 6px; } }
+@media (max-width: 560px) { .ds { padding: 28px 16px 64px; } .g2, .g3, .g4 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="business-theme bct">
+<main class="ds">
+  <div class="ds-top"><img src="../assets/bct-logo.svg" alt="Bahwan CyberTek"><span>CRM</span></div>
+  <h1>BCT CRM 設計系統</h1>
+  <p class="ds-lead">BCT AI CRM prototype 用到的顏色、字體、元件和動態規則。這一頁載入的是 prototype 本身的樣式表，所以下面每個範例都是實際元件，<span class="nb">不是截圖。</span>可以離線<span class="nb">開啟。</span></p>
+  <nav class="ds-toc" aria-label="目錄">
+    <a href="#base">架構</a><a href="#color">顏色</a><a href="#type">字體</a><a href="#numbers">數字</a><a href="#controls">按鈕與篩選</a>
+    <a href="#flags">狀態標籤</a><a href="#ai">AI 助理</a><a href="#tooltip">Tooltip</a><a href="#cards">卡片與表格</a><a href="#motion">動態</a><a href="#writing">文字規則</a><a href="#files">檔案</a>
+  </nav>
+
+  <section id="base">
+    <h2>架構</h2>
+    <p>建在 Gina UI（Business v2）上。Gina 的檔案原封不動放在 <code>vendor/gina/</code>，BCT 需要的部分都寫在 <code>bct-crm.css</code>，而且只在 <code>body.business-theme.bct</code> 底下生效。要改樣式就改 <code>bct-crm.css</code>，不要動 <span class="nb">Gina 的檔案。</span></p>
+    <div class="panel">
+      <pre class="files">vendor/fonts/inter.css        Inter 字體（本機檔，離線可用）
+vendor/gina/tokens.css        Gina 基礎 token：灰階、間距、圓角、字級
+vendor/gina/app.css           Gina 版面：側欄、對話、popover
+vendor/gina/app-business-v2.css  Gina Business v2 主題
+bct-crm.css                   BCT 品牌色與 CRM 元件（依編號分段）</pre>
+    </div>
+  </section>
+
+  <section id="color">
+    <h2>顏色</h2>
+    <p>品牌色只有四個：深藍、主藍、青藍，加上當作「黑色」用的墨色。灰階和背景沿用 Gina。色碼是從實際樣式表<span class="nb">讀出來的。</span></p>
+    <h3>品牌</h3>
+    <div class="grid g4" data-swatches="--bct-ink|墨色 Ink|主要文字、大數字、首頁問候、深色按鈕、tooltip 底色;--bct-midnight|深藍 Midnight|選中的篩選、強調的名稱;--bct-deep|主藍 Deep|主要按鈕、連結、AI 提示的動作;--bct-cyan|青藍 Cyan|「今天」、圖表第三色、Key contact 緞帶"></div>
+    <h3>文字、線條、底色</h3>
+    <div class="grid g4" data-swatches="--text-primary|文字 Primary|標題、內文重點;--text-secondary|文字 Secondary|內文;--text-tertiary|文字 Tertiary|說明、日期、圖表軸;--accent-blue-bg|淡藍 Accent|選中列、AI 提示底色起點;--border-subtle|線 Subtle|表格列分隔;--border-default|線 Default|卡片、按鈕外框;--bg-field|底 Field|輸入框、進度條底;--bg-surface|底 Surface|卡片"></div>
+    <h3>圖表順序</h3>
+    <div class="panel"><div class="row" style="gap:6px">
+      <i style="flex:35;height:40px;border-radius:10px;background:var(--bct-ink)"></i><i style="flex:32;height:40px;border-radius:10px;background:var(--bct-deep)"></i><i style="flex:21;height:40px;border-radius:10px;background:var(--bct-cyan)"></i><i style="flex:12;height:40px;border-radius:10px;background:#cfd6e0"></i></div>
+      <p class="cap"><b>墨色 → 主藍 → 青藍 → 灰 #cfd6e0。</b>最重要的一類用墨色；只有一個重點時，其他全部用灰，重點用墨色（例如 Activity 有會議的日子）。「今天」固定<span class="nb">用青藍。</span></p></div>
+  </section>
+
+  <section id="type">
+    <h2>字體</h2>
+    <p>英文用 Inter（400、500、600、700），中文用系統字（Mac 是蘋方，Windows 是微軟正黑體）。數字一律等寬（<code>tabular-nums</code>），跳動時才不會左右晃。</p>
+    <div class="panel">
+      <dl class="ty"><dt><b>首頁問候</b>30px · 500 · 墨色</dt><dd style="margin:0;font-size:30px;font-weight:500;letter-spacing:-.02em;color:var(--bct-ink)">Good afternoon, Gaurav</dd></dl>
+      <dl class="ty"><dt><b>頁面標題</b>34px · 400 · <code>.rp-head h1</code></dt><dd class="rp-head" style="margin:0"><h1 style="margin:0">Reports</h1></dd></dl>
+      <dl class="ty"><dt><b>大數字</b>46px · <code>.rp-big</code>，單位用 sup</dt><dd style="margin:0"><span class="rp-big">$2.55<sup>M</sup></span></dd></dl>
+      <dl class="ty"><dt><b>卡片標題</b>13.5px · 500 · <code>.rp-ct</code></dt><dd style="margin:0"><div class="rp-ct"><span>Activity, last 60 days <span class="rp-muted">· 142 emails · 31 meetings</span></span></div></dd></dl>
+      <dl class="ty"><dt><b>內文</b>13.5–14.5px · 400</dt><dd style="margin:0;font-size:14px;line-height:1.6;color:var(--text-secondary)">Gulf Harbor closes Monday with pricing still open.</dd></dl>
+      <dl class="ty"><dt><b>說明、日期</b>12–12.5px · Tertiary · <code>.rp-muted</code></dt><dd style="margin:0"><span class="rp-muted">60% win rate. Both losses were on price.</span></dd></dl>
+    </div>
+  </section>
+
+  <section id="numbers">
+    <h2>數字列</h2>
+    <p>Reports、Accounts 頁首和首頁釘選列都用同一組數字樣式。標籤加了虛線底線的，滑過去會出現說明（見 Tooltip）。進頁面時數字會從 0 跳到實際值，約 0.2 <span class="nb">秒。</span></p>
+    <div class="panel"><div class="rp-heads">
+      <div class="rp-hd"><span class="rp-big">$2.55<sup>M</sup></span><div class="rp-row"><span class="tip-def" tabindex="0" data-tip="All your open deals, at full value.">Open pipeline</span> <span class="rp-delta up">+12%</span></div></div>
+      <div class="rp-hd"><span class="rp-big">$1.10<sup>M</sup></span><div class="rp-row"><span class="tip-def" tabindex="0" data-tip="Committed $540K plus best case $560K, closing by 31 Dec.">Q4 forecast</span> · 73% of target</div></div>
+      <div class="rp-hd"><span class="rp-big">2</span><div class="rp-row">New leads this week</div></div>
+    </div>
+    <p class="cap"><b>變化：</b><code>.rp-delta.up</code> 綠、<code>.rp-delta.down</code> 紅，沒有方向的用預設灰。</p></div>
+  </section>
+
+  <section id="controls">
+    <h2>按鈕與篩選</h2>
+    <p>一個區塊最多一個主要按鈕（主藍）。深色 <code>.ink</code> 留給頁面上最重要的一個動作；套用後的按鈕變灰，<span class="nb">不能再按。</span></p>
+    <div class="panel">
+      <div class="row"><button class="btn-bct">Draft follow-up</button><button class="btn-bct secondary">Open record</button><button class="btn-bct ink">Show me</button><button class="btn-bct applied" disabled>Applied</button></div>
+      <p class="cap"><code>.btn-bct</code> · <code>.btn-bct.secondary</code> · <code>.btn-bct.ink</code> · <code>.btn-bct.applied</code></p>
+      <h3>篩選</h3>
+      <div class="row"><button class="chip-f active">My deals<span class="chip-n">6</span></button><button class="chip-f">All deals<span class="chip-n">7</span></button><span class="vw-sep"></span><button class="chip-f">Services<span class="chip-n">5</span></button><button class="chip-f">Resell<span class="chip-n">1</span></button></div>
+      <p class="cap"><code>.chip-f</code>，選中加 <code>.active</code>（深藍）。數量放在 <code>.chip-n</code>。同一組裡二選一的放前面，用分隔線隔開可複選<span class="nb">的類型。</span></p>
+    </div>
+  </section>
+
+  <section id="flags">
+    <h2>狀態標籤</h2>
+    <p>一列只放一個最重要的狀態。顏色代表意思，不要拿來<span class="nb">裝飾。</span></p>
+    <div class="panel">
+      <div class="row"><span class="flag overdue">Overdue</span><span class="flag warn">Quiet 18 days</span><span class="flag ok">Active today</span><span class="flag new">New lead</span><span class="flag match">Matches ACC-0214</span><span class="flag due">Due today</span><span class="flag ink">Call today 11:00</span><span class="flag muted">Replied</span></div>
+      <p class="cap"><b>overdue</b> 逾期、要馬上處理 · <b>warn</b> 太久沒動 · <b>ok</b> 正常 · <b>new</b> 新進 · <b>match</b> 系統找到關聯 · <b>due</b> 今天到期 · <b>ink</b> 今天的行程 · <b>muted</b> 已<span class="nb">處理。</span></p>
+    </div>
+  </section>
+
+  <section id="ai">
+    <h2>AI 助理</h2>
+    <p>助理用同一顆水滴頭像（<code>assets/ai/</code>：一般、思考、開心三張）。大顆會動的只出現在首頁和對話；頁面上的提示用小頭像。每頁的 AI 提示怎麼統一，還在提案中（<code>docs/workspace-ai-proposals.html</code>），下面是目前的<span class="nb">標準長條。</span></p>
+    <div class="panel">
+      <div class="acc-ins" style="margin:0"><img src="../assets/ai/ai-face.webp" alt=""><p><b>2 accounts need you.</b> Gulf Harbor closes Monday with pricing still open, and Muscat Municipality has been quiet for <span class="nb">18 days.</span></p><button class="acc-ins-go">Show them</button></div>
+      <p class="cap"><code>.acc-ins</code>：小頭像 34px、粗體開頭一句、右邊一個藍字動作（<code>.acc-ins-go</code>）。一句話講完，說得出「為什麼現在要做」。</p>
+      <h3>頭像尺寸</h3>
+      <div class="row" style="gap:24px;align-items:flex-end">
+        <div style="text-align:center"><img src="../assets/ai/ai-face.webp" alt="" style="width:84px;height:84px;filter:drop-shadow(0 12px 22px rgb(0 66 183/26%))"><p class="cap">首頁 84px，會動</p></div>
+        <div style="text-align:center"><img src="../assets/ai/ai-face.webp" alt="" style="width:34px;height:34px"><p class="cap">頁面提示 34px</p></div>
+        <div style="text-align:center"><img src="../assets/ai/ai-face.webp" alt="" style="width:24px;height:24px"><p class="cap">對話回覆 24px</p></div>
+        <div style="text-align:center"><img src="../assets/ai/ai-face-think.webp" alt="" style="width:34px;height:34px"><p class="cap">思考中</p></div>
+        <div style="text-align:center"><img src="../assets/ai/ai-face-happy.webp" alt="" style="width:34px;height:34px"><p class="cap">開心（點擊、打招呼）</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tooltip">
+    <h2>Tooltip</h2>
+    <p>全站共用一個黑底 tooltip（<code>tooltip.js</code>，class 是 <code>.bct-tip</code>，因為 Gina 已經用了 <code>.tip</code>）。分兩種：數值型掛在圖表上，顯示那一點的數字；說明型掛在標題和欄位名上，加虛線底線，<span class="nb">說明意思。</span></p>
+    <div class="grid g2">
+      <div class="panel">
+        <div class="tip-sample"><b>20 Sep · Workshop</b>4 meetings · 5 emails</div>
+        <p class="cap"><b>樣式：</b>墨色底、白字 12.5px、圓角 8px、最寬 240px、有箭頭。第一行粗體<span class="nb">可省略。</span></p>
+      </div>
+      <div class="panel">
+        <div class="row" style="gap:24px">
+          <span class="tip-def" tabindex="0" data-tip="What is left to reach your Q4 target of $1.5M, after the forecast.">To target</span>
+          <span class="rp-delta up tip-def" tabindex="0" data-tip="Up from $2.28M at the end of Q3.">+12%</span>
+          <div class="rp-bars" data-tip-cols style="width:160px;height:48px;margin:0">
+            <i style="height:40%" data-tip-h="18 Oct" data-tip="2 emails"></i><i style="height:70%" class="m" data-tip-h="19 Oct" data-tip="1 meeting · 3 emails"></i><i style="height:55%" data-tip-h="20 Oct" data-tip="3 emails"></i><i style="height:90%" class="m" data-tip-h="21 Oct" data-tip="2 meetings · 4 emails"></i><i style="height:30%" class="t" data-tip-h="Today" data-tip="1 email"></i></div>
+        </div>
+        <p class="cap">滑過去試試看。<b>規則：</b>停 300ms 才出現；在長條間滑動直接換內容；滑走、捲動、Esc 立刻收；Tab 聚焦也會出現；手機點一下<span class="nb">顯示。</span></p>
+      </div>
+    </div>
+    <p class="cap">寫法：<code>data-tip</code> 放內容、<code>data-tip-h</code> 放粗體第一行；說明型加 <code>class="tip-def" tabindex="0"</code>；細長的圖表在外層加 <code>data-tip-cols</code>，游標最近的那一根<span class="nb">會被選中。</span></p>
+  </section>
+
+  <section id="cards">
+    <h2>卡片與表格</h2>
+    <p>卡片圓角 20px、1px 外框、極淡陰影。Reports 的卡片放在 12 欄網格裡（<code>.s4</code> 佔三分之一、<code>.s8</code> 三分之二、<code>.s12</code> 整排），同一排的卡片內容要差不多高，<span class="nb">不留大片空白。</span></p>
+    <div class="grid g2">
+      <section class="rp-card" style="margin:0">
+        <div class="rp-ct"><span>Won and lost <span class="rp-muted">· last 90 days</span></span></div>
+        <div class="rp-wl">
+          <div class="won"><i aria-label="Won"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></i><span>ERP renewal<small>Qamar Energy · 12 Aug</small></span><em>$640K</em></div>
+          <div class="lost"><i aria-label="Lost"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></i><span>Data audit<small>Oman Air · lost on price</small></span><em>$150K</em></div>
+        </div>
+        <p class="rp-muted" style="margin-top:10px">60% win rate. Both losses were on price.</p>
+      </section>
+      <section class="rp-card" style="margin:0">
+        <div class="rp-ct">Average days in stage</div>
+        <div class="rp-gantt">
+          <div>Discovery<b style="width:44%;background:#cfd6e0"></b><em>12 d</em></div>
+          <div>Proposal<b style="width:100%;background:var(--bct-ink)"></b><em>27 d</em></div>
+          <div>Negotiation<b style="width:33%;background:var(--bct-cyan)"></b><em>9 d</em></div></div>
+        <p class="rp-muted" style="margin-top:14px">Proposal is where deals wait longest. BCT average is <span class="nb">19 days.</span></p>
+      </section>
+    </div>
+    <p class="cap"><b>卡片的結構：</b>標題（<code>.rp-ct</code>）→ 內容 → 一句結論（<code>.rp-muted</code>）。結論要說出「所以呢」，<span class="nb">不只重複數字。</span>表格（Accounts）整列可點、可用 Enter 開啟紀錄，打開紀錄面板時隱藏較不重要的欄位，<span class="nb">不讓名字被擠斷。</span></p>
+  </section>
+
+  <section id="motion">
+    <h2>動態</h2>
+    <p>輕：小幅上升加淡入，不彈跳、不大幅滑動、不閃。系統設定「減少動態」時全部<span class="nb">跳過。</span></p>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><div class="mo" id="mo"><i></i><i></i><i></i><i></i><i></i></div><button class="btn-bct secondary" id="mo-play">重播</button></div>
+      <ul class="rules" style="margin-top:20px">
+        <li><span><b>進頁面：</b>上升 8px、淡入 320ms，依序間隔 60ms；曲線 <code>cubic-bezier(.2,.7,.2,1)</code>。</span></li>
+        <li><span><b>首頁第一次：</b>水滴頭像落下（小擠壓＋漣漪），問候和卡片依序出現，約 0.8 秒；全部落定後頭像做一次點擊時的動態（笑臉、水波、水滴）<span class="nb">打招呼。</span></span></li>
+        <li><span><b>回到首頁：</b>同樣依序上升但較短（約 0.5 秒），沒有落下和漣漪，最後一樣打招呼。</span></li>
+        <li><span><b>點首頁的建議：</b>頭像先「思考」，頁面淡出，頭像飛進對話、落在 AI 回覆的小頭像位置，兩端用<span class="nb">同一張圖。</span></span></li>
+        <li><span><b>Tooltip：</b>延遲 300ms，淡入 140ms 加 4px 位移；消失不做動畫。</span></li>
+        <li><span><b>淡出</b>只寫終點（從目前透明度開始），避免先閃成實色。</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="writing">
+    <h2>文字規則</h2>
+    <p>介面文字是英文，說明文件是繁體中文。</p>
+    <div class="grid g2">
+      <div class="panel"><h3 style="margin-top:0">要</h3><ul class="rules">
+        <li><span><b>句首大寫</b>（Sentence case）：Open pipeline，不是 Open Pipeline。</span></li>
+        <li><span><b>日期</b>寫成 14 Oct、今天寫 Today；金額寫 $540K、$2.55M。</span></li>
+        <li><span><b>AI 的句子</b>先講結論，再講原因，最後給一個動作。說得出根據（例如 Based on OPP-1031）。</span></li>
+        <li><span><b>中文不能孤字：</b>最後一行只剩一兩個字時，用 <code>&lt;span class="nb"&gt;</code> 把詞包起來。</span></li>
+      </ul></div>
+      <div class="panel"><h3 style="margin-top:0">不要</h3><ul class="rules dont">
+        <li><span>在 Workspace 頁面重複打招呼（問候只在首頁）。</span></li>
+        <li><span>同一件事用三種按鈕樣式。</span></li>
+        <li><span>AI 提示講別頁的事，或按下去跳到別頁<span class="nb">卻沒說。</span></span></li>
+        <li><span>用顏色裝飾：紅色只代表逾期或需要注意。</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="files">
+    <h2>檔案</h2>
+    <p>直接用瀏覽器開 <code>index.html</code> 就能看，不需要網路或伺服器。示範日期是 2026 年 10 月底，登入的示範使用者是 Gaurav <span class="nb">Shrotriya。</span></p>
+    <div class="panel"><pre class="files">index.html          prototype 入口
+crm.js              首頁、對話、紀錄面板、側欄
+views.js            Workspace：Pipeline、Accounts、Reports
+page-ask.js         「Ask about this page」：帶著頁面開新對話
+tooltip.js          黑底 tooltip
+home-motion.js      首頁進場、離開、打招呼
+ai-face-motion.js   水滴頭像的眨眼、水波、點擊動態
+chat-export.js      匯出對話
+assets/             品牌圖、AI 頭像、人物照片、插圖
+docs/design-system.html  這一頁</pre></div>
+  </section>
+</main>
+<script src="../tooltip.js"></script>
+<script>
+// Swatches: read the real values from the stylesheets.
+const toHex = c => { const m = c.match(/\d+(\.\d+)?/g); return m ? '#' + m.slice(0, 3).map(n => (+n).toString(16).padStart(2, '0')).join('').toUpperCase() : c; };
+document.querySelectorAll('[data-swatches]').forEach(box => {
+  box.innerHTML = box.dataset.swatches.split(';').map(s => { const [v, name, use] = s.split('|'); return `<div class="sw"><i style="background:var(${v})" data-v="${v}"></i><div><b>${name}</b><span>${v} · <em class="hex"></em></span><small>${use}</small></div></div>`; }).join('');
+});
+document.querySelectorAll('.sw i').forEach(i => { i.parentNode.querySelector('.hex').textContent = toHex(getComputedStyle(i).backgroundColor); i.parentNode.querySelector('.hex').style.fontStyle = 'normal'; });
+// Motion demo: the standard page entrance.
+const play = () => { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('#mo i').forEach((n, i) => n.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: i * 60, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' })); };
+document.getElementById('mo-play').addEventListener('click', play);
+</script>
+</body>
+</html>

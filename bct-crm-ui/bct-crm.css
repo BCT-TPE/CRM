@@ -37,7 +37,7 @@ body.business-theme.bct .cbtn.send.ready { background: var(--bct-deep); color: #
 body.business-theme.bct .cbtn.send.ready:hover { background: var(--bct-deep-hover); }
 body.business-theme.bct .side-nav-item.active,
 body.business-theme.bct .hist.active { background: var(--bg-selected); color: var(--text-primary); }
-body.business-theme.bct .hero h1 { color: var(--bct-midnight); }
+body.business-theme.bct .hero h1 { color: var(--bct-ink, #10182a); } /* black greeting (2026-10-28), was midnight blue */
 body.business-theme.bct .hero-ask-grad { color: var(--bct-deep); -webkit-text-fill-color: currentColor; background: none; }
 body.business-theme.bct .toast { background: var(--bct-midnight); color: #fff; }
 
@@ -490,7 +490,7 @@ body.business-theme.bct .rp-waffle i { aspect-ratio: 1; border-radius: 3px; back
 body.business-theme.bct .rp-waffle i.w { background: var(--bct-ink); }
 body.business-theme.bct .rp-wf .rp-big { font-size: 42px; }
 body.business-theme.bct .rp-person { display: flex; flex-direction: column; background: linear-gradient(180deg, #ffffff 0%, #f3f7fd 100%); }
-body.business-theme.bct .rp-pc { position: relative; height: 150px; margin: 10px -18px 0; display: grid; place-items: center; overflow: hidden; }
+body.business-theme.bct .rp-pc { position: relative; height: 150px; margin: 10px -18px 0; display: grid; place-items: center; } /* no overflow:hidden: it cut the photo shadow; the ribbon svg clips itself */
 body.business-theme.bct .rp-ribbon { position: absolute; inset: 0; width: 100%; height: 100%; }
 body.business-theme.bct .rp-ribbon path { stroke: var(--bct-cyan); opacity: .85; }
 body.business-theme.bct .rp-pc img { position: relative; width: 116px; height: 116px; border-radius: 50%; object-fit: cover; border: 5px solid rgba(255,255,255,.92); box-shadow: 0 14px 30px -10px rgb(0 66 183 / 40%); }
@@ -761,6 +761,32 @@ body.business-theme.bct .rp-wl span { flex: 1; min-width: 0; color: var(--text-p
 body.business-theme.bct .rp-wl small { display: block; margin-top: 1px; font-size: 11.5px; color: var(--text-tertiary); }
 body.business-theme.bct .rp-wl em { font-style: normal; font-weight: 600; font-variant-numeric: tabular-nums; }
 body.business-theme.bct .rp-wl .lost em { color: var(--text-tertiary); font-weight: 500; }
+/* Activity card: key, and where the time went per account (2026-10-28). Side by side when the card is full width. */
+body.business-theme.bct .rp-key { display: flex; gap: 14px; font-size: 11.5px; font-weight: 400; color: var(--text-tertiary); }
+body.business-theme.bct .rp-key span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 2px; background: #cfd6e0; }
+body.business-theme.bct .rp-key .m::before { background: var(--bct-ink); }
+body.business-theme.bct .rp-key .t::before { background: var(--bct-cyan); }
+body.business-theme.bct .rp-act-g { display: flex; flex-direction: column; gap: 22px; }
+body.business-theme.bct .rp-act.s12 .rp-act-g { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 40px; align-items: end; }
+body.business-theme.bct .rp-aa-h, body.business-theme.bct .rp-aa-r { display: grid; grid-template-columns: minmax(0, 1fr) 64px 64px 56px; align-items: center; gap: 12px; }
+body.business-theme.bct .rp-aa-h { padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle); font-size: 11.5px; color: var(--text-tertiary); }
+body.business-theme.bct .rp-aa-h span:not(:first-child), body.business-theme.bct .rp-aa-r > :not(:first-child) { text-align: right; }
+body.business-theme.bct .rp-aa-r { width: 100%; padding: 9px 0; border: 0; border-bottom: 1px solid var(--border-subtle); background: none; font: inherit; font-size: 13px; color: var(--text-primary); text-align: left; cursor: pointer; }
+body.business-theme.bct .rp-aa-r:last-child { border-bottom: 0; }
+body.business-theme.bct .rp-aa-r:hover .rp-aa-n { color: var(--bct-deep); }
+body.business-theme.bct .rp-aa-n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.business-theme.bct .rp-aa-n i { display: block; height: 4px; margin-top: 6px; border-radius: 2px; background: linear-gradient(90deg, var(--bct-ink) var(--w), var(--bg-field) var(--w)); }
+body.business-theme.bct .rp-aa-r b { font-weight: 600; font-variant-numeric: tabular-nums; }
+body.business-theme.bct .rp-aa-r > span:last-child { font-size: 12px; color: var(--text-tertiary); }
+body.business-theme.bct .rp-aa-r.under b:nth-of-type(2) { color: #a33a00; }
+body.business-theme.bct .rp-aa-f { margin: 10px 0 0; }
+body.business-theme.bct .rp-act .rp-bars { height: 100px; }
+body.business-theme.bct .rp-key span { white-space: nowrap; }
+@media (max-width: 640px) {
+  body.business-theme.bct .rp-act .rp-ct { flex-wrap: wrap; row-gap: 6px; }
+  body.business-theme.bct .rp-aa-h, body.business-theme.bct .rp-aa-r { grid-template-columns: minmax(0, 1fr) 44px 52px 44px; gap: 8px; }
+  body.business-theme.bct .rp-aa-r > span:last-child, body.business-theme.bct .rp-aa-h span:last-child { font-size: 11.5px; }
+}
 body.business-theme.bct .flag { white-space: nowrap; }
 body.business-theme.bct .flag.muted { background: var(--bg-field); color: var(--text-secondary); }
 @media (max-width: 640px) { body.business-theme.bct .rp-heads { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; } }
@@ -857,3 +883,33 @@ body.business-theme.bct .pin-strip .snap-btn { width: 32px; height: 32px; flex: 
    Auto margins centre it when it fits and let it scroll from the top when it doesn't. */
 body.business-theme.bct:not(.viewing):not(.chatting) .scroll { justify-content: flex-start; }
 body.business-theme.bct:not(.viewing):not(.chatting) .hero { margin-top: auto; margin-bottom: auto; }
+
+/* ---------- BCT colleagues with photos (2026-10-28) ----------
+   Gaurav Shrotriya (Data Lake deal team) and Sundara Balaji (owner of Muscat Municipality). */
+body.business-theme.bct .who-mini { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+body.business-theme.bct .who-av { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; background: #dfe6f1; }
+body.business-theme.bct .acc-owner .who-av { width: 16px; height: 16px; margin-right: 5px; vertical-align: -3px; }
+body.business-theme.bct .flag.due { background: var(--accent-blue-bg); color: var(--bct-deep); }
+body.business-theme.bct .flag.ink { background: #eef1f5; color: var(--text-primary); }
+
+/* ---------- Pipeline filters (2026-10-28) ---------- */
+body.business-theme.bct .kb-empty { padding: 14px 8px; border: 1px dashed var(--border-default); border-radius: 8px; font-size: 12.5px; color: var(--text-tertiary); text-align: center; }
+body.business-theme.bct .pv-owner { align-self: flex-start; padding: 2px 8px 2px 3px; border-radius: 999px; background: #eef1f6; font-size: 11.5px; color: var(--text-secondary); }
+body.business-theme.bct .pv-owner .who-av { width: 18px; height: 18px; }
+
+/* ---------- Tooltips (2026-10-28): one dark tooltip, see tooltip.js. Not .tip: Gina already uses that name ---------- */
+.bct-tip { position: fixed; z-index: 1000; max-width: 240px; padding: 8px 10px; border-radius: 8px; background: var(--bct-ink, #10182a); color: #fff;
+  font: 400 12.5px/1.45 Inter, "Noto Sans TC", system-ui, sans-serif; box-shadow: 0 8px 24px rgb(16 24 42 / 22%); pointer-events: none; }
+.bct-tip[hidden] { display: none; }
+.bct-tip b { display: block; margin-bottom: 2px; font-weight: 600; }
+.bct-tip span { color: rgb(255 255 255 / 82%); }
+.bct-tip b + span { display: block; }
+.bct-tip::after { content: ""; position: absolute; left: var(--ax, 50%); top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--bct-ink, #10182a); }
+.bct-tip.below::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--bct-ink, #10182a); }
+body.business-theme.bct .tip-def { text-decoration: underline dotted var(--border-strong, #aeb9c8); text-decoration-thickness: 1px; text-underline-offset: 4px; cursor: help; border-radius: 3px; }
+body.business-theme.bct .tip-def:hover, body.business-theme.bct .tip-def.tip-on { text-decoration-color: var(--text-secondary); }
+body.business-theme.bct .tip-def:focus-visible { outline: 2px solid var(--bct-deep); outline-offset: 2px; }
+body.business-theme.bct [data-tip-cols] [data-tip] { transition: filter .12s; }
+body.business-theme.bct [data-tip-cols] .tip-on { filter: brightness(.82); }
+body.business-theme.bct .rp-bars i.tip-on.m, body.business-theme.bct .rp-gantt b.tip-on { filter: brightness(1.6); }
+body.business-theme.bct .pv-bc rect.tip-on { filter: none; }
