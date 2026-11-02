@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <link rel="icon" type="image/svg+xml" href="../../bct-crm-ui/assets/fav.svg" />
 <!-- Proposal page (2026-10-28): what each scripted question would look like in Claude with the BCT CRM connector.
-     Every answer = one card (BCT style, MCP Apps) + one or two sentences from Claude. Fictional data; demo day Thu 22 Oct. -->
+     Every answer = one card (BCT style, MCP Apps) + one or two sentences from Claude. Fictional data; dates pinned to Fri 11 Dec 2026 by the build script. -->
 <style>
   :root {
     --ink: #10182a; --muted: #56657a; --title: #172033; --line: #e1e6ef; --line-soft: #e9edf4; --surface: #fff;
@@ -232,7 +232,7 @@
 </div></div>
 
 <div class="intro">
-  <p>How the six scripted questions look in Claude. <b>The cards are the real cards the connector sends</b>, filled with what it actually returns, and every date follows today. The rule: every answer is one card plus one or two sentences.</p>
+  <p>How the six scripted questions look in Claude. <b>The cards are the real cards the connector sends</b>, filled with what it actually returns, shown as of Fri 11 Dec 2026. In the connector itself, every date follows today. The rule: every answer is one card plus one or two sentences.</p>
   <p>To try it yourself, download the connector with the button at the top and drag it into Claude Desktop under Settings › Extensions. The chat frame around the cards is neutral; Claude decides its real look and fonts. Press a button on a card to see the sentence it would send to Claude. After changing the connector, run <code style="font-size:12px">npm run docs</code> in <code style="font-size:12px">bct-crm-mcp</code> to refresh these cards.</p>
   <div class="legend"><span><i style="background:var(--red-bg);border:1px solid #f3c5b7"></i>Overdue</span><span><i style="background:var(--amber-bg);border:1px solid #f0dc9c"></i>Quiet too long / not saved yet</span><span><i style="background:var(--blue-bg);border:1px solid #c9d8f4"></i>Due today</span><span><i style="background:var(--violet-bg);border:1px solid #d9cff3"></i>Matches an existing account</span><span><i style="background:var(--up-bg);border:1px solid #bfe2cb"></i>Saved / up</span></div>
 </div>
@@ -244,7 +244,7 @@
     
     <div class="used"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>Used BCT CRM</div>
     <iframe class="cardframe" data-q="q1" title="BCT CRM card" loading="lazy"></iframe><div class="sent" data-sent="q1" hidden></div>
-    <p class="say">You're <b>$400K</b> short with nine weeks to go. Data Lake alone would close the gap, and it has been quiet for a month.</p>
+    <p class="say">You're <b>$400K</b> short with three weeks to go. Data Lake alone would close the gap, and it has been quiet for a month.</p>
   </div>
   <aside class="notes"><span class="tag done">Built into the connector</span><h3>Q4 snapshot card</h3><dl><dt>Card</dt><dd>Four headline numbers. The same card as in the web prototype.</dd><dt>Text</dt><dd>No numbers repeated. Only the gap and the deal to push.</dd><dt>Tool</dt><dd><code>get_forecast</code></dd><dt>Interaction</dt><dd>Open in BCT CRM opens the web prototype.</dd></dl></aside>
 </section>
@@ -294,7 +294,7 @@
       <div class="acts"><button class="btn pri">Allow once</button><button class="btn">Always allow</button><button class="btn ghost">Deny</button></div></div>
     <div class="used"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>Used BCT CRM</div>
     <iframe class="cardframe" data-q="q5" title="BCT CRM card" loading="lazy"></iframe><div class="sent" data-sent="q5" hidden></div>
-    <p class="say">Saved. The proposal is due tomorrow. Want me to draft the phased outline?</p>
+    <p class="say">Saved. The proposal is due next Friday, 18 Dec. Want me to draft the phased outline?</p>
   </div>
   <aside class="notes"><span class="tag done">Built into the connector</span><h3>After saving</h3><dl><dt>Two confirmations</dt><dd>After you reply yes, Claude shows its own permission prompt (Claude decides how it looks). Choose "Always allow" and it stops asking.</dd><dt>Card</dt><dd>The same card turns green, "Saved", with the four changes ticked and an Undo button.</dd><dt>Text</dt><dd>Offers the next step: drafting the proposal outline.</dd><dt>Tool</dt><dd><code>apply_changes</code></dd></dl></aside>
 </section>

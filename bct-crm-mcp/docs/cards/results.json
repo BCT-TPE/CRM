@@ -1,5 +1,5 @@
 {
- "built": "2026-10-28",
+ "built": "2026-12-11",
  "steps": {
   "q1": {
    "card": "q4-snapshot.html",
@@ -8,14 +8,14 @@
     "content": [
      {
       "type": "text",
-      "text": "Where the interface supports it, the user also sees these four headline numbers as a Q4 snapshot card. Mention them in one short sentence at most, then focus on what they mean and what needs attention.\n\n{\n  \"period\": \"Q4 2026\",\n  \"as_of\": \"2026-10-28 06:00\",\n  \"owner\": \"Sheldon Cooper\",\n  \"open_pipeline\": \"$2.55M\",\n  \"open_pipeline_change\": \"+12% vs last quarter\",\n  \"open_deals\": 6,\n  \"forecast\": \"$1.10M\",\n  \"target\": \"$1.50M\",\n  \"percent_of_target\": 73,\n  \"percent_change\": \"+8 pts vs last month\",\n  \"committed\": \"$540K\",\n  \"best_case\": \"$560K\",\n  \"gap\": \"$400K\",\n  \"weeks_left\": 9,\n  \"won_last_90_days\": \"$1.07M\",\n  \"win_rate_last_90_days\": 60,\n  \"won\": [\n    {\n      \"deal\": \"ERP renewal\",\n      \"account\": \"Qamar Energy\",\n      \"closed\": \"2026-08-18\",\n      \"amount\": \"$640K\"\n    },\n    {\n      \"deal\": \"Citizen portal phase 1\",\n      \"account\": \"Muscat Municipality\",\n      \"closed\": \"2026-09-28\",\n      \"amount\": \"$310K\"\n    },\n    {\n      \"deal\": \"Security review\",\n      \"account\": \"Sahyadri Bank\",\n      \"closed\": \"2026-10-09\",\n      \"amount\": \"$120K\"\n    }\n  ],\n  \"lost\": [\n    {\n      \"deal\": \"Fleet tracking app\",\n      \"account\": \"Emirates Transport\",\n      \"reason\": \"lost on price\",\n      \"amount\": \"$280K\"\n    },\n    {\n      \"deal\": \"Data audit\",\n      \"account\": \"Oman Air\",\n      \"reason\": \"lost on price\",\n      \"amount\": \"$150K\"\n    }\n  ],\n  \"new_leads_this_week\": 2,\n  \"by_type\": {\n    \"Services\": \"$880K\",\n    \"Services + IP\": \"$820K\",\n    \"Resell + Services\": \"$540K\",\n    \"KPO / BPO\": \"$310K\"\n  },\n  \"by_region\": {\n    \"Oman\": \"$1.73M\",\n    \"UAE\": \"$540K\",\n    \"India\": \"$280K\"\n  },\n  \"insight\": \"Proposal holds 53% of open value, and the two Proposal deals (Data Lake, Gulf Harbor) have had no activity this month.\"\n}"
+      "text": "Where the interface supports it, the user also sees these four headline numbers as a Q4 snapshot card. Mention them in one short sentence at most, then focus on what they mean and what needs attention.\n\n{\n  \"period\": \"Q4 2026\",\n  \"as_of\": \"2026-12-11 06:00\",\n  \"owner\": \"Gaurav Shrotriya\",\n  \"open_pipeline\": \"$2.55M\",\n  \"open_pipeline_change\": \"+12% vs last quarter\",\n  \"open_deals\": 6,\n  \"forecast\": \"$1.10M\",\n  \"target\": \"$1.50M\",\n  \"percent_of_target\": 73,\n  \"percent_change\": \"+8 pts vs last month\",\n  \"committed\": \"$540K\",\n  \"best_case\": \"$560K\",\n  \"gap\": \"$400K\",\n  \"weeks_left\": 9,\n  \"won_last_90_days\": \"$1.07M\",\n  \"win_rate_last_90_days\": 60,\n  \"won\": [\n    {\n      \"deal\": \"ERP renewal\",\n      \"account\": \"Qamar Energy\",\n      \"closed\": \"2026-10-01\",\n      \"amount\": \"$640K\"\n    },\n    {\n      \"deal\": \"Citizen portal phase 1\",\n      \"account\": \"Muscat Municipality\",\n      \"closed\": \"2026-11-11\",\n      \"amount\": \"$310K\"\n    },\n    {\n      \"deal\": \"Security review\",\n      \"account\": \"Sahyadri Bank\",\n      \"closed\": \"2026-11-22\",\n      \"amount\": \"$120K\"\n    }\n  ],\n  \"lost\": [\n    {\n      \"deal\": \"Fleet tracking app\",\n      \"account\": \"Emirates Transport\",\n      \"reason\": \"lost on price\",\n      \"amount\": \"$280K\"\n    },\n    {\n      \"deal\": \"Data audit\",\n      \"account\": \"Oman Air\",\n      \"reason\": \"lost on price\",\n      \"amount\": \"$150K\"\n    }\n  ],\n  \"new_leads_this_week\": 2,\n  \"by_type\": {\n    \"Services\": \"$880K\",\n    \"Services + IP\": \"$820K\",\n    \"Resell + Services\": \"$540K\",\n    \"KPO / BPO\": \"$310K\"\n  },\n  \"by_region\": {\n    \"Oman\": \"$1.73M\",\n    \"UAE\": \"$540K\",\n    \"India\": \"$280K\"\n  },\n  \"insight\": \"Proposal holds 53% of open value, and the two Proposal deals (Data Lake, Gulf Harbor) have had no activity this month.\"\n}"
      }
     ],
     "structuredContent": {
      "snapshot": {
       "title": "Q4 snapshot",
       "updated": "Updated today 06:00",
-      "web_url": "http://localhost:5394/bct-crm-ui/",
+      "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/",
       "tiles": [
        {
         "prefix": "$",
@@ -64,7 +64,7 @@
     "content": [
      {
       "type": "text",
-      "text": "{\n  \"today\": \"2026-10-28\",\n  \"count\": 4,\n  \"total\": \"$2.05M\",\n  \"deals\": [\n    {\n      \"id\": \"OPP-1031\",\n      \"name\": \"Warehouse management system\",\n      \"account\": \"Gulf Harbor Logistics\",\n      \"amount\": \"$540K\",\n      \"stage\": \"Proposal\",\n      \"close_date\": \"2026-11-02\",\n      \"next_step\": \"Send revised pricing with a phased licence\",\n      \"owner\": \"Sheldon Cooper\",\n      \"last_activity\": {\n        \"date\": \"2026-10-20\",\n        \"type\": \"email\",\n        \"summary\": \"Proposal v2 sent\",\n        \"days_ago\": 8\n      },\n      \"needs_attention\": \"Closes Mon 2 Nov. Finance pushed back on price on Wed 14 Oct; revised pricing is one day overdue.\",\n      \"why\": [\n        \"1 day late\",\n        \"Closes Monday\"\n      ],\n      \"next\": \"Send revised pricing to Omar Haddad · was due Tue 27 Oct\"\n    },\n    {\n      \"id\": \"OPP-1017\",\n      \"name\": \"Field Ops mobile app\",\n      \"account\": \"Qamar Energy\",\n      \"amount\": \"$410K\",\n      \"stage\": \"Negotiation\",\n      \"close_date\": \"2026-12-06\",\n      \"next_step\": \"Demo to field supervisors on Thu 5 Nov\",\n      \"owner\": \"Sheldon Cooper\",\n      \"last_activity\": {\n        \"date\": \"2026-10-22\",\n        \"type\": \"email\",\n        \"summary\": \"Revised SOW sent\",\n        \"days_ago\": 6\n      },\n      \"why\": [\n        \"Due today 16:00\"\n      ],\n      \"next\": \"Prepare Field Ops demo for Qamar · due today 16:00\"\n    },\n    {\n      \"id\": \"OPP-1058\",\n      \"name\": \"Core banking security review\",\n      \"account\": \"Sahyadri Bank\",\n      \"amount\": \"$280K\",\n      \"stage\": \"Discovery\",\n      \"close_date\": \"2027-02-06\",\n      \"next_step\": \"Call Rajesh about scope options\",\n      \"owner\": \"Sheldon Cooper\",\n      \"last_activity\": {\n        \"date\": \"2026-10-21\",\n        \"type\": \"email\",\n        \"summary\": \"Asked for scope options\",\n        \"days_ago\": 7\n      },\n      \"why\": [\n        \"Due today 11:00\"\n      ],\n      \"next\": \"Call Rajesh Kulkarni about security review scope · due today 11:00\"\n    },\n    {\n      \"id\": \"OPP-1042\",\n      \"name\": \"Data Lake modernisation\",\n      \"account\": \"Qamar Energy\",\n      \"amount\": \"$820K\",\n      \"stage\": \"Proposal\",\n      \"close_date\": \"2026-12-21\",\n      \"next_step\": \"Follow up after workshop\",\n      \"owner\": \"Sheldon Cooper\",\n      \"last_activity\": {\n        \"date\": \"2026-09-26\",\n        \"type\": \"meeting\",\n        \"summary\": \"Solution workshop with the IT team, run with Gaurav Shrotriya (pre-sales)\",\n        \"days_ago\": 32\n      },\n      \"needs_attention\": \"No activity since the solution workshop on Sat 26 Sept. Biggest open deal; would cover the $400K Q4 gap on its own.\",\n      \"why\": [\n        \"Quiet 32 days\"\n      ],\n      \"next\": \"Send phased proposal to Hana · due Fri 30 Oct\"\n    }\n  ],\n  \"can_wait\": [\n    \"AI document processing\"\n  ]\n}"
+      "text": "{\n  \"today\": \"2026-12-11\",\n  \"count\": 4,\n  \"total\": \"$2.05M\",\n  \"deals\": [\n    {\n      \"id\": \"OPP-1031\",\n      \"name\": \"Warehouse management system\",\n      \"account\": \"Gulf Harbor Logistics\",\n      \"amount\": \"$540K\",\n      \"stage\": \"Proposal\",\n      \"close_date\": \"2026-12-14\",\n      \"next_step\": \"Send revised pricing with a phased licence\",\n      \"owner\": \"Gaurav Shrotriya\",\n      \"last_activity\": {\n        \"date\": \"2026-12-03\",\n        \"type\": \"email\",\n        \"summary\": \"Proposal v2 sent\",\n        \"days_ago\": 8\n      },\n      \"needs_attention\": \"Closes Mon 14 Dec. Finance pushed back on price on Fri 27 Nov; revised pricing is one day overdue.\",\n      \"why\": [\n        \"1 day late\",\n        \"Closes Monday\"\n      ],\n      \"next\": \"Send revised pricing to Omar Haddad · was due Thu 10 Dec\"\n    },\n    {\n      \"id\": \"OPP-1017\",\n      \"name\": \"Field Ops mobile app\",\n      \"account\": \"Qamar Energy\",\n      \"amount\": \"$410K\",\n      \"stage\": \"Negotiation\",\n      \"close_date\": \"2027-01-19\",\n      \"next_step\": \"Demo to field supervisors on Thu 17 Dec\",\n      \"owner\": \"Gaurav Shrotriya\",\n      \"last_activity\": {\n        \"date\": \"2026-12-05\",\n        \"type\": \"email\",\n        \"summary\": \"Revised SOW sent\",\n        \"days_ago\": 6\n      },\n      \"why\": [\n        \"Due today 16:00\"\n      ],\n      \"next\": \"Prepare Field Ops demo for Qamar · due today 16:00\"\n    },\n    {\n      \"id\": \"OPP-1058\",\n      \"name\": \"Core banking security review\",\n      \"account\": \"Sahyadri Bank\",\n      \"amount\": \"$280K\",\n      \"stage\": \"Discovery\",\n      \"close_date\": \"2027-03-22\",\n      \"next_step\": \"Call Rajesh about scope options\",\n      \"owner\": \"Gaurav Shrotriya\",\n      \"last_activity\": {\n        \"date\": \"2026-12-04\",\n        \"type\": \"email\",\n        \"summary\": \"Asked for scope options\",\n        \"days_ago\": 7\n      },\n      \"why\": [\n        \"Due today 11:00\"\n      ],\n      \"next\": \"Call Rajesh Kulkarni about security review scope · due today 11:00\"\n    },\n    {\n      \"id\": \"OPP-1042\",\n      \"name\": \"Data Lake modernisation\",\n      \"account\": \"Qamar Energy\",\n      \"amount\": \"$820K\",\n      \"stage\": \"Proposal\",\n      \"close_date\": \"2027-02-03\",\n      \"next_step\": \"Follow up after workshop\",\n      \"owner\": \"Gaurav Shrotriya\",\n      \"last_activity\": {\n        \"date\": \"2026-11-09\",\n        \"type\": \"meeting\",\n        \"summary\": \"Solution workshop with the IT team, run with Sundara Balaji (pre-sales)\",\n        \"days_ago\": 32\n      },\n      \"needs_attention\": \"No activity since the solution workshop on Mon 9 Nov. Biggest open deal; would cover the $400K Q4 gap on its own.\",\n      \"why\": [\n        \"Quiet 32 days\"\n      ],\n      \"next\": \"Send phased proposal to Hana · due Fri 18 Dec\"\n    }\n  ],\n  \"can_wait\": [\n    \"AI document processing\"\n  ]\n}"
      }
     ],
     "structuredContent": {
@@ -73,16 +73,8 @@
       "subtitle": "4 deals · $2.05M",
       "week": [
        {
-        "label": "Wed",
-        "today": true
-       },
-       {
-        "label": "Thu",
-        "today": false
-       },
-       {
         "label": "Fri",
-        "today": false
+        "today": true
        },
        {
         "label": "Sat",
@@ -98,6 +90,14 @@
        },
        {
         "label": "Tue",
+        "today": false
+       },
+       {
+        "label": "Wed",
+        "today": false
+       },
+       {
+        "label": "Thu",
         "today": false
        }
       ],
@@ -120,7 +120,7 @@
           "text": "Closes Monday"
          }
         ],
-        "next": "Send revised pricing to Omar Haddad · was due Tue 27 Oct",
+        "next": "Send revised pricing to Omar Haddad · was due Thu 10 Dec",
         "marks": [
          {
           "day": -1,
@@ -128,12 +128,12 @@
           "label": "Send revised pricing to Omar Haddad"
          },
          {
-          "day": 5,
+          "day": 3,
           "kind": "due",
           "label": "Prepare contract draft for Gulf Harbor"
          },
          {
-          "day": 5,
+          "day": 3,
           "kind": "close",
           "label": "Close date"
          }
@@ -211,14 +211,8 @@
           "text": "Quiet 32 days"
          }
         ],
-        "next": "Send phased proposal to Hana · due Fri 30 Oct",
-        "marks": [
-         {
-          "day": 2,
-          "kind": "due",
-          "label": "Send phased proposal to Hana"
-         }
-        ],
+        "next": "Send phased proposal to Hana · due Fri 18 Dec",
+        "marks": [],
         "action": {
          "label": "Draft follow-up to Hana",
          "prompt": "Draft a follow-up email to Hana Al-Rashdi about the Data Lake deal (OPP-1042)."
@@ -228,7 +222,7 @@
       "later": [
        "AI document processing"
       ],
-      "web_url": "http://localhost:5394/bct-crm-ui/"
+      "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/"
      }
     }
    }
@@ -240,7 +234,7 @@
     "content": [
      {
       "type": "text",
-      "text": "{\n  \"today\": \"2026-10-28\",\n  \"count\": 2,\n  \"leads\": [\n    {\n      \"id\": \"LEAD-0311\",\n      \"company\": \"Al Dhafra Facilities Management\",\n      \"contact\": \"Faisal Al-Mazrouei\",\n      \"title\": \"Head of Operations\",\n      \"country\": \"UAE\",\n      \"source\": \"Website · Services page\",\n      \"received\": \"today 02:14\",\n      \"status\": \"new\",\n      \"request\": \"Field service management for ~400 technicians across Abu Dhabi. Currently on spreadsheets and WhatsApp. Wants a demo before the December budget round.\",\n      \"duplicate_check\": \"No match in Accounts or Contacts.\",\n      \"open_tasks\": []\n    },\n    {\n      \"id\": \"LEAD-0312\",\n      \"company\": \"Qamar Energy\",\n      \"contact\": \"Khalid Al-Riyami\",\n      \"title\": \"Procurement Lead\",\n      \"country\": \"Oman\",\n      \"source\": \"Website · Contact page\",\n      \"received\": \"today 06:40\",\n      \"status\": \"new\",\n      \"request\": \"Pricing for AI document processing for the finance team.\",\n      \"duplicate_check\": \"Matches account ACC-0214 and the open deal OPP-1066 (AI document processing). Suggest linking instead of creating a second lead.\",\n      \"matches\": {\n        \"account\": \"ACC-0214\",\n        \"opportunity\": \"OPP-1066\"\n      },\n      \"open_tasks\": []\n    }\n  ]\n}"
+      "text": "{\n  \"today\": \"2026-12-11\",\n  \"count\": 2,\n  \"leads\": [\n    {\n      \"id\": \"LEAD-0311\",\n      \"company\": \"Al Dhafra Facilities Management\",\n      \"contact\": \"Faisal Al-Mazrouei\",\n      \"title\": \"Head of Operations\",\n      \"country\": \"UAE\",\n      \"source\": \"Website · Services page\",\n      \"received\": \"today 02:14\",\n      \"status\": \"new\",\n      \"request\": \"Field service management for ~400 technicians across Abu Dhabi. Currently on spreadsheets and WhatsApp. Wants a demo before the December budget round.\",\n      \"duplicate_check\": \"No match in Accounts or Contacts.\",\n      \"open_tasks\": []\n    },\n    {\n      \"id\": \"LEAD-0312\",\n      \"company\": \"Qamar Energy\",\n      \"contact\": \"Khalid Al-Riyami\",\n      \"title\": \"Procurement Lead\",\n      \"country\": \"Oman\",\n      \"source\": \"Website · Contact page\",\n      \"received\": \"today 06:40\",\n      \"status\": \"new\",\n      \"request\": \"Pricing for AI document processing for the finance team.\",\n      \"duplicate_check\": \"Matches account ACC-0214 and the open deal OPP-1066 (AI document processing). Suggest linking instead of creating a second lead.\",\n      \"matches\": {\n        \"account\": \"ACC-0214\",\n        \"opportunity\": \"OPP-1066\"\n      },\n      \"open_tasks\": []\n    }\n  ]\n}"
      }
     ],
     "structuredContent": {
@@ -304,7 +298,7 @@
         ]
        }
       ],
-      "web_url": "http://localhost:5394/bct-crm-ui/"
+      "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/"
      }
     }
    }
@@ -316,7 +310,7 @@
     "content": [
      {
       "type": "text",
-      "text": "PREVIEW ONLY. Nothing has been saved. The user sees these changes on a card (where supported); ask in one short sentence whether to save them. Call apply_changes with this proposal_id only after they say yes.\n\n{\n  \"proposal_id\": \"prop_60d48551\",\n  \"saved\": false,\n  \"preview\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-10-28 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-10-30, owner Sheldon Cooper\"\n  ]\n}"
+      "text": "PREVIEW ONLY. Nothing has been saved. The user sees these changes on a card (where supported); ask in one short sentence whether to save them. Call apply_changes with this proposal_id only after they say yes.\n\n{\n  \"proposal_id\": \"prop_8d27482d\",\n  \"saved\": false,\n  \"preview\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
      }
     ],
     "structuredContent": {
@@ -351,12 +345,12 @@
         "kind": "add",
         "label": "New task",
         "title": "Send phased proposal to Hana",
-        "detail": "Due Fri 30 Oct · Sheldon Cooper"
+        "detail": "Due Fri 18 Dec · Gaurav Shrotriya"
        }
       ],
       "count": 4,
-      "web_url": "http://localhost:5394/bct-crm-ui/",
-      "proposal_id": "prop_60d48551"
+      "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/",
+      "proposal_id": "prop_8d27482d"
      }
     }
    }
@@ -368,7 +362,7 @@
     "content": [
      {
       "type": "text",
-      "text": "Saved. The user sees what changed on a card (where supported). Confirm in one short sentence and offer the obvious next step; they can ask you to undo it.\n\n{\n  \"change_id\": \"chg_95704c37\",\n  \"saved\": true,\n  \"applied\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-10-28 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-10-30, owner Sheldon Cooper\"\n  ]\n}"
+      "text": "Saved. The user sees what changed on a card (where supported). Confirm in one short sentence and offer the obvious next step; they can ask you to undo it.\n\n{\n  \"change_id\": \"chg_85280a5a\",\n  \"saved\": true,\n  \"applied\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
      }
     ],
     "structuredContent": {
@@ -403,12 +397,12 @@
         "kind": "add",
         "label": "New task",
         "title": "Send phased proposal to Hana",
-        "detail": "Due Fri 30 Oct · Sheldon Cooper"
+        "detail": "Due Fri 18 Dec · Gaurav Shrotriya"
        }
       ],
       "count": 4,
-      "web_url": "http://localhost:5394/bct-crm-ui/",
-      "change_id": "chg_95704c37"
+      "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/",
+      "change_id": "chg_85280a5a"
      }
     }
    }
@@ -420,7 +414,7 @@
     "content": [
      {
       "type": "text",
-      "text": "Undone. Confirm in one short sentence.\n\n{\n  \"change_id\": \"chg_95704c37\",\n  \"undone\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-10-28 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-10-30, owner Sheldon Cooper\"\n  ]\n}"
+      "text": "Undone. Confirm in one short sentence.\n\n{\n  \"change_id\": \"chg_85280a5a\",\n  \"undone\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
      }
     ],
     "structuredContent": {
@@ -455,12 +449,12 @@
         "kind": "add",
         "label": "New task",
         "title": "Send phased proposal to Hana",
-        "detail": "Due Fri 30 Oct · Sheldon Cooper"
+        "detail": "Due Fri 18 Dec · Gaurav Shrotriya"
        }
       ],
       "count": 4,
-      "web_url": "http://localhost:5394/bct-crm-ui/",
-      "change_id": "chg_95704c37"
+      "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/",
+      "change_id": "chg_85280a5a"
      }
     }
    }

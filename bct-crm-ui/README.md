@@ -82,7 +82,9 @@ Gina 的 CSS 改版後，重新複製三個檔案到 `vendor/gina/` 即可；BCT
 照片在 `assets/people/`（原檔在 `src/`），由 Candace 提供，只裁切沒有修圖。
 
 - **Sundara Balaji**：Muscat Municipality 的負責人（取代原本的 Priya Nair）。Accounts 表格的負責人標籤和紀錄面板的 Owner 會顯示照片。
-- **Gaurav Shrotriya**：登入的示範使用者（2026-10-28 起，原本是插畫頭像的 Sheldon Cooper）。左下角、帳號選單、首頁問候、Owner、My deals 都是他。
+- **Gaurav Shrotriya**：登入的示範使用者（2026-10-28 起，原本是 Sheldon Cooper）。左下角、帳號選單、首頁問候、Owner、My deals 都是他。
+- Gaurav 和 Sundara 的頭像 2026-11-02 改成依原圖繪製的插畫，真人照片留在本機 `assets/people/src/`，不上傳。
+- 提案頁（`docs/*-proposals.html`、`customer-photo-candidates.html`）從 2026-11-02 起只留本機，repo 裡的 docs 只有設計系統。
 - 客戶頭像換成免費圖庫的真人照片（不要卡通）。候選頁在 `docs/customer-photo-candidates.html`，用編號挑選，選中才下載。
 - **客戶照片（2026-10-28 全部換完）**：都在 `assets/people/`（256px），原檔在 `src/`。全部來自 Unsplash，採 Unsplash License（可免費使用，不需標註作者）。用臉部自動裁切取得頭肩構圖，並確認沒有同一個人重複出現。
 

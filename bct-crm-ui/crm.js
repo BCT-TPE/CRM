@@ -58,7 +58,8 @@ hydrateIcons();
 /* Illustrated contacts generated for BCT (assets/gen). Anyone else gets initials. */
 /* People photos. Customers: free Unsplash photos (Unsplash License), chosen 2026-10-28 from
    docs/customer-photo-candidates.html; originals and sources in assets/people/src and the README.
-   BCT colleagues: real photos supplied by Candace. The signed-in demo user is Gaurav Shrotriya (2026-10-28, was Sheldon Cooper). */
+   BCT colleagues: illustrations drawn from their photos (2026-11-02), originals in assets/people/src, not published.
+   The signed-in demo user is Gaurav Shrotriya (2026-10-28, was Sheldon Cooper). */
 const AVATARS = {
   hana:'people/hana-al-rashdi.webp', maryam:'people/maryam-al-lawati.webp', noura:'people/noura-al-shamsi.webp',
   omar:'people/omar-haddad.webp', khalid:'people/khalid-al-riyami.webp', faisal:'people/faisal-al-mazrouei.webp',

@@ -14,7 +14,7 @@ The signed-in demo user is Gaurav Shrotriya (Sales · ACAP).
 
 ## Design system
 
-[`bct-crm-ui/docs/design-system.html`](bct-crm-ui/docs/design-system.html) covers colours, type, components, tooltips, motion and writing rules. Its samples are live components. Design proposals are in the same folder.
+[`bct-crm-ui/docs/design-system.html`](bct-crm-ui/docs/design-system.html) covers colours, type, components, tooltips, motion and writing rules. Its samples are live components.
 
 ## Connector
 
