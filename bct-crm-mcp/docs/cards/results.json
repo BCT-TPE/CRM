@@ -310,7 +310,7 @@
     "content": [
      {
       "type": "text",
-      "text": "PREVIEW ONLY. Nothing has been saved. The user sees these changes on a card (where supported); ask in one short sentence whether to save them. Call apply_changes with this proposal_id only after they say yes.\n\n{\n  \"proposal_id\": \"prop_8d27482d\",\n  \"saved\": false,\n  \"preview\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
+      "text": "PREVIEW ONLY. Nothing has been saved. The user sees these changes on a card (where supported); ask in one short sentence whether to save them. Call apply_changes with this proposal_id only after they say yes.\n\n{\n  \"proposal_id\": \"prop_e1fe1e5d\",\n  \"saved\": false,\n  \"preview\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
      }
     ],
     "structuredContent": {
@@ -350,7 +350,7 @@
       ],
       "count": 4,
       "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/",
-      "proposal_id": "prop_8d27482d"
+      "proposal_id": "prop_e1fe1e5d"
      }
     }
    }
@@ -362,7 +362,7 @@
     "content": [
      {
       "type": "text",
-      "text": "Saved. The user sees what changed on a card (where supported). Confirm in one short sentence and offer the obvious next step; they can ask you to undo it.\n\n{\n  \"change_id\": \"chg_85280a5a\",\n  \"saved\": true,\n  \"applied\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
+      "text": "Saved. The user sees what changed on a card (where supported). Confirm in one short sentence and offer the obvious next step; they can ask you to undo it.\n\n{\n  \"change_id\": \"chg_390009a5\",\n  \"saved\": true,\n  \"applied\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
      }
     ],
     "structuredContent": {
@@ -402,7 +402,7 @@
       ],
       "count": 4,
       "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/",
-      "change_id": "chg_85280a5a"
+      "change_id": "chg_390009a5"
      }
     }
    }
@@ -414,7 +414,7 @@
     "content": [
      {
       "type": "text",
-      "text": "Undone. Confirm in one short sentence.\n\n{\n  \"change_id\": \"chg_85280a5a\",\n  \"undone\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
+      "text": "Undone. Confirm in one short sentence.\n\n{\n  \"change_id\": \"chg_390009a5\",\n  \"undone\": [\n    \"Activity on OPP-1042 Data Lake modernisation: meeting on 2026-12-11 — \\\"Wants a 3-phase rollout. Budget approved for phase 1. Phased proposal by Friday.\\\"\",\n    \"OPP-1042 Data Lake modernisation: next step \\\"Follow up after workshop\\\" → \\\"Send phased proposal\\\"\",\n    \"OPP-1042 Data Lake modernisation: budget \\\"Unconfirmed\\\" → \\\"Approved for phase 1\\\"\",\n    \"New task on OPP-1042 Data Lake modernisation: \\\"Send phased proposal to Hana\\\", due 2026-12-18, owner Gaurav Shrotriya\"\n  ]\n}"
      }
     ],
     "structuredContent": {
@@ -454,7 +454,7 @@
       ],
       "count": 4,
       "web_url": "https://bct-tpe.github.io/CRM/bct-crm-ui/",
-      "change_id": "chg_85280a5a"
+      "change_id": "chg_390009a5"
      }
     }
    }
