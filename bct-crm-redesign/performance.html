@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales performance · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="assets/crm.css?v=20261113w">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261113w">
+<style>
+/* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
+/* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
+.att-bar .fbar-track { background: var(--chart-track); }
+.fbar-exp { position: absolute; top: -6px; bottom: -6px; width: 0; border-left: 2px dashed #6b778a; }
+.fbar-exp span { position: absolute; top: -19px; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: 500; color: #56595b; white-space: nowrap; }
+.sum-legend .lg i.lg-line, .legend i.lg-line, .lg-line { display: inline-block; width: 14px; height: 0; border-radius: 0; background: none; border-top: 2px dashed #6b778a; }
+.sum-legend .lg i.lg-tick, .legend i.lg-tick, .lg-tick { display: inline-block; width: 2px; height: 12px; border-radius: 1px; background: var(--ink); }
+
+/* Quarter chart: this year (ink) beside last year (gray), dashed target per quarter */
+.pq-plot { position: relative; flex: 1; min-height: 170px; margin-top: 22px; }
+.pq-pair { position: absolute; left: 50%; bottom: 0; height: 100%; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 4px; }
+.pq-pair i { display: block; border-radius: 4px 4px 0 0; transition: height .45s var(--ease); }
+.pq-pair i.ly { width: 20px; background: var(--chart-gray); }
+.pq-pair i.ty { width: 44px; background: var(--ink); }
+.pq-pair i.ty.prog { background: #6b778a; }
+.pq-tot { position: absolute; left: 0; right: 0; text-align: center; font-size: 12px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.qlab .ly-d { display: block; margin-top: 2px; font-size: 12px; color: var(--t3); white-space: nowrap; }
+.lg-ly { background: var(--chart-gray); }
+
+/* Won vs lost */
+.wl { display: flex; flex-direction: column; gap: 20px; }
+.wl-row { display: flex; flex-direction: column; gap: 8px; }
+.wl-h { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--t2); }
+.wl-h b { font-size: 16px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.wl-bar { display: flex; gap: 2px; height: 12px; }
+.wl-bar button { border: 0; padding: 0; height: 100%; cursor: pointer; transition: opacity .15s; }
+.wl-bar button:first-child { border-radius: 4px 0 0 4px; } .wl-bar button:last-child { border-radius: 0 4px 4px 0; } .wl-bar button:only-child { border-radius: 4px; }
+.wl-bar .won { background: var(--ink); } .wl-bar .lost { background: var(--chart-gray); }
+.wl-bar button:hover { opacity: .8; }
+.wl-bar.has-on button:not(.on) { opacity: .35; }
+.wl-k { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); font-variant-numeric: tabular-nums; }
+.wl-k span { display: inline-flex; align-items: center; gap: 6px; }
+.wl-k i { width: 10px; height: 10px; border-radius: 3px; }
+
+/* Loss reasons */
+.lr-list { display: flex; flex-direction: column; gap: 2px; }
+.lr { display: grid; grid-template-columns: minmax(0, 1fr) auto 14px; grid-template-rows: auto auto; gap: 6px 12px; align-items: center; width: calc(100% + 16px); margin: 0 -8px; padding: 8px; border: 0; border-radius: 10px; background: none; text-align: left; font: inherit; color: inherit; }
+.lr:hover, .lr.on { background: var(--hover); }
+.lr-n { font-size: 13px; font-weight: 500; color: var(--t1); }
+.lr-n small { font-weight: 400; color: var(--t3); margin-left: 6px; }
+.lr-v { font-size: 13px; font-weight: 500; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+.lr .lean-bar { grid-column: 1 / 3; }
+.lr .chev { grid-row: 1 / 3; grid-column: 3; }
+.lr-card .so-what, .wl-card .so-what { margin-top: auto; padding-top: 16px; }
+
+/* Attainment table */
+.tbl.att { table-layout: fixed; }
+.tbl.att col.c-name { width: 24%; } .tbl.att col.c-tgt { width: 10%; } .tbl.att col.c-bkd { width: 10%; } .tbl.att col.c-bar { width: 24%; }
+.tbl.att col.c-wl { width: 10%; } .tbl.att col.c-wr { width: 8%; } .tbl.att col.c-avg { width: 10%; } .tbl.att col.c-chev { width: 4%; }
+.tbl.att td { height: 60px; }
+.attn-cell { display: flex; align-items: center; gap: 12px; }
+.attn-track { position: relative; flex: 1; height: 12px; border-radius: 4px; background: var(--chart-track); }
+.attn-track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--ink); }
+.attn-track i.under { background: #6b778a; }
+.attn-track .t100 { position: absolute; top: -4px; bottom: -4px; width: 0; border-left: 2px solid var(--ink); }
+.attn-p { width: 44px; text-align: right; font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.attn-p.met { color: var(--ok); }
+.attn-p.na { color: var(--t3); font-weight: 400; }
+
+/* Closed deals table */
+.tbl.cl { table-layout: fixed; }
+.tbl.cl col.c-opp { width: 30%; } .tbl.cl col.c-own { width: 20%; } .tbl.cl col.c-res { width: 20%; } .tbl.cl col.c-val { width: 10%; } .tbl.cl col.c-date { width: 12%; } .tbl.cl col.c-q { width: 8%; }
+.tbl.cl td { height: 60px; }
+.res { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; color: var(--t1); }
+.res i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); flex: none; }
+.res.lost { color: var(--t2); font-weight: 400; }
+.res.lost i { background: var(--chart-gray); }
+.dr-res { color: var(--t3); }
+.kpi-perf button.ks:first-child { border-radius: var(--r-card) 0 0 var(--r-card); }
+.kpi-perf button.ks:nth-child(2) { border-radius: 0; }
+.tbl tbody tr.on-row td { background: var(--info-bg); }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+    <header class="page-head">
+      <div>
+        <h1>Sales performance</h1>
+        <p id="page-meta">Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD</p>
+      </div>
+      <div class="acts">
+        <span class="updated"><i></i>Updated 10:12</span>
+        <button class="btn" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
+      </div>
+    </header>
+
+    <!-- Same filter row as Pipeline & forecast (requirement 11.1: both dashboards use common filters). -->
+    <div class="filters" id="filters" role="toolbar" aria-label="Filters">
+      <label class="select" id="f-fy-wrap"><span class="lbl">Fiscal year</span>
+        <select id="f-fy" aria-label="Fiscal year"><option value="2526">FY25-26</option><option value="2627" selected>FY26-27</option><option value="2728">FY27-28</option></select>
+      </label>
+      <div class="seg" id="f-q" role="radiogroup" aria-label="Period">
+        <button data-q="0" class="on" role="radio" aria-checked="true">Full year</button>
+        <button data-q="1" role="radio" aria-checked="false">Q1</button>
+        <button data-q="2" role="radio" aria-checked="false">Q2</button>
+        <button data-q="3" role="radio" aria-checked="false">Q3<small>now</small></button>
+        <button data-q="4" role="radio" aria-checked="false">Q4</button>
+      </div>
+      <label class="select" id="w-team"><span class="lbl">Team</span>
+        <select id="f-team" aria-label="Sales team"></select>
+      </label>
+      <label class="select" id="w-owner"><span class="lbl">Owner</span>
+        <select id="f-owner" aria-label="Owner"></select>
+      </label>
+      <div style="position:relative">
+        <button class="btn" id="more-btn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>More filters<span class="count-badge" id="more-n" hidden></span></button>
+        <div class="pop" id="more-pop" role="dialog" aria-label="More filters" hidden style="top:44px;right:0">
+          <div class="grp"><h4>Geography</h4><div id="m-geo"></div></div>
+          <div class="pop-foot"><button class="link" id="more-clear">Clear</button><button class="btn primary" id="more-done" style="height:32px">Done</button></div>
+        </div>
+      </div>
+      <button class="btn ghost" id="reset" hidden>Reset</button>
+      <span class="sp"></span>
+    </div>
+
+    <div id="page"></div>
+  </main>
+</div>
+<aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
+
+<script src="assets/crm.js?v=20261113w"></script>
+<script src="assets/crm-data.js?v=20261113w"></script>
+<script>
+/* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
+   Data and rules are shared with Pipeline & forecast (assets/crm-data.js), so Q1–Q3 bookings match on both pages. */
+const { money, moneyBig, icon, toast } = CRM;
+const chev = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const DAY = 864e5;
+const S = { fy: '2627', q: 0, team: '', owner: '', geo: [], drill: null, who: 'teams', tab: 'all', sort: 'closed', page: 1 };
+const PER_PAGE = 8;
+
+/* ---------- Scope ---------- */
+function teamsInScope() {
+  return Object.keys(TEAMS).filter(t => (!S.team || t === S.team) && (!S.geo.length || S.geo.includes(TEAMS[t].geo)) && (!S.owner || TEAMS[t].people.includes(S.owner)));
+}
+function closedIn(fy, q) { // closed deals for the scope; q = 0 means the whole year
+  const teams = teamsInScope();
+  return CLOSED.filter(o => o.fy === fy && (!q || o.q === q) && teams.includes(o.team) && (!S.owner || o.owner === S.owner));
+}
+function quarterTarget() { // one quarter's target for the current scope; null = no target defined (shown as N/A)
+  if (S.owner) return PERSON_TARGET[S.owner] ? PERSON_TARGET[S.owner] / 4 : null;
+  if (S.team) return TEAMS[S.team].target / 4;
+  if (S.geo.length) return S.geo.reduce((s, g) => s + GEO_TARGET[g], 0) / 4;
+  return COMPANY_TARGET / 4;
+}
+function qElapsed(q) { // share of quarter q that has passed today
+  const a = new Date(Q_RANGE[q][0]), b = new Date(Q_RANGE[q][1]).getTime() + DAY;
+  return Math.max(0, Math.min(1, (TODAY - a) / (b - a)));
+}
+function periodStats(q) {
+  const qs = q ? [q] : [1, 2, 3, 4];
+  const rows = closedIn('2627', q), won = rows.filter(o => o.result === 'won'), lost = rows.filter(o => o.result === 'lost');
+  const tq = quarterTarget();
+  const target = tq == null ? null : tq * qs.length;
+  const expected = tq == null ? null : qs.reduce((s, x) => s + tq * qElapsed(x), 0);
+  const booked = won.reduce((s, o) => s + o.value, 0), lostV = lost.reduce((s, o) => s + o.value, 0);
+  const end = q ? new Date(Q_RANGE[q][1]).getTime() + DAY : FY_END.getTime() + DAY;
+  const start = q ? new Date(Q_RANGE[q][0]).getTime() : FY_START.getTime();
+  const daysLeft = Math.max(0, Math.ceil((end - TODAY) / DAY));
+  const elapsed = Math.max(0, Math.min(1, (TODAY - start) / (end - start)));
+  return { q, rows, won, lost, booked, lostV, target, expected, daysLeft, elapsed };
+}
+
+/* ---------- Render ---------- */
+const page = document.getElementById('page');
+function zoneHead(n, title, scope) {
+  return `<div class="zone s12"><h2 class="zone-t">${title}</h2><span class="zone-s">${scope}</span></div>`;
+}
+function render() {
+  syncControls();
+  if (S.fy !== '2627') { page.innerHTML = fyEmpty(); renderDrill(); return; }
+  const P = periodStats(S.q);
+  const label = S.q ? `Q${S.q} FY26-27` : 'FY26-27';
+  page.innerHTML = `
+    <div class="grid">
+      ${zoneHead(1, 'Target attainment', `${label} · closed won bookings against target`)}
+      ${attainCard(P, label)}
+      ${quarterCard()}
+      ${zoneHead(2, 'Win and loss', `Opportunities closed in ${label} · ${P.rows.length} deals`)}
+      ${kpiStrip(P)}
+      ${wonLostCard(P)}
+      ${lossCard(P)}
+      ${zoneHead(3, 'Attainment by team and salesperson', `${label} · each against its own target`)}
+      ${whoCard(P)}
+      ${zoneHead(4, 'Closed deals', 'The records behind every number above')}
+      ${closedTable(P)}
+    </div>`;
+  if (!render.done) { page.querySelectorAll('.card, .zone').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
+  renderDrill();
+}
+
+// Zone 1 · attainment (static summary card, like the forecast card on Pipeline)
+function attainCard(P, label) {
+  const p = P.target ? pct(P.booked, P.target) : null;
+  const ahead = P.expected != null && P.booked >= P.expected;
+  const done = P.daysLeft === 0, notStarted = P.elapsed === 0;
+  const pillCls = p == null ? '' : p >= 100 ? 'ok' : notStarted ? '' : ahead ? 'info' : 'warn';
+  const pillTxt = p == null ? 'No target for this filter' : `${p}% of target${p >= 100 ? ' · met' : notStarted || done ? '' : ahead ? ' · on pace' : ' · behind pace'}`;
+  const max = P.target != null ? Math.max(P.target, P.booked) * 1.04 || 1 : P.booked || 1;
+  const w = (v) => (v / max * 100).toFixed(2) + '%';
+  const variance = P.target != null ? P.booked - P.target : null;
+  const vsExp = P.expected != null ? P.booked - P.expected : null;
+  const needed = P.target != null ? Math.max(P.target - P.booked, 0) : null;
+  let sowhat;
+  if (P.target == null) sowhat = 'No target is set for this filter, so attainment shows as N/A.';
+  else if (notStarted) sowhat = `${label} has not started yet.`;
+  else if (variance >= 0) sowhat = `Target met: <b>${money(variance)} over</b>.`;
+  else if (done) sowhat = `Closed <b>${money(-variance)} under</b> target.`;
+  else sowhat = `<b>${money(Math.abs(vsExp))} ${vsExp < 0 ? 'behind' : 'ahead of'}</b> today's pace; <b>${money(needed)}</b> still needed in ${P.daysLeft} days.`;
+  const mini = (k, v, cls = '') => `<div class="mini"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  const sign = (v) => v == null ? 'N/A' : `${v < 0 ? '−' : '+'}${money(Math.abs(v))}`;
+  return `
+  <section class="card s6 fc" aria-labelledby="at-h">
+    <div class="card-h"><div><h2 id="at-h">${label} attainment</h2><p>Closed won bookings, compared with target</p></div>
+      <div class="r"><span class="pill ${pillCls}">${pillTxt}</span></div></div>
+    <div class="hero-num"><span class="big">${moneyBig(P.booked)}</span><span class="of">booked${P.target != null ? ` of <b>${money(P.target)}</b> target` : ''}</span></div>
+    <p class="sum-what">${sowhat}</p>
+    <div class="fbar att-bar" role="img" aria-label="Booked ${money(P.booked)}${P.expected != null ? `, expected by today ${money(P.expected)}` : ''}${P.target != null ? `, target ${money(P.target)}` : ''}">
+      <div class="fbar-track">${P.booked ? `<i class="c-won" style="width:${w(P.booked)}" data-tip-h="Booked" data-tip="${money(P.booked)}"></i>` : ''}</div>
+      ${P.expected != null && !done && !notStarted ? `<div class="fbar-exp" style="left:${w(P.expected)}"><span>Expected today</span></div>` : ''}
+      ${P.target != null ? `<div class="fbar-target" style="left:${w(P.target)}"><span>Target</span></div>` : ''}
+    </div>
+    <div class="sum-legend">
+      <span class="lg"><i class="c-won"></i>Booked<b>${money(P.booked)}</b></span>
+      ${P.expected != null ? `<span class="lg"><i class="lg-line"></i><span class="def" tabindex="0" data-tip="Each quarter's target × the share of that quarter that has passed.">Expected by today</span><b>${money(P.expected)}</b></span>` : ''}
+      ${P.target != null ? `<span class="lg"><i class="lg-tick"></i>Target<b>${money(P.target)}</b></span>` : ''}
+    </div>
+    <div class="minis">
+      ${mini('Variance to target', sign(variance), variance == null ? '' : variance < 0 ? 'neg' : 'pos')}
+      ${mini('<span class="def" tabindex="0" data-tip="Booked minus expected by today.">Vs expected today</span>', done || notStarted ? '—' : sign(vsExp), vsExp == null || done || notStarted ? '' : vsExp < 0 ? 'neg' : 'pos')}
+      ${mini(`Needed in ${P.daysLeft} days`, needed == null ? 'N/A' : money(needed))}
+      ${mini('Period elapsed', `${Math.round(P.elapsed * 100)}%`)}
+    </div>
+  </section>`;
+}
+
+// Zone 1 · bookings by quarter: this year vs last year, target per quarter
+function quarterCard() {
+  const tq = quarterTarget();
+  const qs = [1, 2, 3, 4].map(q => ({ q, ty: closedIn('2627', q).filter(o => o.result === 'won').reduce((s, o) => s + o.value, 0), ly: closedIn('2526', q).filter(o => o.result === 'won').reduce((s, o) => s + o.value, 0) }));
+  const max = Math.max(1, ...qs.map(x => Math.max(x.ty, x.ly, tq || 0))) * 1.12;
+  const h = (v) => (v / max * 100).toFixed(2) + '%';
+  const cols = qs.map(x => {
+    const past = x.q < CUR_Q, cur = x.q === CUR_Q, fut = x.q > CUR_Q;
+    const att = tq ? pct(x.ty, tq) : null;
+    const status = fut ? 'Not started' : att == null ? 'No target' : past ? `${att}% attained` : `${att}% so far`;
+    const met = !fut && att != null && att >= 100;
+    const on = S.drill && S.drill.type === 'quarter' && S.drill.v === x.q;
+    const d = x.ty - x.ly;
+    return `<button class="qcol ${on ? 'on' : ''}" data-act="q" data-q="${x.q}" aria-pressed="${on}"
+      data-tip-html="<b>Q${x.q}</b><div class='row'><span>FY26-27</span><span>${money(x.ty)}</span></div><div class='row'><span>FY25-26</span><span>${money(x.ly)}</span></div>${tq ? `<div class='row'><span>Target</span><span>${money(tq)}</span></div>` : ''}">
+      <div class="pq-plot">
+        ${fut ? '' : `<div class="pq-tot" style="bottom:calc(${h(Math.max(x.ty, tq || 0))} + 6px)">${money(x.ty)}</div>`}
+        <div class="pq-pair"><i class="ly" style="height:${h(x.ly)}"></i><i class="ty ${cur ? 'prog' : ''}" style="height:${h(x.ty)}"></i></div>
+        ${tq ? `<div class="qtarget" style="bottom:${h(tq)}" aria-hidden="true"></div>` : ''}
+      </div>
+      <div class="qbase"></div>
+      <div class="qlab"><b>Q${x.q}${cur ? ' · now' : ''}${chev}</b><small>Target ${tq ? money(tq) : 'N/A'}</small><div class="att ${met ? 'met' : ''}">${status}</div><span class="ly-d">${fut ? '&nbsp;' : `${d >= 0 ? '+' : '−'}${money(Math.abs(d))} vs last year`}</span></div>
+    </button>`;
+  }).join('');
+  const tyToDate = qs.filter(x => x.q <= CUR_Q).reduce((s, x) => s + x.ty, 0), lyToDate = qs.filter(x => x.q <= CUR_Q).reduce((s, x) => s + x.ly, 0);
+  return `
+  <section class="card s6" aria-labelledby="q-h">
+    <div class="card-h"><div><h2 id="q-h">Bookings by quarter</h2><p>Closed won vs target and last year · select a quarter to see its deals</p></div></div>
+    <div class="legend" style="margin-bottom:12px"><span><i class="c-won"></i>FY26-27</span><span><i style="background:#6b778a"></i>In progress</span><span><i class="lg-ly"></i>FY25-26</span><span><i class="line"></i>Target</span></div>
+    <div class="qchart">${cols}</div>
+    <p class="qnote"><b>${tyToDate >= lyToDate ? '+' : '−'}${money(Math.abs(tyToDate - lyToDate))}</b> vs the same quarters last year (${money(lyToDate)}).</p>
+  </section>`;
+}
+
+// Zone 2 · KPI strip (Won and Lost are subsets, so they are clickable)
+function kpiStrip(P) {
+  const nW = P.won.length, nL = P.lost.length;
+  const wr = nW + nL ? pct(nW, nW + nL) : null, wrV = P.booked + P.lostV ? pct(P.booked, P.booked + P.lostV) : null;
+  const avg = nW ? P.booked / nW : null, largest = nW ? Math.max(...P.won.map(o => o.value)) : null;
+  const on = (r) => S.drill && S.drill.type === 'result' && S.drill.v === r;
+  const cell = (k, val, sub) => `<div class="ks"><span class="kpi-k">${k}</span><span class="mid">${val}</span><span class="kpi-s">${sub}</span></div>`;
+  const btn = (r, k, val, sub) => `<button class="ks click ${on(r) ? 'on' : ''}" data-act="drill" data-type="result" data-v="${r}" aria-pressed="${on(r)}"><span class="kpi-k">${k}${chev}</span><span class="mid">${val}</span><span class="kpi-s">${sub}</span></button>`;
+  return `
+  <section class="card s12 kpi-strip kpi-perf" aria-label="Win and loss KPIs">
+    ${btn('won', 'Won', nW, `<b>${money(P.booked)}</b> booked`)}
+    ${btn('lost', 'Lost', nL, `<b>${money(P.lostV)}</b> lost value`)}
+    ${cell('<span class="def" tabindex="0" data-tip-h="Win rate" data-tip="Won ÷ (won + lost). N/A when nothing closed in the period.">Win rate</span>', wr == null ? 'N/A' : wr + '%', wrV == null ? '—' : `By value <b>${wrV}%</b>`)}
+    ${cell('Avg deal size', avg == null ? 'N/A' : moneyBig(avg), largest == null ? '—' : `Largest win <b>${money(largest)}</b>`)}
+  </section>`;
+}
+
+function wonLostCard(P) {
+  const nW = P.won.length, nL = P.lost.length, n = nW + nL, v = P.booked + P.lostV;
+  const on = (r) => S.drill && S.drill.type === 'result' && S.drill.v === r;
+  const any = S.drill && S.drill.type === 'result';
+  const bar = (a, b, fa, fb) => `<div class="wl-bar ${any ? 'has-on' : ''}">${a ? `<button class="won ${on('won') ? 'on' : ''}" style="flex:${a}" data-act="drill" data-type="result" data-v="won" aria-label="Won ${fa}" data-tip="Won · ${fa}"></button>` : ''}${b ? `<button class="lost ${on('lost') ? 'on' : ''}" style="flex:${b}" data-act="drill" data-type="result" data-v="lost" aria-label="Lost ${fb}" data-tip="Lost · ${fb}"></button>` : ''}</div>`;
+  const avgW = nW ? P.booked / nW : 0, avgL = nL ? P.lostV / nL : 0;
+  return `
+  <section class="card s6 wl-card" aria-labelledby="wl-h">
+    <div class="card-h"><div><h2 id="wl-h">Won vs lost</h2><p>Closed opportunities by count and by value · select to see the deals</p></div></div>
+    ${n ? `<div class="wl">
+      <div class="wl-row"><div class="wl-h"><span>By count</span><b>${pct(nW, n)}% won</b></div>${bar(nW, nL, `${nW} deals`, `${nL} deals`)}
+        <div class="wl-k"><span><i class="c-won"></i>${nW} won</span><span><i style="background:var(--chart-gray)"></i>${nL} lost</span></div></div>
+      <div class="wl-row"><div class="wl-h"><span>By value</span><b>${pct(P.booked, v)}% won</b></div>${bar(P.booked, P.lostV, money(P.booked), money(P.lostV))}
+        <div class="wl-k"><span><i class="c-won"></i>${money(P.booked)}</span><span><i style="background:var(--chart-gray)"></i>${money(P.lostV)}</span></div></div>
+    </div>
+    <p class="so-what">${nL ? `Lost deals averaged <b>${money(avgL)}</b>, against <b>${money(avgW)}</b> for wins.` : 'Nothing was lost in this period.'}</p>` : emptyMsg()}
+  </section>`;
+}
+
+function lossCard(P) {
+  const tot = P.lostV || 1;
+  const rows = LOSS_REASONS.map(r => { const os = P.lost.filter(o => o.reason === r); return { r, n: os.length, v: os.reduce((s, o) => s + o.value, 0) }; }).filter(x => x.n).sort((a, b) => b.v - a.v);
+  const max = Math.max(1, ...rows.map(x => x.v));
+  const list = rows.map((x, i) => {
+    const on = S.drill && S.drill.type === 'reason' && S.drill.v === x.r;
+    return `<button class="lr click ${on ? 'on' : ''}" data-act="drill" data-type="reason" data-v="${esc(x.r)}" aria-pressed="${on}">
+      <span class="lr-n">${esc(x.r)}<small>${x.n} deal${x.n === 1 ? '' : 's'} · ${pct(x.v, tot)}%</small></span><span class="lr-v">${money(x.v)}</span>${chev}
+      <span class="lean-bar"><i class="${i === 0 ? 'key' : ''}" style="width:${(x.v / max * 100).toFixed(1)}%"></i></span>
+    </button>`;
+  }).join('');
+  return `
+  <section class="card s6 lr-card" aria-labelledby="lr-h">
+    <div class="card-h"><div><h2 id="lr-h">Why we lost</h2><p>Closed lost value by loss reason · select a reason to see the deals</p></div></div>
+    ${rows.length ? `<div class="lr-list">${list}</div><p class="so-what"><b>${esc(rows[0].r)}</b> accounts for ${pct(rows[0].v, tot)}% of lost value.</p>`
+      : `<div class="empty"><b>No losses</b>Nothing was closed lost in this period.</div>`}
+  </section>`;
+}
+
+// Zone 3 · attainment table (teams or salespeople)
+function whoCard(P) {
+  const qs = S.q ? 1 : 4;
+  const teams = teamsInScope();
+  const units = S.who === 'teams'
+    ? teams.map(t => ({ key: t, type: 'team', name: t, sub: `${TEAMS[t].people.length} salespeople · ${TEAMS[t].geo}`, target: TEAMS[t].target / 4 * qs, rows: P.rows.filter(o => o.team === t) }))
+    : teams.flatMap(t => TEAMS[t].people).filter(p => !S.owner || p === S.owner).map(p => ({ key: p, type: 'person', name: p, sub: PERSON_TEAM[p], target: PERSON_TARGET[p] / 4 * qs, rows: P.rows.filter(o => o.owner === p) }));
+  units.forEach(u => { u.won = u.rows.filter(o => o.result === 'won'); u.lost = u.rows.filter(o => o.result === 'lost'); u.booked = u.won.reduce((s, o) => s + o.value, 0); u.att = u.target ? u.booked / u.target * 100 : null; });
+  units.sort((a, b) => (b.att ?? -1) - (a.att ?? -1));
+  const scale = Math.max(100, ...units.map(u => u.att || 0)) * 1.05;
+  const rows = units.map(u => {
+    const on = S.drill && S.drill.type === u.type && S.drill.v === u.key;
+    const nW = u.won.length, nL = u.lost.length;
+    return `<tr class="click ${on ? 'on-row' : ''}" data-act="drill" data-type="${u.type}" data-v="${esc(u.key)}" tabindex="0">
+      <td><div class="ell t-main">${esc(u.name)}</div><div class="ell t-sub">${esc(u.sub)}</div></td>
+      <td class="r num">${money(u.target)}</td>
+      <td class="r num t-val">${money(u.booked)}</td>
+      <td><div class="attn-cell"><span class="attn-track" data-tip="${u.att == null ? 'No target' : `${Math.round(u.att)}% of ${money(u.target)}`}">${u.booked ? `<i class="${u.att != null && u.att < 100 ? 'under' : ''}" style="width:${Math.min((u.att || 0) / scale * 100, 100).toFixed(1)}%"></i>` : ''}<span class="t100" style="left:${(100 / scale * 100).toFixed(1)}%"></span></span>
+        <span class="attn-p ${u.att == null ? 'na' : u.att >= 100 ? 'met' : ''}">${u.att == null ? 'N/A' : Math.round(u.att) + '%'}</span></div></td>
+      <td class="r num">${nW} / ${nL}</td>
+      <td class="r num">${nW + nL ? pct(nW, nW + nL) + '%' : 'N/A'}</td>
+      <td class="r num">${nW ? money(u.booked / nW) : 'N/A'}</td>
+      <td class="r">${chev}</td>
+    </tr>`;
+  }).join('');
+  const top = units.find(u => u.att != null);
+  return `
+  <section class="card s12" aria-labelledby="who-h">
+    <div class="card-h"><div><h2 id="who-h">Attainment</h2><p>Bookings against each ${S.who === 'teams' ? "team's" : "salesperson's"} own target · targets are not added together · select a row to see its deals</p></div>
+      <div class="r legend"><span><i class="c-won"></i>Met target</span><span><i style="background:#6b778a"></i>Below target</span><span><i class="lg-tick"></i>100%</span></div></div>
+    <div class="tabs" role="tablist" aria-label="Group by">
+      <button role="tab" aria-selected="${S.who === 'teams'}" class="tab ${S.who === 'teams' ? 'on' : ''}" data-act="who" data-v="teams">Teams<span class="tab-n">${teams.length}</span></button>
+      <button role="tab" aria-selected="${S.who === 'people'}" class="tab ${S.who === 'people' ? 'on' : ''}" data-act="who" data-v="people">Salespeople<span class="tab-n">${teams.flatMap(t => TEAMS[t].people).length}</span></button>
+    </div>
+    ${units.length ? `<div class="tbl-wrap"><table class="tbl att">
+      <colgroup><col class="c-name"><col class="c-tgt"><col class="c-bkd"><col class="c-bar"><col class="c-wl"><col class="c-wr"><col class="c-avg"><col class="c-chev"></colgroup>
+      <thead><tr><th>${S.who === 'teams' ? 'Sales team' : 'Salesperson'}</th><th class="r">Target</th><th class="r">Booked</th><th>Attainment</th><th class="r">Won / lost</th><th class="r">Win rate</th><th class="r">Avg deal</th><th></th></tr></thead>
+      <tbody>${rows}</tbody></table></div>
+      ${top ? `<p class="so-what"><b>${esc(top.name)}</b> leads at ${Math.round(top.att)}% of target.</p>` : ''}` : emptyMsg()}
+  </section>`;
+}
+
+// Zone 4 · closed deals table
+const SORTS = {
+  name: { fn: (a, b) => a.name.localeCompare(b.name), dir: 'asc' },
+  value: { fn: (a, b) => b.value - a.value, dir: 'desc' },
+  closed: { fn: (a, b) => b.closed.localeCompare(a.closed), dir: 'desc' }
+};
+function th(key, label, cls = '') {
+  if (!SORTS[key]) return `<th class="${cls}">${label}</th>`;
+  const on = S.sort === key;
+  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↕'}</span></button></th>`;
+}
+const ell = (txt, cls = '') => `<div class="ell ${cls}" title="${esc(txt)}">${esc(txt)}</div>`;
+const resCell = (o) => o.result === 'won' ? '<span class="res"><i></i>Won</span>' : `<span class="res lost"><i></i>Lost</span><div class="t-sub ell">${esc(o.reason)}</div>`;
+function closedTable(P) {
+  const TABS = [['all', 'All closed', () => true], ['won', 'Won', o => o.result === 'won'], ['lost', 'Lost', o => o.result === 'lost']];
+  const tab = TABS.find(t => t[0] === S.tab);
+  const rows = P.rows.filter(tab[2]).sort(SORTS[S.sort].fn);
+  const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+  S.page = Math.min(S.page, pages);
+  const shown = rows.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
+  return `
+  <section class="card s12" id="closed-table" aria-labelledby="cl-h">
+    <div class="card-h"><div><h2 id="cl-h">Closed opportunities</h2><p>${money(rows.filter(o => o.result === 'won').reduce((s, o) => s + o.value, 0))} won · ${money(rows.filter(o => o.result === 'lost').reduce((s, o) => s + o.value, 0))} lost · select a row to open the record</p></div>
+      <div class="r"><button class="link" data-act="si">Open in Sales initiatives ${icon('arrow')}</button></div></div>
+    <div class="tabs" role="tablist" aria-label="Which deals">
+      ${TABS.map(([k, n, f]) => `<button role="tab" aria-selected="${S.tab === k}" class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-v="${k}">${n}<span class="tab-n">${P.rows.filter(f).length}</span></button>`).join('')}
+    </div>
+    ${rows.length ? `
+    <div class="tbl-wrap"><table class="tbl cl">
+      <colgroup><col class="c-opp"><col class="c-own"><col class="c-res"><col class="c-val"><col class="c-date"><col class="c-q"></colgroup>
+      <thead><tr>${th('name', 'Opportunity')}${th('', 'Owner / team')}${th('', 'Result')}${th('value', 'Value', 'r')}${th('closed', 'Closed')}${th('', 'Quarter', 'r')}</tr></thead>
+      <tbody>${shown.map(o => `
+        <tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
+          <td>${ell(o.name, 't-main')}${ell(`${o.id} · ${o.acc}`, 't-sub')}</td>
+          <td>${ell(o.owner)}${ell(o.team, 't-sub')}</td>
+          <td>${resCell(o)}</td>
+          <td class="r num t-val">${money(o.value)}</td>
+          <td class="num">${fmtDate(o.closed)}</td>
+          <td class="r num"><span class="days-cell">Q${o.q}${chev}</span></td>
+        </tr>`).join('')}</tbody>
+    </table></div>
+    <div class="pager"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, rows.length)} of ${rows.length}</span><span class="sp"></span>
+      <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
+      ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}
+      <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button>
+    </div>` : emptyMsg(true)}
+  </section>`;
+}
+
+function emptyMsg(table) {
+  const why = S.q && S.q > CUR_Q ? `Q${S.q} has not started, so nothing has closed in it yet.` : 'Nothing closed in this period for these filters.';
+  return `<div class="empty"><b>Nothing to show</b>${why}${S.q || S.team || S.owner || S.geo.length ? ` <button class="link" data-act="reset">Reset filters</button>` : ''}</div>`;
+}
+function fyEmpty() {
+  const fy = S.fy === '2526' ? 'FY25-26' : 'FY27-28';
+  return `<div class="card"><div class="empty" style="padding:72px 12px"><b>No data for ${fy} in this demo</b>The prototype only carries FY26-27 targets. <button class="link" data-act="fy-back">Back to FY26-27</button></div></div>`;
+}
+
+/* ---------- Drill panel (same pattern as Pipeline & forecast) ---------- */
+const drillEl = document.getElementById('drill');
+function drillRows() {
+  const d = S.drill, P = periodStats(S.q);
+  if (d.type === 'quarter') return closedIn('2627', d.v);
+  const r = P.rows;
+  if (d.type === 'result') return r.filter(o => o.result === d.v);
+  if (d.type === 'reason') return r.filter(o => o.reason === d.v);
+  if (d.type === 'team') return r.filter(o => o.team === d.v);
+  if (d.type === 'person') return r.filter(o => o.owner === d.v);
+  return r;
+}
+function renderDrill() {
+  const d = S.drill;
+  document.body.classList.toggle('drill-open', !!d);
+  drillEl.setAttribute('aria-hidden', String(!d));
+  if (!d) return;
+  const rows = drillRows().slice().sort((a, b) => b.value - a.value);
+  const won = rows.filter(o => o.result === 'won'), lost = rows.filter(o => o.result === 'lost');
+  const kind = { quarter: 'Bookings by quarter', result: 'Win and loss', reason: 'Why we lost', team: 'Sales team', person: 'Salesperson' }[d.type];
+  const title = d.type === 'quarter' ? `Closed in Q${d.v} FY26-27` : d.type === 'result' ? (d.v === 'won' ? 'Won deals' : 'Lost deals') : d.v;
+  let extra = '';
+  if (d.type === 'team' || d.type === 'person' || d.type === 'quarter') {
+    const tq = d.type === 'team' ? TEAMS[d.v].target / 4 : d.type === 'person' ? PERSON_TARGET[d.v] / 4 : quarterTarget();
+    const tgt = tq == null ? null : tq * (d.type === 'quarter' || S.q ? 1 : 4);
+    const bk = won.reduce((s, o) => s + o.value, 0);
+    extra = `<div class="dr-kpis"><div><span>Booked</span><b>${money(bk)}</b></div><div><span>Target</span><b>${tgt == null ? 'N/A' : money(tgt)}</b></div><div><span>Attainment</span><b>${tgt ? pct(bk, tgt) + '%' : 'N/A'}</b></div></div>`;
+  }
+  drillEl.innerHTML = `
+    <header class="dr-head">
+      <div><p class="dr-kind">${kind}</p><h2 id="drill-title">${esc(title)}</h2>
+        <p class="dr-sub">${won.length} won · ${money(won.reduce((s, o) => s + o.value, 0))}${lost.length ? ` · ${lost.length} lost · ${money(lost.reduce((s, o) => s + o.value, 0))}` : ''}</p></div>
+      <button class="icon-btn" data-act="undrill" aria-label="Close panel">${icon('x')}</button>
+    </header>
+    ${extra}
+    <div class="dr-body">
+      ${rows.length ? rows.map(o => `<button class="dr-row" data-act="open" data-id="${o.id}">
+          <span class="dr-l"><b>${esc(o.name)}</b><small>${o.id} · ${esc(o.acc)}</small><small>${esc(o.owner)} · ${esc(o.team)}</small></span>
+          <span class="dr-r"><b>${money(o.value)}</b><small>${o.result === 'won' ? 'Won' : `Lost · ${esc(o.reason)}`}</small><small>${fmtDate(o.closed)}</small></span>
+        </button>`).join('') : `<div class="empty"><b>Nothing closed</b>${d.type === 'quarter' && d.v > CUR_Q ? `Q${d.v} has not started yet.` : 'No closed deals match this selection.'}</div>`}
+    </div>
+    <footer class="dr-foot"><button class="btn primary" data-act="si">Open ${rows.length} in Sales initiatives</button><button class="btn ghost" data-act="undrill">Close</button></footer>`;
+}
+drillEl.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  if (a.dataset.act === 'undrill') { S.drill = null; render(); }
+  else if (a.dataset.act === 'open') { const o = CLOSED.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (a.dataset.act === 'si') toast('Would open Sales initiatives with this selection');
+});
+
+/* ---------- Controls ---------- */
+const $ = (s) => document.querySelector(s);
+function syncControls() {
+  $('#f-fy').value = S.fy;
+  document.querySelectorAll('#f-q button').forEach(b => { const on = +b.dataset.q === S.q; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+  const teams = Object.keys(TEAMS).filter(t => !S.geo.length || S.geo.includes(TEAMS[t].geo));
+  $('#f-team').innerHTML = `<option value="">All teams</option>` + teams.map(t => `<option ${S.team === t ? 'selected' : ''}>${esc(t)}</option>`).join('');
+  const people = (S.team ? TEAMS[S.team].people : teams.flatMap(t => TEAMS[t].people)).slice().sort();
+  $('#f-owner').innerHTML = `<option value="">All owners</option>` + people.map(p => `<option ${S.owner === p ? 'selected' : ''}>${esc(p)}</option>`).join('');
+  $('#w-team').classList.toggle('set', !!S.team);
+  $('#w-owner').classList.toggle('set', !!S.owner);
+  $('#more-n').hidden = !S.geo.length; $('#more-n').textContent = S.geo.length;
+  $('#reset').hidden = !(S.q || S.team || S.owner || S.geo.length || S.drill || S.fy !== '2627');
+  $('#page-meta').textContent = `Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD · ${S.q ? `Q${S.q}` : 'Full year'} · Q3 in progress, week 7 of 14`;
+}
+function buildMore() { $('#m-geo').innerHTML = Object.keys(GEO_TARGET).map(g => `<label class="check"><input type="checkbox" value="${g}" ${S.geo.includes(g) ? 'checked' : ''}>${g}</label>`).join(''); }
+function setMore(open) { $('#more-pop').hidden = !open; $('#more-btn').setAttribute('aria-expanded', open); if (open) buildMore(); }
+function resetAll() { Object.assign(S, { fy: '2627', q: 0, team: '', owner: '', geo: [], drill: null, page: 1 }); render(); }
+
+$('#f-fy').addEventListener('change', (e) => { S.fy = e.target.value; S.drill = null; render(); });
+$('#f-q').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.q = +b.dataset.q; S.page = 1; render(); });
+$('#f-team').addEventListener('change', (e) => { S.team = e.target.value; if (S.owner && S.team && !TEAMS[S.team].people.includes(S.owner)) S.owner = ''; S.page = 1; render(); });
+$('#f-owner').addEventListener('change', (e) => { S.owner = e.target.value; S.page = 1; render(); });
+$('#reset').addEventListener('click', resetAll);
+$('#more-btn').addEventListener('click', (e) => { e.stopPropagation(); setMore($('#more-pop').hidden); });
+$('#more-pop').addEventListener('click', (e) => e.stopPropagation());
+$('#more-pop').addEventListener('change', (e) => {
+  const i = e.target, k = S.geo.indexOf(i.value);
+  if (i.checked && k < 0) S.geo.push(i.value); if (!i.checked && k >= 0) S.geo.splice(k, 1);
+  if (S.team && S.geo.length && !S.geo.includes(TEAMS[S.team].geo)) { S.team = ''; S.owner = ''; }
+  S.page = 1; render();
+});
+$('#more-clear').addEventListener('click', () => { S.geo = []; buildMore(); render(); });
+$('#more-done').addEventListener('click', () => setMore(false));
+document.addEventListener('click', () => setMore(false));
+document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; setMore(false); if (S.drill) { S.drill = null; render(); } });
+
+page.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'drill') { const v = a.dataset.v, same = S.drill && S.drill.type === a.dataset.type && S.drill.v === v; S.drill = same ? null : { type: a.dataset.type, v }; render(); }
+  else if (act === 'q') { const v = +a.dataset.q, same = S.drill && S.drill.type === 'quarter' && S.drill.v === v; S.drill = same ? null : { type: 'quarter', v }; render(); }
+  else if (act === 'who') { S.who = a.dataset.v; if (S.drill && ['team', 'person'].includes(S.drill.type)) S.drill = null; render(); }
+  else if (act === 'tab') { S.tab = a.dataset.v; S.page = 1; render(); }
+  else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
+  else if (act === 'page') { S.page = +a.dataset.v; render(); }
+  else if (act === 'open') { const o = CLOSED.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (act === 'si') toast('Would open Sales initiatives with these filters applied');
+  else if (act === 'reset') resetAll();
+  else if (act === 'fy-back') { S.fy = '2627'; render(); }
+});
+page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-act]')) e.target.click(); });
+
+$('#export').addEventListener('click', () => {
+  if (S.fy !== '2627') { toast('Nothing to export for this fiscal year'); return; }
+  const rows = periodStats(S.q).rows;
+  const head = ['Initiative', 'Name', 'Account', 'Owner', 'Team', 'Result', 'Loss reason', 'Value (USD)', 'Closed', 'Quarter'];
+  const csv = [head, ...rows.map(o => [o.id, o.name, o.acc, o.owner, o.team, o.result, o.reason || '', Math.round(o.value), o.closed, 'Q' + o.q])]
+    .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
+  a.download = `closed-FY26-27${S.q ? '-Q' + S.q : ''}.csv`; a.click();
+  toast(`Exported ${rows.length} closed opportunities`);
+});
+
+CRM.renderShell('performance');
+CRM.watchSticky($('#filters'));
+render();
+</script>
+</body>
+</html>

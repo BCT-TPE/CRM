@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline & forecast · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="assets/crm.css?v=20261113w">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261113w">
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+
+    <header class="page-head">
+      <div>
+        <h1>Pipeline &amp; forecast</h1>
+        <p id="page-meta">Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · Q3 in progress, week 7 of 14</p>
+      </div>
+      <div class="acts">
+        <span class="updated"><i></i>Updated 10:11</span>
+        <button class="btn" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
+      </div>
+    </header>
+
+    <!-- One filter row for the whole page; KPI cards, charts and the table all respond. -->
+    <div class="filters" id="filters" role="toolbar" aria-label="Filters">
+      <label class="select" id="f-fy-wrap"><span class="lbl">Fiscal year</span>
+        <select id="f-fy" aria-label="Fiscal year"><option value="2526">FY25-26</option><option value="2627" selected>FY26-27</option><option value="2728">FY27-28</option></select>
+      </label>
+      <div class="seg" id="f-q" role="radiogroup" aria-label="Close quarter">
+        <button data-q="0" class="on" role="radio" aria-checked="true">Full year</button>
+        <button data-q="1" role="radio" aria-checked="false">Q1</button>
+        <button data-q="2" role="radio" aria-checked="false">Q2</button>
+        <button data-q="3" role="radio" aria-checked="false">Q3<small>now</small></button>
+        <button data-q="4" role="radio" aria-checked="false">Q4</button>
+      </div>
+      <label class="select" id="w-team"><span class="lbl">Team</span>
+        <select id="f-team" aria-label="Sales team"></select>
+      </label>
+      <label class="select" id="w-owner"><span class="lbl">Owner</span>
+        <select id="f-owner" aria-label="Owner"></select>
+      </label>
+      <div style="position:relative">
+        <button class="btn" id="more-btn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>More filters<span class="count-badge" id="more-n" hidden></span></button>
+        <div class="pop" id="more-pop" role="dialog" aria-label="More filters" hidden style="top:44px;right:0">
+          <div class="grp"><h4>Geography</h4><div id="m-geo"></div></div>
+          <div class="grp"><h4>Forecast category</h4><div id="m-cat"></div></div>
+          <div class="pop-foot"><button class="link" id="more-clear">Clear</button><button class="btn primary" id="more-done" style="height:32px">Done</button></div>
+        </div>
+      </div>
+      <button class="btn ghost" id="reset" hidden>Reset</button>
+      <span class="sp"></span>
+    </div>
+
+    <div id="page"></div>
+  </main>
+</div>
+<aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
+
+<script src="assets/crm.js?v=20261113w"></script>
+<script src="assets/crm-data.js?v=20261113w"></script>
+<script src="assets/region-map.js?v=20261113w"></script>
+<script>
+/* Data lives in assets/crm-data.js (shared with Sales performance). */
+const { money, moneyBig, icon, toast } = CRM;
+
+/* ---------- State ---------- */
+const S = { fy: '2627', q: 0, team: '', owner: '', geo: [], cats: [], drill: null, sort: 'value', page: 1, breakdown: 'team', tab: 'all' };
+const PER_PAGE = 8;
+
+function scoped() { // filters that define "who" — used for both open opps and closed-won
+  return OPPS.filter(o =>
+    (!S.team || o.team === S.team) &&
+    (!S.owner || o.owner === S.owner) &&
+    (!S.geo.length || S.geo.includes(TEAMS[o.team].geo)) &&
+    (!S.cats.length || S.cats.includes(o.cat)));
+}
+function inQuarter(list) { return S.q ? list.filter(o => o.q === S.q) : list; }
+function teamsInScope() {
+  return Object.keys(TEAMS).filter(t => (!S.team || t === S.team) && (!S.geo.length || S.geo.includes(TEAMS[t].geo)) && (!S.owner || TEAMS[t].people.includes(S.owner)));
+}
+function wonIn(q) { // closed-won bookings in FY26-27 quarter q under the current scope (from the shared CLOSED records)
+  const teams = teamsInScope();
+  return CLOSED.filter(o => o.result === 'won' && o.fy === '2627' && o.q === q && teams.includes(o.team) && (!S.owner || o.owner === S.owner)).reduce((s, o) => s + o.value, 0);
+}
+function targetFor() { // per-quarter target under current scope; null when none is defined (shows N/A)
+  if (S.owner) return PERSON_TARGET[S.owner] ? PERSON_TARGET[S.owner] / 4 : null;
+  if (S.team) return TEAMS[S.team].target / 4;
+  if (S.geo.length) return S.geo.reduce((s, g) => s + GEO_TARGET[g], 0) / 4;
+  return COMPANY_TARGET / 4;
+}
+function quarterStats(q, list) {
+  const inq = list.filter(o => o.q === q);
+  const sum = (c) => inq.filter(o => o.cat === c).reduce((s, o) => s + o.value, 0);
+  const won = wonIn(q), commit = sum('Commit'), best = sum('Best case'), pipe = sum('Pipeline');
+  const target = targetFor();
+  return { q, won, commit, best, pipe, target, weighted: inq.reduce((s, o) => s + o.w, 0), openGross: commit + best + pipe, n: inq.length, forecast: won + commit, total: won + commit + best + pipe };
+}
+
+/* ---------- Render ---------- */
+const page = document.getElementById('page');
+
+function render() {
+  syncControls();
+  if (S.fy !== '2627') { page.innerHTML = fyEmpty(); return; }
+  const base = scoped();
+  const list = inQuarter(base);
+  const heroQ = S.q || CUR_Q;
+  const qLabel = `Q${heroQ} FY26-27 · ${heroQ < CUR_Q ? 'closed quarter' : heroQ === CUR_Q ? 'current quarter' : 'next quarter'}`;
+  page.innerHTML = `
+    <div class="grid">
+      ${zoneHead(1, 'Target &amp; forecast', `${qLabel} · bookings, targets and deals closing in the quarter`)}
+      ${forecastCard(quarterStats(heroQ, base))}
+      ${quarterCard(base)}
+      ${zoneHead(2, 'Pipeline now', `All open opportunities in the filters · ${list.length} deals`, LAYOUT_A)}
+      ${kpiCards(list)}
+      ${LAYOUT_A ? stageCard(list) + breakdownCard(list) : `<div class="s6 stack2">${mixCard(list)}${ageCard2(list)}</div>${teamMapCard(list)}`}
+      ${zoneHead(3, 'Deals to act on', 'The records behind every number above')}
+      ${tableCard(list)}
+    </div>`;
+  // Enter motion only on first load; later updates swap content in place so nothing slides or fades.
+  if (!render.done) { page.querySelectorAll('.card, .zone').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
+  renderDrill(list, base);
+}
+
+/* Layout: three zones, each says what it covers. All rows use the same 6 | 6 split so card edges line up.
+   1 Target & forecast (selected quarter, uses bookings + targets) · 2 Pipeline now (all open deals) · 3 Deals to act on (table). */
+function zoneHead(n, title, scope, legend) {
+  const lg = legend ? `<span class="zone-lg" aria-label="Bar colours"><span>Bar colour = forecast category</span><span><i class="c-commit"></i>Commit · L1</span><span><i class="c-best"></i>Best case · L2</span><span><i class="c-pipe"></i>Pipeline · L3</span></span>` : '';
+  return `<div class="zone s12"><h2 class="zone-t">${title}</h2><span class="zone-s">${scope}</span>${lg}</div>`;
+}
+const chev = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+
+// Static summary: nothing here is clickable (the quarter chart next to it is).
+function forecastCard(h) {
+  const past = h.q < CUR_Q;
+  const headline = past ? h.won : h.forecast;
+  const p = h.target ? pct(headline, h.target) : null;
+  const pillCls = p == null ? '' : p >= 100 ? 'ok' : p >= 80 ? 'info' : 'warn';
+  const pillTxt = p == null ? 'No target for this filter' : `${p}% of target`;
+  const max = h.target != null ? Math.max(h.target, h.total) * 1.08 || 1 : h.total || 1;
+  const w = (v) => (v / max * 100).toFixed(2) + '%';
+  const gap = h.target != null ? headline - h.target : null;
+  const remaining = h.target != null ? Math.max(h.target - h.won, 0) : null;
+  const coverage = remaining ? h.openGross / remaining : null;
+  let sowhat;
+  if (h.target == null) sowhat = `Targets are set for teams and geographies, not owners, so attainment is N/A.`;
+  else if (past) sowhat = `Closed at <b>${money(h.won)}</b>, ${gap >= 0 ? `<b>${money(gap)}</b> over` : `<b>${money(-gap)}</b> under`} target.`;
+  else if (gap >= 0) sowhat = `Won + commit is <b>${money(gap)} ahead</b> of target.`;
+  else sowhat = `<b>${money(-gap)} short</b> of target. ${h.best ? `Best case adds ${money(h.best)}${h.best >= -gap ? ', enough to close the gap' : `, still ${money(-gap - h.best)} short`}.` : 'No best-case deals close this quarter.'}`;
+  const mini = (k, v, cls = '') => `<div class="mini"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  const cat = (cls, k, v, tip) => `<span class="lg"><i class="${cls}"></i>${tip ? `<span class="def" tabindex="0" data-tip="${tip}">${k}</span>` : k}<b>${v}</b></span>`;
+  return `
+  <section class="card s6 fc" aria-labelledby="fc-h">
+    <div class="card-h"><div><h2 id="fc-h">Q${h.q} <span class="def" tabindex="0" data-tip-h="Forecast" data-tip="Closed won in the quarter + Commit (L1 deals with an expected close in the quarter).">forecast</span></h2><p>${past ? 'Bookings compared with target' : 'Closed won + commit, compared with target'}</p></div>
+      <div class="r"><span class="pill ${pillCls}">${pillTxt}</span></div></div>
+    <div class="hero-num"><span class="big">${moneyBig(headline)}</span><span class="of">${past ? 'booked' : 'won + commit'}${h.target != null ? ` of <b>${money(h.target)}</b>` : ''}</span></div>
+    <p class="sum-what">${sowhat}</p>
+    <div class="fbar" role="img" aria-label="Closed won ${money(h.won)}, commit ${money(h.commit)}, best case ${money(h.best)}, pipeline ${money(h.pipe)}${h.target != null ? `, target ${money(h.target)}` : ''}">
+      <div class="fbar-track">
+        ${h.won ? `<i class="c-won" style="width:${w(h.won)}" data-tip-h="Closed won" data-tip="${money(h.won)}"></i>` : ''}
+        ${h.commit ? `<i class="c-commit" style="width:${w(h.commit)}" data-tip-h="Commit · L1" data-tip="${money(h.commit)}"></i>` : ''}
+        ${h.best ? `<i class="c-best" style="width:${w(h.best)}" data-tip-h="Best case · L2" data-tip="${money(h.best)}"></i>` : ''}
+        ${h.pipe ? `<i class="c-pipe" style="width:${w(h.pipe)}" data-tip-h="Pipeline · L3" data-tip="${money(h.pipe)}"></i>` : ''}
+      </div>
+      ${h.target != null ? `<div class="fbar-target" style="left:${w(h.target)}"><span>Target</span></div>` : ''}
+    </div>
+    <div class="sum-legend">
+      ${cat('c-won', 'Closed won', money(h.won))}
+      ${cat('c-commit', 'Commit', money(h.commit), 'L1 deals: commercial negotiation and contract finalization.')}
+      ${cat('c-best', 'Best case', money(h.best), 'L2 deals: proposal preparation and submission.')}
+      ${cat('c-pipe', 'Pipeline', money(h.pipe), 'L3 deals: early-stage opportunities.')}
+    </div>
+    <div class="minis">
+      ${mini('<span class="def" tabindex="0" data-tip-h="Weighted forecast" data-tip="Σ value × probability for open deals closing in this quarter.">Weighted forecast</span>', money(h.weighted))}
+      ${mini(gap != null && gap >= 0 ? 'Ahead of target' : 'Gap to target', gap == null ? 'N/A' : money(Math.abs(gap)), gap == null ? '' : gap < 0 ? 'neg' : 'pos')}
+      ${mini('<span class="def" tabindex="0" data-tip-h="Pipeline coverage" data-tip="Open pipeline closing this quarter ÷ target still to win. Below 1× means even winning every open deal would not reach target.">Coverage</span>', past ? '—' : coverage == null ? (h.target == null ? 'N/A' : 'Met') : coverage.toFixed(1) + '×')}
+      ${mini('Open deals in quarter', h.n)}
+    </div>
+  </section>`;
+}
+
+// Four KPIs (requirement 11.8) in one card, split by hairlines. Only "Over 90 days" is a subset, so only it is clickable.
+function kpiCards(list) {
+  const gross = list.reduce((s, o) => s + o.value, 0), wt = list.reduce((s, o) => s + o.w, 0);
+  const avg = list.length ? gross / list.length : null, largest = list.length ? Math.max(...list.map(o => o.value)) : null;
+  const old = list.filter(o => o.days > 90), oldPast = old.filter(o => o.close && new Date(o.close) < TODAY).length;
+  const on90 = S.drill && S.drill.type === 'age' && S.drill.v === 3;
+  const cell = (k, val, sub) => `<div class="ks"><span class="kpi-k">${k}</span><span class="mid">${val}</span><span class="kpi-s">${sub}</span></div>`;
+  return `
+  <section class="card s12 kpi-strip" aria-label="Open pipeline KPIs">
+    ${cell('Open pipeline', moneyBig(gross), `<b>${list.length}</b> open opportunities`)}
+    ${cell('<span class="def" tabindex="0" data-tip-h="Weighted pipeline" data-tip="Σ value × probability. Probability comes from the stage default unless the owner overrode it.">Weighted</span>', moneyBig(wt), gross ? `<b>${pct(wt, gross)}%</b> of gross` : 'No open deals')}
+    ${cell('Avg deal size', avg == null ? 'N/A' : moneyBig(avg), largest == null ? '—' : `Largest <b>${money(largest)}</b>`)}
+    <button class="ks click ${on90 ? 'on' : ''} ${old.length ? 'alert' : ''}" data-act="drill" data-type="age" data-v="3" aria-pressed="${!!on90}">
+      <span class="kpi-k"><span class="def" data-tip="Opportunities that have stayed in their current stage for more than 90 days.">Over 90 days in stage</span>${chev}</span><span class="mid">${old.length}</span><span class="kpi-s"><b>${money(old.reduce((s, o) => s + o.value, 0))}</b> · ${oldPast} past close</span>
+    </button>
+  </section>`;
+}
+
+/* Zone 2, version B (2026-11-13): one question per card, one chart, one closing sentence — same approach as the
+   prototype's Reports page. Mix spans 6 columns, Team and Ageing 3 each, so edges line up with the KPI cards above.
+   Version A (stageCard + breakdownCard) is kept below; open pipeline.html?layout=a to see it. */
+const CODES = [['L1', 'Commit', 'c-commit'], ['L2', 'Best case', 'c-best'], ['L3', 'Pipeline', 'c-pipe']];
+function mixCard(list) {
+  const tot = list.reduce((s, o) => s + o.value, 0);
+  const c = CODES.map(([code, cat, cls]) => { const os = list.filter(o => o.code === code); return { code, cat, cls, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; });
+  const isOn = (code) => S.drill && S.drill.type === 'code' && S.drill.v === code;
+  const top = c.slice().sort((a, b) => b.g - a.g)[0];
+  const blocks = c.filter(x => x.g).map(x => `
+    <button class="mix-b ${isOn(x.code) ? 'on' : ''} ${S.drill && S.drill.type === 'code' && !isOn(x.code) ? 'dim' : ''}" style="flex:${Math.max(x.g / tot, .06)}" data-act="drill" data-type="code" data-v="${x.code}" aria-pressed="${isOn(x.code)}"
+      data-tip-html="<b>${x.cat} · ${x.code}</b><div class='row'><span>Gross</span><span>${money(x.g)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div><div class='row'><span>Deals</span><span>${x.n}</span></div>">
+      <span class="mix-p">${pct(x.g, tot)}%</span><span class="mix-bar ${x.cls}"></span>
+    </button>`).join('');
+  const cols = c.map(x => `
+    <button class="mix-c click ${isOn(x.code) ? 'on' : ''}" data-act="drill" data-type="code" data-v="${x.code}" aria-pressed="${isOn(x.code)}">
+      <span class="mix-k"><i class="${x.cls}"></i>${x.cat}<span class="code">${x.code}</span>${chev}</span>
+      <span class="mix-v">${money(x.g)}</span>
+      <span class="mix-s">${money(x.w)} weighted<br>${x.n} deal${x.n === 1 ? '' : 's'}</span>
+    </button>`).join('');
+  return `
+  <section class="card mix" aria-labelledby="mix-h">
+    <div class="card-h"><div><h2 id="mix-h">Pipeline mix</h2><p>Share of open value by forecast category · select one to see its stages and deals</p></div></div>
+    ${tot ? `<div class="mix-strip">${blocks}</div><div class="mix-cols">${cols}</div>
+    <p class="so-what"><b>${pct(top.g, tot)}%</b> of open value is ${top.code === 'L3' ? 'still early stage (L3)' : top.code === 'L2' ? 'at proposal stage (L2)' : 'in negotiation or contract (L1)'}.</p>` : emptyMsg()}
+  </section>`;
+}
+function teamCard2(list) {
+  const tot = list.reduce((s, o) => s + o.value, 0) || 1;
+  const teams = Object.keys(TEAMS).map(t => { const os = list.filter(o => o.team === t); return { t, os, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; })
+    .filter(x => x.n || teamsInScope().includes(x.t)).sort((a, b) => b.g - a.g);
+  const max = Math.max(1, ...teams.map(x => x.g));
+  const rows = teams.map((x, i) => {
+    const on = S.drill && S.drill.type === 'team' && S.drill.v === x.t;
+    const segs = catSegs(x.os).map(([v, cls, n]) => `<div class='row'><span><i class='${cls}'></i>${n}</span><span>${money(v)}</span></div>`).join('');
+    return `<button class="lean click ${on ? 'on' : ''} ${x.n ? '' : 'zero'}" data-act="team" data-v="${esc(x.t)}" aria-pressed="${on}"
+      data-tip-html="<b>${esc(x.t)}</b><div class='row'><span>Gross</span><span>${money(x.g)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div>${segs}">
+      <span class="lean-top"><span class="lean-n">${esc(x.t)}</span><span class="lean-p">${x.n ? pct(x.g, tot) + '%' : '—'}</span></span>
+      <span class="lean-bar"><i class="${i === 0 && x.g ? 'key' : ''}" style="width:${(x.g / max * 100).toFixed(1)}%"></i></span>
+      <span class="lean-s">${x.n ? `${money(x.g)} · ${x.n} deal${x.n === 1 ? '' : 's'}` : 'No open deals'}</span>
+    </button>`;
+  }).join('');
+  return `
+  <section class="card s3 lean-card" aria-labelledby="tm-h">
+    <div class="card-h"><div><h2 id="tm-h">By sales team</h2><p>Share of open value</p></div></div>
+    ${list.length ? `<div class="lean-list">${rows}</div><p class="so-what"><b>${esc(teams[0].t)}</b> holds ${pct(teams[0].g, tot)}%.</p>` : emptyMsg()}
+  </section>`;
+}
+function ageCard2(list) {
+  const tot = list.reduce((s, o) => s + o.value, 0) || 1;
+  const b = [0, 1, 2, 3].map(i => { const os = list.filter(o => ageBucket(o.days) === i); return { i, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; });
+  const max = Math.max(1, ...b.map(x => x.g));
+  const rows = b.map(x => {
+    const on = S.drill && S.drill.type === 'age' && S.drill.v === x.i, key = x.i === 3;
+    return `<button class="age-r click ${on ? 'on' : ''}" data-act="drill" data-type="age" data-v="${x.i}" aria-pressed="${on}"
+      data-tip-html="<b>${AGE_NAMES[x.i]} in stage</b><div class='row'><span>Gross</span><span>${money(x.g)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div><div class='row'><span>Deals</span><span>${x.n}</span></div>">
+      <span class="age-l">${AGE_NAMES[x.i].replace(' days', 'd').replace('Over 90d', '90d +')}</span>
+      <span class="age-bar"><i class="${key ? 'key' : ''}" style="width:${x.g ? Math.max(x.g / max * 100, 4).toFixed(1) : 0}%"></i></span>
+      <span class="age-v">${money(x.g)}<small class="${key && x.n ? 'hot' : ''}">${x.n} deal${x.n === 1 ? '' : 's'}</small></span>
+    </button>`;
+  }).join('');
+  return `
+  <section class="card lean-card" aria-labelledby="ag-h">
+    <div class="card-h"><div><h2 id="ag-h">Days in stage</h2><p>Open value by time in the current stage</p></div></div>
+    ${list.length ? `<div class="age-list">${rows}</div><p class="so-what"><b>${pct(b[3].g, tot)}%</b> has sat over 90 days.</p>` : emptyMsg()}
+  </section>`;
+}
+// By sales team, with a dot map of the three geographies. Region dots use one hue, darker = larger share (sequential).
+const GEO_KEYS = { 'Middle East': 'me', 'India': 'in', 'APAC': 'ap' };
+// Labels sit over open sea next to each region so they never cover its dots (map units: x = (lon-32)·6.67, y = (38-lat)·6.67).
+const GEO_LABEL = { me: [70, 205], in: [390, 200], ap: [560, 120] };
+function teamMapCard(list) {
+  const M = window.REGION_MAP;
+  const tot = list.reduce((s, o) => s + o.value, 0) || 1;
+  const geos = Object.keys(GEO_KEYS).map(g => { const os = list.filter(o => TEAMS[o.team].geo === g); return { g, k: GEO_KEYS[g], n: os.length, v: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; });
+  const gmax = Math.max(1, ...geos.map(x => x.v));
+  // One rule for the whole card, map and bars alike: darker = more open value. Neutral ink ramp, so it never reads as a forecast category (blue = Commit elsewhere).
+  const shade = (v, m = gmax) => !v ? '#e6eaf0' : v / m > .8 ? '#0042B7' : v / m > .45 ? '#00A0E4' : '#a8dcf4';
+  const gOn = (g) => S.drill && S.drill.type === 'geo' && S.drill.v === g;
+  const dots = (k, fill) => M.dots[k].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${M.r}"/>`).join('');
+  const regionG = geos.map(x => `<g class="geo-g ${gOn(x.g) ? 'on' : ''} ${S.drill && S.drill.type === 'geo' && !gOn(x.g) ? 'dim' : ''}" style="fill:${shade(x.v)}" data-act="drill" data-type="geo" data-v="${x.g}">${dots(x.k)}</g>`).join('');
+  const labels = geos.map(x => {
+    const [ax, ay] = GEO_LABEL[x.k];
+    return `<button class="geo-l click ${gOn(x.g) ? 'on' : ''}" style="left:${(ax / M.w * 100).toFixed(1)}%;top:${(ay / M.h * 100).toFixed(1)}%" data-act="drill" data-type="geo" data-v="${x.g}" aria-pressed="${gOn(x.g)}"
+      data-tip-html="<b>${x.g}</b><div class='row'><span>Gross</span><span>${money(x.v)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div><div class='row'><span>Deals</span><span>${x.n}</span></div>">
+      <b>${x.g}</b><span>${money(x.v)} · ${pct(x.v, tot)}%</span></button>`;
+  }).join('');
+  const teams = Object.keys(TEAMS).map(t => { const os = list.filter(o => o.team === t); return { t, os, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; })
+    .filter(x => x.n || teamsInScope().includes(x.t)).sort((a, b) => b.g - a.g);
+  const max = Math.max(1, ...teams.map(x => x.g));
+  const rows = teams.map((x, i) => {
+    const on = S.drill && S.drill.type === 'team' && S.drill.v === x.t;
+    const segs = catSegs(x.os).map(([v, cls, n]) => `<div class='row'><span>${n}</span><span>${money(v)}</span></div>`).join('');
+    return `<button class="tm-r click ${on ? 'on' : ''} ${x.n ? '' : 'zero'}" data-act="team" data-v="${esc(x.t)}" aria-pressed="${on}">
+      <span class="tm-n">${esc(x.t)}<small>${TEAMS[x.t].geo}</small></span>
+      <span class="lean-bar" data-tip-html="<b>${esc(x.t)}</b><div class='row'><span>Gross</span><span>${money(x.g)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div>${segs}"><i style="width:${(x.g / max * 100).toFixed(1)}%;background:${shade(x.g, max)}"></i></span>
+      <span class="tm-v">${x.n ? money(x.g) : '—'}<small>${x.n ? `${x.n} deal${x.n === 1 ? '' : 's'}` : 'No deals'}</small></span>
+      <span class="tm-p">${x.n ? pct(x.g, tot) + '%' : ''}</span>${chev}
+    </button>`;
+  }).join('');
+  const topG = geos.slice().sort((a, b) => b.v - a.v)[0];
+  return `
+  <section class="card s6 geo-card" aria-labelledby="tm-h">
+    <div class="card-h"><div><h2 id="tm-h">By sales team</h2><p>Share of open value · select to see deals</p></div>
+      <div class="r legend shade-lg" aria-label="Darker means more open value"><span>Less</span><i style="background:#a8dcf4"></i><i style="background:#00A0E4"></i><i style="background:#0042B7"></i><span>More</span></div></div>
+    ${list.length ? `
+    <div class="geo-map"><svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="Open pipeline by geography: ${geos.map(x => `${x.g} ${money(x.v)}`).join(', ')}"><g fill="#e6eaf0">${dots('')}</g>${regionG}</svg>${labels}</div>
+    <div class="tm-list">${rows}</div>
+    <p class="so-what"><b>${topG.g}</b> holds ${pct(topG.v, tot)}% of open value; <b>${esc(teams[0].t)}</b> is the largest team at ${pct(teams[0].g, tot)}%.</p>` : emptyMsg()}
+  </section>`;
+}
+const LAYOUT_A = new URLSearchParams(location.search).get('layout') === 'a';
+
+/* Bar rows share one encoding across the page: bar length = gross value, colour = forecast category
+   (same colours as the forecast bar and the quarter chart). Weighted value is a number column, not a second bar. */
+function rowsHead(first) {
+  return `<div class="rows-head"><span>${first}</span><span></span><span class="r">Gross</span><span class="r">Weighted</span><span></span></div>`;
+}
+// Colour rule for every bar on the page: colour = forecast category (Commit deep blue · Best case cyan · Pipeline gray).
+// Team and ageing bars are split into the same three colours, so a colour never means two different things.
+function catSegs(os) {
+  return [['Commit', 'c-commit'], ['Best case', 'c-best'], ['Pipeline', 'c-pipe']]
+    .map(([c, cls]) => [os.filter(o => o.cat === c).reduce((s, o) => s + o.value, 0), cls, c]).filter(x => x[0]);
+}
+function barRow({ act, type, v, on, dim, name, sub, g, w, max, cls, segs, tip, hot, nested }) {
+  const width = Math.max(g / max * 100, 1.5).toFixed(1);
+  // nested: light bar = gross, solid bar inside = weighted (always ≤ gross), both in the category's colour.
+  const bar = !g ? '' : nested
+    ? `<i class="gross ${cls}" style="width:${width}%"></i><i class="wtd ${cls}" style="width:${Math.max(w / max * 100, 1).toFixed(1)}%"></i>`
+    : segs
+    ? `<span class="stack" style="width:${width}%">${segs.map(([val, c]) => `<i class="${c}" style="flex:${val}"></i>`).join('')}</span>`
+    : `<i class="${cls}" style="width:${width}%"></i>`;
+  const segTip = segs && g ? segs.map(([val, c, n]) => `<div class='row'><span><i class='${c}'></i>${n}</span><span>${money(val)}</span></div>`).join('') : '';
+  return `<button class="row ${on ? 'on' : ''} ${dim ? 'dim' : ''} ${g ? '' : 'zero'} ${hot ? 'hot-row' : ''}" data-act="${act}" ${type ? `data-type="${type}"` : ''} data-v="${esc(v)}" aria-pressed="${!!on}" ${tip || segTip ? `data-tip-html="${tip || `<b>${esc(String(name).replace(/<[^>]+>/g, ''))}</b>${segTip}`}"` : ''}>
+    <span class="nm"><b>${name}</b><small>${sub}</small></span>
+    <span class="track">${bar}</span>
+    <span class="val">${g ? money(g) : '—'}</span><span class="val2">${g ? money(w) : '—'}</span>${chev}
+  </button>`;
+}
+
+function stageCard(list) {
+  const tot = list.reduce((s, o) => s + o.value, 0);
+  const maxV = Math.max(1, ...STAGES.map(s => list.filter(o => o.st === s.id).reduce((a, o) => a + o.value, 0)));
+  const groups = ['L3', 'L2', 'L1'].map(code => {
+    const inG = list.filter(o => o.code === code);
+    const gV = inG.reduce((s, o) => s + o.value, 0), wV = inG.reduce((s, o) => s + o.w, 0);
+    return `
+      <div class="grp-h"><span class="code">${code}</span><span class="cat"><i class="${CODE_INFO[code].cls}"></i>${CODE_INFO[code].cat}</span><span class="muted">· ${CODE_INFO[code].label.toLowerCase()}</span>
+        <span class="tot">${inG.length} opp${inG.length === 1 ? '' : 's'} · ${money(gV)} · ${money(wV)}</span></div>
+      ${STAGES.filter(s => s.code === code).map(s => {
+        const os = list.filter(o => o.st === s.id);
+        const g = os.reduce((a, o) => a + o.value, 0), w = os.reduce((a, o) => a + o.w, 0);
+        const on = S.drill && S.drill.type === 'stage' && S.drill.v === s.id;
+        return barRow({ act: 'drill', type: 'stage', v: s.id, on, dim: S.drill && S.drill.type === 'stage' && !on, name: s.name,
+          sub: `${os.length} opp${os.length === 1 ? '' : 's'} · ${s.prob}% default`, g, w, max: maxV, cls: CODE_INFO[code].cls, nested: true,
+          tip: `<b>${esc(s.name)}</b><div class='row'><span>Opportunities</span><span>${os.length}</span></div><div class='row'><span>Gross</span><span>${money(g)}</span></div><div class='row'><span>Weighted</span><span>${money(w)}</span></div>` });
+      }).join('')}`;
+  }).join('');
+  const W = list.reduce((s, o) => s + o.w, 0);
+  return `
+  <section class="card s6" aria-labelledby="st-h">
+    <div class="card-h"><div><h2 id="st-h">Pipeline by stage</h2><p>Select a stage to see its deals</p></div>
+      <div class="r legend nest-lg"><span><i class="lg-gross"></i>Gross</span><span><i class="lg-wtd"></i>Weighted</span></div></div>
+    ${list.length ? `${rowsHead('Stage')}<div class="rows">${groups}</div>
+    <div class="rows-foot"><span><b>${list.length}</b> open opportunities</span><span><b>${money(tot)}</b> gross · <b>${money(W)}</b> weighted</span></div>` : emptyMsg()}
+  </section>`;
+}
+
+// Team and ageing answer the same question ("where does the pipeline sit?"), so they share one card with a switch.
+function breakdownCard(list) {
+  // Team and ageing are both shown (stacked) so the card matches the stage chart's height without empty space.
+  const tot = list.reduce((s, o) => s + o.value, 0) || 1;
+  const teams = Object.keys(TEAMS).map(t => {
+    const os = list.filter(o => o.team === t);
+    return { t, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) };
+  }).filter(x => x.n || teamsInScope().includes(x.t)).sort((a, b) => b.g - a.g);
+  const tMax = Math.max(1, ...teams.map(x => x.g));
+  const teamRows = teams.map(x => barRow({ act: 'team', v: x.t, on: S.drill && S.drill.type === 'team' && S.drill.v === x.t, dim: S.drill && S.drill.type === 'team' && S.drill.v !== x.t, name: esc(x.t),
+    sub: `${x.n} opp${x.n === 1 ? '' : 's'} · ${pct(x.g, tot)}% of pipeline`, g: x.g, w: x.w, max: tMax, segs: catSegs(list.filter(o => o.team === x.t)) })).join('');
+  const b = [0, 1, 2, 3].map(i => { const os = list.filter(o => ageBucket(o.days) === i); return { i, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; });
+  const aMax = Math.max(1, ...b.map(x => x.g));
+  const ageRows = b.map(x => {
+    const on = S.drill && S.drill.type === 'age' && S.drill.v === x.i;
+    return barRow({ act: 'drill', type: 'age', v: x.i, on, dim: S.drill && S.drill.type === 'age' && !on, name: AGE_NAMES[x.i],
+      sub: x.i === 3 ? `${x.n} opp${x.n === 1 ? '' : 's'} · needs attention` : `${x.n} opp${x.n === 1 ? '' : 's'}`, g: x.g, w: x.w, max: aMax, segs: catSegs(list.filter(o => ageBucket(o.days) === x.i)), hot: x.i === 3 && x.n });
+  }).join('');
+  const note = b[3].n ? `<b>${pct(b[3].g, tot)}%</b> of open value has sat in its stage for more than 90 days.` : 'Nothing has sat in its stage for more than 90 days.';
+  return `
+  <section class="card s6 bd-card" aria-labelledby="bd-h">
+    <div class="card-h"><div><h2 id="bd-h">Where the pipeline sits</h2><p>By sales team and by days in the current stage · select a row to see its deals</p></div></div>
+    ${list.length ? `${rowsHead('Sales team')}<div class="rows">${teamRows}</div>
+      <div class="bd-gap"></div>${rowsHead('Days in current stage')}<div class="rows">${ageRows}</div>
+      <div class="rows-foot"><span>${note}</span></div>` : emptyMsg()}
+  </section>`;
+}
+
+function quarterCard(base) {
+  const qs = [1, 2, 3, 4].map(q => quarterStats(q, base));
+  const max = Math.max(1, ...qs.map(x => Math.max(x.total, x.target || 0))) * 1.12;
+  const h = (v) => (v / max * 100).toFixed(2) + '%';
+  const noDate = base.filter(o => !o.close), later = base.filter(o => o.q === 'next');
+  const cols = qs.map(x => {
+    const past = x.q < CUR_Q, cur = x.q === CUR_Q;
+    const att = x.target ? pct(past ? x.won : x.forecast, x.target) : null;
+    const attTxt = att == null ? 'No target' : past ? `${att}% attained` : (x.forecast ? `${att}% forecast` : 'Not started');
+    const attCls = att != null && past && att >= 100 ? 'met' : '';
+    const on = S.drill && S.drill.type === 'quarter' && S.drill.v === x.q;
+    const tipRows = [['var(--ink)', 'Closed won', x.won], ['var(--deep)', 'Commit', x.commit], ['var(--cyan)', 'Best case', x.best], ['var(--chart-gray)', 'Pipeline', x.pipe]]
+      .map(([c, n, v]) => `<div class='row'><span><i style='background:${c}'></i>${n}</span><span>${money(v)}</span></div>`).join('') + (x.target ? `<div class='row'><span>Target</span><span>${money(x.target)}</span></div>` : '');
+    return `<button class="qcol ${on ? 'on' : ''}" data-act="q" data-q="${x.q}" aria-pressed="${on}" data-tip-html="<b>Q${x.q} FY26-27</b>${tipRows}">
+      <div class="qplot">
+        <div class="qtot" style="bottom:calc(${h(Math.max(x.total, x.target || 0))} + 6px)">${money(x.total)}</div>
+        <div class="qstack">
+          ${x.won ? `<i class="c-won" style="height:${h(x.won)}"></i>` : ''}${x.commit ? `<i class="c-commit" style="height:${h(x.commit)}"></i>` : ''}${x.best ? `<i class="c-best" style="height:${h(x.best)}"></i>` : ''}${x.pipe ? `<i class="c-pipe" style="height:${h(x.pipe)}"></i>` : ''}
+        </div>
+        ${x.target ? `<div class="qtarget" style="bottom:${h(x.target)}" aria-hidden="true"></div>` : ''}
+      </div>
+      <div class="qbase"></div>
+      <div class="qlab"><b>Q${x.q}${cur ? ' · now' : ''}${chev}</b><small>Target ${x.target ? money(x.target) : 'N/A'}</small><div class="att ${attCls}">${attTxt}</div></div>
+    </button>`;
+  }).join('');
+  const notes = [];
+  if (noDate.length) notes.push(`${noDate.length} open opportunit${noDate.length === 1 ? 'y' : 'ies'} (${money(noDate.reduce((s, o) => s + o.value, 0))}) ${noDate.length === 1 ? 'has' : 'have'} no expected close date`);
+  if (later.length) notes.push(`${later.length} (${money(later.reduce((s, o) => s + o.value, 0))}) close after FY26-27`);
+  return `
+  <section class="card s6" aria-labelledby="q-h">
+    <div class="card-h"><div><h2 id="q-h">Bookings vs target by quarter</h2><p>Closed won plus open pipeline by forecast category · select a quarter to see its deals</p></div></div>
+    <div class="legend" style="margin-bottom:12px"><span><i class="c-won"></i>Closed won</span><span><i class="c-commit"></i>Commit</span><span><i class="c-best"></i>Best case</span><span><i class="c-pipe"></i>Pipeline</span><span><i class="line"></i>Target</span></div>
+    <div class="qchart">${cols}</div>
+    ${notes.length ? `<p class="qnote">${notes.join(' · ')}, so ${noDate.length + later.length === 1 ? 'it is' : 'they are'} not in any quarter above.</p>` : ''}
+  </section>`;
+}
+
+/* Drill-down panel. One rule for every chart and KPI on the page: selecting a mark opens the deals behind it here.
+   It never changes the page filters, never scrolls the page, and the page behind it does not move. */
+function applyDrill(list) {
+  const d = S.drill; if (!d) return list;
+  if (d.type === 'stage') return list.filter(o => o.st === d.v);
+  if (d.type === 'age') return list.filter(o => ageBucket(o.days) === d.v);
+  if (d.type === 'attn') return list.filter(o => attention(o).length);
+  if (d.type === 'team') return list.filter(o => o.team === d.v);
+  if (d.type === 'quarter') return list.filter(o => o.q === d.v);
+  if (d.type === 'code') return list.filter(o => o.code === d.v);
+  if (d.type === 'geo') return list.filter(o => TEAMS[o.team].geo === d.v);
+  return list; // 'all'
+}
+function drillLabel(d) {
+  if (d.type === 'stage') return STAGE[d.v].name;
+  if (d.type === 'age') return `${AGE_NAMES[d.v]} in stage`;
+  if (d.type === 'attn') return 'Needs attention';
+  if (d.type === 'team') return d.v;
+  if (d.type === 'quarter') return `Closing in Q${d.v} FY26-27`;
+  if (d.type === 'code') return `${CODE_INFO[d.v].cat} · ${d.v}`;
+  if (d.type === 'geo') return d.v;
+  return 'All open opportunities';
+}
+function drillKind(d) {
+  return { stage: `Stage · ${STAGE[d.v] ? STAGE[d.v].code : ''}`, age: 'Pipeline ageing', attn: 'Pipeline health', team: 'Sales team', quarter: 'Quarterly forecast', all: 'Open pipeline', code: 'Pipeline mix', geo: 'Geography' }[d.type];
+}
+const drillEl = document.getElementById('drill');
+function renderDrill(list, base) {
+  const d = S.drill;
+  document.body.classList.toggle('drill-open', !!d);
+  drillEl.setAttribute('aria-hidden', String(!d));
+  if (!d) return;
+  // a quarter drill ignores the quarter filter: it is about that quarter
+  const src = d.type === 'quarter' ? base : list;
+  const rows = applyDrill(src).slice().sort((a, b) => b.value - a.value);
+  const g = rows.reduce((s, o) => s + o.value, 0), w = rows.reduce((s, o) => s + o.w, 0);
+  let extra = '';
+  if (d.type === 'code') {
+    // The sub-stage detail that version A showed on the page lives here now: one click away, nothing removed.
+    const st = STAGES.filter(x => x.code === d.v).map(x => { const os = src.filter(o => o.st === x.id); return { x, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; });
+    const cls = CODE_INFO[d.v].cls;
+    extra = `<div class="dr-stages"><table><thead><tr><th>Stage</th><th class="r">Deals</th><th class="r">Gross</th><th class="r">Weighted</th></tr></thead><tbody>${st.map(r => `<tr><td>${r.x.name}<div class="muted" style="font-size:12px">${r.x.prob}% default</div></td><td class="r">${r.n}</td><td class="r">${money(r.g)}</td><td class="r"><span class="wbar"><i class="${cls}" style="width:${r.g ? (r.w / r.g * 100).toFixed(0) : 0}%"></i></span>${money(r.w)}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  if (d.type === 'quarter') {
+    const x = quarterStats(d.v, base);
+    extra = `<div class="dr-kpis"><div><span>Closed won</span><b>${money(x.won)}</b></div><div><span>Target</span><b>${x.target ? money(x.target) : 'N/A'}</b></div><div><span>Forecast</span><b>${money(x.forecast)}</b></div></div>`;
+  }
+  drillEl.innerHTML = `
+    <header class="dr-head">
+      <div><p class="dr-kind">${drillKind(d)}</p><h2 id="drill-title">${esc(drillLabel(d))}</h2>
+        <p class="dr-sub">${rows.length} open opportunit${rows.length === 1 ? 'y' : 'ies'} · ${money(g)} gross · ${money(w)} weighted</p></div>
+      <button class="icon-btn" data-act="undrill" aria-label="Close panel">${icon('x')}</button>
+    </header>
+    ${extra}
+    <div class="dr-body">
+      ${rows.length ? rows.map(o => {
+        const passed = o.close && new Date(o.close) < TODAY;
+        const why = d.type === 'attn' ? attention(o) : [];
+        return `<button class="dr-row" data-act="open" data-id="${o.id}">
+          <span class="dr-l"><b>${esc(o.name)}</b><small>${o.id} · ${esc(o.acc)}</small>
+            <small><span class="code">${o.code}</span> ${o.stage} · ${esc(o.owner)}</small>
+            ${why.length ? `<small class="dr-why">${why.map(x => `<span class="${/No next|passed|No close/.test(x) ? 'hot' : ''}">${x}</span>`).join(' · ')}</small>` : ''}</span>
+          <span class="dr-r"><b>${money(o.value)}</b><small>${o.prob}% · ${money(o.w)}</small>
+            <small class="${passed ? 'hot' : ''}">${o.close ? fmtDate(o.close) : 'No close date'}</small>
+            <small class="${o.days > 90 ? 'hot' : ''}">${o.days} days in stage</small></span>
+        </button>`;
+      }).join('') : `<div class="empty"><b>No open opportunities</b>${d.type === 'quarter' && d.v < CUR_Q ? `Q${d.v} has closed. Its bookings are in Sales performance.` : 'Nothing matches this selection with the current filters.'}</div>`}
+    </div>
+    <footer class="dr-foot"><button class="btn primary" data-act="si">Open ${rows.length} in Sales initiatives</button><button class="btn ghost" data-act="undrill">Close</button></footer>`;
+}
+drillEl.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  if (a.dataset.act === 'undrill') { S.drill = null; render(); }
+  else if (a.dataset.act === 'open') { const o = OPPS.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (a.dataset.act === 'si') toast(`Would open Sales initiatives filtered to “${drillLabel(S.drill)}”`);
+});
+
+/* Table: every row is two fixed lines (primary + secondary) so rows are equal height; long text ends in an ellipsis
+   with the full text on hover. Sorting lives on the column headers. Days > 90 and passed close dates are red. */
+const SORTS = {
+  name: { label: 'Opportunity', fn: (a, b) => a.name.localeCompare(b.name), dir: 'asc' },
+  value: { label: 'Value', fn: (a, b) => b.value - a.value, dir: 'desc' },
+  w: { label: 'Weighted', fn: (a, b) => b.w - a.w, dir: 'desc' },
+  close: { label: 'Expected close', fn: (a, b) => (a.close || '9999').localeCompare(b.close || '9999'), dir: 'asc' },
+  days: { label: 'Days in stage', fn: (a, b) => b.days - a.days, dir: 'desc' }
+};
+function th(key, label, cls = '', tip = '') {
+  if (!SORTS[key]) return `<th class="${cls}">${tip ? `<span class="def" tabindex="0" data-tip="${tip}">${label}</span>` : label}</th>`;
+  const on = S.sort === key;
+  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↕'}</span></button></th>`;
+}
+const ell = (txt, cls = '') => `<div class="ell ${cls}" title="${esc(txt)}">${esc(txt)}</div>`;
+
+const TABS = [
+  ['all', 'All open', () => true],
+  ['attn', 'Needs attention', (o) => attention(o).length > 0],
+  ['old', 'Over 90 days in stage', (o) => o.days > 90]
+];
+function tableCard(all) {
+  const tab = TABS.find(t => t[0] === S.tab) || TABS[0];
+  let rows = all.filter(tab[2]).sort(SORTS[S.sort].fn);
+  const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+  S.page = Math.min(S.page, pages);
+  const shown = rows.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
+  const g = rows.reduce((s, o) => s + o.value, 0), w = rows.reduce((s, o) => s + o.w, 0);
+  const outside = S.q || S.tab !== 'all' ? 0 : all.filter(o => !o.close || o.q === 'next').length;
+  const why = S.tab === 'attn';
+  return `
+  <section class="card s12" id="opp-table" aria-labelledby="tb-h">
+    <div class="card-h"><div><h2 id="tb-h">Open opportunities</h2>
+      <p>${money(g)} gross · ${money(w)} weighted${outside ? ` · includes ${outside} closing after FY26-27 or without a close date` : ''} · select a row to open the record</p></div>
+      <div class="r"><button class="link" data-act="si">Open in Sales initiatives ${icon('arrow')}</button></div></div>
+    <div class="tabs" role="tablist" aria-label="Which deals">
+      ${TABS.map(([k, n, f]) => { const c = all.filter(f).length; return `<button role="tab" aria-selected="${S.tab === k}" class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-v="${k}">${n}<span class="tab-n ${k !== 'all' && c ? 'hot' : ''}">${c}</span></button>`; }).join('')}
+    </div>
+    ${rows.length ? `
+    <div class="tbl-wrap"><table class="tbl opp ${why ? 'with-why' : ''}">
+      <colgroup><col class="c-opp">${why ? '<col class="c-why">' : ''}<col class="c-own"><col class="c-stg"><col class="c-val"><col class="c-prob"><col class="c-w"><col class="c-close"><col class="c-days"></colgroup>
+      <thead><tr>${th('name', 'Opportunity')}${why ? th('', 'Why it needs attention') : ''}${th('', 'Owner / team')}${th('', 'Stage · forecast', '', "Forecast category comes from the stage's funnel code: L1 = Commit, L2 = Best case, L3 = Pipeline.")}${th('value', 'Value', 'r')}${th('', 'Prob.', 'r')}${th('w', 'Weighted', 'r')}${th('close', 'Expected close')}${th('days', 'Days in stage', 'r')}</tr></thead>
+      <tbody>${shown.map(o => {
+        const passed = o.close && new Date(o.close) < TODAY, ovr = o.prob !== STAGE[o.st].prob, r = attention(o);
+        return `
+        <tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
+          <td>${ell(o.name, 't-main')}${ell(`${o.id} · ${o.acc}`, 't-sub')}</td>
+          ${why ? `<td><div class="why-l" title="${esc(r.join(' · '))}">${r.slice(0, 2).map((x, i) => `<span class="${/No next|passed|No close/.test(x) ? 'hot' : ''}">${x}${i === 1 && r.length > 2 ? ` <em class="more">+${r.length - 2}</em>` : ''}</span>`).join('')}</div></td>` : ''}
+          <td>${ell(o.owner)}${ell(o.team, 't-sub')}</td>
+          <td><div class="stg"><span class="code">${o.code}</span><span class="ell" title="${esc(o.stage)}">${o.stage}</span></div><div class="t-sub cat"><i class="${CODE_INFO[o.code].cls}"></i>${o.cat}</div></td>
+          <td class="r num t-val">${money(o.value)}</td>
+          <td class="r num ${ovr ? 'prob-ovr' : ''}" ${ovr ? `data-tip="Overridden from the ${STAGE[o.st].prob}% stage default"` : ''}>${o.prob}%</td>
+          <td class="r num">${money(o.w)}</td>
+          <td class="num">${o.close ? `<span class="${passed ? 'hot' : ''}">${fmtDate(o.close)}</span>${passed ? '<div class="t-sub hot">Passed</div>' : ''}` : '<span class="muted">Not set</span>'}</td>
+          <td class="r num"><span class="days-cell">${o.days > 90 ? `<span class="hot">${o.days}</span>` : o.days}${chev}</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>
+    <div class="pager"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, rows.length)} of ${rows.length}</span><span class="sp"></span>
+      <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
+      ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}
+      <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button>
+    </div>` : (S.tab === 'all' ? emptyMsg(true) : `<div class="empty"><b>Nothing here</b>No open deals in the filters ${S.tab === 'attn' ? 'need attention' : 'have sat in their stage for more than 90 days'}.</div>`)}
+  </section>`;
+}
+
+function emptyMsg(table) {
+  const why = S.q && S.q < CUR_Q ? `Q${S.q} has closed, so no open opportunities close in it.` : 'No open opportunities match these filters.';
+  return `<div class="empty"><b>Nothing to show</b>${why}${table || S.q || S.team || S.owner || S.geo.length || S.cats.length ? ` <button class="link" data-act="reset">Reset filters</button>` : ''}</div>`;
+}
+function fyEmpty() {
+  const fy = S.fy === '2526' ? 'FY25-26' : 'FY27-28';
+  return `<div class="card"><div class="empty" style="padding:72px 12px"><b>No data for ${fy} in this demo</b>The prototype only carries FY26-27 records. <button class="link" data-act="fy-back">Back to FY26-27</button></div></div>`;
+}
+
+/* ---------- Controls ---------- */
+const $ = (s) => document.querySelector(s);
+function syncControls() {
+  $('#f-fy').value = S.fy;
+  document.querySelectorAll('#f-q button').forEach(b => { const on = +b.dataset.q === S.q; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+  const teams = Object.keys(TEAMS).filter(t => !S.geo.length || S.geo.includes(TEAMS[t].geo));
+  $('#f-team').innerHTML = `<option value="">All teams</option>` + teams.map(t => `<option ${S.team === t ? 'selected' : ''}>${esc(t)}</option>`).join('');
+  const people = (S.team ? TEAMS[S.team].people : teams.flatMap(t => TEAMS[t].people)).slice().sort();
+  $('#f-owner').innerHTML = `<option value="">All owners</option>` + people.map(p => `<option ${S.owner === p ? 'selected' : ''}>${esc(p)}</option>`).join('');
+  $('#w-team').classList.toggle('set', !!S.team);
+  $('#w-owner').classList.toggle('set', !!S.owner);
+  const more = S.geo.length + S.cats.length;
+  $('#more-n').hidden = !more; $('#more-n').textContent = more;
+  $('#reset').hidden = !(S.q || S.team || S.owner || more || S.drill || S.fy !== '2627');
+  const q = S.q || CUR_Q;
+  $('#page-meta').textContent = `Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · ${S.q ? `Closing in Q${S.q}` : 'All close dates'} · Q3 in progress, week 7 of 14`;
+}
+function buildMore() {
+  $('#m-geo').innerHTML = Object.keys(GEO_TARGET).map(g => `<label class="check"><input type="checkbox" value="${g}" ${S.geo.includes(g) ? 'checked' : ''} data-m="geo">${g}</label>`).join('');
+  $('#m-cat').innerHTML = ['Commit', 'Best case', 'Pipeline'].map(c => `<label class="check"><input type="checkbox" value="${c}" ${S.cats.includes(c) ? 'checked' : ''} data-m="cats"><span class="cat"><i class="${{ Commit: 'c-commit', 'Best case': 'c-best', Pipeline: 'c-pipe' }[c]}"></i>${c}</span></label>`).join('');
+}
+function setMore(open) {
+  $('#more-pop').hidden = !open; $('#more-btn').setAttribute('aria-expanded', open);
+  if (open) buildMore();
+}
+function resetAll() { Object.assign(S, { fy: '2627', q: 0, team: '', owner: '', geo: [], cats: [], drill: null, page: 1 }); render(); }
+
+$('#f-fy').addEventListener('change', (e) => { S.fy = e.target.value; render(); });
+$('#f-q').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.q = +b.dataset.q; S.page = 1; render(); });
+$('#f-team').addEventListener('change', (e) => { S.team = e.target.value; if (S.owner && S.team && !TEAMS[S.team].people.includes(S.owner)) S.owner = ''; S.page = 1; render(); });
+$('#f-owner').addEventListener('change', (e) => { S.owner = e.target.value; S.page = 1; render(); });
+$('#reset').addEventListener('click', resetAll);
+$('#more-btn').addEventListener('click', (e) => { e.stopPropagation(); setMore($('#more-pop').hidden); });
+$('#more-pop').addEventListener('click', (e) => e.stopPropagation());
+$('#more-pop').addEventListener('change', (e) => {
+  const i = e.target; if (!i.dataset.m) return;
+  const arr = S[i.dataset.m]; const k = arr.indexOf(i.value);
+  if (i.checked && k < 0) arr.push(i.value); if (!i.checked && k >= 0) arr.splice(k, 1);
+  if (S.team && S.geo.length && !S.geo.includes(TEAMS[S.team].geo)) { S.team = ''; S.owner = ''; }
+  S.page = 1; render();
+});
+$('#more-clear').addEventListener('click', () => { S.geo = []; S.cats = []; buildMore(); render(); });
+$('#more-done').addEventListener('click', () => setMore(false));
+document.addEventListener('click', () => setMore(false));
+document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; setMore(false); if (S.drill) { S.drill = null; render(); } });
+
+page.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'drill') {
+    const v = ['stage', 'code', 'geo'].includes(a.dataset.type) ? a.dataset.v : +a.dataset.v;
+    const same = S.drill && S.drill.type === a.dataset.type && S.drill.v === v;
+    S.drill = same ? null : { type: a.dataset.type, v }; render();
+  }
+  else if (act === 'bd') { S.breakdown = a.dataset.v; render(); }
+  else if (act === 'undrill') { S.drill = null; render(); }
+  else if (act === 'team') { const same = S.drill && S.drill.type === 'team' && S.drill.v === a.dataset.v; S.drill = same ? null : { type: 'team', v: a.dataset.v }; render(); }
+  else if (act === 'q') { const v = +a.dataset.q, same = S.drill && S.drill.type === 'quarter' && S.drill.v === v; S.drill = same ? null : { type: 'quarter', v }; render(); }
+  else if (act === 'tab') { S.tab = a.dataset.v; S.page = 1; render(); }
+  else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); keepTable(); }
+  else if (act === 'page') { S.page = +a.dataset.v; render(); keepTable(); }
+  else if (act === 'open') { const o = OPPS.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (act === 'si') toast('Would open Sales initiatives with these filters applied');
+  else if (act === 'reset') resetAll();
+  else if (act === 'fy-back') { S.fy = '2627'; render(); }
+});
+page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-act="open"]')) e.target.click(); });
+function scrollToTable() { requestAnimationFrame(() => { const t = $('#opp-table'); if (t) t.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }); }
+function keepTable() { const t = $('#opp-table'); if (t && t.getBoundingClientRect().top < 0) t.scrollIntoView({ block: 'start' }); }
+
+// Export: CSV of the opportunities currently in the list (same filters as the page)
+$('#export').addEventListener('click', () => {
+  if (S.fy !== '2627') { toast('Nothing to export for this fiscal year'); return; }
+  const rows = applyDrill(inQuarter(scoped()));
+  const head = ['Initiative', 'Name', 'Account', 'Owner', 'Team', 'Funnel', 'Stage', 'Forecast', 'Value (USD)', 'Probability %', 'Weighted (USD)', 'Expected close', 'Days in stage'];
+  const csv = [head, ...rows.map(o => [o.id, o.name, o.acc, o.owner, o.team, o.code, o.stage, o.cat, Math.round(o.value), o.prob, Math.round(o.w), o.close || '', o.days])]
+    .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
+  a.download = `pipeline-FY26-27${S.q ? '-Q' + S.q : ''}.csv`; a.click();
+  toast(`Exported ${rows.length} opportunities`);
+});
+
+CRM.renderShell('pipeline');
+CRM.watchSticky($('#filters'));
+render();
+</script>
+</body>
+</html>
