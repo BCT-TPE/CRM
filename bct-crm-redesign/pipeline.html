@@ -1,28 +1,28 @@
 <!doctype html>
+<!-- Pipeline & forecast, blue-glass theme (formerly pipeline_v2.html, adopted 2026-11-16). Previous layout: pipeline_archieve.html. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pipeline & forecast · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="assets/crm.css?v=20261113w">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261113w">
+<link rel="stylesheet" href="assets/crm.css?v=20261116i">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261116c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261116j">
 </head>
-<body>
+<body class="v2">
 <div class="app">
   <aside class="side" id="side" aria-label="Navigation"></aside>
 
   <main class="main">
 
-    <header class="page-head">
-      <div>
-        <h1>Pipeline &amp; forecast</h1>
+    <header class="v2-head">
+      <div class="v2-hello">
+        <div class="v2-top"><span class="v2-eyebrow">Pipeline &amp; forecast</span><span class="updated"><i></i>Updated 10:11</span></div>
+        <h1 id="hello">Good morning, Gaurav</h1>
         <p id="page-meta">Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · Q3 in progress, week 7 of 14</p>
       </div>
-      <div class="acts">
-        <span class="updated"><i></i>Updated 10:11</span>
-        <button class="btn" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
-      </div>
+      <div class="v2-kpis" id="hero-kpis" aria-label="Open pipeline KPIs"></div>
     </header>
 
     <!-- One filter row for the whole page; KPI cards, charts and the table all respond. -->
@@ -53,6 +53,7 @@
       </div>
       <button class="btn ghost" id="reset" hidden>Reset</button>
       <span class="sp"></span>
+      <button class="btn primary" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
     </div>
 
     <div id="page"></div>
@@ -60,8 +61,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261113w"></script>
-<script src="assets/crm-data.js?v=20261113w"></script>
+<script src="assets/crm.js?v=20261116b"></script>
+<script src="assets/crm-data.js?v=20261116a"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
 /* Data lives in assets/crm-data.js (shared with Sales performance). */
@@ -105,24 +106,26 @@ const page = document.getElementById('page');
 
 function render() {
   syncControls();
-  if (S.fy !== '2627') { page.innerHTML = fyEmpty(); return; }
+  if (S.fy !== '2627') { $('#hero-kpis').innerHTML = ''; page.innerHTML = fyEmpty(); return; }
   const base = scoped();
   const list = inQuarter(base);
   const heroQ = S.q || CUR_Q;
   const qLabel = `Q${heroQ} FY26-27 · ${heroQ < CUR_Q ? 'closed quarter' : heroQ === CUR_Q ? 'current quarter' : 'next quarter'}`;
+  const h = quarterStats(heroQ, base);
+  $('#hero-kpis').innerHTML = heroKpis(list);
   page.innerHTML = `
     <div class="grid">
       ${zoneHead(1, 'Target &amp; forecast', `${qLabel} · bookings, targets and deals closing in the quarter`)}
-      ${forecastCard(quarterStats(heroQ, base))}
-      ${quarterCard(base)}
-      ${zoneHead(2, 'Pipeline now', `All open opportunities in the filters · ${list.length} deals`, LAYOUT_A)}
-      ${kpiCards(list)}
-      ${LAYOUT_A ? stageCard(list) + breakdownCard(list) : `<div class="s6 stack2">${mixCard(list)}${ageCard2(list)}</div>${teamMapCard(list)}`}
+      ${forecastHero(h)}
+      ${ringCard(h)}
+      ${quarterCard(base).replace('class="card s6"', 'class="card s5"')}
+      ${zoneHead(2, 'Pipeline now', `All open opportunities in the filters · ${list.length} deals`)}
+      <div class="s7 v2-stack">${mixPills(list)}${ageDots(list)}</div>
+      ${teamMapCard(list).replace('card s6 geo-card', 'card s5 geo-card')}
       ${zoneHead(3, 'Deals to act on', 'The records behind every number above')}
       ${tableCard(list)}
     </div>`;
-  // Enter motion only on first load; later updates swap content in place so nothing slides or fades.
-  if (!render.done) { page.querySelectorAll('.card, .zone').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
+  if (!render.done) { document.querySelectorAll('.card, .zone, .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
   renderDrill(list, base);
 }
 
@@ -132,7 +135,7 @@ function zoneHead(n, title, scope, legend) {
   const lg = legend ? `<span class="zone-lg" aria-label="Bar colours"><span>Bar colour = forecast category</span><span><i class="c-commit"></i>Commit · L1</span><span><i class="c-best"></i>Best case · L2</span><span><i class="c-pipe"></i>Pipeline · L3</span></span>` : '';
   return `<div class="zone s12"><h2 class="zone-t">${title}</h2><span class="zone-s">${scope}</span>${lg}</div>`;
 }
-const chev = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const chev = ''; // chevrons removed: hover fill already signals clickability
 
 // Static summary: nothing here is clickable (the quarter chart next to it is).
 function forecastCard(h) {
@@ -507,7 +510,7 @@ function renderDrill(list, base) {
 drillEl.addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a) return;
   if (a.dataset.act === 'undrill') { S.drill = null; render(); }
-  else if (a.dataset.act === 'open') { const o = OPPS.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (a.dataset.act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
   else if (a.dataset.act === 'si') toast(`Would open Sales initiatives filtered to “${drillLabel(S.drill)}”`);
 });
 
@@ -559,7 +562,7 @@ function tableCard(all) {
         <tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
           <td>${ell(o.name, 't-main')}${ell(`${o.id} · ${o.acc}`, 't-sub')}</td>
           ${why ? `<td><div class="why-l" title="${esc(r.join(' · '))}">${r.slice(0, 2).map((x, i) => `<span class="${/No next|passed|No close/.test(x) ? 'hot' : ''}">${x}${i === 1 && r.length > 2 ? ` <em class="more">+${r.length - 2}</em>` : ''}</span>`).join('')}</div></td>` : ''}
-          <td>${ell(o.owner)}${ell(o.team, 't-sub')}</td>
+          <td><div class="own">${avatar(o.owner)}<div class="own-t">${ell(o.owner)}${ell(o.team, 't-sub')}</div></div></td>
           <td><div class="stg"><span class="code">${o.code}</span><span class="ell" title="${esc(o.stage)}">${o.stage}</span></div><div class="t-sub cat"><i class="${CODE_INFO[o.code].cls}"></i>${o.cat}</div></td>
           <td class="r num t-val">${money(o.value)}</td>
           <td class="r num ${ovr ? 'prob-ovr' : ''}" ${ovr ? `data-tip="Overridden from the ${STAGE[o.st].prob}% stage default"` : ''}>${o.prob}%</td>
@@ -585,6 +588,144 @@ function fyEmpty() {
   const fy = S.fy === '2526' ? 'FY25-26' : 'FY27-28';
   return `<div class="card"><div class="empty" style="padding:72px 12px"><b>No data for ${fy} in this demo</b>The prototype only carries FY26-27 records. <button class="link" data-act="fy-back">Back to FY26-27</button></div></div>`;
 }
+
+
+/* ---------- v2 components (2026-11-16) ----------
+   Same data and rules as pipeline.html; only the arrangement and theme differ.
+   Hero KPIs = the four Pipeline-now KPIs. Ring card = the forecast card's % of target + its four minis. */
+function heroKpis(list) {
+  const gross = list.reduce((s, o) => s + o.value, 0), wt = list.reduce((s, o) => s + o.w, 0);
+  const avg = list.length ? gross / list.length : null, largest = list.length ? Math.max(...list.map(o => o.value)) : null;
+  const old = list.filter(o => o.days > 90), oldPast = old.filter(o => o.close && new Date(o.close) < TODAY).length;
+  const on90 = S.drill && S.drill.type === 'age' && S.drill.v === 3;
+  const k = (label, val, badge, sub, extra = '') => `<div class="v2-kpi ${extra}"><div class="v2-kv">${val}${badge ? `<span class="v2-badge">${badge}</span>` : ''}</div><div class="v2-kl">${label}</div><div class="v2-ks">${sub}</div></div>`;
+  return k('Open pipeline', moneyBig(gross), `${list.length} deals`, 'Gross value of open opportunities')
+    + k('<span class="def" tabindex="0" data-tip-h="Weighted pipeline" data-tip="Σ value × probability. Probability comes from the stage default unless the owner overrode it.">Weighted</span>', moneyBig(wt), gross ? `${pct(wt, gross)}%` : '', 'of gross')
+    + k('Avg deal size', avg == null ? 'N/A' : moneyBig(avg), '', largest == null ? '—' : `Largest <b>${money(largest)}</b>`)
+    + `<button class="v2-kpi click ${on90 ? 'on' : ''} ${old.length ? 'alert' : ''}" data-act="drill" data-type="age" data-v="3" aria-pressed="${!!on90}">
+        <div class="v2-kv">${old.length}<span class="v2-badge ${old.length ? 'hot' : ''}">${money(old.reduce((s, o) => s + o.value, 0))}</span></div>
+        <div class="v2-kl"><span class="def" data-tip="Opportunities that have stayed in their current stage for more than 90 days.">Over 90 days in stage</span></div>
+        <div class="v2-ks">${oldPast} past close</div></button>`;
+}
+
+function forecastHero(h) {
+  const past = h.q < CUR_Q;
+  const headline = past ? h.won : h.forecast;
+  const max = h.target != null ? Math.max(h.target, h.total) * 1.08 || 1 : h.total || 1;
+  const w = (v) => (v / max * 100).toFixed(2) + '%';
+  const gap = h.target != null ? headline - h.target : null;
+  let sowhat;
+  if (h.target == null) sowhat = `Targets are set for teams and geographies, not owners, so attainment is N/A.`;
+  else if (past) sowhat = `Closed at <b>${money(h.won)}</b>, ${gap >= 0 ? `<b>${money(gap)}</b> over` : `<b>${money(-gap)}</b> under`} target.`;
+  else if (gap >= 0) sowhat = `Won + commit is <b>${money(gap)} ahead</b> of target.`;
+  else sowhat = `<b>${money(-gap)} short</b> of target. ${h.best ? `Best case adds ${money(h.best)}${h.best >= -gap ? ', enough to close the gap' : `, still ${money(-gap - h.best)} short`}.` : 'No best-case deals close this quarter.'}`;
+  const cat = (cls, k, v, tip) => `<span class="lg"><i class="${cls}"></i>${tip ? `<span class="def" tabindex="0" data-tip="${tip}">${k}</span>` : k}<b>${v}</b></span>`;
+  return `
+  <section class="card s4 fc tint" aria-labelledby="fc-h">
+    <div class="card-h"><div><h2 id="fc-h">Q${h.q} <span class="def" tabindex="0" data-tip-h="Forecast" data-tip="Closed won in the quarter + Commit (L1 deals with an expected close in the quarter).">forecast</span></h2><p>${past ? 'Bookings compared with target' : 'Closed won + commit, compared with target'}</p></div></div>
+    <div class="hero-num"><span class="big">${moneyBig(headline)}</span></div>
+    <div class="v2-of">${past ? 'booked' : 'won + commit'}${h.target != null ? ` of <b>${money(h.target)}</b> target` : ''}</div>
+    <p class="sum-what">${sowhat}</p>
+    <div class="fbar" role="img" aria-label="Closed won ${money(h.won)}, commit ${money(h.commit)}, best case ${money(h.best)}, pipeline ${money(h.pipe)}${h.target != null ? `, target ${money(h.target)}` : ''}">
+      <div class="fbar-track">
+        ${h.won ? `<i class="c-won" style="width:${w(h.won)}" data-tip-h="Closed won" data-tip="${money(h.won)}"></i>` : ''}
+        ${h.commit ? `<i class="c-commit" style="width:${w(h.commit)}" data-tip-h="Commit · L1" data-tip="${money(h.commit)}"></i>` : ''}
+        ${h.best ? `<i class="c-best" style="width:${w(h.best)}" data-tip-h="Best case · L2" data-tip="${money(h.best)}"></i>` : ''}
+        ${h.pipe ? `<i class="c-pipe" style="width:${w(h.pipe)}" data-tip-h="Pipeline · L3" data-tip="${money(h.pipe)}"></i>` : ''}
+      </div>
+      ${h.target != null ? `<div class="fbar-target" style="left:${w(h.target)}"><span>Target</span></div>` : ''}
+    </div>
+    <div class="sum-legend">
+      ${cat('c-won', 'Closed won', money(h.won))}
+      ${cat('c-commit', 'Commit', money(h.commit), 'L1 deals: commercial negotiation and contract finalization.')}
+      ${cat('c-best', 'Best case', money(h.best), 'L2 deals: proposal preparation and submission.')}
+      ${cat('c-pipe', 'Pipeline', money(h.pipe), 'L3 deals: early-stage opportunities.')}
+    </div>
+  </section>`;
+}
+
+function ringCard(h) {
+  const past = h.q < CUR_Q;
+  const headline = past ? h.won : h.forecast;
+  const p = h.target ? pct(headline, h.target) : null;
+  const gap = h.target != null ? headline - h.target : null;
+  const remaining = h.target != null ? Math.max(h.target - h.won, 0) : null;
+  const coverage = remaining ? h.openGross / remaining : null;
+  const R = 62, C = 2 * Math.PI * R, frac = p == null ? 0 : Math.min(p, 100) / 100;
+  const ticks = Array.from({ length: 60 }, (_, i) => { const a = (i / 60) * 2 * Math.PI - Math.PI / 2, on = i / 60 < frac;
+    return `<line x1="${(90 + 76 * Math.cos(a)).toFixed(1)}" y1="${(90 + 76 * Math.sin(a)).toFixed(1)}" x2="${(90 + 84 * Math.cos(a)).toFixed(1)}" y2="${(90 + 84 * Math.sin(a)).toFixed(1)}" class="${on ? 'on' : ''}"/>`; }).join('');
+  const mini = (k, v, cls = '') => `<div class="mini"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  return `
+  <section class="card s3 ring-card" aria-labelledby="rg-h">
+    <div class="card-h"><div><h2 id="rg-h">Q${h.q} progress</h2><p>${past ? 'Booked' : 'Won + commit'} as a share of target</p></div></div>
+    <div class="ring" role="img" aria-label="${p == null ? 'No target for this filter' : `${p}% of target`}">
+      <svg viewBox="0 0 180 180"><g class="ticks">${ticks}</g>
+        <circle cx="90" cy="90" r="${R}" class="trk"/>
+        <circle cx="90" cy="90" r="${R}" class="val" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 90 90)"/></svg>
+      <div class="ring-c"><b>${p == null ? 'N/A' : p + '%'}</b><span>${p == null ? 'No target for this filter' : 'of target'}</span></div>
+    </div>
+    <div class="minis">
+      ${mini('<span class="def" tabindex="0" data-tip-h="Weighted forecast" data-tip="Σ value × probability for open deals closing in this quarter.">Weighted forecast</span>', money(h.weighted))}
+      ${mini(gap != null && gap >= 0 ? 'Ahead of target' : 'Gap to target', gap == null ? 'N/A' : money(Math.abs(gap)), gap == null ? '' : gap < 0 ? 'neg' : 'pos')}
+      ${mini('<span class="def" tabindex="0" data-tip-h="Pipeline coverage" data-tip="Open pipeline closing this quarter ÷ target still to win. Below 1× means even winning every open deal would not reach target.">Coverage</span>', past ? '—' : coverage == null ? (h.target == null ? 'N/A' : 'Met') : coverage.toFixed(1) + '×')}
+      ${mini('Open deals in quarter', h.n)}
+    </div>
+  </section>`;
+}
+
+// Pipeline mix as three chunky pills (one per forecast category), percentages above, values below.
+function mixPills(list) {
+  const tot = list.reduce((s, o) => s + o.value, 0);
+  const c = CODES.map(([code, cat, cls]) => { const os = list.filter(o => o.code === code); return { code, cat, cls, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; });
+  const isOn = (code) => S.drill && S.drill.type === 'code' && S.drill.v === code;
+  const anyOn = S.drill && S.drill.type === 'code';
+  const top = c.slice().sort((a, b) => b.g - a.g)[0];
+  const pills = c.filter(x => x.g).map(x => `
+    <button class="mp ${isOn(x.code) ? 'on' : ''} ${anyOn && !isOn(x.code) ? 'dim' : ''}" style="flex:${Math.max(x.g / tot, .1)}" data-act="drill" data-type="code" data-v="${x.code}" aria-pressed="${isOn(x.code)}"
+      data-tip-html="<b>${x.cat} · ${x.code}</b><div class='row'><span>Gross</span><span>${money(x.g)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div><div class='row'><span>Deals</span><span>${x.n}</span></div>">
+      <span class="mp-p">${pct(x.g, tot)}%</span><span class="mp-b ${x.cls}"></span></button>`).join('');
+  const cols = c.map(x => `
+    <button class="mix-c click ${isOn(x.code) ? 'on' : ''}" data-act="drill" data-type="code" data-v="${x.code}" aria-pressed="${isOn(x.code)}">
+      <span class="mix-k"><i class="${x.cls}"></i>${x.cat}<span class="code">${x.code}</span></span>
+      <span class="mix-v">${money(x.g)}</span>
+      <span class="mix-s">${money(x.w)} weighted · ${x.n} deal${x.n === 1 ? '' : 's'}</span>
+    </button>`).join('');
+  return `
+  <section class="card mix v2-mix" aria-labelledby="mix-h">
+    <div class="card-h"><div><h2 id="mix-h">Pipeline mix</h2><p>Share of open value by forecast category · select one to see its deals</p></div></div>
+    ${tot ? `<div class="mp-row">${pills}</div><div class="mix-cols">${cols}</div>
+    <p class="so-what"><b>${pct(top.g, tot)}%</b> of open value is ${top.code === 'L3' ? 'still early stage (L3)' : top.code === 'L2' ? 'at proposal stage (L2)' : 'in negotiation or contract (L1)'}.</p>` : emptyMsg()}
+  </section>`;
+}
+
+// Days in stage as dot columns: one dot = a fixed slice of open value, so column height reads as value.
+function ageDots(list) {
+  const tot = list.reduce((s, o) => s + o.value, 0) || 1;
+  const b = [0, 1, 2, 3].map(i => { const os = list.filter(o => ageBucket(o.days) === i); return { i, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; });
+  const maxG = Math.max(1, ...b.map(x => x.g));
+  const COLS = 10, ROWS = 7, CAP = COLS * ROWS;
+  const unit = [25e3, 50e3, 100e3, 250e3, 500e3, 1e6].find(u => maxG / u <= CAP) || 2e6;
+  const cols = b.map(x => {
+    const on = S.drill && S.drill.type === 'age' && S.drill.v === x.i, key = x.i === 3;
+    const filled = x.g ? Math.max(1, Math.round(x.g / unit)) : 0;
+    let dots = '';
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) dots += `<i class="${(ROWS - 1 - r) * COLS + c < filled ? 'f' : ''}"></i>`;
+    return `<button class="ad click ${on ? 'on' : ''} ${key ? 'key' : ''} ${S.drill && S.drill.type === 'age' && !on ? 'dim' : ''}" data-act="drill" data-type="age" data-v="${x.i}" aria-pressed="${on}"
+      data-tip-html="<b>${AGE_NAMES[x.i]} in stage</b><div class='row'><span>Gross</span><span>${money(x.g)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div><div class='row'><span>Deals</span><span>${x.n}</span></div>">
+      <span class="ad-g" style="grid-template-columns:repeat(${COLS},1fr)">${dots}</span>
+      <span class="ad-l">${AGE_NAMES[x.i].replace(' days', 'd').replace('Over 90d', '90d +')}</span>
+      <span class="ad-v">${money(x.g)}</span><span class="ad-s ${key && x.n ? 'hot' : ''}">${x.n} deal${x.n === 1 ? '' : 's'}</span>
+    </button>`;
+  }).join('');
+  return `
+  <section class="card v2-age" aria-labelledby="ag-h">
+    <div class="card-h"><div><h2 id="ag-h">Days in stage</h2><p>Open value by time in the current stage · select a column to see its deals</p></div>
+      <div class="r legend"><span><i class="ad-key"></i>1 dot = ${money(unit)}</span></div></div>
+    ${list.length ? `<div class="ad-row">${cols}</div><p class="so-what"><b>${pct(b[3].g, tot)}%</b> has sat over 90 days.</p>` : emptyMsg()}
+  </section>`;
+}
+
+const avatar = CRM.avatar;
 
 /* ---------- Controls ---------- */
 const $ = (s) => document.querySelector(s);
@@ -632,7 +773,7 @@ $('#more-done').addEventListener('click', () => setMore(false));
 document.addEventListener('click', () => setMore(false));
 document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; setMore(false); if (S.drill) { S.drill = null; render(); } });
 
-page.addEventListener('click', (e) => {
+document.querySelector('.main').addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a) return;
   const act = a.dataset.act;
   if (act === 'drill') {
@@ -647,7 +788,7 @@ page.addEventListener('click', (e) => {
   else if (act === 'tab') { S.tab = a.dataset.v; S.page = 1; render(); }
   else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); keepTable(); }
   else if (act === 'page') { S.page = +a.dataset.v; render(); keepTable(); }
-  else if (act === 'open') { const o = OPPS.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
   else if (act === 'si') toast('Would open Sales initiatives with these filters applied');
   else if (act === 'reset') resetAll();
   else if (act === 'fy-back') { S.fy = '2627'; render(); }
@@ -670,6 +811,7 @@ $('#export').addEventListener('click', () => {
 });
 
 CRM.renderShell('pipeline');
+{ const hr = new Date().getHours(); $('#hello').textContent = `Good ${hr < 12 ? 'morning' : hr < 18 ? 'afternoon' : 'evening'}, ${ME.split(' ')[0]}`; }
 CRM.watchSticky($('#filters'));
 render();
 </script>

@@ -5,39 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales initiatives · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="assets/crm.css?v=20261113x">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261113x">
+<link rel="stylesheet" href="assets/crm.css?v=20261116i">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261116c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261116j">
 <style>
 /* ---------- Page: Sales initiatives (list page) ---------- */
 /* Search field in the filter row */
 .search { position: relative; display: inline-flex; align-items: center; height: 36px; width: 260px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); }
 .search:focus-within { border-color: var(--deep); }
 .search svg { position: absolute; left: 11px; width: 16px; height: 16px; fill: none; stroke: var(--t3); stroke-width: 2; stroke-linecap: round; }
-.search input { width: 100%; height: 100%; border: 0; background: none; padding: 0 12px 0 34px; font-size: 13px; outline: none; }
+.search input { width: 100%; height: 100%; border: 0; background: none; padding: 0 12px 0 34px; font-size: 14px; outline: none; }
 .search input::placeholder { color: #8a8f96; }
 
 /* Lifecycle strip: status tiles filter the list (list-page behaviour, as in the old CRM) */
-.life { display: grid; grid-template-columns: 1.15fr repeat(3, 1fr) 14px 1fr 1fr 14px 1fr; align-items: stretch; padding: 0; }
-.lt { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 20px 24px; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; position: relative; }
-.lt:hover { background: #fbfcfe; }
+/* Lifecycle: three related groups, each its own card. Open = total + its three statuses (in order);
+   Closed = won + lost; All = everything. Selected tile = soft fill only (no underline). */
+.life-g { padding: 8px; gap: 0; }
+.life-h { display: flex; align-items: baseline; gap: 8px; padding: 10px 16px 4px; font-size: 12px; font-weight: 600; color: var(--ink); }
+.life-h span { font-weight: 400; color: var(--t3); }
+.life-cells { display: grid; gap: 4px; align-items: stretch; flex: 1; }
+.life-open .life-cells { grid-template-columns: 1.1fr 1px 1fr 14px 1fr 14px 1fr; }
+.life-closed .life-cells { grid-template-columns: 1fr 1fr; }
+.life-all .life-cells { grid-template-columns: 1fr; }
+.lt { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 12px 16px 14px; border: 0; border-radius: 12px; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.lt:hover { background: var(--hover); }
 .lt.on { background: var(--info-bg); }
-.lt.on::after { content: ""; position: absolute; left: 24px; right: 24px; bottom: 0; height: 2px; border-radius: 2px; background: var(--deep); }
-.lt:first-child { border-radius: var(--r-card) 0 0 var(--r-card); }
-.lt:last-child { border-radius: 0 var(--r-card) var(--r-card) 0; }
 .lt-k { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--t3); white-space: nowrap; }
 .lt-k i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .lt-n { font-size: 28px; font-weight: 400; letter-spacing: -.03em; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; }
 .lt-v { font-size: 12px; color: var(--t3); font-variant-numeric: tabular-nums; }
 .lt-v b { font-weight: 500; color: var(--t1); }
-.lt + .lt { border-left: 1px solid var(--line); }
+.life-div { align-self: stretch; margin: 10px 0; background: var(--line); }
 .life-arrow { display: grid; place-items: center; color: var(--line-3); }
 .life-arrow svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.life-arrow + .lt { border-left: 0; }
 .dot-pro { background: #a8dcf4; } .dot-lead { background: #00A0E4; } .dot-opp { background: var(--deep); } .dot-won { background: var(--ink); } .dot-lost { background: var(--chart-gray); } .dot-all { background: var(--t3); }
 
 /* List toolbar inside the card */
 .lt-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-.lt-bar .sum { font-size: 13px; color: var(--t2); }
+.lt-bar .sum { font-size: 14px; color: var(--t2); }
 .lt-bar .sum b { font-weight: 600; color: var(--ink); }
 .lt-bar .sp { flex: 1; }
 .tog { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--surface); font: inherit; font-size: 12px; color: var(--t2); cursor: pointer; }
@@ -76,42 +81,68 @@
 .kb-h small { margin-left: auto; font-weight: 400; color: var(--t3); font-variant-numeric: tabular-nums; }
 .kb-c { display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .kb-c:hover { border-color: var(--line-3); box-shadow: 0 2px 8px rgb(16 24 42 / 6%); }
-.kb-c b { font-size: 13px; font-weight: 500; color: var(--ink); line-height: 1.35; }
+.kb-c b { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.35; }
 .kb-c small { font-size: 12px; color: var(--t3); }
-.kb-c .kb-v { display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.kb-c .kb-v { display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px; font-size: 14px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .kb-c .kb-v span { font-size: 12px; font-weight: 400; color: var(--t3); }
+.v2 .kb-c { border-radius: 14px; }
+/* Selected tile: same soft fill as Pipeline mix on white cards; white (no border) on the tinted Open card */
+.v2 .lt.on { background: var(--hover); box-shadow: none; }
+.v2 .life-open .lt.on { background: #fff; }
 .kb-empty { padding: 16px 4px; font-size: 12px; color: var(--t3); text-align: center; }
 
-/* Funnel: one row per sub-stage, bar = value, grouped by main status */
-.fn { display: flex; flex-direction: column; }
-.fn-g { display: flex; align-items: center; gap: 8px; padding: 14px 0 6px; font-size: 12px; color: var(--t3); }
-.fn-g:first-child { padding-top: 0; }
-.fn-r { display: grid; grid-template-columns: 220px minmax(0, 1fr) 64px 88px 14px; align-items: center; gap: 16px; width: calc(100% + 16px); margin: 0 -8px; padding: 8px; border: 0; border-radius: 10px; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
-.fn-r:hover { background: var(--hover); }
-.fn-r.zero { cursor: default; } .fn-r.zero:hover { background: none; }
-.fn-n { font-size: 13px; font-weight: 500; color: var(--t1); }
-.fn-r.zero .fn-n, .fn-r.zero .fn-c, .fn-r.zero .fn-v { color: var(--t3); font-weight: 400; }
-.fn-bar { height: 12px; border-radius: 4px; background: var(--chart-track); position: relative; }
-.fn-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
-.fn-c, .fn-v { text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; }
-.fn-c { color: var(--t3); } .fn-v { font-weight: 500; color: var(--ink); }
+/* Lifecycle funnel (same structure as CRMpulse): one band per stage, width = initiatives that reached it,
+   "here now" + avg days on the right, conversion between bands, KPI tiles beside, the selected band's records below. */
+.fn-wrap { display: flex; flex-direction: column; gap: 20px; } /* KPI row on top, funnel below */
+.fn-h { margin: 0 0 2px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.fn-p { margin: 0; font-size: 12px; color: var(--t3); }
+/* Drop-off columns (Mixpanel style): solid = reached this stage, faint cap = lost since the stage before */
+.fnc-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.fnc { display: flex; flex-direction: column; align-items: stretch; min-width: 0; padding: 10px 10px 12px; border: 1px solid transparent; border-radius: 14px; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.fnc:hover { background: var(--hover); }
+.fnc.on { background: var(--hover); } /* fill only, same as Pipeline mix */
+.fnc-plot { position: relative; height: 200px; display: flex; flex-direction: column; justify-content: flex-end; }
+.fnc-n { margin-bottom: 6px; text-align: center; font-size: 14px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.fnc-drop { border-radius: 6px 6px 0 0; opacity: .22; }
+.fnc-bar { border-radius: 0 0 6px 6px; transition: height .45s var(--ease); }
+.fnc-drop + .fnc-bar { border-radius: 0 0 6px 6px; }
+.fnc-bar:first-child { border-radius: 6px; }
+.fnc-conv { margin-top: 8px; text-align: center; font-size: 12px; color: var(--t3); }
+.fnc-conv b { font-weight: 600; color: var(--ok); } .fnc-conv b.lo { color: var(--warn); }
+.fnc-k { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.fnc-k small { display: block; font-size: 12px; font-weight: 400; color: var(--t3); }
+.fnc-s { margin-top: 6px; font-size: 12px; color: var(--t3); line-height: 1.45; }
+.fnc-s b { font-weight: 600; color: var(--ink); }
+.fn-note { margin: 14px 0 0; font-size: 12px; color: var(--t3); }
+.fn-kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.fk { padding: 14px 16px; border: 1px solid var(--line-2); border-radius: 14px; background: var(--surface); }
+.fk-k { font-size: 12px; color: var(--t3); }
+.fk-v { margin-top: 6px; font-size: 24px; font-weight: 500; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.fk-v.neg { color: var(--danger); } .fk-v.warn { color: var(--warn); }
+.fk-s { margin-top: 4px; font-size: 12px; color: var(--t3); }
+.fn-list { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.fn-list-h { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.fn-list-h b { font-size: 15px; font-weight: 600; color: var(--ink); }
+.fn-list-h span { font-size: 12px; color: var(--t3); }
+.tbl.fnt col.c-n { width: 34%; } .tbl.fnt col.c-s { width: 24%; } .tbl.fnt col.c-o { width: 18%; } .tbl.fnt col.c-v { width: 12%; } .tbl.fnt col.c-d { width: 12%; }
 
 .filter-chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 6px 0 10px; border-radius: 999px; background: var(--midnight); color: #fff; font-size: 12px; }
 .filter-chip button { display: grid; place-items: center; width: 18px; height: 18px; border: 0; border-radius: 50%; background: rgb(255 255 255 / 18%); color: #fff; cursor: pointer; padding: 0; }
 .filter-chip svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2; fill: none; }
 </style>
 </head>
-<body>
+<body class="v2">
 <div class="app">
   <aside class="side" id="side" aria-label="Navigation"></aside>
 
   <main class="main">
-    <header class="page-head">
-      <div>
+    <header class="v2-head">
+      <div class="v2-hello">
+        <div class="v2-top"><span class="v2-eyebrow">Sales</span></div>
         <h1>Sales initiatives</h1>
         <p>Prospects, leads and opportunities as one record, from first interest to closure · USD</p>
       </div>
-      <div class="acts">
+      <div class="acts" style="display:flex;gap:8px">
         <button class="btn" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export to Excel</button>
         <button class="btn primary" id="new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New sales initiative</button>
       </div>
@@ -141,13 +172,13 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261113x"></script>
-<script src="assets/crm-data.js?v=20261113x"></script>
+<script src="assets/crm.js?v=20261116b"></script>
+<script src="assets/crm-data.js?v=20261116a"></script>
 <script>
 /* Sales initiatives — the list behind every number on the dashboards (requirement 5.12: list, kanban and funnel views). */
 const { money, moneyBig, icon, toast } = CRM;
 const chev = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
-const S = { q: '', mine: 'all', team: '', close: '', owners: [], geo: [], status: 'open', attn: false, view: 'list', sort: 'value', page: 1, stage: '' };
+const S = { q: '', mine: 'all', team: '', close: '', owners: [], geo: [], status: 'open', attn: false, view: 'list', sort: 'value', page: 1, stage: '', band: '' };
 const PER_PAGE = 10;
 const STATUS = [
   ['open', 'All open', 'dot-all', o => o.kind === 'open'],
@@ -205,21 +236,35 @@ function render() {
     <div class="grid">
       ${zoneHead(1, 'Lifecycle', 'Prospect → lead → opportunity → closed · select a status to filter the list')}
       ${lifeStrip(b)}
-      ${zoneHead(2, 'Initiatives', S.view === 'list' ? 'One row per initiative · select a row to open it' : S.view === 'kanban' ? 'Grouped by main status and funnel code' : 'Every configured sub-stage, in order · select a stage to list it')}
+      ${zoneHead(2, 'Initiatives', S.view === 'list' ? 'One row per initiative · select a row to open it' : S.view === 'kanban' ? 'Grouped by main status and funnel code' : 'How far initiatives get · the status tiles above do not apply here')}
       ${listCard(b)}
     </div>`;
   if (!render.done) { page.querySelectorAll('.card, .zone').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
 }
 
 function lifeStrip(b) {
-  const tile = ([k, n, dot, f]) => {
-    const r = b.filter(f), v = r.reduce((s, o) => s + o.value, 0);
+  const sum = (f) => { const r = b.filter(f); return [r.length, r.reduce((s, o) => s + o.value, 0)]; };
+  const tile = ([k, n, dot, f], short) => {
+    const [c, v] = sum(f);
     return `<button class="lt ${S.status === k ? 'on' : ''}" data-act="status" data-v="${k}" aria-pressed="${S.status === k}">
-      <span class="lt-k"><i class="${dot}"></i>${n}</span><span class="lt-n">${r.length}</span><span class="lt-v"><b>${money(v)}</b></span></button>`;
+      <span class="lt-k"><i class="${dot}"></i>${short || n}</span><span class="lt-n">${c}</span><span class="lt-v"><b>${money(v)}</b></span></button>`;
   };
   const arrow = `<span class="life-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>`;
   const [open, pro, lead, opp, won, lost, all] = STATUS;
-  return `<section class="card s12 life" aria-label="Initiatives by status">${tile(open)}${tile(pro)}${tile(lead)}${tile(opp)}${arrow}${tile(won)}${tile(lost)}${arrow}${tile(all)}</section>`;
+  const [, closedV] = sum(o => o.kind !== 'open'), closedN = sum(o => o.kind !== 'open')[0];
+  return `
+    <section class="card s7 life-g life-open tint" aria-label="Open initiatives">
+      <div class="life-h">Open<span>in progress, from first interest to opportunity</span></div>
+      <div class="life-cells">${tile(open, 'All open')}<span class="life-div" aria-hidden="true"></span>${tile(pro)}${arrow}${tile(lead)}${arrow}${tile(opp, 'Opportunities')}</div>
+    </section>
+    <section class="card s3 life-g life-closed" aria-label="Closed initiatives">
+      <div class="life-h">Closed<span>${closedN} · ${money(closedV)}</span></div>
+      <div class="life-cells">${tile(won, 'Won')}${tile(lost, 'Lost')}</div>
+    </section>
+    <section class="card s2 life-g life-all" aria-label="All initiatives">
+      <div class="life-h">Total<span>all time</span></div>
+      <div class="life-cells">${tile(all)}</div>
+    </section>`;
 }
 
 function listCard(b) {
@@ -227,7 +272,7 @@ function listCard(b) {
   const g = rows.reduce((s, o) => s + o.value, 0), w = rows.reduce((s, o) => s + (o.w || 0), 0);
   const attnN = inStatus(b).filter(o => needs(o).length).length;
   const label = STATUS.find(s => s[0] === S.status)[1];
-  const body = S.view === 'list' ? listView(rows) : S.view === 'kanban' ? kanbanView(rows) : funnelView(inStatus(b));
+  const body = S.view === 'list' ? listView(rows) : S.view === 'kanban' ? kanbanView(rows) : funnelView(b);
   return `
   <section class="card s12" id="list-card" aria-label="${label}">
     <div class="lt-bar">
@@ -280,7 +325,7 @@ function listView(rows) {
           <td>${ell(o.name, 't-main')}${ell(`${o.id} · ${o.acc}`, 't-sub')}</td>
           <td><div class="stg2">${stagePill(o)}${o.kind === 'open' ? `<span class="ell" title="${esc(o.sub)}">${o.sub}</span>${o.code ? `<span class="code">${o.code}</span>` : ''}` : `<span class="muted">${o.kind === 'won' ? 'Closed won · L0' : 'Closed lost'}</span>`}</div>
             ${o.kind === 'open' ? `${prog(o)}<div class="t-sub ${o.days > 30 ? 'hot' : ''}" style="margin-top:4px">${o.days} days in stage</div>` : `<div class="t-sub">${o.kind === 'lost' ? esc(o.reason) : 'Booked'}</div>`}</td>
-          <td>${ell(o.owner)}${ell(o.team, 't-sub')}</td>
+          <td><div class="own">${CRM.avatar(o.owner)}<div class="own-t">${ell(o.owner)}${ell(o.team, 't-sub')}</div></div></td>
           <td class="r num"><div class="t-val">${money(o.value)}</div>${local ? `<div class="t-sub">${local}</div>` : ''}</td>
           <td class="r num">${o.prob}%</td>
           <td class="num">${o.close ? `<span class="${passed ? 'hot' : ''}">${fmtDate(o.close)}</span>` : '<span class="muted">Not set</span>'}</td>
@@ -315,20 +360,80 @@ function kanbanView(rows) {
   }).join('')}</div>`;
 }
 
-function funnelView(rows) {
-  if (!rows.length) return emptyMsg();
-  const groups = [['Prospect', PRE_STAGES.Prospect, 'dot-pro', '#a8dcf4'], ['Lead', PRE_STAGES.Lead, 'dot-lead', '#00A0E4'], ['Opportunity', STAGES.map(x => x.name), 'dot-opp', 'var(--deep)'], ['Closed', ['Closed won', 'Closed lost'], 'dot-won', 'var(--ink)']];
-  const max = Math.max(1, ...ALL_STEPS.concat(['Closed won', 'Closed lost']).map(st => rows.filter(o => o.sub === st).reduce((s, o) => s + o.value, 0)));
-  return `<div class="fn">${groups.map(([g, steps, dot, color]) => {
-    const inG = rows.filter(o => steps.includes(o.sub));
-    if (g === 'Closed' && !inG.length) return '';
-    return `<div class="fn-g"><span class="st ${g === 'Closed' ? 'won' : g}">${g}</span>${inG.length} · ${money(inG.reduce((s, o) => s + o.value, 0))}</div>` + steps.map(st => {
-      const r = rows.filter(o => o.sub === st), v = r.reduce((s, o) => s + o.value, 0);
-      return `<button class="fn-r ${r.length ? '' : 'zero'}" ${r.length ? `data-act="stage" data-v="${esc(st)}"` : 'disabled'}>
-        <span class="fn-n">${st}</span><span class="fn-bar">${v ? `<i style="width:${Math.max(v / max * 100, 1.5).toFixed(1)}%;background:${st === 'Closed lost' ? 'var(--chart-gray)' : color}"></i>` : ''}</span>
-        <span class="fn-c">${r.length} deal${r.length === 1 ? '' : 's'}</span><span class="fn-v">${r.length ? money(v) : '—'}</span>${r.length ? chev : '<span></span>'}</button>`;
-    }).join('');
+// Lifecycle funnel. "Reached" = initiatives whose furthest stage is at or past the band (a skipped stage still counts as
+// passed); lost initiatives count up to where they got and are never "here now". Uses every status, so the status tiles don't apply.
+const BANDS = [
+  { k: 'pro', n: 'Prospect', fill: '#a8dcf4', f: o => o.kind === 'open' && o.status === 'Prospect' },
+  { k: 'lead', n: 'Lead', fill: '#7fcdf0', f: o => o.kind === 'open' && o.status === 'Lead' },
+  { k: 'L3', n: 'Opportunity', sub: 'L3 · Pipeline', fill: '#5cc3ee', f: o => o.kind === 'open' && o.code === 'L3' },
+  { k: 'L2', n: 'Opportunity', sub: 'L2 · Best case', fill: '#00A0E4', f: o => o.kind === 'open' && o.code === 'L2' },
+  { k: 'L1', n: 'Opportunity', sub: 'L1 · Commit', fill: '#0042B7', dk: true, f: o => o.kind === 'open' && o.code === 'L1' },
+  { k: 'won', n: 'Closed won', fill: '#052870', dk: true, f: o => o.kind === 'won' }
+];
+const BAND_IX = { Prospect: 0, Lead: 1, L3: 2, L2: 3, L1: 4 };
+function furthest(o) { if (o.kind === 'won') return 5; if (o.kind === 'lost') return BAND_IX[o.reached || 'L3']; return o.status === 'Opportunity' ? BAND_IX[o.code] : BAND_IX[o.status]; }
+function funnelView(b) {
+  if (!b.length) return emptyMsg();
+  const reached = BANDS.map((_, i) => b.filter(o => furthest(o) >= i).length);
+  const max = Math.max(1, reached[0]);
+  if (!S.band || !BANDS.some(x => x.k === S.band)) S.band = (b.some(BANDS[2].f) ? BANDS[2] : BANDS.find(x => b.some(x.f)) || BANDS[2]).k;
+  const H = 200 - 26; // plot height minus the number label
+  const bands = `<div class="fnc-row">${BANDS.map((x, i) => {
+    const now = b.filter(x.f), v = now.reduce((s2, o) => s2 + o.value, 0);
+    const avg = now.length && x.k !== 'won' ? Math.round(now.reduce((s2, o) => s2 + (o.days || 0), 0) / now.length) : null;
+    const prev = i ? reached[i - 1] : reached[0], hb = reached[i] / max * H, hd = (prev - reached[i]) / max * H;
+    const conv = i && prev ? pct(reached[i], prev) : null;
+    return `<button class="fnc ${S.band === x.k ? 'on' : ''}" data-act="band" data-v="${x.k}" aria-pressed="${S.band === x.k}"
+        data-tip-html="<b>${x.n}${x.sub ? ' · ' + x.sub : ''}</b><div class='row'><span>Reached</span><span>${reached[i]}</span></div>${i ? `<div class='row'><span>Lost since ${BANDS[i - 1].sub ? BANDS[i - 1].sub.split(' · ')[0] : BANDS[i - 1].n}</span><span>${prev - reached[i]}</span></div>` : ''}<div class='row'><span>Here now</span><span>${now.length} · ${money(v)}</span></div>">
+        <span class="fnc-plot"><span class="fnc-n">${reached[i]}</span>${hd > 0 ? `<span class="fnc-drop" style="height:${hd.toFixed(1)}px;background:${x.fill}"></span>` : ''}<span class="fnc-bar" style="height:${Math.max(hb, 2).toFixed(1)}px;background:${x.fill}"></span></span>
+        <span class="fnc-conv">${conv == null ? 'reached' : `<b class="${conv < 70 ? 'lo' : ''}">${conv}%</b> moved on`}</span>
+        <span class="fnc-k">${x.n}<small>${x.sub || '&nbsp;'}</small></span>
+        <span class="fnc-s"><b>${now.length}</b> here now · ${money(v)}<br>${x.k === 'won' ? 'closed' : avg == null ? 'none here now' : `avg ${avg} days`}</span>
+      </button>`;
   }).join('')}</div>`;
+  const won = b.filter(o => o.kind === 'won'), lost = b.filter(o => o.kind === 'lost'), open = b.filter(o => o.kind === 'open');
+  const ov = open.reduce((s, o) => s + o.value, 0), ow = open.reduce((s, o) => s + o.w, 0);
+  const avgDays = open.length ? Math.round(open.reduce((s, o) => s + (o.days || 0), 0) / open.length) : null;
+  const attn = open.filter(o => needs(o).length).length;
+  const fk = (k, v, sub, cls = '') => `<div class="fk"><div class="fk-k">${k}</div><div class="fk-v ${cls}">${v}</div><div class="fk-s">${sub}</div></div>`;
+  const band = BANDS.find(x => x.k === S.band), rows = b.filter(band.f).sort((a2, b2) => b2.value - a2.value);
+  const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE)); S.page = Math.min(S.page, pages);
+  const shown = rows.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
+  return `
+    <div class="fn-wrap">
+      <div>
+          <h3 class="fn-h">Lifecycle funnel</h3>
+          <p class="fn-p">How many initiatives reached each stage · solid = reached, faint = lost since the stage before · select a stage to list what's in it now</p>
+      </div>
+      <div class="fn-kpis">
+        ${fk('Win rate', won.length + lost.length ? pct(won.length, won.length + lost.length) + '%' : '—', `${won.length} won · ${lost.length} lost`)}
+        ${fk('Lost', lost.length, `${money(lost.reduce((s, o) => s + o.value, 0))} lost value`, lost.length ? 'neg' : '')}
+        ${fk('Open pipeline', money(ov), `${open.length} open initiatives`)}
+        ${fk('<span class="def" tabindex="0" data-tip="Σ value × probability.">Weighted</span>', money(ow), 'Value × probability')}
+        ${fk('Avg days in stage', avgDays == null ? '—' : `${avgDays} days`, 'Open initiatives')}
+        ${fk('<span class="def" tabindex="0" data-tip="No next step, follow-up overdue, close date passed, or more than 30 days in the stage.">Need attention</span>', attn, 'Open initiatives', attn ? 'warn' : '')}
+      </div>
+      <div>
+        ${bands}
+        <p class="fn-note"><span class="def" tabindex="0" data-tip="Counted from each initiative's stage history.">“Reached”</span> counts initiatives whose furthest recorded stage is at or past the band, so a skipped stage still counts as passed. Lost initiatives (${lost.length}) count up to where they got and are never “here now”.</p>
+      </div>
+    </div>
+    <div class="fn-list">
+      <div class="fn-list-h"><b>In ${band.n}${band.sub ? ' · ' + band.sub.split(' · ')[0] : ''} now</b><span>${rows.length} initiative${rows.length === 1 ? '' : 's'} · ${money(rows.reduce((s, o) => s + o.value, 0))} · select a row to open it</span></div>
+      ${rows.length ? `<div class="tbl-wrap"><table class="tbl fnt">
+        <colgroup><col class="c-n"><col class="c-s"><col class="c-o"><col class="c-v"><col class="c-d"></colgroup>
+        <thead><tr><th>Initiative</th><th>Stage</th><th>Owner</th><th class="r">Value</th><th class="r">${band.k === 'won' ? 'Closed' : 'Days in stage'}</th></tr></thead>
+        <tbody>${shown.map(o => `<tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
+          <td>${ell(o.name, 't-main')}${ell(o.acc, 't-sub')}</td><td>${ell(o.sub)}</td><td><div class="own">${CRM.avatar(o.owner)}<div class="own-t">${ell(o.owner)}</div></div></td>
+          <td class="r num t-val">${money(o.value)}</td>
+          <td class="r num">${band.k === 'won' ? fmtDate(o.close) : `<span class="${o.days > 90 ? 'hot' : ''}">${o.days} days</span>`}</td></tr>`).join('')}</tbody>
+      </table></div>
+      ${pages > 1 ? `<div class="pager"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, rows.length)} of ${rows.length}</span><span class="sp"></span>
+        <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
+        ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}">${i + 1}</button>`).join('')}
+        <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>` : ''}`
+      : `<div class="empty"><b>Nothing here now</b>No initiatives are in this stage under the current filters.</div>`}
+    </div>`;
 }
 
 function emptyMsg() {
@@ -382,11 +487,12 @@ page.addEventListener('click', (e) => {
   if (act === 'status') { S.status = a.dataset.v; S.page = 1; S.stage = ''; render(); }
   else if (act === 'attn') { S.attn = !S.attn; S.page = 1; render(); }
   else if (act === 'view') { S.view = a.dataset.v; S.page = 1; render(); }
+  else if (act === 'band') { S.band = a.dataset.v; S.page = 1; render(); }
   else if (act === 'stage') { S.stage = a.dataset.v; S.view = 'list'; S.page = 1; render(); }
   else if (act === 'unstage') { S.stage = ''; S.page = 1; render(); }
   else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
   else if (act === 'page') { S.page = +a.dataset.v; render(); }
-  else if (act === 'open') { const o = INITS.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
   else if (act === 'reset') resetAll();
 });
 page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-act]')) e.target.click(); });

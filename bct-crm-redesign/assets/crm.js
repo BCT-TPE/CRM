@@ -233,5 +233,54 @@
     new IntersectionObserver(([en]) => el.classList.toggle('stuck', !en.isIntersecting)).observe(s);
   }
 
-  window.CRM = { icon, renderShell, money, moneyBig, toast, watchSticky };
+  // Custom select: the native <select> stays as the data source (pages keep using .value / 'change'),
+  // but is hidden and driven by a button + listbox styled like the filter popover.
+  const selCheck = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  let selOpen = null;
+  function closeSel() { if (!selOpen) return; selOpen.menu.hidden = true; selOpen.btn.setAttribute('aria-expanded', 'false'); selOpen.wrap.classList.remove('open'); selOpen = null; }
+  function enhanceSelect(sel) {
+    if (sel._enh) return; sel._enh = true;
+    const wrap = sel.closest('.select'); if (!wrap) return;
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'sel-btn';
+    btn.setAttribute('aria-haspopup', 'listbox'); btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-label', sel.getAttribute('aria-label') || '');
+    const menu = document.createElement('div'); menu.className = 'pop sel-pop'; menu.setAttribute('role', 'listbox'); menu.hidden = true;
+    sel.before(btn); wrap.appendChild(menu); sel.hidden = true; sel.tabIndex = -1;
+    const sync = () => { const o = sel.options[sel.selectedIndex]; btn.textContent = o ? o.textContent : ''; };
+    const build = () => {
+      menu.innerHTML = [...sel.options].map((o, i) => `<button type="button" class="sel-opt${i === sel.selectedIndex ? ' on' : ''}" role="option" aria-selected="${i === sel.selectedIndex}" data-i="${i}"><span>${o.textContent}</span>${selCheck}</button>`).join('');
+    };
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    Object.defineProperty(sel, 'value', { get() { return desc.get.call(this); }, set(v) { desc.set.call(this, v); sync(); } });
+    new MutationObserver(sync).observe(sel, { childList: true, subtree: true, attributes: true });
+    sync();
+    const open = () => { closeSel(); build(); menu.hidden = false; wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); selOpen = { menu, btn, wrap };
+      (menu.querySelector('.on') || menu.firstElementChild)?.focus(); };
+    btn.addEventListener('click', (e) => { e.preventDefault(); if (selOpen && selOpen.menu === menu) closeSel(); else open(); });
+    btn.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(); } });
+    menu.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const b = e.target.closest('.sel-opt'); if (!b) return;
+      const i = +b.dataset.i; closeSel(); btn.focus();
+      if (i !== sel.selectedIndex) { sel.selectedIndex = i; sync(); sel.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
+    menu.addEventListener('keydown', (e) => {
+      const items = [...menu.children], k = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(k + 1, items.length - 1)]?.focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[Math.max(k - 1, 0)]?.focus(); }
+      else if (e.key === 'Escape' || e.key === 'Tab') { closeSel(); if (e.key === 'Escape') btn.focus(); }
+    });
+  }
+  document.addEventListener('click', (e) => { if (selOpen && !selOpen.wrap.contains(e.target)) closeSel(); });
+  function enhanceSelects(root) { (root || document).querySelectorAll('.select select').forEach(enhanceSelect); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => enhanceSelects()); else setTimeout(enhanceSelects);
+
+  // Owner avatar: initials on a blue-family tint, fixed per person (styles .av / .av-a…e in theme-v2.css)
+  function avatar(name) {
+    const ini = name.split(/\s+/).map(s => s[0]).slice(0, 2).join('');
+    let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return `<span class="av av-${'abcde'[h % 5]}" aria-hidden="true">${ini}</span>`;
+  }
+
+  window.CRM = { icon, renderShell, money, moneyBig, toast, watchSticky, enhanceSelects, avatar };
 })();

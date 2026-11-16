@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales initiative · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="assets/crm.css?v=20261116i">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261116c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261116j">
+<style>
+/* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
+   Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
+   and a right rail with next steps, account and team. Visual language = the rest of the redesign. */
+.back { display: inline-flex; align-items: center; gap: 6px; margin-top: 28px; font-size: 13px; color: var(--t3); text-decoration: none; }
+.back:hover { color: var(--deep); }
+.back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.back b { font-weight: 500; color: var(--t2); }
+.rec-head { display: flex; align-items: flex-start; gap: 24px; margin: 10px 0 20px; }
+.rec-t { flex: 1; min-width: 0; }
+.rec-t h1 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 8px; font-size: 34px; font-weight: 400; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
+.rec-pills { display: flex; gap: 6px; margin-bottom: 8px; }
+.rec-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--t3); }
+.rec-meta a { color: var(--deep); font-weight: 500; text-decoration: none; }
+.rec-meta a:hover { text-decoration: underline; }
+.rec-acts { display: flex; gap: 8px; flex: none; padding-top: 30px; }
+.btn[aria-disabled="true"] { color: var(--t3); background: var(--field); cursor: not-allowed; }
+.btn.icon-only { width: 36px; padding: 0; justify-content: center; }
+
+.st { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.st.Prospect { background: #e6f5fc; color: #0a6c99; } .st.Lead { background: #d9f0fb; color: #006a99; } .st.Opportunity { background: var(--info-bg); color: var(--deep); }
+.st.won { background: #e7e9ee; color: var(--ink); } .st.lost { background: var(--hover); color: var(--t3); }
+.sub-p { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border: 1px solid var(--line-2); border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--t1); background: var(--surface); white-space: nowrap; }
+
+/* Stage stepper */
+.stepper { display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 16px; }
+.step-k { display: flex; flex-direction: column; flex: none; font-size: 12px; color: var(--t3); }
+.step-k b { font-size: 12px; font-weight: 600; color: var(--deep); letter-spacing: .02em; }
+.steps { flex: 1; min-width: 0; display: flex; }
+.stp { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; padding: 0 10px 0 18px; font-size: 12px; color: var(--t3); background: var(--field);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%); white-space: nowrap; overflow: hidden; }
+.stp:first-child { clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%); border-radius: 8px 0 0 8px; padding-left: 12px; }
+.stp + .stp { margin-left: -6px; }
+.stp span { overflow: hidden; text-overflow: ellipsis; }
+.stp svg { width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.stp.done { background: var(--info-bg); color: var(--deep); }
+.stp.cur { flex: 1.8; background: var(--deep); color: #fff; font-weight: 600; }
+.stp.lost { background: #e7e9ee; color: var(--t1); font-weight: 600; }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 28px; padding: 14px 4px 0; font-size: 14px; color: var(--t3); }
+.facts b { font-weight: 600; color: var(--ink); }
+.facts .hot { color: var(--danger); }
+.attn-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; padding: 0 4px; font-size: 12px; color: var(--t3); }
+
+/* Body: tabs + rail */
+.rec-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; margin-top: 16px; }
+.rec-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.rec-tabs { display: flex; gap: 4px; padding: 6px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line-2); }
+.rtab { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; background: none; font: inherit; font-size: 14px; color: var(--t2); cursor: pointer; }
+.rtab:hover { background: var(--hover); color: var(--ink); }
+.rtab.on { background: var(--deep); color: #fff; font-weight: 500; }
+.rtab .tab-n { background: var(--hover); }
+.rtab.on .tab-n { background: rgb(255 255 255 / 20%); color: #fff; }
+.card-h .r .btn { height: 32px; }
+
+.dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; }
+.dl div { min-width: 0; }
+.dl dt { font-size: 12px; color: var(--t3); }
+.dl dd { margin: 4px 0 0; font-size: 14px; color: var(--ink); }
+.bant { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.bt { display: flex; gap: 10px; padding: 14px; border: 1px solid var(--line-2); border-radius: 12px; }
+.bt i { display: grid; place-items: center; width: 22px; height: 22px; flex: none; border-radius: 50%; background: var(--ok-bg); color: var(--ok); }
+.bt i svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.bt.miss i { background: var(--hover); color: var(--t3); }
+.bt small { display: block; font-size: 12px; color: var(--t3); }
+.bt b { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--ink); }
+.bt.miss b { color: var(--t3); font-weight: 400; }
+.sell { display: flex; flex-wrap: wrap; gap: 10px; }
+.sell div { padding: 10px 14px; border: 1px solid var(--line-2); border-radius: 12px; }
+.sell small { display: block; font-size: 12px; color: var(--t3); }
+.sell b { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--ink); }
+.desc { margin: 0; font-size: 14px; color: var(--t1); }
+
+.tbl.li col.c-i { width: 4%; } .tbl.li col.c-n { width: 30%; } .tbl.li col.c-c { width: 24%; } .tbl.li col.c-q { width: 7%; } .tbl.li col.c-u { width: 11%; } .tbl.li col.c-a { width: 12%; } .tbl.li col.c-t { width: 12%; }
+.tbl.li tbody tr { cursor: default; }
+.tbl.li tfoot td { padding: 14px 10px; border-top: 1px solid var(--line); font-weight: 600; color: var(--ink); }
+.tbl.li tfoot td:first-child { padding-left: 24px; } .tbl.li tfoot td:last-child { padding-right: 24px; }
+.tbl.li tfoot small { display: block; font-size: 12px; font-weight: 400; color: var(--t3); }
+
+.ct { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+.ct:first-of-type { border-top: 0; padding-top: 0; }
+.av { display: inline-grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 50%; font-size: 12px; font-weight: 600; }
+.acc .av { background: var(--info-bg); color: var(--deep); }
+.ct b { font-size: 14px; font-weight: 500; color: var(--ink); }
+.ct small { display: block; font-size: 12px; color: var(--t3); margin-top: 2px; }
+.role { display: inline-flex; height: 20px; align-items: center; padding: 0 7px; margin-left: 8px; border-radius: 5px; background: var(--hover); font-size: 11px; font-weight: 600; color: var(--t2); }
+.role.dm { background: var(--info-bg); color: var(--deep); }
+.ct-acts { display: flex; gap: 8px; }
+.foot-note { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--t3); }
+.foot-note a { color: var(--deep); text-decoration: none; }
+
+.chips { display: flex; gap: 6px; margin-bottom: 16px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--surface); font: inherit; font-size: 13px; color: var(--t2); cursor: pointer; }
+.chip.on { background: var(--midnight); border-color: var(--midnight); color: #fff; }
+.chip small { font-size: 11px; opacity: .75; }
+.tl-g { margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .06em; color: var(--t3); }
+.tl { display: grid; grid-template-columns: 64px 18px minmax(0, 1fr); gap: 12px; padding-bottom: 18px; }
+.tl-d { text-align: right; font-size: 12px; color: var(--t3); line-height: 1.4; }
+.tl-d b { display: block; font-size: 13px; font-weight: 500; color: var(--t1); }
+.tl-dot { position: relative; display: flex; justify-content: center; }
+.tl-dot::before { content: ""; width: 10px; height: 10px; margin-top: 4px; border-radius: 50%; background: var(--deep); box-shadow: 0 0 0 3px var(--info-bg); }
+.tl:not(:last-child) .tl-dot::after { content: ""; position: absolute; top: 18px; bottom: -18px; width: 1px; background: var(--line-2); }
+.tl-b b { font-size: 14px; font-weight: 500; color: var(--ink); }
+.tl-b p { margin: 4px 0 0; font-size: 13px; color: var(--t2); }
+.tl-tags { display: flex; gap: 6px; margin-top: 6px; }
+.tl-tags span { display: inline-flex; height: 20px; align-items: center; padding: 0 7px; border-radius: 5px; background: var(--hover); font-size: 11px; font-weight: 500; color: var(--t2); }
+
+.tk-form { display: grid; grid-template-columns: minmax(0, 1fr) 150px 170px auto; gap: 8px; align-items: center; padding: 12px; border-radius: 12px; background: var(--field); }
+.tk-form input, .tk-form select { height: 36px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); font-size: 14px; outline: none; min-width: 0; }
+.tk-form input:focus, .tk-form select:focus { border-color: var(--deep); }
+.tk-err { grid-column: 1 / -1; font-size: 12px; color: var(--danger); }
+.tk { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.tk input { width: 16px; height: 16px; accent-color: var(--deep); margin: 0; }
+.tk b { font-size: 14px; font-weight: 500; color: var(--ink); } .tk.done b { color: var(--t3); text-decoration: line-through; font-weight: 400; }
+.tk small { font-size: 12px; color: var(--t3); }
+
+.sum3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.sm3 { padding: 14px 16px; border: 1px solid var(--line-2); border-radius: 12px; }
+.sm3 small { display: block; font-size: 12px; color: var(--t3); }
+.sm3 b { display: block; margin: 4px 0 2px; font-size: 20px; font-weight: 500; letter-spacing: -.01em; color: var(--ink); }
+.sm3 b.warn { color: var(--warn); }
+.sm3 span { font-size: 12px; color: var(--t3); }
+.road { position: relative; padding: 84px 28px 44px; border-radius: 14px; background: var(--field); overflow-x: auto; }
+.road-line { position: relative; display: flex; align-items: center; height: 12px; border-radius: 6px; background: var(--midnight); min-width: 520px; }
+.road-node { position: absolute; top: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px; display: grid; place-items: center; border-radius: 50%; background: var(--deep); border: 3px solid var(--surface); color: #fff; font-size: 11px; font-weight: 700; }
+.road-node.cur { background: var(--cyan); }
+.road-lab { position: absolute; bottom: 22px; transform: translateX(-50%); width: 120px; text-align: center; font-size: 12px; color: var(--t3); line-height: 1.35; }
+.road-lab b { display: block; font-size: 12px; font-weight: 600; color: var(--ink); }
+.road-dur { position: absolute; top: 50%; transform: translate(-50%, -50%); height: 18px; padding: 0 6px; border-radius: 9px; background: var(--surface); font-size: 11px; font-weight: 600; color: var(--ink); line-height: 18px; }
+.road-dur.long { background: #fde7b0; color: #7a4d00; }
+.road-start { position: absolute; left: 28px; bottom: 14px; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--t3); }
+.road-lg { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; font-size: 12px; color: var(--t3); }
+.road-lg span { display: inline-flex; align-items: center; gap: 6px; }
+.road-lg i { width: 10px; height: 10px; border-radius: 50%; background: var(--deep); }
+.road-lg em { font-style: normal; height: 16px; padding: 0 6px; border-radius: 8px; background: #fde7b0; color: #7a4d00; font-weight: 600; font-size: 11px; line-height: 16px; }
+
+.drop { display: grid; place-items: center; gap: 6px; padding: 32px 16px; border: 1.5px dashed var(--line-3); border-radius: 14px; background: var(--field); text-align: center; font-size: 13px; color: var(--t3); cursor: pointer; }
+.drop:hover { border-color: var(--deep); color: var(--deep); }
+.drop svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.drop b { color: var(--deep); font-weight: 500; }
+
+/* v2: pill tabs and stepper on glass, owner avatars use the shared tints */
+.v2 .rec-tabs { border-radius: 999px; padding: 4px; border-color: #fff; background: rgb(255 255 255 / 80%); }
+.v2 .rtab { border-radius: 999px; }
+.v2 .rtab.on { background: var(--midnight); }
+.v2 .stp.cur { background: var(--midnight); }
+.v2 .ns { background: linear-gradient(165deg, #d7e9ff 0%, #e9f3ff 45%, rgb(255 255 255 / 88%) 100%); border-color: #fff; }
+.v2 .ns-h i { background: var(--midnight); }
+.v2 .req { border-color: #fff; background: rgb(255 255 255 / 80%); }
+.v2 .bt, .v2 .sell div, .v2 .sm3 { border-color: var(--line); background: rgb(255 255 255 / 60%); }
+.v2 .road { background: rgb(228 236 248 / 60%); }
+
+/* Rail */
+.rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+.ns { border-color: rgb(0 66 183 / 30%); background: linear-gradient(180deg, var(--info-bg), var(--surface) 40%); }
+.ns-h { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.ns-h i { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--deep); color: #fff; }
+.ns-h i svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ns-h b { font-size: 16px; font-weight: 600; color: var(--ink); }
+.ns-to { margin: 0 0 10px; font-size: 13px; color: var(--deep); }
+.req { display: flex; gap: 10px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); }
+.req::before { content: ""; width: 6px; height: 6px; margin-top: 7px; flex: none; border-radius: 50%; background: var(--deep); }
+.req b { display: block; font-size: 14px; font-weight: 500; color: var(--ink); }
+.req small { display: block; font-size: 12px; color: var(--t3); }
+.kv { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 13px; color: var(--t3); }
+.kv:first-of-type { margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--line); }
+.kv b { text-align: right; font-weight: 600; color: var(--ink); } .kv b.hot { color: var(--danger); } .kv b.none { color: var(--warn); font-weight: 500; }
+.ns .btn { width: 100%; justify-content: center; margin-top: 8px; }
+.acc { display: flex; gap: 12px; align-items: center; }
+.acc .av { border-radius: 10px; width: 40px; height: 40px; }
+.acc a { font-size: 15px; font-weight: 600; color: var(--deep); text-decoration: none; }
+.acc small { display: block; font-size: 12px; color: var(--t3); margin-top: 2px; }
+.links { display: flex; gap: 14px; margin-top: 12px; }
+.mem { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.mem b { display: block; font-size: 14px; font-weight: 500; color: var(--ink); }
+.mem small { font-size: 12px; color: var(--t3); }
+.rail h3 { margin: 0 0 12px; font-size: 15px; font-weight: 600; color: var(--ink); }
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+  <main class="main" id="main"></main>
+</div>
+
+<script src="assets/crm.js?v=20261116b"></script>
+<script src="assets/crm-data.js?v=20261116a"></script>
+<script>
+/* Data for one record. Everything shown comes from the shared demo data (assets/crm-data.js); details the list doesn't
+   carry (line items, BANT, contacts, activities, stage path) are derived here so every record opens, and the Lotus
+   record (SI-2026-0024) uses the values from CRMpulse. */
+const { money, icon, toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const DAY = 864e5;
+const addDays = (d, n) => new Date(new Date(d).getTime() + n * DAY);
+const iso = (d) => new Date(d).toISOString().slice(0, 10);
+const dd = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '—';
+const hash = (s) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+const pick = (arr, s) => arr[hash(s) % arr.length];
+const ini = (n) => n.split(/\s+/).map(x => x[0]).slice(0, 2).join('').toUpperCase();
+const SVG = {
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  back: '<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+  edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
+  swap: '<svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>',
+  order: '<svg viewBox="0 0 24 24"><path d="M7 3h10v18l-5-3-5 3zM10 8h4M10 12h4"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  more: '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  up: '<svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>',
+  phone: '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/></svg>'
+};
+
+const id = new URLSearchParams(location.search).get('id') || 'SI-2026-0024';
+const o = INITS.find(x => x.id === id);
+
+// ---- Derived record details ----
+const CLOSED_STEPS = { won: 'Closed won', lost: 'Closed lost' };
+function stepsOf(o) {
+  if (o.status === 'Prospect') return { label: 'Prospect', list: [...PRE_STAGES.Prospect, 'Lead'] };
+  if (o.status === 'Lead') return { label: 'Lead', list: [...PRE_STAGES.Lead, 'Opportunity'] };
+  return { label: 'Opportunity', list: [...STAGES.map(s => s.name), o.kind === 'lost' ? 'Closed lost' : 'Closed won'] };
+}
+const REQ = {
+  'Identified': [['Find the right contact', 'Name and role at the account'], ['Make first contact', 'Call, email or meeting'], ['Log the conversation', 'Record it as an activity']],
+  'Initial contact': [['Get a reply or a meeting', 'A two-way conversation'], ['Share the capability deck', 'Attach it to the record'], ['Set a follow-up date', 'So it does not go quiet']],
+  'Engaged': [['Confirm there is a need', 'What they want solved'], ['Link the account', 'Pick or create it'], ['Agree the next conversation', 'Set next step & follow-up']],
+  'Active dialogue': [['Capture the requirement', 'In the description'], ['Identify the decision maker', 'Add them as a contact'], ['Discuss budget and timing', 'BANT is optional']],
+  'Qualification': [['Confirm the need is real', 'Not just interest'], ['Get a rough budget', 'Even a range helps'], ['Estimate the value', 'Needed to convert later']],
+  'Qualified': [['Account, need and value recorded', 'Required to convert'], ['Set an expected close', 'Drives the forecast'], ['Pick the opening stage', 'Usually opportunity identification']],
+  'Opportunity identification': [['Book a client meeting', 'With the business owner'], ['Agree what to scope', 'Share an agenda'], ['Add the buying committee', 'Contacts and roles']],
+  'Client meeting / scope discussion': [['Confirm the scope in writing', 'Email or minutes'], ['Name a solution owner', 'Presales or delivery'], ['Update the value estimate', 'Line items if known']],
+  'Solution development': [['Agree the solution approach', 'With the client'], ['Confirm the budget range', 'Record it in BANT'], ['Plan the proposal', 'Owner and due date']],
+  'Proposal preparation': [['Finish pricing and line items', 'Value = sum of line items'], ['Internal review', 'Margin and delivery check'], ['Attach the proposal', 'Attachments tab']],
+  'Proposal submission': [['Client acknowledges the proposal', 'Log it as an activity'], ['Answer clarifications', 'Keep the date current'], ['Agree to negotiate', 'Commercial terms next']],
+  'Commercial negotiation': [['Agree final price and terms', 'Record the agreed value'], ['Get discount approvals', 'If below standard margin'], ['Confirm the decision date', 'Update expected close']],
+  'Contract finalization': [['Get the signed contract or PO', 'Attach it'], ['Confirm the booking value', 'Matches the line items'], ['Set the actual close date', 'Books it in the quarter']]
+};
+const VERTICAL = [[/Retail|Lotus|Al Noor/, 'Retail'], [/Health|Sundaram/, 'Healthcare'], [/Bank|Finance/, 'Banking'], [/Kaveri|Pharma/, 'Pharma'], [/Steel|Manufactur|Industrial/, 'Manufacturing'], [/Energy|Petro/, 'Energy'], [/Logistics/, 'Logistics'], [/Facilit/, 'Facilities']];
+const REGION = { India: ['India North', 'India West', 'India South'], 'Middle East': ['UAE', 'KSA', 'Oman'], APAC: ['Singapore', 'Malaysia', 'Indonesia'] };
+function selling(o) {
+  const off = o.name.split(' – ').slice(1).join(' – ') || o.name;
+  const m = (re) => re.test(off);
+  const sbu = m(/ERP|SAP|Application|POS|Portal|App/) ? 'Enterprise Applications' : m(/Cloud|Infrastructure|Network|Recovery|Service Desk/) ? 'Cloud & Infrastructure' : m(/Identity|Security|Fraud/) ? 'Cybersecurity' : 'Data & AI';
+  const practice = { 'Enterprise Applications': 'Application Services', 'Cloud & Infrastructure': 'Cloud Services', 'Cybersecurity': 'Security Services', 'Data & AI': 'Data Services' }[sbu];
+  const tech = m(/ERP|SAP/) ? 'SAP' : m(/Cloud|Recovery/) ? 'AWS' : m(/Identity/) ? 'Okta' : m(/GenAI/) ? 'Azure OpenAI' : m(/Data|Analytics|Warehouse|Lake/) ? 'Databricks' : m(/Infrastructure|Network/) ? 'VMware' : m(/Support|Service Desk/) ? 'ServiceNow' : '—';
+  const vertical = (VERTICAL.find(([re]) => re.test(o.acc)) || [0, 'Enterprise'])[1];
+  return { off, sbu, practice, tech, vertical };
+}
+function details(o) {
+  const lotus = o.id === 'SI-2026-0024';
+  const closeD = o.kind === 'open' ? null : new Date(o.close);
+  const created = lotus ? new Date('2026-07-06') : o.kind === 'open' ? addDays(TODAY, -(o.open || (o.days || 10) + 12)) : addDays(closeD, -(80 + hash(o.id) % 70));
+  const existing = INITS.some(x => x.acc === o.acc && x.id !== o.id && x.kind === 'won');
+  const sell = selling(o);
+  const geo = TEAMS[o.team].geo;
+  // Line items: value = sum of items (requirement: the initiative value is the sum of its line items)
+  const local = (usd) => o.cur === 'USD' ? usd : usd * FX[o.cur];
+  const sym = o.cur === 'INR' ? '₹' : o.cur === 'USD' ? '$' : o.cur + ' ';
+  const fmtL = (v) => v == null ? '—' : sym + Math.round(v).toLocaleString('en-US');
+  const total = lotus ? 116667000 : local(o.value);
+  const items = lotus
+    ? [{ n: 'Implementation services', c: 'Professional Services', r: 'One-time', amt: 70000200 }, { n: 'Subscriptions and support', c: 'Subscriptions', r: 'Recurring', arr: 46666800, amt: 46666800 }]
+    : o.value >= 0.3e6
+      ? [{ n: `${sell.off} – implementation`, c: 'Professional Services', r: 'One-time', amt: Math.round(total * .6) }, { n: 'Managed support (12 months)', c: 'Managed Services', r: 'Recurring', arr: Math.round(total * .4), amt: total - Math.round(total * .6) }]
+      : [{ n: sell.off, c: 'Professional Services', r: 'One-time', amt: total }];
+  // BANT: further along = more recorded
+  const ix = o.kind === 'open' ? (o.status === 'Prospect' ? 0 : o.status === 'Lead' ? 1 : { L3: 2, L2: 3, L1: 4 }[o.code]) : 4;
+  const role = pick(['CIO', 'CTO', 'Head of IT', 'CFO'], o.acc);
+  const bant = [['Budget', ix >= 2 ? (ix >= 4 ? 'Approved' : 'Indicative range') : null], ['Authority', ix >= 1 ? (lotus ? 'CIO' : role) : null], ['Need', ix >= 1 ? `${sell.off} requirement` : null], ['Timeline', ix >= 3 ? (o.close && fyq(o.close).fy === '2627' ? 'This FY' : 'Next FY') : null]];
+  // Contacts (fictional)
+  const FIRST = ['Arjun', 'Meera', 'Rahul', 'Sara', 'Khalid', 'Lina', 'Wei Ling', 'Farah', 'Nikhil', 'Huda'], LAST = ['Patel', 'Nair', 'Kapoor', 'Haddad', 'Rahman', 'Chen', 'Salem', 'Menon', 'Al-Farsi', 'Lim'];
+  const nm = (k) => `${pick(FIRST, o.acc + k)} ${pick(LAST, k + o.acc)}`;
+  const contacts = lotus ? [{ n: 'Arjun Patel', t: 'Head of Data', role: 'Decision Maker' }]
+    : ix === 0 ? [{ n: nm('a'), t: pick(['IT Manager', 'Head of Operations'], o.acc), role: 'Influencer' }]
+    : [{ n: nm('a'), t: role, role: 'Decision Maker' }, ...(ix >= 3 ? [{ n: nm('b'), t: pick(['Procurement Lead', 'Finance Controller'], o.acc), role: 'Influencer' }] : [])];
+  // Stage path (entered dates). Lotus = CRMpulse history; others: created in an earlier stage, current stage from days-in-stage.
+  const steps = stepsOf(o).list;
+  let path;
+  if (lotus) path = [['Solution development', '2026-07-06'], ['Proposal submission', '2026-09-01'], ['Commercial negotiation', '2026-10-29']];
+  else {
+    const curName = o.kind === 'open' ? o.sub : CLOSED_STEPS[o.kind];
+    const curIx = o.kind === 'lost' ? Math.min(steps.length - 2, { L3: 2, L2: 4, L1: 5 }[o.reached] || 2) : steps.indexOf(curName);
+    const curStart = o.kind === 'open' ? addDays(TODAY, -o.days) : closeD;
+    const startIx = Math.max(0, curIx - 2);
+    path = [[steps[startIx], iso(created)]];
+    if (curIx - startIx === 2 && (curStart - created) / DAY > 30) path.push([steps[startIx + 1], iso(addDays(created, Math.round((curStart - created) / DAY / 2)))]);
+    if (o.kind === 'lost') path.push([steps[curIx], iso(addDays(curStart, -20))]);
+    if (curIx !== startIx || o.kind !== 'open') path.push([curName, iso(curStart)]);
+  }
+  // Activities (fictional, oldest last)
+  const acts = lotus
+    ? [{ d: '2026-11-10T17:24', t: 'Messages with Lotus Retail India – Relationship Building', type: 'Messaging', purpose: 'Relationship Building', who: [] },
+       { d: '2026-07-11T16:00', t: 'Follow-up – Lotus Retail India', type: 'Event / Conference', note: 'Discussed scope, timelines and next steps.', who: ['Arjun Patel'] }]
+    : [{ d: iso(addDays(path[path.length - 1][1], 3)) + 'T11:30', t: `${o.kind === 'open' ? 'Call' : 'Meeting'} with ${o.acc}`, type: o.kind === 'open' ? 'Call' : 'Meeting', purpose: 'Follow-up', note: o.next ? `Agreed next step: ${o.next.toLowerCase()}.` : 'No next step agreed yet.', who: [contacts[0].n] },
+       { d: iso(addDays(created, 4)) + 'T15:00', t: `Discovery meeting – ${o.acc}`, type: 'Meeting', purpose: 'Discovery', note: `Walked through the ${sell.off.toLowerCase()} need.`, who: [contacts[0].n] }]
+      .filter(a => new Date(a.d) <= TODAY);
+  return { lotus, created, existing, sell, geo, region: lotus ? 'India North' : pick(REGION[geo], o.acc), items, total, fmtL, bant, contacts, path, acts,
+    leadType: lotus ? 'Existing Account New Lead' : existing ? 'Existing Account New Lead' : 'New Account New Lead',
+    source: lotus ? 'Event / Conference' : pick(['Event / Conference', 'Referral', 'Website', 'Partner', 'Outbound'], o.id),
+    category: lotus ? 'New Customer – New Business' : existing ? 'Existing Customer – New Business' : 'New Customer – New Business',
+    modified: lotus ? '2026-10-29' : path[path.length - 1][1] };
+}
+
+// ---- Render ----
+const T = { tab: (location.hash || '#overview').slice(1), road: 'road', actType: 'All', tasks: [] };
+const TABS = [['overview', 'Overview'], ['items', 'Line items'], ['contacts', 'Contacts'], ['activities', 'Activities'], ['tasks', 'Tasks'], ['history', 'Stage history'], ['files', 'Attachments']];
+let D;
+
+function header() {
+  const st = stepsOf(o), cur = o.kind === 'open' ? st.list.indexOf(o.sub) : o.kind === 'won' ? st.list.length - 1 : st.list.length - 1;
+  const lostAt = o.kind === 'lost' ? D.path[D.path.length - 2][0] : null;
+  const steps = st.list.map((n, i) => {
+    const cls = o.kind === 'lost' ? (i === st.list.length - 1 ? 'lost' : st.list.indexOf(lostAt) >= i ? 'done' : '') : i < cur || o.kind === 'won' ? 'done' : i === cur ? 'cur' : '';
+    return `<div class="stp ${cls}" title="${esc(n)}${cls === 'done' ? ', done' : cls === 'cur' ? ', current' : ', not reached'}">${cls === 'done' ? SVG.check : ''}<span>${esc(n)}</span></div>`;
+  }).join('');
+  const local = localAmount(o.value, o.cur);
+  const openDays = Math.round(((o.kind === 'open' ? TODAY : new Date(o.close)) - D.created) / DAY);
+  const passed = o.kind === 'open' && o.close && new Date(o.close) < TODAY;
+  const r = o.kind === 'open' ? attention(o).filter(x => !/^Open /.test(x)) : [];
+  const won = o.kind === 'won', closed = o.kind !== 'open';
+  return `
+    <a class="back" href="initiatives.html">${SVG.back}Sales initiatives<span>·</span><b>${o.id}</b></a>
+    <header class="rec-head">
+      <div class="rec-t">
+        <div class="rec-pills"><span class="st ${o.kind === 'open' ? o.status : o.kind}">${o.kind === 'open' ? o.status : won ? 'Closed won' : 'Closed lost'}</span>${o.kind === 'open' ? `<span class="sub-p">${esc(o.sub)}</span>` : ''}</div>
+        <h1>${esc(o.name)}</h1>
+        <div class="rec-meta"><a href="#" data-act="acc">${esc(o.acc)}</a><span>${esc(o.owner)} · ${esc(o.team)}</span><span>${D.geo} › ${D.region}</span></div>
+      </div>
+      <div class="rec-acts">
+        <button class="btn" data-act="toast" data-v="Would open the edit form">${SVG.edit}Edit</button>
+        ${closed ? '' : `<button class="btn primary" data-act="toast" data-v="Would open Change stage">${SVG.swap}Change stage</button>`}
+        <button class="btn" ${won ? 'data-act="toast" data-v="Would create a customer order from this initiative"' : 'aria-disabled="true" data-tip="Available once the initiative is Closed won."'}>${SVG.order}Create customer order</button>
+        <button class="btn" ${closed ? 'data-act="toast" data-v="Would start a follow-on initiative"' : 'aria-disabled="true" data-tip="Available once the initiative is closed."'}>${SVG.plus}Follow-on initiative</button>
+        <button class="btn icon-only" aria-label="More actions" data-act="toast" data-v="More: duplicate, put on hold, discontinue">${SVG.more}</button>
+      </div>
+    </header>
+    <section class="card" style="padding:0">
+      <div class="stepper"><div class="step-k"><b>${st.label.toUpperCase()}</b>${o.kind === 'lost' ? 'Closed lost' : `Stage ${cur + 1} of ${st.list.length}`}</div>
+        <div class="steps">${steps}</div>
+        <button class="link" data-act="tab" data-v="history">History</button></div>
+    </section>
+    <div class="facts">
+      <span>Value <b>${local || money(o.value)}</b>${local ? ` (${money(o.value)})` : ''}</span>
+      <span>Probability <b>${o.prob}%</b></span>
+      <span>Funnel code <b>${o.code || '—'}</b></span>
+      <span>${closed ? 'Closed' : 'Expected close'} <b class="${passed ? 'hot' : ''}">${o.close ? dd(o.close) : 'Not set'}</b></span>
+      <span>Created <b>${dd(D.created)}</b></span>
+      <span>${closed ? 'Took' : 'Open for'} <b>${openDays} days</b></span>
+    </div>
+    ${r.length ? `<div class="attn-row">Needs attention:${r.map(x => `<span class="pill danger">${x}</span>`).join('')}</div>` : ''}`;
+}
+
+function counts() { return { items: D.items.length, contacts: D.contacts.length, activities: D.acts.length, tasks: T.tasks.filter(t => !t.done).length, files: 0 }; }
+function tabsBar() {
+  const c = counts();
+  return `<div class="rec-tabs" role="tablist">${TABS.map(([k, n]) => `<button class="rtab ${T.tab === k ? 'on' : ''}" role="tab" aria-selected="${T.tab === k}" data-act="tab" data-v="${k}">${n}${k === 'items' || (k === 'tasks' && c.tasks) ? `<span class="tab-n">${c[k]}</span>` : ''}</button>`).join('')}</div>`;
+}
+
+function overview() {
+  const rec = D.bant.filter(b => b[1]).length;
+  return `
+    <section class="card"><div class="card-h"><div><h2>Deal details</h2></div></div>
+      <dl class="dl">
+        <div><dt>${o.kind === 'open' ? 'Expected close' : 'Closed'}</dt><dd>${o.close ? dd(o.close) : 'Not set'}</dd></div>
+        <div><dt>Lead type</dt><dd>${D.leadType}</dd></div>
+        <div><dt>Lead source</dt><dd>${D.source}</dd></div>
+        <div><dt>Business category</dt><dd>${D.category}</dd></div>
+        <div><dt>Created</dt><dd>${dd(D.created)} · ${esc(o.owner)}</dd></div>
+        <div><dt>Last modified</dt><dd>${dd(D.modified)} · ${esc(o.owner)}</dd></div>
+        <div><dt>Line items</dt><dd><button class="link" data-act="tab" data-v="items">${D.items.length} item${D.items.length === 1 ? '' : 's'} · view</button></dd></div>
+        ${o.kind === 'lost' ? `<div><dt>Loss reason</dt><dd>${esc(o.reason)}</dd></div>` : ''}
+      </dl></section>
+    <section class="card"><div class="card-h"><div><h2>Qualification (BANT)</h2><p>Optional · not a gate for moving to Opportunity</p></div><div class="r"><span class="pill ${rec === 4 ? 'ok' : ''}">${rec} of 4 recorded</span></div></div>
+      <div class="bant">${D.bant.map(([k, v]) => `<div class="bt ${v ? '' : 'miss'}"><i>${v ? SVG.check : ''}</i><div><small>${k}</small><b>${v ? esc(v) : 'Not recorded'}</b></div></div>`).join('')}</div></section>
+    <section class="card"><div class="card-h"><div><h2>What we're selling</h2></div></div>
+      <div class="sell">${[['SBU', D.sell.sbu], ['Practice / service line', D.sell.practice], ['Offering', D.sell.off], ['Technology', D.sell.tech], ['Vertical', D.sell.vertical]].map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div></section>
+    <section class="card"><div class="card-h"><div><h2>Outcome &amp; notes</h2></div></div>
+      <dl class="dl" style="grid-template-columns:1fr"><div><dt>Description</dt><dd>${esc(D.sell.off)} for ${esc(o.acc)}.</dd></div>
+      ${o.kind === 'won' ? `<div><dt>Outcome</dt><dd>Closed won on ${dd(o.close)} · booked ${money(o.value)}</dd></div>` : o.kind === 'lost' ? `<div><dt>Outcome</dt><dd>Closed lost on ${dd(o.close)} · ${esc(o.reason)}</dd></div>` : ''}</dl></section>`;
+}
+
+function itemsTab() {
+  return `<section class="card"><div class="card-h"><div><h2>Line items</h2><p>The initiative value is the sum of these items</p></div><div class="r"><button class="btn" data-act="toast" data-v="Would open the line item editor">${SVG.edit}Edit line items</button></div></div>
+    <div class="tbl-wrap"><table class="tbl li">
+      <colgroup><col class="c-i"><col class="c-n"><col class="c-c"><col class="c-q"><col class="c-u"><col class="c-a"><col class="c-t"></colgroup>
+      <thead><tr><th>#</th><th>Item</th><th>Category · revenue stream</th><th class="r">Qty</th><th class="r">Unit price</th><th class="r">ARR</th><th class="r">Amount</th></tr></thead>
+      <tbody>${D.items.map((x, i) => `<tr><td class="muted">${i + 1}</td><td class="t-main">${esc(x.n)}</td><td>${x.c}<div class="t-sub">${x.r}</div></td><td class="r muted">—</td><td class="r muted">—</td><td class="r num">${x.arr ? D.fmtL(x.arr) : '<span class="muted">—</span>'}</td><td class="r num t-val">${D.fmtL(x.amt)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="6">Total</td><td class="r num">${D.fmtL(D.total)}${o.cur !== 'USD' ? `<small>${money(o.value)} USD</small>` : ''}</td></tr></tfoot>
+    </table></div></section>`;
+}
+
+function contactsTab() {
+  const n = (c) => D.acts.filter(a => a.who.includes(c.n));
+  return `<section class="card"><div class="card-h"><div><h2>Buying committee</h2><p>Who decides and who else is involved, by their role in this initiative</p></div><div class="r"><button class="btn" data-act="toast" data-v="Would open contacts and roles">${SVG.edit}Edit contacts &amp; roles</button></div></div>
+    ${D.contacts.map(c => { const a = n(c); return `<div class="ct">${CRM.avatar(c.n)}
+      <div><b>${esc(c.n)}</b><span class="role ${c.role === 'Decision Maker' ? 'dm' : ''}">${c.role}</span><small>${esc(c.t)}</small><small>${a.length ? `Last interaction ${dd(a[0].d)} · ${a.length} interaction${a.length === 1 ? '' : 's'}` : 'No interactions yet'}</small></div>
+      <div class="ct-acts"><button class="btn icon-only" aria-disabled="true" aria-label="Call" data-tip="No phone number recorded for this contact.">${SVG.phone}</button><button class="btn" data-act="tab" data-v="activities">Log activity</button></div></div>`; }).join('')}
+    <p class="foot-note">Interactions count activities on this initiative that name the contact. Contacts come from ${esc(o.acc)} · <a href="#" data-act="toast" data-v="Would open all account contacts">All account contacts</a></p></section>`;
+}
+
+function activitiesTab() {
+  const types = ['All', ...new Set(D.acts.map(a => a.type))];
+  const rows = D.acts.filter(a => T.actType === 'All' || a.type === T.actType);
+  return `<section class="card"><div class="card-h"><div><h2>Activity timeline</h2><p>Calls, emails, meetings and notes on this initiative</p></div><div class="r"><button class="btn primary" data-act="toast" data-v="Would open Log activity">${SVG.plus}Log activity</button></div></div>
+    <div class="chips">${types.map(t => `<button class="chip ${T.actType === t ? 'on' : ''}" data-act="atype" data-v="${esc(t)}">${t}<small>${t === 'All' ? D.acts.length : D.acts.filter(a => a.type === t).length}</small></button>`).join('')}</div>
+    ${rows.length ? `<p class="tl-g">PAST</p>${rows.map(a => { const d = new Date(a.d); return `<div class="tl"><div class="tl-d"><b>${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</b>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div><div class="tl-dot"></div>
+      <div class="tl-b"><b>${esc(a.t)}</b>${a.note ? `<p>${esc(a.note)}</p>` : ''}<div class="tl-tags"><span>${a.type}</span>${a.purpose ? `<span>${a.purpose}</span>` : ''}</div></div></div>`; }).join('')}` : '<div class="empty"><b>No activities</b>Nothing of this type yet.</div>'}
+  </section>`;
+}
+
+function tasksTab() {
+  const open = T.tasks.filter(t => !t.done).length;
+  return `<section class="card"><div class="card-h"><div><h2>Tasks</h2><p>${open} open · tasks here also appear in each assignee's Tasks list</p></div></div>
+    <form class="tk-form" id="tk-form" novalidate>
+      <input id="tk-t" placeholder="New task" aria-label="Task title">
+      <input id="tk-d" type="date" aria-label="Due date">
+      <select id="tk-a" aria-label="Assignee">${[o.owner, ME, ...TEAMS[o.team].people].filter((v, i, a) => a.indexOf(v) === i).map(p => `<option>${esc(p)}</option>`).join('')}</select>
+      <button class="btn primary" type="submit">Add</button>
+      <div class="tk-err" id="tk-err" hidden></div>
+    </form>
+    ${T.tasks.length ? T.tasks.map((t, i) => `<label class="tk ${t.done ? 'done' : ''}"><input type="checkbox" data-act="tk" data-v="${i}" ${t.done ? 'checked' : ''}><div><b>${esc(t.t)}</b><br><small>${esc(t.a)}</small></div><small class="${!t.done && new Date(t.d) < TODAY ? 'hot' : ''}">Due ${dd(t.d)}</small></label>`).join('')
+      : '<div class="empty"><b>No tasks yet</b>Add one above.</div>'}
+  </section>`;
+}
+
+function historyTab() {
+  const end = o.kind === 'open' ? TODAY : new Date(o.close);
+  const segs = D.path.map(([n, d], i) => ({ n, d, days: Math.max(0, Math.round(((i < D.path.length - 1 ? new Date(D.path[i + 1][1]) : end) - new Date(d)) / DAY)), cur: i === D.path.length - 1 && o.kind === 'open' }));
+  const total = Math.round((end - D.created) / DAY);
+  const done = segs.filter(s => !(s.cur));
+  const longest = (done.length ? done : segs).slice().sort((a, b) => b.days - a.days)[0];
+  const oppSegs = segs.filter(s => STAGES.some(x => x.name === s.n) || /Closed/.test(s.n));
+  const oppDays = oppSegs.length ? Math.round((end - new Date(oppSegs[0].d)) / DAY) : 0;
+  const first = D.path[0][0], skipped = STAGES.some(x => x.name === first) ? 'Prospect and Lead stages were skipped: it was created as an opportunity' : PRE_STAGES.Lead.includes(first) ? 'The Prospect stage was skipped: it was created as a lead' : '';
+  const n = segs.length, pos = (i) => n === 1 ? 50 : 10 + i * 80 / (n - 1);
+  const road = `<div class="road"><div class="road-line">
+      ${segs.map((s, i) => `<span class="road-node ${s.cur ? 'cur' : ''}" style="left:${pos(i)}%">${i + 1}</span><span class="road-lab" style="left:${pos(i)}%"><b>${esc(s.n)}</b>${dd(s.d)}${s.cur ? ` · ${s.days}d so far` : ''}</span>`).join('')}
+      ${segs.slice(0, -1).map((s, i) => `<span class="road-dur ${s === longest ? 'long' : ''}" style="left:${(pos(i) + pos(i + 1)) / 2}%">${s.days}d</span>`).join('')}
+    </div><span class="road-start">START · CREATED AS ${D.path[0][0] && STAGES.some(x => x.name === first) ? 'OPPORTUNITY' : PRE_STAGES.Lead.includes(first) ? 'LEAD' : 'PROSPECT'}</span></div>
+    <div class="road-lg"><span><i></i>Stage entered</span><span><em>${longest.days}d</em>Longest stretch</span>${skipped ? `<span>${skipped}</span>` : ''}</div>`;
+  const list = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Stage</th><th>Entered</th><th class="r">Days in stage</th></tr></thead>
+    <tbody>${segs.map((s, i) => `<tr style="cursor:default"><td class="muted">${i + 1}</td><td class="t-main">${esc(s.n)}</td><td>${dd(s.d)}</td><td class="r num ${s === longest ? 'hot' : ''}">${s.days}${s.cur ? ' so far' : ''}</td></tr>`).join('')}</tbody></table></div>`;
+  return `<section class="card"><div class="card-h"><div><h2>The journey so far</h2><p>Every stage this initiative passed through, and how long it stayed</p></div>
+      <div class="r"><div class="seg">${[['road', 'Road'], ['list', 'List']].map(([k, l]) => `<button class="${T.road === k ? 'on' : ''}" data-act="road" data-v="${k}">${l}</button>`).join('')}</div></div></div>
+    <div class="sum3">
+      <div class="sm3"><small>${o.kind === 'open' ? 'Open for' : 'Took'}</small><b>${total} days</b><span>${dd(D.created)} → ${o.kind === 'open' ? 'today' : dd(o.close)}</span></div>
+      <div class="sm3"><small>As an opportunity</small><b>${oppDays ? oppDays + ' days' : '—'}</b><span>${oppSegs.length} stage${oppSegs.length === 1 ? '' : 's'}</span></div>
+      <div class="sm3"><small>Longest stage</small><b class="warn">${longest.days} days</b><span>${esc(longest.n)}</span></div>
+    </div>
+    ${T.road === 'road' ? road : list}</section>`;
+}
+
+function filesTab() {
+  return `<section class="card"><div class="card-h"><div><h2>Attachments</h2><p>Proposals, contracts and qualification documents</p></div></div>
+    <div class="drop" data-act="toast" data-v="Would open the file picker">${SVG.up}<span>Drop files here or <b>browse</b></span><small>PDF, Word, Excel, PowerPoint, CSV, text or images</small></div>
+    <div class="empty" style="padding-bottom:8px">No attachments yet.</div></section>`;
+}
+
+function rail() {
+  const st = stepsOf(o).list, cur = st.indexOf(o.sub), nextName = o.kind === 'open' ? st[cur + 1] : null;
+  const req = REQ[o.sub] || [];
+  const late = o.follow && new Date(o.follow) < TODAY;
+  const others = INITS.filter(x => x.acc === o.acc && x.id !== o.id).length;
+  const ns = o.kind === 'open' ? `
+    <section class="card ns"><div class="ns-h"><i>${SVG.arrow}</i><b>Next steps</b></div>
+      <p class="ns-to">To reach ${esc(nextName)}:</p>
+      ${req.map(([t, s]) => `<div class="req"><div><b>${t}</b><small>${s}</small></div></div>`).join('')}
+      <div class="kv"><span>Next step on record</span><b class="${o.next ? '' : 'none'}">${o.next ? esc(o.next) : 'None recorded'}</b></div>
+      <div class="kv"><span>Next follow-up</span><b class="${late ? 'hot' : ''}">${o.follow ? dd(o.follow) + (late ? ' · overdue' : '') : '—'}</b></div>
+      <button class="btn" data-act="toast" data-v="Would open Set next step & follow-up">Set next step &amp; follow-up</button>
+      <button class="btn primary" data-act="toast" data-v="Would move this initiative to ${esc(nextName)}">Move to ${esc(nextName)} ${SVG.arrow}</button>
+    </section>` : `
+    <section class="card"><h3>Outcome</h3><div class="kv" style="border-top:0;margin-top:0;padding-top:0"><span>Result</span><b>${o.kind === 'won' ? 'Closed won' : 'Closed lost'}</b></div>
+      <div class="kv" style="border-top:0;margin-top:0;padding-top:8px"><span>Closed</span><b>${dd(o.close)}</b></div>
+      ${o.kind === 'lost' ? `<div class="kv" style="border-top:0;margin-top:0;padding-top:8px"><span>Loss reason</span><b>${esc(o.reason)}</b></div>` : ''}</section>`;
+  return `${ns}
+    <section class="card"><h3>Account</h3><div class="acc"><span class="av">${ini(o.acc)}</span><div><a href="#" data-act="acc">${esc(o.acc)}</a><small>${D.sell.vertical} · ${D.geo} · ${D.existing ? 'Customer' : 'Prospect'}</small></div></div>
+      <div class="links"><button class="link" data-act="toast" data-v="Would list the other ${others} initiatives at ${esc(o.acc)}">Other initiatives${others ? ` (${others})` : ''}</button><button class="link" data-act="acc">Account 360°</button></div></section>
+    <section class="card"><h3>Team</h3><div class="mem">${CRM.avatar(o.owner)}<div><b>${esc(o.owner)}</b><small>Sales owner · ${esc(o.team)}</small></div></div>
+      <button class="btn" data-act="toast" data-v="Would open Add contributor">${SVG.plus}Add contributor</button></section>`;
+}
+
+function render() {
+  if (!o) { $('#main').innerHTML = `<a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a><div class="card" style="margin-top:20px"><div class="empty" style="padding:72px 12px"><b>Initiative not found</b>No record ${esc(id)} in this demo.</div></div>`; return; }
+  const body = { overview, items: itemsTab, contacts: contactsTab, activities: activitiesTab, tasks: tasksTab, history: historyTab, files: filesTab }[T.tab] || overview;
+  $('#main').innerHTML = `${header()}<div class="rec-grid"><div class="rec-main">${tabsBar()}${body()}</div><aside class="rail">${rail()}</aside></div>`;
+}
+
+$('#main').addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act !== 'tk') e.preventDefault();
+  if (act === 'tab') { T.tab = a.dataset.v; history.replaceState(null, '', '#' + T.tab); render(); }
+  else if (act === 'atype') { T.actType = a.dataset.v; render(); }
+  else if (act === 'road') { T.road = a.dataset.v; render(); }
+  else if (act === 'tk') { T.tasks[+a.dataset.v].done = a.checked; render(); }
+  else if (act === 'acc') toast(`Would open the ${o.acc} account`);
+  else if (act === 'toast') toast(a.dataset.v);
+});
+$('#main').addEventListener('submit', (e) => {
+  if (e.target.id !== 'tk-form') return;
+  e.preventDefault();
+  const t = $('#tk-t').value.trim(), d = $('#tk-d').value, err = $('#tk-err');
+  const miss = [!t && 'a title', !d && 'a due date'].filter(Boolean);
+  if (miss.length) { err.textContent = `Enter ${miss.join(' and ')} first.`; err.hidden = false; return; }
+  T.tasks.unshift({ t, d, a: $('#tk-a').value, done: false }); render(); toast('Task added');
+});
+$('#main').addEventListener('input', (e) => { if (e.target.closest('#tk-form')) { const err = $('#tk-err'); if (err) err.hidden = true; } });
+
+if (o) { D = details(o); document.title = `${o.name} · BCT CRM`; }
+CRM.renderShell('initiatives');
+render();
+</script>
+</body>
+</html>

@@ -70,7 +70,7 @@
 
 /* Table tabs */
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 0 -24px 0; padding: 0 18px; }
-.tab { position: relative; display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 10px; border: 0; background: none; font: inherit; font-size: 13px; color: var(--t2); cursor: pointer; }
+.tab { position: relative; display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 10px; border: 0; background: none; font: inherit; font-size: 14px; color: var(--t2); cursor: pointer; }
 .tab:hover { color: var(--ink); }
 .tab.on { color: var(--ink); font-weight: 600; }
 .tab.on::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--deep); }
@@ -92,9 +92,9 @@
 .row.on { background: var(--info-bg); }
 .row.dim { opacity: .45; }
 .row .nm { min-width: 0; }
-.row .nm b { display: block; font-size: 13px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .nm b { display: block; font-size: 14px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .row .nm small { display: block; font-size: 12px; color: var(--t3); margin-top: 1px; }
-.row .val { text-align: right; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--ink); }
+.row .val { text-align: right; font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--ink); }
 .row .val2 { text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--t3); }
 .track { position: relative; height: 10px; }
 .track::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--line-3); }
@@ -120,12 +120,13 @@
 .qtarget { position: absolute; left: 6%; right: 6%; height: 0; border-top: 2px dashed var(--ink); }
 .qbase { height: 1px; background: var(--line-3); margin: 0 -4px; }
 .qlab { margin-top: 8px; text-align: center; }
-.qlab b { display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.qlab b { display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 14px; font-weight: 600; color: var(--ink); }
 .qlab small { display: block; font-size: 12px; color: var(--t3); margin-top: 1px; white-space: nowrap; }
 .qlab .att { margin-top: 4px; font-size: 12px; font-weight: 500; color: var(--t2); white-space: nowrap; }
 .qlab .att.met { color: var(--ok); }
 .qcol.on .qlab .att, .qcol.on .qlab b { color: var(--ink); }
-.qnote { margin: 12px 0 0; font-size: 12px; color: var(--t3); }
+/* min-height = a .minis row (12px label + 3px + 16px value), so the note lines up with the forecast card's minis beside it */
+.qnote { margin: 12px 0 0; min-height: calc(12px * 1.45 + 3px + 16px * 1.45); font-size: 12px; color: var(--t3); }
 
 /* Opportunity table */
 .tbl.opp { table-layout: fixed; }
@@ -135,7 +136,7 @@
 .tbl.opp.with-why col.c-opp { width: 19%; } .tbl.opp.with-why col.c-why { width: 15%; } .tbl.opp.with-why col.c-own { width: 13%; } .tbl.opp.with-why col.c-stg { width: 15%; } .tbl.opp.with-why col.c-prob { width: 5%; } .tbl.opp.with-why col.c-days { width: 7.5%; }
 .tbl.opp td { height: 60px; padding-top: 9px; padding-bottom: 9px; }
 .tbl .ell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.tbl .t-val { font-weight: 600; color: var(--ink); font-size: 13px; }
+.tbl .t-val { font-weight: 600; color: var(--ink); font-size: 14px; }
 .stg { display: flex; align-items: center; gap: 7px; min-width: 0; }
 .stg .code { flex: none; }
 .tbl .t-sub.cat { display: flex; gap: 6px; align-items: center; }
@@ -161,7 +162,7 @@
 .mix-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 24px; }
 .mix-c { display: flex; flex-direction: column; gap: 4px; padding: 12px; margin: -12px; border: 0; border-radius: 12px; background: none; text-align: left; font: inherit; color: inherit; }
 .mix-c:hover, .mix-c.on { background: var(--hover); }
-.mix-k { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--t2); }
+.mix-k { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--t2); }
 .mix-k i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
 .mix-k .code { margin-left: 2px; }
 .mix-k .chev { margin-left: auto; }
@@ -172,25 +173,25 @@
 .lean { display: flex; flex-direction: column; gap: 5px; width: calc(100% + 16px); margin: 0 -8px; padding: 6px 8px; border: 0; border-radius: 10px; background: none; text-align: left; font: inherit; color: inherit; }
 .lean:hover, .lean.on { background: var(--hover); }
 .lean-top { display: flex; align-items: baseline; gap: 8px; }
-.lean-n { flex: 1; min-width: 0; font-size: 13px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lean-n { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lean-p { font-size: 16px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .lean-bar, .age-bar { display: block; height: 12px; border-radius: 4px; background: var(--chart-track); overflow: hidden; }
 .lean-bar i, .age-bar i { display: block; height: 100%; border-radius: 4px; background: var(--chart-gray); }
 .lean-bar i.key, .age-bar i.key { background: var(--ink); }
 .lean-s { font-size: 12px; color: var(--t3); }
 .lean.zero .lean-n, .lean.zero .lean-p { color: var(--t3); font-weight: 400; }
-.age-r { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: calc(100% + 16px); margin: 0 -8px; padding: 6px 8px; border: 0; border-radius: 10px; background: none; text-align: left; font: inherit; color: inherit; }
+.age-r { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: calc(100% + 16px); margin: 0 -8px; padding: 6px 8px; border: 0; border-radius: 10px; background: none; text-align: left; font: inherit; color: inherit; }
 .age-r:hover, .age-r.on { background: var(--hover); }
-.age-l { font-size: 13px; font-weight: 500; color: var(--t1); white-space: nowrap; }
+.age-l { font-size: 14px; font-weight: 500; color: var(--t1); white-space: nowrap; }
 .age-bar { background: transparent; }
 
-.age-v { text-align: right; font-size: 13px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.age-v { text-align: right; font-size: 14px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .age-v small { display: block; font-size: 12px; font-weight: 400; color: var(--t3); }
 .age-v small.hot { color: var(--danger); }
 .lean-card .so-what, .mix .so-what { margin-top: auto; padding-top: 16px; }
 /* drill panel: stage breakdown at the top of a category drill */
 .dr-stages { padding: 8px 24px 14px; border-bottom: 1px solid var(--line); }
-.dr-stages table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.dr-stages table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
 .dr-stages th { text-align: left; font-size: 12px; font-weight: 500; color: var(--t3); padding: 6px 0; }
 .dr-stages td { padding: 6px 0; border-top: 1px solid var(--line); }
 .dr-stages .r { text-align: right; }
@@ -225,9 +226,9 @@ button.ks.on { background: var(--info-bg); }
 .tm-r { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(60px, 1fr) 72px 40px 14px; align-items: center; gap: 14px; width: calc(100% + 16px); margin: 0 -8px; padding: 7px 8px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; font: inherit; color: inherit; }
 .tm-r:last-child { border-bottom: 0; }
 .tm-r:hover, .tm-r.on { background: var(--hover); }
-.tm-n { min-width: 0; font-size: 13px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tm-n { min-width: 0; font-size: 14px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tm-n small, .tm-v small { display: block; font-size: 12px; font-weight: 400; color: var(--t3); }
-.tm-v { text-align: right; font-size: 13px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tm-v { text-align: right; font-size: 14px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .tm-p { text-align: right; font-size: 15px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .tm-r.zero .tm-n, .tm-r.zero .tm-v { color: var(--t3); font-weight: 400; }
 .geo-card .so-what { margin-top: auto; padding-top: 16px; }
@@ -251,11 +252,11 @@ body.drill-open .drill { transform: none; visibility: visible; transition: trans
 .dr-row:last-child { border-bottom: 0; }
 .dr-row:hover { background: var(--hover); }
 .dr-l { flex: 1; min-width: 0; }
-.dr-l b { display: block; font-size: 13px; font-weight: 500; color: var(--ink); }
+.dr-l b { display: block; font-size: 14px; font-weight: 500; color: var(--ink); }
 .dr-row small { display: block; margin-top: 3px; font-size: 12px; color: var(--t3); }
 .dr-l .code { height: 18px; min-width: 22px; font-size: 11px; }
 .dr-r { flex: none; text-align: right; font-variant-numeric: tabular-nums; }
-.dr-r b { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+.dr-r b { display: block; font-size: 14px; font-weight: 600; color: var(--ink); }
 .dr-why .hot, .dr-r .hot { color: var(--danger); }
 .dr-foot { display: flex; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--line); }
 /* the mark that opened the panel stays highlighted; nothing else on the page changes */

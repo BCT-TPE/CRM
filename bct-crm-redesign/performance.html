@@ -5,16 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales performance · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="assets/crm.css?v=20261113w">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261113w">
+<link rel="stylesheet" href="assets/crm.css?v=20261116i">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261116c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261116j">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
 .att-bar .fbar-track { background: var(--chart-track); }
 .fbar-exp { position: absolute; top: -6px; bottom: -6px; width: 0; border-left: 2px dashed #6b778a; }
 .fbar-exp span { position: absolute; top: -19px; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: 500; color: #56595b; white-space: nowrap; }
-.sum-legend .lg i.lg-line, .legend i.lg-line, .lg-line { display: inline-block; width: 14px; height: 0; border-radius: 0; background: none; border-top: 2px dashed #6b778a; }
-.sum-legend .lg i.lg-tick, .legend i.lg-tick, .lg-tick { display: inline-block; width: 2px; height: 12px; border-radius: 1px; background: var(--ink); }
+.sum-legend .lg i.lg-line, .legend i.lg-line, .lg-line { display: inline-block; width: 0; height: 12px; border-radius: 0; background: none; border-left: 2px dashed #6b778a; justify-self: center; } /* vertical, like the marker on the bar */
+.sum-legend .lg i.lg-tick, .legend i.lg-tick, .lg-tick { display: inline-block; width: 2px; height: 12px; border-radius: 1px; background: var(--ink); justify-self: center; }
 
 /* Quarter chart: this year (ink) beside last year (gray), dashed target per quarter */
 .pq-plot { position: relative; flex: 1; min-height: 170px; margin-top: 22px; }
@@ -24,13 +25,13 @@
 .pq-pair i.ty { width: 44px; background: var(--ink); }
 .pq-pair i.ty.prog { background: #6b778a; }
 .pq-tot { position: absolute; left: 0; right: 0; text-align: center; font-size: 12px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
-.qlab .ly-d { display: block; margin-top: 2px; font-size: 12px; color: var(--t3); white-space: nowrap; }
+.qlab .ly-d { display: block; margin-top: 2px; font-size: 12px; color: var(--t3); white-space: normal; line-height: 1.35; }
 .lg-ly { background: var(--chart-gray); }
 
 /* Won vs lost */
 .wl { display: flex; flex-direction: column; gap: 20px; }
 .wl-row { display: flex; flex-direction: column; gap: 8px; }
-.wl-h { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--t2); }
+.wl-h { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: var(--t2); }
 .wl-h b { font-size: 16px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .wl-bar { display: flex; gap: 2px; height: 12px; }
 .wl-bar button { border: 0; padding: 0; height: 100%; cursor: pointer; transition: opacity .15s; }
@@ -46,9 +47,9 @@
 .lr-list { display: flex; flex-direction: column; gap: 2px; }
 .lr { display: grid; grid-template-columns: minmax(0, 1fr) auto 14px; grid-template-rows: auto auto; gap: 6px 12px; align-items: center; width: calc(100% + 16px); margin: 0 -8px; padding: 8px; border: 0; border-radius: 10px; background: none; text-align: left; font: inherit; color: inherit; }
 .lr:hover, .lr.on { background: var(--hover); }
-.lr-n { font-size: 13px; font-weight: 500; color: var(--t1); }
+.lr-n { font-size: 14px; font-weight: 500; color: var(--t1); }
 .lr-n small { font-weight: 400; color: var(--t3); margin-left: 6px; }
-.lr-v { font-size: 13px; font-weight: 500; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+.lr-v { font-size: 14px; font-weight: 500; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
 .lr .lean-bar { grid-column: 1 / 3; }
 .lr .chev { grid-row: 1 / 3; grid-column: 3; }
 .lr-card .so-what, .wl-card .so-what { margin-top: auto; padding-top: 16px; }
@@ -63,7 +64,7 @@
 .attn-track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--ink); }
 .attn-track i.under { background: #6b778a; }
 .attn-track .t100 { position: absolute; top: -4px; bottom: -4px; width: 0; border-left: 2px solid var(--ink); }
-.attn-p { width: 44px; text-align: right; font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.attn-p { width: 44px; text-align: right; font-size: 14px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .attn-p.met { color: var(--ok); }
 .attn-p.na { color: var(--t3); font-weight: 400; }
 
@@ -71,7 +72,7 @@
 .tbl.cl { table-layout: fixed; }
 .tbl.cl col.c-opp { width: 30%; } .tbl.cl col.c-own { width: 20%; } .tbl.cl col.c-res { width: 20%; } .tbl.cl col.c-val { width: 10%; } .tbl.cl col.c-date { width: 12%; } .tbl.cl col.c-q { width: 8%; }
 .tbl.cl td { height: 60px; }
-.res { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; color: var(--t1); }
+.res { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; color: var(--t1); }
 .res i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); flex: none; }
 .res.lost { color: var(--t2); font-weight: 400; }
 .res.lost i { background: var(--chart-gray); }
@@ -81,20 +82,18 @@
 .tbl tbody tr.on-row td { background: var(--info-bg); }
 </style>
 </head>
-<body>
+<body class="v2">
 <div class="app">
   <aside class="side" id="side" aria-label="Navigation"></aside>
 
   <main class="main">
-    <header class="page-head">
-      <div>
+    <header class="v2-head">
+      <div class="v2-hello">
+        <div class="v2-top"><span class="v2-eyebrow">Dashboards</span><span class="updated"><i></i>Updated 10:12</span></div>
         <h1>Sales performance</h1>
         <p id="page-meta">Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD</p>
       </div>
-      <div class="acts">
-        <span class="updated"><i></i>Updated 10:12</span>
-        <button class="btn" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
-      </div>
+      <div class="v2-kpis" id="hero-kpis" aria-label="Win and loss KPIs"></div>
     </header>
 
     <!-- Same filter row as Pipeline & forecast (requirement 11.1: both dashboards use common filters). -->
@@ -124,6 +123,7 @@
       </div>
       <button class="btn ghost" id="reset" hidden>Reset</button>
       <span class="sp"></span>
+      <button class="btn primary" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
     </div>
 
     <div id="page"></div>
@@ -131,13 +131,13 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261113w"></script>
-<script src="assets/crm-data.js?v=20261113w"></script>
+<script src="assets/crm.js?v=20261116b"></script>
+<script src="assets/crm-data.js?v=20261116a"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
    Data and rules are shared with Pipeline & forecast (assets/crm-data.js), so Q1–Q3 bookings match on both pages. */
 const { money, moneyBig, icon, toast } = CRM;
-const chev = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const chev = ''; // chevrons removed: hover fill already signals clickability
 const DAY = 864e5;
 const S = { fy: '2627', q: 0, team: '', owner: '', geo: [], drill: null, who: 'teams', tab: 'all', sort: 'closed', page: 1 };
 const PER_PAGE = 8;
@@ -181,16 +181,17 @@ function zoneHead(n, title, scope) {
 }
 function render() {
   syncControls();
-  if (S.fy !== '2627') { page.innerHTML = fyEmpty(); renderDrill(); return; }
+  if (S.fy !== '2627') { $('#hero-kpis').innerHTML = ''; page.innerHTML = fyEmpty(); renderDrill(); return; }
   const P = periodStats(S.q);
   const label = S.q ? `Q${S.q} FY26-27` : 'FY26-27';
+  $('#hero-kpis').innerHTML = heroKpis(P);
   page.innerHTML = `
     <div class="grid">
       ${zoneHead(1, 'Target attainment', `${label} · closed won bookings against target`)}
       ${attainCard(P, label)}
-      ${quarterCard()}
+      ${ringCard(P, label)}
+      ${quarterCard().replace('class="card s6"', 'class="card s5"')}
       ${zoneHead(2, 'Win and loss', `Opportunities closed in ${label} · ${P.rows.length} deals`)}
-      ${kpiStrip(P)}
       ${wonLostCard(P)}
       ${lossCard(P)}
       ${zoneHead(3, 'Attainment by team and salesperson', `${label} · each against its own target`)}
@@ -198,7 +199,7 @@ function render() {
       ${zoneHead(4, 'Closed deals', 'The records behind every number above')}
       ${closedTable(P)}
     </div>`;
-  if (!render.done) { page.querySelectorAll('.card, .zone').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
+  if (!render.done) { document.querySelectorAll('.card, .zone, .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
   renderDrill();
 }
 
@@ -207,8 +208,6 @@ function attainCard(P, label) {
   const p = P.target ? pct(P.booked, P.target) : null;
   const ahead = P.expected != null && P.booked >= P.expected;
   const done = P.daysLeft === 0, notStarted = P.elapsed === 0;
-  const pillCls = p == null ? '' : p >= 100 ? 'ok' : notStarted ? '' : ahead ? 'info' : 'warn';
-  const pillTxt = p == null ? 'No target for this filter' : `${p}% of target${p >= 100 ? ' · met' : notStarted || done ? '' : ahead ? ' · on pace' : ' · behind pace'}`;
   const max = P.target != null ? Math.max(P.target, P.booked) * 1.04 || 1 : P.booked || 1;
   const w = (v) => (v / max * 100).toFixed(2) + '%';
   const variance = P.target != null ? P.booked - P.target : null;
@@ -223,10 +222,10 @@ function attainCard(P, label) {
   const mini = (k, v, cls = '') => `<div class="mini"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
   const sign = (v) => v == null ? 'N/A' : `${v < 0 ? '−' : '+'}${money(Math.abs(v))}`;
   return `
-  <section class="card s6 fc" aria-labelledby="at-h">
-    <div class="card-h"><div><h2 id="at-h">${label} attainment</h2><p>Closed won bookings, compared with target</p></div>
-      <div class="r"><span class="pill ${pillCls}">${pillTxt}</span></div></div>
-    <div class="hero-num"><span class="big">${moneyBig(P.booked)}</span><span class="of">booked${P.target != null ? ` of <b>${money(P.target)}</b> target` : ''}</span></div>
+  <section class="card s4 fc tint" aria-labelledby="at-h">
+    <div class="card-h"><div><h2 id="at-h">${label} attainment</h2><p>Closed won bookings, compared with target</p></div></div>
+    <div class="hero-num"><span class="big">${moneyBig(P.booked)}</span></div>
+    <div class="v2-of">booked${P.target != null ? ` of <b>${money(P.target)}</b> target` : ''}</div>
     <p class="sum-what">${sowhat}</p>
     <div class="fbar att-bar" role="img" aria-label="Booked ${money(P.booked)}${P.expected != null ? `, expected by today ${money(P.expected)}` : ''}${P.target != null ? `, target ${money(P.target)}` : ''}">
       <div class="fbar-track">${P.booked ? `<i class="c-won" style="width:${w(P.booked)}" data-tip-h="Booked" data-tip="${money(P.booked)}"></i>` : ''}</div>
@@ -238,13 +237,55 @@ function attainCard(P, label) {
       ${P.expected != null ? `<span class="lg"><i class="lg-line"></i><span class="def" tabindex="0" data-tip="Each quarter's target × the share of that quarter that has passed.">Expected by today</span><b>${money(P.expected)}</b></span>` : ''}
       ${P.target != null ? `<span class="lg"><i class="lg-tick"></i>Target<b>${money(P.target)}</b></span>` : ''}
     </div>
+  </section>`;
+}
+
+// Zone 1 · progress ring: attainment % with the expected-by-today point marked, plus the four minis
+function ringCard(P, label) {
+  const p = P.target ? pct(P.booked, P.target) : null;
+  const done = P.daysLeft === 0, notStarted = P.elapsed === 0;
+  const ahead = P.expected != null && P.booked >= P.expected;
+  const variance = P.target != null ? P.booked - P.target : null;
+  const vsExp = P.expected != null ? P.booked - P.expected : null;
+  const needed = P.target != null ? Math.max(P.target - P.booked, 0) : null;
+  const sign = (v) => v == null ? 'N/A' : `${v < 0 ? '−' : '+'}${money(Math.abs(v))}`;
+  const mini = (k, v, cls = '') => `<div class="mini"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  const R = 62, Cc = 2 * Math.PI * R, frac = p == null ? 0 : Math.min(p, 100) / 100;
+  const ef = P.target && P.expected != null && !done && !notStarted ? Math.min(P.expected / P.target, 1) : null;
+  const ticks = Array.from({ length: 60 }, (_, i) => { const a = (i / 60) * 2 * Math.PI - Math.PI / 2;
+    return `<line x1="${(90 + 76 * Math.cos(a)).toFixed(1)}" y1="${(90 + 76 * Math.sin(a)).toFixed(1)}" x2="${(90 + 84 * Math.cos(a)).toFixed(1)}" y2="${(90 + 84 * Math.sin(a)).toFixed(1)}" class="${i / 60 < frac ? 'on' : ''}"/>`; }).join('');
+  const ea = ef != null ? ef * 2 * Math.PI - Math.PI / 2 : null;
+  const pace = p == null ? 'No target for this filter' : p >= 100 ? 'Target met' : notStarted ? 'Not started' : done ? 'Period closed' : ahead ? 'On pace' : 'Behind pace';
+  return `
+  <section class="card s3 ring-card" aria-labelledby="rg-h">
+    <div class="card-h"><div><h2 id="rg-h">${label} progress</h2><p>Booked as a share of target</p></div></div>
+    <div class="ring" role="img" aria-label="${p == null ? 'No target' : `${p}% of target, ${pace.toLowerCase()}`}">
+      <svg viewBox="0 0 180 180"><g class="ticks">${ticks}</g>
+        <circle cx="90" cy="90" r="${R}" class="trk"/>
+        <circle cx="90" cy="90" r="${R}" class="val" stroke-dasharray="${(Cc * frac).toFixed(1)} ${Cc.toFixed(1)}" transform="rotate(-90 90 90)"/>
+        ${ea != null ? `<circle cx="${(90 + R * Math.cos(ea)).toFixed(1)}" cy="${(90 + R * Math.sin(ea)).toFixed(1)}" r="5" class="exp" data-tip-h="Expected by today" data-tip="${money(P.expected)}"/>` : ''}</svg>
+      <div class="ring-c"><b>${p == null ? 'N/A' : p + '%'}</b><span>${pace}</span></div>
+    </div>
     <div class="minis">
       ${mini('Variance to target', sign(variance), variance == null ? '' : variance < 0 ? 'neg' : 'pos')}
-      ${mini('<span class="def" tabindex="0" data-tip="Booked minus expected by today.">Vs expected today</span>', done || notStarted ? '—' : sign(vsExp), vsExp == null || done || notStarted ? '' : vsExp < 0 ? 'neg' : 'pos')}
+      ${mini('<span class="def" tabindex="0" data-tip="Booked minus expected by today. The dot on the ring marks expected by today.">Vs expected today</span>', done || notStarted ? '—' : sign(vsExp), vsExp == null || done || notStarted ? '' : vsExp < 0 ? 'neg' : 'pos')}
       ${mini(`Needed in ${P.daysLeft} days`, needed == null ? 'N/A' : money(needed))}
       ${mini('Period elapsed', `${Math.round(P.elapsed * 100)}%`)}
     </div>
   </section>`;
+}
+// Header KPIs (were the Win and loss strip). Won and Lost are subsets, so they open the panel.
+function heroKpis(P) {
+  const nW = P.won.length, nL = P.lost.length;
+  const wr = nW + nL ? pct(nW, nW + nL) : null, wrV = P.booked + P.lostV ? pct(P.booked, P.booked + P.lostV) : null;
+  const avg = nW ? P.booked / nW : null, largest = nW ? Math.max(...P.won.map(o => o.value)) : null;
+  const on = (r) => S.drill && S.drill.type === 'result' && S.drill.v === r;
+  const btn = (r, label, val, badge, sub, hot) => `<button class="v2-kpi click ${on(r) ? 'on' : ''}" data-act="drill" data-type="result" data-v="${r}" aria-pressed="${on(r)}"><div class="v2-kv">${val}<span class="v2-badge ${hot ? 'hot' : ''}">${badge}</span></div><div class="v2-kl">${label}</div><div class="v2-ks">${sub}</div></button>`;
+  const k = (label, val, badge, sub) => `<div class="v2-kpi"><div class="v2-kv">${val}${badge ? `<span class="v2-badge">${badge}</span>` : ''}</div><div class="v2-kl">${label}</div><div class="v2-ks">${sub}</div></div>`;
+  return btn('won', 'Won', nW, money(P.booked), 'booked')
+    + btn('lost', 'Lost', nL, money(P.lostV), 'lost value', nL > 0)
+    + k('<span class="def" tabindex="0" data-tip-h="Win rate" data-tip="Won ÷ (won + lost). N/A when nothing closed in the period.">Win rate</span>', wr == null ? 'N/A' : wr + '%', wrV == null ? '' : `${wrV}% by value`, 'won ÷ closed')
+    + k('Avg deal size', avg == null ? 'N/A' : moneyBig(avg), '', largest == null ? '—' : `Largest win <b>${money(largest)}</b>`);
 }
 
 // Zone 1 · bookings by quarter: this year vs last year, target per quarter
@@ -278,23 +319,6 @@ function quarterCard() {
     <div class="legend" style="margin-bottom:12px"><span><i class="c-won"></i>FY26-27</span><span><i style="background:#6b778a"></i>In progress</span><span><i class="lg-ly"></i>FY25-26</span><span><i class="line"></i>Target</span></div>
     <div class="qchart">${cols}</div>
     <p class="qnote"><b>${tyToDate >= lyToDate ? '+' : '−'}${money(Math.abs(tyToDate - lyToDate))}</b> vs the same quarters last year (${money(lyToDate)}).</p>
-  </section>`;
-}
-
-// Zone 2 · KPI strip (Won and Lost are subsets, so they are clickable)
-function kpiStrip(P) {
-  const nW = P.won.length, nL = P.lost.length;
-  const wr = nW + nL ? pct(nW, nW + nL) : null, wrV = P.booked + P.lostV ? pct(P.booked, P.booked + P.lostV) : null;
-  const avg = nW ? P.booked / nW : null, largest = nW ? Math.max(...P.won.map(o => o.value)) : null;
-  const on = (r) => S.drill && S.drill.type === 'result' && S.drill.v === r;
-  const cell = (k, val, sub) => `<div class="ks"><span class="kpi-k">${k}</span><span class="mid">${val}</span><span class="kpi-s">${sub}</span></div>`;
-  const btn = (r, k, val, sub) => `<button class="ks click ${on(r) ? 'on' : ''}" data-act="drill" data-type="result" data-v="${r}" aria-pressed="${on(r)}"><span class="kpi-k">${k}${chev}</span><span class="mid">${val}</span><span class="kpi-s">${sub}</span></button>`;
-  return `
-  <section class="card s12 kpi-strip kpi-perf" aria-label="Win and loss KPIs">
-    ${btn('won', 'Won', nW, `<b>${money(P.booked)}</b> booked`)}
-    ${btn('lost', 'Lost', nL, `<b>${money(P.lostV)}</b> lost value`)}
-    ${cell('<span class="def" tabindex="0" data-tip-h="Win rate" data-tip="Won ÷ (won + lost). N/A when nothing closed in the period.">Win rate</span>', wr == null ? 'N/A' : wr + '%', wrV == null ? '—' : `By value <b>${wrV}%</b>`)}
-    ${cell('Avg deal size', avg == null ? 'N/A' : moneyBig(avg), largest == null ? '—' : `Largest win <b>${money(largest)}</b>`)}
   </section>`;
 }
 
@@ -350,7 +374,7 @@ function whoCard(P) {
     const on = S.drill && S.drill.type === u.type && S.drill.v === u.key;
     const nW = u.won.length, nL = u.lost.length;
     return `<tr class="click ${on ? 'on-row' : ''}" data-act="drill" data-type="${u.type}" data-v="${esc(u.key)}" tabindex="0">
-      <td><div class="ell t-main">${esc(u.name)}</div><div class="ell t-sub">${esc(u.sub)}</div></td>
+      <td>${u.type === 'person' ? `<div class="own">${CRM.avatar(u.name)}<div class="own-t">` : '<div>'}<div class="ell t-main">${esc(u.name)}</div><div class="ell t-sub">${esc(u.sub)}</div>${u.type === 'person' ? '</div></div>' : '</div>'}</td>
       <td class="r num">${money(u.target)}</td>
       <td class="r num t-val">${money(u.booked)}</td>
       <td><div class="attn-cell"><span class="attn-track" data-tip="${u.att == null ? 'No target' : `${Math.round(u.att)}% of ${money(u.target)}`}">${u.booked ? `<i class="${u.att != null && u.att < 100 ? 'under' : ''}" style="width:${Math.min((u.att || 0) / scale * 100, 100).toFixed(1)}%"></i>` : ''}<span class="t100" style="left:${(100 / scale * 100).toFixed(1)}%"></span></span>
@@ -412,7 +436,7 @@ function closedTable(P) {
       <tbody>${shown.map(o => `
         <tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
           <td>${ell(o.name, 't-main')}${ell(`${o.id} · ${o.acc}`, 't-sub')}</td>
-          <td>${ell(o.owner)}${ell(o.team, 't-sub')}</td>
+          <td><div class="own">${CRM.avatar(o.owner)}<div class="own-t">${ell(o.owner)}${ell(o.team, 't-sub')}</div></div></td>
           <td>${resCell(o)}</td>
           <td class="r num t-val">${money(o.value)}</td>
           <td class="num">${fmtDate(o.closed)}</td>
@@ -482,7 +506,7 @@ function renderDrill() {
 drillEl.addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a) return;
   if (a.dataset.act === 'undrill') { S.drill = null; render(); }
-  else if (a.dataset.act === 'open') { const o = CLOSED.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (a.dataset.act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
   else if (a.dataset.act === 'si') toast('Would open Sales initiatives with this selection');
 });
 
@@ -523,7 +547,7 @@ $('#more-done').addEventListener('click', () => setMore(false));
 document.addEventListener('click', () => setMore(false));
 document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; setMore(false); if (S.drill) { S.drill = null; render(); } });
 
-page.addEventListener('click', (e) => {
+document.querySelector('.main').addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a) return;
   const act = a.dataset.act;
   if (act === 'drill') { const v = a.dataset.v, same = S.drill && S.drill.type === a.dataset.type && S.drill.v === v; S.drill = same ? null : { type: a.dataset.type, v }; render(); }
@@ -532,7 +556,7 @@ page.addEventListener('click', (e) => {
   else if (act === 'tab') { S.tab = a.dataset.v; S.page = 1; render(); }
   else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
   else if (act === 'page') { S.page = +a.dataset.v; render(); }
-  else if (act === 'open') { const o = CLOSED.find(x => x.id === a.dataset.id); toast(`Would open ${o.id} · ${o.name}`); }
+  else if (act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
   else if (act === 'si') toast('Would open Sales initiatives with these filters applied');
   else if (act === 'reset') resetAll();
   else if (act === 'fy-back') { S.fy = '2627'; render(); }

@@ -74,11 +74,11 @@ const CLOSED = [
   { id: 'SI-2026-0012', name: 'Emirates Logistics Hub – Fleet Tracking', acc: 'Emirates Logistics Hub', owner: 'Omar Haddad', team: 'Middle East Enterprise', result: 'won', value: 0.55e6, closed: '2026-08-24' },
   { id: 'SI-2026-0013', name: 'ABC – Fraud Analytics', acc: 'ABC Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', result: 'won', value: 0.35e6, closed: '2026-09-26' },
   { id: 'SI-2026-0038', name: 'Desert – Asset Monitoring AMC', acc: 'Desert Industrial Holdings', owner: 'Omar Haddad', team: 'Middle East Enterprise', result: 'won', value: 0.35e6, closed: '2026-10-15' },
-  // FY26-27 · lost
-  { id: 'SI-2026-0006', name: 'Straits – Analytics Platform', acc: 'Straits Energy Pte Ltd', owner: 'Daniel Tan', team: 'APAC Sales', result: 'lost', value: 0.12e6, closed: '2026-06-03', reason: 'No budget' },
-  { id: 'SI-2026-0015', name: 'Pacific – Data Lake', acc: 'Pacific Health Systems', owner: 'Mei Lin Wong', team: 'APAC Sales', result: 'lost', value: 0.65e6, closed: '2026-09-18', reason: 'Lost to competitor' },
-  { id: 'SI-2026-0017', name: 'Bharat – Customer Portal', acc: 'Bharat Steel Works', owner: 'Priya Sharma', team: 'India Enterprise', result: 'lost', value: 0.40e6, closed: '2026-08-14', reason: 'Scope mismatch' },
-  { id: 'SI-2026-0034', name: 'Lotus – Loyalty App', acc: 'Lotus Retail India', owner: 'Vikram Iyer', team: 'India Strategic Accounts', result: 'lost', value: 0.18e6, closed: '2026-10-09', reason: 'No decision / deferred' },
+  // FY26-27 · lost (reached = furthest funnel code before it was lost, for the lifecycle funnel)
+  { id: 'SI-2026-0006', name: 'Straits – Analytics Platform', acc: 'Straits Energy Pte Ltd', owner: 'Daniel Tan', team: 'APAC Sales', result: 'lost', value: 0.12e6, closed: '2026-06-03', reason: 'No budget' , reached: 'L3' },
+  { id: 'SI-2026-0015', name: 'Pacific – Data Lake', acc: 'Pacific Health Systems', owner: 'Mei Lin Wong', team: 'APAC Sales', result: 'lost', value: 0.65e6, closed: '2026-09-18', reason: 'Lost to competitor' , reached: 'L1' },
+  { id: 'SI-2026-0017', name: 'Bharat – Customer Portal', acc: 'Bharat Steel Works', owner: 'Priya Sharma', team: 'India Enterprise', result: 'lost', value: 0.40e6, closed: '2026-08-14', reason: 'Scope mismatch' , reached: 'L2' },
+  { id: 'SI-2026-0034', name: 'Lotus – Loyalty App', acc: 'Lotus Retail India', owner: 'Vikram Iyer', team: 'India Strategic Accounts', result: 'lost', value: 0.18e6, closed: '2026-10-09', reason: 'No decision / deferred' , reached: 'L3' },
   // FY25-26 · won (for "vs last year")
   { id: 'SI-2025-0041', name: 'Gulf – Branch Network Refresh', acc: 'Gulf National Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', result: 'won', value: 0.18e6, closed: '2025-11-20' },
   { id: 'SI-2025-0052', name: 'Indus – Loan Origination', acc: 'Indus Finance Corporation', owner: 'Priya Sharma', team: 'India Enterprise', result: 'won', value: 0.36e6, closed: '2026-02-15' }
