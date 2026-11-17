@@ -24,7 +24,7 @@
 .life-h { display: flex; align-items: baseline; gap: 8px; padding: 10px 16px 4px; font-size: 12px; font-weight: 600; color: var(--ink); }
 .life-h span { font-weight: 400; color: var(--t3); }
 .life-cells { display: grid; gap: 4px; align-items: stretch; flex: 1; }
-.life-open .life-cells { grid-template-columns: 1.1fr 1px 1fr 14px 1fr 14px 1fr; }
+.life-open .life-cells { grid-template-columns: 1.1fr 1fr 1fr 1fr; }
 .life-closed .life-cells { grid-template-columns: 1fr 1fr; }
 .life-all .life-cells { grid-template-columns: 1fr; }
 .lt { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 12px 16px 14px; border: 0; border-radius: 12px; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
@@ -35,9 +35,6 @@
 .lt-n { font-size: 28px; font-weight: 400; letter-spacing: -.03em; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; }
 .lt-v { font-size: 12px; color: var(--t3); font-variant-numeric: tabular-nums; }
 .lt-v b { font-weight: 500; color: var(--t1); }
-.life-div { align-self: stretch; margin: 10px 0; background: var(--line); }
-.life-arrow { display: grid; place-items: center; color: var(--line-3); }
-.life-arrow svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .dot-pro { background: #a8dcf4; } .dot-lead { background: #00A0E4; } .dot-opp { background: var(--deep); } .dot-won { background: var(--ink); } .dot-lost { background: var(--chart-gray); } .dot-all { background: var(--t3); }
 
 /* List toolbar inside the card */
@@ -250,13 +247,12 @@ function lifeStrip(b) {
     return `<button class="lt ${S.status === k ? 'on' : ''}" data-act="status" data-v="${k}" aria-pressed="${S.status === k}">
       <span class="lt-k"><i class="${dot}"></i>${short || n}</span><span class="lt-n">${c}</span><span class="lt-v"><b>${money(v)}</b></span></button>`;
   };
-  const arrow = `<span class="life-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>`;
   const [open, pro, lead, opp, won, lost, all] = STATUS;
   const [, closedV] = sum(o => o.kind !== 'open'), closedN = sum(o => o.kind !== 'open')[0];
   return `
     <section class="card s7 life-g life-open tint" aria-label="Open initiatives">
       <div class="life-h">Open<span>in progress, from first interest to opportunity</span></div>
-      <div class="life-cells">${tile(open, 'All open')}<span class="life-div" aria-hidden="true"></span>${tile(pro)}${arrow}${tile(lead)}${arrow}${tile(opp, 'Opportunities')}</div>
+      <div class="life-cells">${tile(open, 'All open')}${tile(pro)}${tile(lead)}${tile(opp, 'Opportunities')}</div>
     </section>
     <section class="card s3 life-g life-closed" aria-label="Closed initiatives">
       <div class="life-h">Closed<span>${closedN} · ${money(closedV)}</span></div>

@@ -7,7 +7,15 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-17
+## 2026-11-17 (2)
+
+### Changed
+- **Sales initiatives lifecycle:** the decorative › arrows between prospects, leads and opportunities in the Open card were removed. They carried no data and read as conversion or as clickable. The flow order is still stated in the section subtitle.
+- **Sales initiatives lifecycle:** the vertical divider between "All open" and the three statuses was removed. The "All open" label already says it is the total.
+
+---
+
+## 2026-11-17 · `7a6ba67`
 
 ### Added
 - **`initiative-new.html`: new sales initiative form.** It mirrors CRMpulse `/initiatives/new` and has six numbered sections:
