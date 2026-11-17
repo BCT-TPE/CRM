@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="assets/crm.css?v=20261116i">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261116c">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261116j">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261117j">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
@@ -131,7 +131,7 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261116b"></script>
+<script src="assets/crm.js?v=20261117a"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
@@ -425,7 +425,7 @@ function closedTable(P) {
   return `
   <section class="card s12" id="closed-table" aria-labelledby="cl-h">
     <div class="card-h"><div><h2 id="cl-h">Closed opportunities</h2><p>${money(rows.filter(o => o.result === 'won').reduce((s, o) => s + o.value, 0))} won · ${money(rows.filter(o => o.result === 'lost').reduce((s, o) => s + o.value, 0))} lost · select a row to open the record</p></div>
-      <div class="r"><button class="link" data-act="si">Open in Sales initiatives ${icon('arrow')}</button></div></div>
+      <div class="r"><button class="link" data-act="si">Open in sales initiatives ${icon('arrow')}</button></div></div>
     <div class="tabs" role="tablist" aria-label="Which deals">
       ${TABS.map(([k, n, f]) => `<button role="tab" aria-selected="${S.tab === k}" class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-v="${k}">${n}<span class="tab-n">${P.rows.filter(f).length}</span></button>`).join('')}
     </div>
@@ -507,7 +507,7 @@ drillEl.addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a) return;
   if (a.dataset.act === 'undrill') { S.drill = null; render(); }
   else if (a.dataset.act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
-  else if (a.dataset.act === 'si') toast('Would open Sales initiatives with this selection');
+  else if (a.dataset.act === 'si') toast('Would open sales initiatives with this selection');
 });
 
 /* ---------- Controls ---------- */
@@ -557,7 +557,7 @@ document.querySelector('.main').addEventListener('click', (e) => {
   else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
   else if (act === 'page') { S.page = +a.dataset.v; render(); }
   else if (act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
-  else if (act === 'si') toast('Would open Sales initiatives with these filters applied');
+  else if (act === 'si') toast('Would open sales initiatives with these filters applied');
   else if (act === 'reset') resetAll();
   else if (act === 'fy-back') { S.fy = '2627'; render(); }
 });

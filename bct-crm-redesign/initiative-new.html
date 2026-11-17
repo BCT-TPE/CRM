@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New sales initiative · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="assets/crm.css?v=20261116i">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261116c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261117j">
+<style>
+/* ---------- Page: new sales initiative ----------
+   Same fields and order as CRMpulse /initiatives/new (status & sub-stage, account & ownership, value & forecast,
+   next step, BANT, classification). Inputs, labels, quick picks, readiness checks and the sticky bar are the
+   ones from the initiative edit form, so creating and editing look the same. */
+.back { display: inline-flex; align-items: center; gap: 6px; margin-top: 28px; font-size: 13px; color: var(--t3); text-decoration: none; }
+.back:hover { color: var(--deep); }
+.back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nw-head { margin: 10px 0 20px; }
+.nw-head h1 { margin: 0 0 8px; font-size: 34px; font-weight: 400; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
+.nw-head p { margin: 0; font-size: 14px; color: var(--t3); }
+
+.nw-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+.nw-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sec-h { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+.sec-n { display: grid; place-items: center; width: 26px; height: 26px; flex: none; border-radius: 50%; background: var(--info-bg); color: var(--deep); font-size: 12px; font-weight: 600; }
+.sec-h h2 { margin: 2px 0 0; font-size: 15px; font-weight: 600; color: var(--ink); }
+.sec-h p { margin: 4px 0 0; font-size: 12px; color: var(--t3); }
+
+/* Status cards + sub-stage pills */
+.stat3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.stat { display: flex; gap: 10px; align-items: flex-start; padding: 14px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.stat:hover { border-color: var(--line-3); }
+.stat i { width: 18px; height: 18px; flex: none; margin-top: 1px; border-radius: 50%; border: 1.5px solid var(--line-3); background: var(--surface); }
+.stat b { display: block; font-size: 14px; font-weight: 600; color: var(--ink); }
+.stat small { display: block; margin-top: 4px; font-size: 12px; line-height: 1.4; color: var(--t3); }
+.stat.on { border-color: var(--midnight); background: var(--surface); } /* active: midnight outline + radio on white */
+.stat.on i { border: 5px solid var(--midnight); }
+.subs-l { margin: 18px 0 8px; font-size: 13px; font-weight: 500; color: var(--ink); }
+.subs { display: flex; flex-wrap: wrap; gap: 6px; }
+.sub { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--surface); font: inherit; font-size: 13px; color: var(--t1); cursor: pointer; }
+.sub:hover { border-color: var(--line-3); }
+.sub small { font-size: 11px; font-weight: 600; color: var(--t3); }
+.sub.on { border-color: var(--midnight); background: var(--midnight); color: #fff; }
+.sub.on small { color: var(--sky); }
+
+/* Fields (same as the initiative edit form) */
+.fg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; }
+.fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fld.full { grid-column: 1 / -1; }
+.fld > .lab { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--ink); }
+.fld > .lab .rq { color: var(--danger); }
+.fld > .lab .opt { font-weight: 400; font-size: 12px; color: var(--t3); }
+.in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); font: inherit; font-size: 14px; color: var(--ink); outline: none; }
+.in::placeholder { color: var(--t3); }
+.in:hover { border-color: var(--line-3); }
+.in:focus { border-color: var(--deep); }
+textarea.in { height: auto; min-height: 84px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.in-wrap { position: relative; }
+.in-wrap .in-suffix { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--t3); }
+.money { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; }
+.fld .help { font-size: 12px; color: var(--t3); }
+.fld.bad .in, .fld.bad .fsel { border-color: var(--danger); }
+.fld .err { font-size: 12px; color: var(--danger); }
+body.v2 label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: 10px; border-color: var(--line-2); background: var(--surface); box-shadow: none; }
+body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(--line-3); }
+.fsel .sel-btn { max-width: none; width: 100%; padding-left: 12px; font-weight: 400; color: var(--ink); }
+.fsel.ph .sel-btn { color: var(--t3); }
+.fsel .sel-pop { max-height: 280px; }
+.picks { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 2px; font-size: 12px; color: var(--t3); }
+.picks button { height: 28px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--surface); font: inherit; font-size: 12px; color: var(--t1); cursor: pointer; }
+.picks button:hover { border-color: var(--deep); color: var(--deep); }
+.fold { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.fold .sec-h { flex: 1; margin-bottom: 0; }
+.fold > svg { width: 18px; height: 18px; flex: none; margin-top: 4px; fill: none; stroke: var(--t3); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.fold.open > svg { transform: rotate(180deg); }
+.fold-b { margin-top: 18px; }
+.contrib .btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+/* Rail: preview (tinted, like Next steps) + what's needed */
+.nw-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+.pv-k { margin: 0 0 10px; font-size: 12px; color: var(--t3); }
+.pv-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.st { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.st.Prospect { background: #e6f5fc; color: #0a6c99; } .st.Lead { background: #d9f0fb; color: #006a99; } .st.Opportunity { background: var(--info-bg); color: var(--deep); }
+.st.sub { background: rgb(255 255 255 / 80%); color: var(--t1); font-weight: 500; }
+.pv-n { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); overflow-wrap: anywhere; }
+.pv-n.muted { color: var(--t3); }
+.pv-a { margin: 4px 0 14px; font-size: 13px; color: var(--t3); }
+.kv { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; font-size: 13px; color: var(--t3); }
+.kv b { text-align: right; font-weight: 600; color: var(--ink); }
+.kv b.muted { color: var(--t3); font-weight: 500; }
+.nw-rail h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.nw-rail h3 .pill { margin-left: auto; }
+.chk { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; color: var(--t1); }
+.chk i { display: grid; place-items: center; width: 20px; height: 20px; flex: none; border-radius: 50%; background: var(--hover); color: var(--t3); }
+.chk i svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.chk.ok i { background: var(--ok-bg); color: var(--ok); }
+.chk:not(.ok) span { color: var(--t3); }
+.rail-note { margin: 10px 0 0; font-size: 12px; color: var(--t3); }
+
+/* Sticky bar (same as edit mode) */
+.ed-bar { position: sticky; bottom: 0; z-index: 30; display: flex; align-items: center; gap: 12px; margin: 16px -40px -40px; padding: 14px 40px; background: rgb(255 255 255 / 88%); box-shadow: 0 -1px 2px rgb(11 26 58 / 4%), 0 -10px 30px rgb(0 66 183 / 7%); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.ed-bar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); }
+.ed-bar.ready .dot { background: var(--ok); }
+.ed-bar b { font-size: 14px; font-weight: 600; color: var(--ink); }
+.ed-bar span { font-size: 13px; color: var(--t3); }
+.ed-bar .sp { flex: 1; }
+body.v2 .btn:disabled, body.v2 .btn:disabled:hover { color: var(--t3); background: var(--field); border-color: var(--line); box-shadow: none; cursor: not-allowed; }
+body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: #fff; background: #a9bddd; border-color: #a9bddd; }
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+  <main class="main" id="main"></main>
+</div>
+
+<script src="assets/crm.js?v=20261117a"></script>
+<script src="assets/crm-data.js?v=20261116a"></script>
+<script>
+const { money, toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const SVG = {
+  back: '<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  chev: '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>'
+};
+
+// ---- Options (same lists as the initiative edit form) ----
+const STATUS = [
+  ['Prospect', 'A target account or contact. No confirmed interest yet.'],
+  ['Lead', 'The client has shown interest. Qualifying need and budget.'],
+  ['Opportunity', 'A specific requirement we are pursuing with a solution.']
+];
+const SUBS = { Prospect: PRE_STAGES.Prospect, Lead: PRE_STAGES.Lead, Opportunity: STAGES.map(s => s.name) };
+const PRE_PROB = { 'Identified': 5, 'Initial contact': 5, 'Engaged': 10, 'Active dialogue': 10, 'Qualification': 15, 'Qualified': 20 };
+const defProb = (sub) => (STAGES.find(s => s.name === sub) || {}).prob ?? PRE_PROB[sub] ?? 10;
+const PICKS = {
+  'Identified': ['Research the account', 'Make first contact', 'Set a follow-up date'],
+  'Initial contact': ['Get a reply or a meeting', 'Share the capability deck', 'Set a follow-up date'],
+  'Engaged': ['Confirm there is a need', 'Link the account', 'Agree the next conversation'],
+  'Active dialogue': ['Confirm the requirement', 'Book a qualification meeting', 'Log the latest activity'],
+  'Qualification': ['Confirm the need is real', 'Get a rough budget', 'Estimate the value'],
+  'Qualified': ['Set an expected close', 'Pick the opening stage', 'Convert to an opportunity'],
+  'Opportunity identification': ['Define the scope', 'Schedule the client meeting', 'Add contributors'],
+  'Client meeting / scope discussion': ['Confirm the scope in writing', 'Name a solution owner', 'Update the value estimate'],
+  'Solution development': ['Agree the solution approach', 'Confirm the budget range', 'Plan the proposal'],
+  'Proposal preparation': ['Finish pricing and line items', 'Internal review', 'Attach the proposal'],
+  'Proposal submission': ['Log the client acknowledgement', 'Answer clarifications', 'Agree to negotiate'],
+  'Commercial negotiation': ['Agree final price and terms', 'Get discount approvals', 'Confirm the decision date'],
+  'Contract finalization': ['Get the signed contract or PO', 'Confirm the booking value', 'Set the actual close date']
+};
+const VERTICAL = [[/Retail|Lotus|Al Noor/, 'Retail'], [/Health|Sundaram/, 'Healthcare'], [/Bank|Finance/, 'Banking'], [/Kaveri|Pharma/, 'Pharma'], [/Steel|Manufactur|Industrial/, 'Manufacturing'], [/Energy|Petro|Qamar/, 'Energy'], [/Logistics/, 'Logistics'], [/Facilit/, 'Facilities']];
+const REGION = { India: ['India North', 'India West', 'India South'], 'Middle East': ['UAE', 'KSA', 'Oman'], APAC: ['Singapore', 'Malaysia', 'Indonesia'] };
+const OPT = {
+  acc: () => [...new Set(INITS.map(x => x.acc))].sort(),
+  owner: () => [...new Set(Object.values(TEAMS).flatMap(t => t.people))].sort(),
+  offering: () => [...new Set(INITS.map(x => x.name.split(' – ').slice(1).join(' – ')).filter(Boolean))].sort(),
+  cur: () => ['AED', 'INR', 'OMR', 'SAR', 'USD'],
+  leadType: () => ['New account new lead', 'Existing account new lead'],
+  source: () => ['Event / conference', 'Referral', 'Website', 'Partner', 'Outbound'],
+  category: () => ['New customer – new business', 'Existing customer – new business', 'Existing customer – existing business'],
+  team: () => ['Automatic', ...Object.keys(TEAMS)],
+  geo: () => Object.keys(REGION),
+  region: (v) => REGION[v.geo] || [],
+  sbu: () => ['Enterprise applications', 'Cloud & infrastructure', 'Cybersecurity', 'Data & AI'],
+  practice: () => ['Application services', 'Cloud services', 'Security services', 'Data services'],
+  tech: () => ['SAP', 'AWS', 'Okta', 'Azure OpenAI', 'Databricks', 'VMware', 'ServiceNow'],
+  vertical: () => ['Retail', 'Healthcare', 'Banking', 'Pharma', 'Manufacturing', 'Energy', 'Logistics', 'Facilities', 'Enterprise']
+};
+const PH = { acc: 'Select account…', offering: 'Choose an offering…', leadType: 'Not set', source: 'Not set', category: 'Not set', geo: 'Not set', region: 'Select a geography first', sbu: 'Select…', practice: 'Not set', tech: 'Not set', vertical: 'Not set' };
+const LABEL = { acc: 'Account', owner: 'Sales owner', offering: 'What are we selling?', name: 'Initiative name', value: 'Estimated value', cur: 'Currency', close: 'Expected close date', prob: 'Probability',
+  next: 'What happens next?', follow: 'Follow-up date', need: 'Need / business requirement', budget: 'Budget', authority: 'Authority', timeline: 'Timeline', remarks: 'Qualification remarks',
+  leadType: 'Lead type', source: 'Lead source', category: 'Business category', team: 'Accountable sales team', geo: 'Geography', region: 'Region', sbu: 'SBU', practice: 'Practice / service line',
+  tech: 'Technology', vertical: 'Vertical', desc: 'Description / remarks' };
+
+// ---- State ----
+const S = { status: 'Prospect', sub: 'Identified', more: false, tried: false, nameTouched: false,
+  v: { acc: '', owner: ME, offering: '', name: '', value: '', cur: 'USD', close: '', prob: String(defProb('Identified')), next: '', follow: '', need: '', budget: '', authority: '', timeline: '', remarks: '',
+       leadType: '', source: '', category: '', team: 'Automatic', geo: '', region: '', sbu: '', practice: '', tech: '', vertical: '', desc: '' } };
+const isOpp = () => S.status === 'Opportunity';
+const usd = () => { const n = +S.v.value || 0; return S.v.cur === 'USD' ? n : n / FX[S.v.cur]; };
+const autoTeam = () => { const ts = Object.entries(TEAMS).filter(([, t]) => t.people.includes(S.v.owner)); return ts.length === 1 ? ts[0][0] : null; };
+const teamNow = () => S.v.team === 'Automatic' ? autoTeam() : S.v.team;
+const vertDefault = () => S.v.acc ? (VERTICAL.find(([re]) => re.test(S.v.acc)) || [0, 'Enterprise'])[1] : '';
+
+// What creating needs (CRMpulse: name, approved account, owner, SBU; an opportunity also needs the need and a value)
+function needs() {
+  const v = S.v, l = [['Initiative name', !!v.name.trim(), 'name'], ['Approved account', !!v.acc, 'acc'], ['Sales owner', !!v.owner, 'owner'], ['SBU', !!v.sbu, 'sbu']];
+  if (isOpp()) l.push(['Specific requirement (Need)', !!v.need.trim(), 'need'], ['Estimated value', +v.value > 0, 'value']);
+  return l;
+}
+const missing = () => needs().filter(x => !x[1]);
+
+// ---- Field helpers ----
+const esc2 = (s) => esc(s ?? '');
+function fld(k, ctl, { req, help, full, opt } = {}) {
+  const bad = S.tried && missing().some(m => m[2] === k);
+  return `<div class="fld ${full ? 'full' : ''} ${bad ? 'bad' : ''}" data-fld="${k}"><span class="lab">${LABEL[k]}${req ? '<span class="rq">*</span>' : ''}${opt ? `<span class="opt">${opt}</span>` : ''}</span>${ctl}${bad ? '<span class="err">Needed to create it</span>' : help ? `<span class="help">${help}</span>` : ''}</div>`;
+}
+const inp = (k, type = 'text', ph = '') => `<input class="in" type="${type}" data-f="${k}" value="${esc2(S.v[k])}" placeholder="${esc2(ph)}" aria-label="${LABEL[k]}">`;
+const txa = (k, ph = '') => `<textarea class="in" data-f="${k}" placeholder="${esc2(ph)}" aria-label="${LABEL[k]}">${esc2(S.v[k])}</textarea>`;
+function sel(k) {
+  const opts = OPT[k](S.v), ph = PH[k], cur = S.v[k];
+  const empty = !cur && ph;
+  return `<label class="select fsel ${empty ? 'ph' : ''}"><select data-f="${k}" aria-label="${LABEL[k]}" ${k === 'region' && !S.v.geo ? 'disabled' : ''}>${ph ? `<option value="" ${!cur ? 'selected' : ''}>${esc(ph)}</option>` : ''}${opts.map(x => `<option ${x === cur ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>`;
+}
+
+// ---- Sections ----
+function secH(n, title, sub) { return `<div class="sec-h"><span class="sec-n">${n}</span><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ''}</div></div>`; }
+function sStatus() {
+  return `<section class="card">${secH(1, 'Where is it today?')}
+    <div class="stat3" role="radiogroup" aria-label="Main status">${STATUS.map(([k, d]) => `<button type="button" class="stat ${S.status === k ? 'on' : ''}" role="radio" aria-checked="${S.status === k}" data-act="status" data-v="${k}"><i></i><span><b>${k}</b><small>${d}</small></span></button>`).join('')}</div>
+    <div class="subs-l">Sub-stage</div>
+    <div class="subs" role="radiogroup" aria-label="Sub-stage">${SUBS[S.status].map(s => { const st = STAGES.find(x => x.name === s);
+      return `<button type="button" class="sub ${S.sub === s ? 'on' : ''}" role="radio" aria-checked="${S.sub === s}" data-act="sub" data-v="${esc(s)}">${esc(s)}${st ? `<small>${st.code}</small>` : ''}</button>`; }).join('')}</div>
+  </section>`;
+}
+function sAccount() {
+  return `<section class="card">${secH(2, 'Account &amp; ownership')}<div class="fg">
+    ${fld('acc', sel('acc'), { req: true, help: 'Only approved accounts can be selected.' })}
+    ${fld('owner', sel('owner'), { req: true, help: 'Selling is never restricted by team, geography or classification.' })}
+    ${fld('offering', sel('offering'), { help: 'Used for the name and the offering classification.' })}
+    ${fld('name', inp('name', 'text', 'Account – Offering'), { req: true, help: 'Filled in from the account and offering. You can edit it.' })}
+  </div></section>`;
+}
+function sValue() {
+  const u = usd(), q = S.v.close ? fyq(S.v.close) : null;
+  return `<section class="card">${secH(3, 'Value &amp; forecast', 'A provisional value is fine until line items are added.')}<div class="fg">
+    ${fld('value', `<div class="money">${sel('cur')}<input class="in" type="number" min="0" data-f="value" value="${esc2(S.v.value)}" placeholder="0" aria-label="Estimated value"></div>`,
+      { req: isOpp(), help: S.v.cur !== 'USD' && u ? `Reported in USD · ${money(u)}` : 'Reported in USD.' })}
+    ${fld('close', inp('close', 'date'), { help: q ? `Forecast in Q${q.q} FY${q.fy.slice(0, 2)}-${q.fy.slice(2)}.` : isOpp() ? 'Needed for the quarterly forecast.' : 'Optional until it becomes an opportunity.' })}
+    ${fld('prob', `<div class="in-wrap"><input class="in" type="number" min="0" max="100" data-f="prob" value="${esc2(S.v.prob)}" aria-label="Probability"><span class="in-suffix">%</span></div>`,
+      { help: +S.v.prob === defProb(S.sub) ? `Default for ${S.sub.charAt(0).toLowerCase() + S.sub.slice(1)}.` : `Default for this sub-stage is ${defProb(S.sub)}%.` })}
+  </div></section>`;
+}
+function sNext() {
+  return `<section class="card">${secH(4, 'Next step')}<div class="fg">
+    ${fld('next', inp('next', 'text', 'e.g. Book a discovery call'))}
+    ${fld('follow', inp('follow', 'date'))}
+    <div class="fld full"><div class="picks">Quick picks for ${esc(S.sub.charAt(0).toLowerCase() + S.sub.slice(1))}:${(PICKS[S.sub] || []).map(t => `<button type="button" data-act="pick" data-v="${esc(t)}">${t}</button>`).join('')}</div></div>
+  </div></section>`;
+}
+function sBant() {
+  return `<section class="card">${secH(5, 'Qualification (BANT)', 'Unknown is fine. Fill it in as you learn more.')}<div class="fg">
+    ${fld('need', txa('need', 'What problem does the client want solved?'), { req: isOpp(), full: true, help: isOpp() ? 'Needed for an opportunity.' : 'Optional for now.' })}
+    ${fld('budget', inp('budget', 'text', 'e.g. Indicative range'))}
+    ${fld('authority', inp('authority', 'text', 'e.g. CIO'))}
+    ${fld('timeline', inp('timeline', 'text', 'e.g. This FY'))}
+    <div></div>
+    ${fld('remarks', txa('remarks'), { full: true })}
+  </div></section>`;
+}
+function sClass() {
+  const at = autoTeam(), vd = vertDefault();
+  return `<section class="card"><button type="button" class="fold ${S.more ? 'open' : ''}" data-act="fold" aria-expanded="${S.more}">
+      ${secH(6, 'Classification, team &amp; notes', 'Vertical defaults from the account · team set automatically when the owner is in one team · lead type and source, business category, classifications, contributors, notes')}${SVG.chev}</button>
+    ${S.more ? `<div class="fold-b"><div class="fg">
+      ${fld('leadType', sel('leadType'))}
+      ${fld('source', sel('source'))}
+      ${fld('category', sel('category'))}
+      ${fld('team', sel('team'), { help: S.v.team === 'Automatic' ? (at ? `Automatic: ${esc(at)}.` : 'Automatic when the owner is in one team; choose when in several.') : 'Automatic when the owner is in one team; choose when in several.' })}
+      ${fld('geo', sel('geo'))}
+      ${fld('region', sel('region'))}
+      ${fld('sbu', sel('sbu'), { req: true })}
+      ${fld('practice', sel('practice'))}
+      ${fld('tech', sel('tech'))}
+      ${fld('vertical', sel('vertical'), { help: vd && !S.v.vertical ? `Defaults to the account's vertical (${vd}) when left empty.` : "Defaults to the account's vertical when left empty." })}
+      <div class="fld full contrib"><span class="lab">Contributors<span class="opt">· presales, delivery and others; no booking credit</span></span><div><button type="button" class="btn" data-act="toast" data-v="Would open add contributor">${SVG.plus}Add contributor</button></div></div>
+      ${fld('desc', txa('desc', 'Anything the team should know'), { full: true })}
+    </div></div>` : ''}
+  </section>`;
+}
+
+// ---- Rail ----
+function rail() {
+  const v = S.v, u = usd(), q = v.close ? fyq(v.close) : null, l = needs(), ok = l.filter(x => x[1]).length;
+  return `<section class="card tint">
+      <p class="pv-k">Preview</p>
+      <div class="pv-tags"><span class="st ${S.status}">${S.status}</span><span class="st sub">${esc(S.sub)}</span></div>
+      <p class="pv-n ${v.name.trim() ? '' : 'muted'}">${v.name.trim() ? esc(v.name) : 'Untitled initiative'}</p>
+      <p class="pv-a">${v.acc ? esc(v.acc) : 'No account yet'}${teamNow() ? ` · ${esc(teamNow())}` : ''}</p>
+      <div class="kv"><span>Value</span><b class="${u ? '' : 'muted'}">${u ? money(u) : '—'}</b></div>
+      <div class="kv"><span>Weighted</span><b class="${u ? '' : 'muted'}">${u ? money(u * (+v.prob || 0) / 100) : '—'}</b></div>
+      <div class="kv"><span>Forecast in</span><b class="${q ? '' : 'muted'}">${q ? `Q${q.q} FY${q.fy.slice(0, 2)}-${q.fy.slice(2)}` : 'No close date'}</b></div>
+    </section>
+    <section class="card">
+      <h3>Needed to create ${isOpp() ? 'an opportunity' : 'a ' + S.status.toLowerCase()}<span class="pill ${ok === l.length ? 'ok' : 'warn'}">${ok}/${l.length}</span></h3>
+      ${l.map(([t, d]) => `<div class="chk ${d ? 'ok' : ''}"><i>${d ? SVG.check : ''}</i><span>${t}</span></div>`).join('')}
+      <p class="rail-note">Switch the status to see what each stage needs. Attachments can be added after the initiative is created.</p>
+    </section>`;
+}
+function bar() {
+  const m = missing(), ready = !m.length;
+  const why = ready ? '' : `Complete ${m.length} required item${m.length === 1 ? '' : 's'} first: ${m.map(x => x[0]).join(', ')}.`;
+  return `<span class="dot"></span><b>${ready ? 'Ready to create' : `${m.length} required item${m.length === 1 ? '' : 's'} left`}</b><span>${ready ? 'You can add line items next.' : esc(m.map(x => x[0]).join(' · '))}</span><span class="sp"></span>
+    <a class="btn ghost" href="initiatives.html">Cancel</a>
+    <span ${why ? `data-tip="${esc(why)}"` : ''}><button class="btn" data-act="create" data-v="items" ${ready ? '' : 'disabled'}>Create &amp; add line items</button></span>
+    <span ${why ? `data-tip="${esc(why)}"` : ''}><button class="btn primary" data-act="create" ${ready ? '' : 'disabled'}>Create initiative</button></span>`;
+}
+
+function render() {
+  $('#main').innerHTML = `<a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a>
+    <header class="nw-head"><h1>New sales initiative</h1><p>One record from first interest to closure. Start with what you know; you can add the rest as it progresses.</p></header>
+    <div class="nw-grid"><div class="nw-main">${sStatus()}${sAccount()}${sValue()}${sNext()}${sBant()}${sClass()}</div><aside class="nw-rail" id="rail">${rail()}</aside></div>
+    <div class="ed-bar ${missing().length ? '' : 'ready'}" id="ed-bar">${bar()}</div>`;
+  CRM.enhanceSelects($('#main'));
+}
+// While typing, only redraw what depends on the value so focus stays in the field
+function refresh() {
+  $('#rail').innerHTML = rail();
+  const b = $('#ed-bar'); b.innerHTML = bar(); b.classList.toggle('ready', !missing().length);
+}
+function autoName() { if (S.nameTouched) return; const off = S.v.offering; S.v.name = S.v.acc && off ? `${S.v.acc.split(' ')[0]} – ${off}` : ''; }
+
+const main = $('#main');
+main.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a || a.disabled) return;
+  const act = a.dataset.act, v = a.dataset.v;
+  if (act === 'status') { if (S.status === v) return; S.status = v; S.sub = SUBS[v][0]; S.v.prob = String(defProb(S.sub)); render(); }
+  else if (act === 'sub') { S.sub = v; S.v.prob = String(defProb(v)); render(); }
+  else if (act === 'pick') { S.v.next = v; render(); }
+  else if (act === 'fold') { S.more = !S.more; render(); }
+  else if (act === 'toast') toast(v);
+  else if (act === 'create') toast(v === 'items' ? 'Would create the initiative and open its line items' : 'Would create the initiative and open it');
+});
+main.addEventListener('input', (e) => {
+  const k = e.target.dataset.f; if (!k) return;
+  S.v[k] = e.target.value;
+  if (k === 'name') S.nameTouched = !!e.target.value.trim();
+  refresh();
+  // help lines under value / close / probability follow the input without redrawing the field
+  if (k === 'value' || k === 'close' || k === 'prob') { const tmp = document.createElement('div'); tmp.innerHTML = sValue();
+    ['value', 'close', 'prob'].forEach(f => { const h = $(`[data-fld="${f}"] .help`), n = tmp.querySelector(`[data-fld="${f}"] .help`); if (h && n) h.textContent = n.textContent; }); }
+});
+main.addEventListener('change', (e) => {
+  const k = e.target.dataset.f; if (!k || e.target.tagName !== 'SELECT') return;
+  S.v[k] = e.target.value;
+  if (k === 'acc' || k === 'offering') autoName();
+  if (k === 'geo') S.v.region = '';
+  if (k === 'owner' || k === 'team') { const t = teamNow(); if (t && !S.v.geo) S.v.geo = TEAMS[t].geo; }
+  render();
+});
+
+CRM.renderShell('initiatives');
+{ const t = autoTeam(); if (t) S.v.geo = TEAMS[t].geo; }
+render();
+</script>
+</body>
+</html>

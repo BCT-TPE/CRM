@@ -10,6 +10,8 @@ Redesign of the CRM V1 classic pages, following the old CRMpulse information arc
 | Sales performance | `performance.html` | How did we do? Bookings vs target, win / loss, attainment by team and salesperson |
 | Sales initiatives | `initiatives.html` | Every prospect, lead and opportunity: list, kanban and lifecycle funnel views |
 | Sales initiative record | `initiative.html?id=SI-2026-0024` | One initiative: stage, line items, contacts, activities, tasks, stage history, attachments, next steps. Every row on the other pages opens it |
+| Sales initiative record · edit | `initiative.html?id=SI-2026-0024&mode=edit` | The same record with every field editable; locked fields show why |
+| New sales initiative | `initiative-new.html` | Create a prospect, lead or opportunity; shows what each status needs before it can be created |
 | Pipeline (archived layout) | `pipeline_archieve.html` | The first Pipeline layout, kept for reference |
 
 Activities and Tasks are next. Desktop only (1440 px).
@@ -32,3 +34,4 @@ then go to `http://localhost:5174/pipeline.html`.
 - `assets/theme-v2.css` — blue-glass theme (`body.v2`) used by every page except the archived Pipeline
 - `assets/region-map.js` — dot map generated from world-atlas 110m (ISC licence)
 - `assets/fonts/` — Inter (OFL)
+- `CHANGELOG.md` — what changed in each push to `main`

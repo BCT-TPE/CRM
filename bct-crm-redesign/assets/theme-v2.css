@@ -21,10 +21,10 @@ body.v2 {
   --r-card: 16px;
   --shadow-card: 0 1px 2px rgb(11 26 58 / 4%), 0 10px 30px rgb(0 66 183 / 6%);
   background:
-    radial-gradient(900px 520px at 88% -8%, #cfe2ff 0%, transparent 62%),
-    radial-gradient(760px 480px at 18% -6%, #d6f2ff 0%, transparent 60%),
-    radial-gradient(900px 700px at 70% 105%, #e2e4ff 0%, transparent 60%),
-    linear-gradient(180deg, #f1f6fd 0%, #eef3fb 100%);
+    radial-gradient(900px 520px at 88% -8%, #e6f0ff 0%, transparent 62%),
+    radial-gradient(760px 480px at 18% -6%, #eaf7ff 0%, transparent 60%),
+    radial-gradient(900px 700px at 70% 105%, #efefff 0%, transparent 60%),
+    linear-gradient(180deg, #f9fbfe 0%, #f6f8fc 100%); /* lighter canvas so tinted cards stand out */
   background-attachment: fixed;
 }
 body.v2 .c-won { background: var(--won); }
@@ -63,14 +63,14 @@ body.v2 .nav-item.active { background: #fff; box-shadow: 0 1px 2px rgb(11 26 58 
 body.v2 .filters { background: transparent; gap: 8px; }
 body.v2 .filters.stuck { background: rgb(241 246 253 / 82%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
 body.v2 .filters::after { background: var(--line-2); }
-body.v2 .select, body.v2 .btn { border-radius: 999px; border-color: #fff; background: rgb(255 255 255 / 80%); box-shadow: 0 1px 2px rgb(11 26 58 / 5%); }
+body.v2 .select, body.v2 .btn { border-radius: 999px; border-color: #fff; background: rgb(255 255 255 / 80%); box-shadow: var(--shadow-card); }
 body.v2 .select:hover, body.v2 .btn:hover { background: #fff; }
 body.v2 .select .lbl { padding-left: 14px; }
 body.v2 .select.set, body.v2 .select.open { border-color: var(--deep); background: #fff; }
 body.v2 .btn.primary { background: var(--midnight); border-color: var(--midnight); color: #fff; }
 body.v2 .btn.primary:hover { background: var(--deep); border-color: var(--deep); }
 body.v2 .btn.ghost { background: transparent; border-color: transparent; box-shadow: none; }
-body.v2 .seg { border-radius: 999px; padding: 3px; background: rgb(255 255 255 / 80%); box-shadow: 0 1px 2px rgb(11 26 58 / 5%); }
+body.v2 .seg { border-radius: 999px; padding: 3px; background: rgb(255 255 255 / 80%); box-shadow: var(--shadow-card); }
 body.v2 .seg button { border-radius: 999px; padding: 0 14px; }
 body.v2 .seg button.on { background: var(--midnight); color: #fff; box-shadow: none; }
 body.v2 .seg button.on small { color: var(--sky); }
@@ -180,14 +180,31 @@ body.v2 .pager button.on { background: var(--midnight); color: #fff; border-colo
 /* Drill panel */
 body.v2 .drill { border-left-color: #fff; border-radius: 24px 0 0 24px; }
 
-/* Ring card: the teal from the owner avatars (.av-e: #c9f0f4 fill, #0b6b78 text) + faint concentric rings
+/* Ring card: light sky blue + faint concentric rings
    centred on the % ring, so it separates from the blue cards without pulling focus (user, 2026-11-16) */
 body.v2 .card.ring-card { position: relative; overflow: hidden; isolation: isolate;
-  background: linear-gradient(170deg, #dcf5f7 0%, #ecf9fa 50%, rgb(255 255 255 / 90%) 100%); }
+  background: linear-gradient(170deg, #dcf0fc 0%, #ebf6fd 50%, rgb(255 255 255 / 90%) 100%); } /* light sky blue */
 body.v2 .ring-card .ring::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; width: 560px; height: 560px; transform: translate(-50%, -50%); border-radius: 50%;
-  background: repeating-radial-gradient(circle, transparent 0 22px, rgb(11 107 120 / 9%) 22px 23px);
+  background: repeating-radial-gradient(circle, transparent 0 22px, rgb(0 120 200 / 9%) 22px 23px);
   -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); mask: radial-gradient(circle, #000 30%, transparent 70%); pointer-events: none; }
 body.v2 .ring-card .ring .trk { stroke: rgb(255 255 255 / 90%); }
-body.v2 .ring-card .ring .ticks line { stroke: rgb(11 107 120 / 16%); }
-body.v2 .ring-card .ring .ticks line.on { stroke: #0b6b78; }
+body.v2 .ring-card .ring .ticks line { stroke: rgb(0 120 200 / 16%); }
+body.v2 .ring-card .ring .ticks line.on { stroke: #0a7cc4; }
 body.v2 .ring-card .minis { border-top: 0; }
+
+/* Secondary buttons: any non-primary button sitting on a white card gets a soft blue fill so it reads as a button (2026-11-17) */
+body.v2 .card .btn:not(.primary):not(.ghost):not(:disabled):not([aria-disabled="true"]) { background: var(--info-bg); border-color: transparent; color: var(--deep); box-shadow: none; }
+body.v2 .card .btn:not(.primary):not(.ghost):not(:disabled):not([aria-disabled="true"]):hover { background: #cfe0fb; }
+
+/* Secondary buttons off white cards (page header, tinted cards) use the header Edit button's look: translucent white, ink text (2026-11-17) */
+body.v2 .card.tint .btn:not(.primary):not(.ghost):not(:disabled) { background: rgb(255 255 255 / 80%); border-color: #fff; color: var(--t1); box-shadow: 0 1px 2px rgb(11 26 58 / 5%); }
+body.v2 .card.tint .btn:not(.primary):not(.ghost):not(:disabled):hover { background: #fff; }
+/* Segmented toggle inside a white card: tinted track so it reads against the card */
+body.v2 .card:not(.tint) .seg { background: #f4f7fc; box-shadow: none; } /* same tone as the page canvas, no border */
+body.v2 .card:not(.tint) .seg button:not(.on) { color: var(--t1); }
+body.v2 .kb-col { background: #f4f7fc; } /* same tone as the toggle track and page canvas */
+/* Search field off cards: same pill, border and shadow as the filter selects (2026-11-17) */
+body.v2 .search { border-radius: 999px; border-color: #fff; background: rgb(255 255 255 / 80%); box-shadow: var(--shadow-card); }
+body.v2 .search:focus-within { border-color: var(--deep); }
+body.v2 .card .search { box-shadow: none; }
+body.v2 .card .btn.primary, body.v2 .card .select { box-shadow: none; } /* inside a card, controls stay flat; the card carries the shadow */

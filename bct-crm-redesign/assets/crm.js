@@ -83,7 +83,7 @@
   const SRC = { outlook: ['Outlook mail', 'mail', true], teams: ['Teams calendar', 'calendar', true], files: ['SharePoint files', 'file-text', false], brief: ['Daily brief', 'sparkle', true] };
   // Notifications: their own sidebar item above the profile. Unread state is a blue dot (no number).
   const NOTES = [
-    { id: 1, t: 'Lotus – ERP Upgrade moved to Commercial negotiation', s: 'Vikram Iyer · 2 hours ago', unread: true },
+    { id: 1, t: 'Lotus – ERP Upgrade moved to commercial negotiation', s: 'Vikram Iyer · 2 hours ago', unread: true },
     { id: 2, t: 'Task overdue: Credit check for Sundaram Healthcare', s: 'Assigned to Neha Gupta · yesterday', unread: true },
     { id: 3, t: 'Daniel Tan added you to Singapore – Identity & Access Management', s: '2 days ago', unread: true }
   ];

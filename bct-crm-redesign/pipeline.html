@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="assets/crm.css?v=20261116i">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261116c">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261116j">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261117j">
 </head>
 <body class="v2">
 <div class="app">
@@ -61,7 +61,7 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261116b"></script>
+<script src="assets/crm.js?v=20261117a"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
@@ -503,7 +503,7 @@ function renderDrill(list, base) {
             <small class="${passed ? 'hot' : ''}">${o.close ? fmtDate(o.close) : 'No close date'}</small>
             <small class="${o.days > 90 ? 'hot' : ''}">${o.days} days in stage</small></span>
         </button>`;
-      }).join('') : `<div class="empty"><b>No open opportunities</b>${d.type === 'quarter' && d.v < CUR_Q ? `Q${d.v} has closed. Its bookings are in Sales performance.` : 'Nothing matches this selection with the current filters.'}</div>`}
+      }).join('') : `<div class="empty"><b>No open opportunities</b>${d.type === 'quarter' && d.v < CUR_Q ? `Q${d.v} has closed. Its bookings are in sales performance.` : 'Nothing matches this selection with the current filters.'}</div>`}
     </div>
     <footer class="dr-foot"><button class="btn primary" data-act="si">Open ${rows.length} in Sales initiatives</button><button class="btn ghost" data-act="undrill">Close</button></footer>`;
 }
@@ -511,7 +511,7 @@ drillEl.addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a) return;
   if (a.dataset.act === 'undrill') { S.drill = null; render(); }
   else if (a.dataset.act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
-  else if (a.dataset.act === 'si') toast(`Would open Sales initiatives filtered to “${drillLabel(S.drill)}”`);
+  else if (a.dataset.act === 'si') toast(`Would open sales initiatives filtered to “${drillLabel(S.drill)}”`);
 });
 
 /* Table: every row is two fixed lines (primary + secondary) so rows are equal height; long text ends in an ellipsis
@@ -548,7 +548,7 @@ function tableCard(all) {
   <section class="card s12" id="opp-table" aria-labelledby="tb-h">
     <div class="card-h"><div><h2 id="tb-h">Open opportunities</h2>
       <p>${money(g)} gross · ${money(w)} weighted${outside ? ` · includes ${outside} closing after FY26-27 or without a close date` : ''} · select a row to open the record</p></div>
-      <div class="r"><button class="link" data-act="si">Open in Sales initiatives ${icon('arrow')}</button></div></div>
+      <div class="r"><button class="link" data-act="si">Open in sales initiatives ${icon('arrow')}</button></div></div>
     <div class="tabs" role="tablist" aria-label="Which deals">
       ${TABS.map(([k, n, f]) => { const c = all.filter(f).length; return `<button role="tab" aria-selected="${S.tab === k}" class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-v="${k}">${n}<span class="tab-n ${k !== 'all' && c ? 'hot' : ''}">${c}</span></button>`; }).join('')}
     </div>
@@ -789,7 +789,7 @@ document.querySelector('.main').addEventListener('click', (e) => {
   else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); keepTable(); }
   else if (act === 'page') { S.page = +a.dataset.v; render(); keepTable(); }
   else if (act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
-  else if (act === 'si') toast('Would open Sales initiatives with these filters applied');
+  else if (act === 'si') toast('Would open sales initiatives with these filters applied');
   else if (act === 'reset') resetAll();
   else if (act === 'fy-back') { S.fy = '2627'; render(); }
 });
