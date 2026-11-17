@@ -1,0 +1,122 @@
+/* Responsive layout (2026-11-17). Loaded by every page after theme-v2.css.
+   Desktop (1440) is unchanged. Below it, in order:
+   ≤1360  header KPIs drop under the greeting; filter row wraps.
+   ≤1180  cards re-flow: small cards in pairs, wide ones full width; funnel KPI tiles 3 across.
+   ≤1100  sidebar collapses to the icon rail (crm.js); page padding 24px; tables keep their columns and scroll sideways
+          with the first column pinned (no hidden columns).
+   ≤768   sidebar becomes a drawer behind a top bar; every card full width; filter row stops sticking.
+   ≤480   phone: 16px padding, header KPIs 2×2, smaller page title.
+   Page rules in initiatives.html load after this file, so overrides for them are prefixed with .main.
+   All values are design tokens; breakpoints are written as px because media queries cannot read custom properties. */
+
+/* Record, new-initiative and performance pages (added 2026-11-17). Their page styles load after this file,
+   so these rules are prefixed with .main to win. */
+
+/* Top bar for the drawer (built by crm.js, shown ≤768 only) */
+.m-bar { display: none; }
+.m-scrim { display: none; }
+
+@media (max-width: 1360px) {
+  .v2-head { flex-wrap: wrap; row-gap: var(--space-6); }
+  .v2-hello { flex: 1 1 420px; }
+  .v2-hello h1 { white-space: normal; }
+  .filters { flex-wrap: wrap; row-gap: var(--space-2); }
+}
+
+@media (max-width: 1180px) {
+  .grid > .s2, .grid > .s3, .grid > .s4 { grid-column: span 6; }
+  .grid > .s5, .grid > .s7, .grid > .s8 { grid-column: span 12; }
+  .main .fn-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 1100px) {
+  :root { --pad-page: 24px; }
+  .main { padding: 0 var(--pad-page) var(--pad-page); }
+  .filters { padding-left: var(--pad-page); padding-right: var(--pad-page); margin-left: calc(-1 * var(--pad-page)); margin-right: calc(-1 * var(--pad-page)); }
+  /* Tables: same columns, scroll sideways, first column stays put */
+  .tbl.opp, .tbl.si, .main .tbl.cl { min-width: 1040px; }
+  .tbl.fnt, .main .tbl.att, .main .tbl.li { min-width: 760px; }
+  /* record and new-initiative pages: the right rail moves under the form and stops sticking */
+  .main .rec-grid, .main .ed-grid, .main .nw-grid { grid-template-columns: minmax(0, 1fr); }
+  .main .rail, .main .ed-rail, .main .nw-rail { position: static; }
+  .main .ed-bar { margin: var(--space-4) calc(-1 * var(--pad-page)) calc(-1 * var(--pad-page)); padding-left: var(--pad-page); padding-right: var(--pad-page); }
+  .tbl th:first-child, .tbl td:first-child { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+  .tbl th:first-child { z-index: 2; }
+  body.v2 .tbl tbody tr:hover td:first-child { background: var(--hover); }
+  .tbl-wrap { -webkit-overflow-scrolling: touch; }
+}
+
+@media (max-width: 768px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  /* Drawer */
+  .side { position: fixed; left: 0; top: 0; bottom: 0; z-index: 80; width: 280px; height: auto; transform: translateX(-100%); visibility: hidden;
+    transition: transform var(--dur) var(--ease), visibility 0s var(--dur); box-shadow: var(--shadow-panel); }
+  body.v2 .side { background: var(--surface); }
+  body.nav-open .side { transform: none; visibility: visible; transition: transform var(--dur) var(--ease); }
+  body.nav-open .m-scrim { display: block; position: fixed; inset: 0; z-index: 70; background: color-mix(in srgb, var(--ink) 30%, transparent); }
+  .side-toggle { display: none; }
+  .m-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: var(--space-3); height: 56px; padding: 0 var(--pad-page);
+    background: var(--glass-bar); backdrop-filter: var(--blur-bar); -webkit-backdrop-filter: var(--blur-bar); border-bottom: 1px solid var(--line); }
+  .m-bar .brand { padding: 0; flex: none; }
+  .m-bar .sp { flex: 1; }
+  .m-bar .avatar-img { width: 28px; height: 28px; border-radius: var(--radius-sm); }
+  .v2-head { padding-top: var(--space-6); }
+  .grid > [class*="s"] { grid-column: span 12; }
+  .filters { position: relative; } /* not sticky on small screens; keeps its layer so menus open above the cards */
+  .main .lt-bar { flex-wrap: wrap; }
+  .drill { width: min(480px, 100vw); }
+  .main .fnc-row { grid-template-columns: repeat(6, minmax(112px, 1fr)); overflow-x: auto; padding-bottom: var(--space-1); }
+  /* record page: title, actions and stage stepper */
+  .main .rec-head { flex-wrap: wrap; row-gap: var(--space-3); }
+  .main .rec-t { flex-basis: 100%; }
+  .main .rec-tabs { overflow-x: auto; scrollbar-width: none; }
+  .main .rec-tabs > * { flex: none; }
+  .main .steps2 { overflow-x: auto; scrollbar-width: none; }
+  .main .steps2 ol { min-width: 720px; }
+  .main .facts .f { flex: 1 1 40%; }
+  .main .facts .f.val { flex-basis: 100%; }
+  .main .dl, .main .sum3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .main .bant { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .main .tk-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .main .tk-form > :first-child { grid-column: 1 / -1; }
+  .main .ed-bar { flex-wrap: wrap; row-gap: var(--space-2); }
+  /* zone title keeps one line; its scope note moves under it */
+  .zone { flex-wrap: wrap; row-gap: 2px; }
+  .zone-t { white-space: nowrap; }
+  .zone-s { flex-basis: 100%; padding-left: 18px; }
+  /* table tabs never wrap inside a pill; the row scrolls instead */
+  .tabs { overflow-x: auto; scrollbar-width: none; }
+  .tab { flex: none; white-space: nowrap; }
+}
+
+@media (max-width: 480px) {
+  :root { --pad-page: 16px; --pad-card: 16px; }
+  .card { padding: var(--pad-card); }
+  .tbl-wrap { margin: 0 calc(-1 * var(--pad-card)); }
+  .tbl th:first-child, .tbl td:first-child { padding-left: var(--pad-card); }
+  .tabs, body.v2 .tabs { margin-left: calc(-1 * var(--pad-card)); margin-right: calc(-1 * var(--pad-card)); padding-left: var(--pad-card); padding-right: var(--pad-card); overflow-x: auto; }
+  .v2-hello h1 { font-size: var(--text-3xl); }
+  .v2-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); width: 100%; }
+  .v2-kv { font-size: var(--text-3xl); }
+  .v2-ks { white-space: normal; }
+  .main .search { flex: 1 1 100%; width: auto; }
+  .card-h { flex-wrap: wrap; }
+  .card-h .r { margin-left: 0; }
+  .filters .sp { display: none; }
+  body.v2 .fc .hero-num .big { font-size: var(--text-5xl); }
+  .mix-cols { grid-template-columns: 1fr; gap: var(--space-4); }
+  .qlab small, .qlab .att { white-space: normal; }
+  .ad-row { gap: var(--space-1); }
+  .ad { padding: var(--space-2); }
+  .main .fg, .main .fg.g3, .main .fg.c3, .main .stat3, .main .dl, .main .sum3 { grid-template-columns: minmax(0, 1fr); }
+  .main .fld .btn { max-width: 100%; }
+  /* sticky save / create bar: status on top, the two main buttons side by side; Cancel is the back link at the top */
+  .main .ed-bar { gap: var(--space-1) var(--space-2); padding-top: var(--space-3); padding-bottom: var(--space-3); }
+  .main .ed-bar .sp, .main .ed-bar .btn.ghost { display: none; }
+  .main .ed-bar > :nth-child(3) { flex-basis: 100%; padding-left: var(--space-4); font-size: var(--text-xs); }
+  .main .ed-bar > :nth-last-child(-n+2) { flex: 1 1 0; margin-top: var(--space-1); }
+  .main .ed-bar > :nth-last-child(-n+2) .btn, .main .ed-bar > .btn { width: 100%; justify-content: center; }
+  .main .life-open .life-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .main .fn-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pager { flex-wrap: wrap; }
+}

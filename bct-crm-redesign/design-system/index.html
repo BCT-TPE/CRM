@@ -1,0 +1,263 @@
+<!doctype html>
+<!-- BCT CRM V1 redesign · design system (2026-11-17). Every swatch and value on this page is read from tokens.css,
+     and every component is drawn with the real classes from assets/, so the page cannot drift from the product. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design system · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="../assets/fav.svg">
+<link rel="stylesheet" href="tokens.css?v=20261117dt">
+<link rel="stylesheet" href="../assets/crm.css?v=20261117dt">
+<link rel="stylesheet" href="../assets/dashboard.css?v=20261117dt">
+<link rel="stylesheet" href="../assets/theme-v2.css?v=20261117dt">
+<link rel="stylesheet" href="../assets/responsive.css?v=20261117dt">
+<style>
+/* Page layout only (ds- prefix). Values are tokens. */
+.ds { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: var(--space-10); max-width: 1280px; margin: 0 auto; padding: 0 var(--pad-page) var(--space-10); }
+.ds-nav { position: sticky; top: 0; align-self: start; padding-top: var(--space-10); }
+.ds-nav b { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-5); font-size: var(--text-sm); color: var(--ink); }
+.ds-nav b img { height: 20px; }
+.ds-nav a { display: block; padding: 6px var(--space-3); border-radius: var(--radius-pill); font-size: var(--text-sm); color: var(--t2); }
+.ds-nav a:hover { background: var(--glass); color: var(--ink); }
+.ds-main { min-width: 0; padding-top: var(--space-10); }
+.ds-sec { margin-bottom: var(--space-10); scroll-margin-top: var(--space-6); }
+.ds-sec > h2 { margin: 0 0 var(--space-1); font-size: var(--text-xl); font-weight: 600; color: var(--ink); letter-spacing: -.01em; }
+.ds-sec > p { margin: 0 0 var(--space-4); max-width: 760px; font-size: var(--text-sm); color: var(--t2); }
+.ds-h3 { margin: var(--space-6) 0 var(--space-3); font-size: var(--text-xs); font-weight: 600; color: var(--t3); }
+.ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }
+.sw { display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-card); }
+.sw i { height: 56px; border-bottom: 1px solid var(--line); }
+.sw span { padding: var(--space-2) var(--space-3) var(--space-3); font-size: var(--text-xs); color: var(--t3); line-height: 1.4; }
+.sw b { display: block; font-weight: 500; color: var(--ink); }
+.ds-type { display: grid; grid-template-columns: 120px 64px minmax(0, 1fr); align-items: baseline; gap: var(--space-4); padding: var(--space-3) 0; border-bottom: 1px solid var(--line); }
+.ds-type code, .ds-k { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--text-xs); color: var(--t3); }
+.ds-type span { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ds-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.ds-box { display: grid; place-items: center; width: 96px; height: 72px; background: var(--surface); box-shadow: var(--shadow-card); font-size: var(--text-xs); color: var(--t3); text-align: center; }
+.ds-space { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs); color: var(--t3); }
+.ds-space i { display: block; height: 12px; border-radius: var(--radius-2xs); background: var(--deep); }
+.ds-demo { padding: var(--pad-card); border-radius: var(--radius-card); background: var(--glass-card); border: 1px solid var(--glass-line); }
+.ds-note { margin: var(--space-3) 0 0; font-size: var(--text-xs); color: var(--t3); }
+table.ds-t { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.ds-t th { text-align: left; font-size: var(--text-xs); font-weight: 500; color: var(--t3); padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--line); }
+.ds-t td { padding: var(--space-3); border-bottom: 1px solid var(--line); vertical-align: top; color: var(--t1); }
+.ds-t td:first-child { white-space: nowrap; font-weight: 500; color: var(--ink); }
+.ds-rules { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.ds-rules ul { margin: 0; padding-left: var(--space-5); font-size: var(--text-sm); color: var(--t1); line-height: 1.6; }
+.ds-rules h4 { margin: 0 0 var(--space-2); font-size: var(--text-sm); }
+.ds-do h4 { color: var(--ok); } .ds-dont h4 { color: var(--danger); }
+.ds-static .tip { position: static; opacity: 1; transform: none; display: inline-block; }
+.ds-static .toast { position: static; opacity: 1; transform: none; display: inline-block; }
+@media (max-width: 900px) { .ds { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 var(--space-4) var(--space-10); } .ds-nav { position: static; padding-top: var(--space-6); } .ds-nav nav { display: flex; flex-wrap: wrap; gap: var(--space-1); } .ds-rules { grid-template-columns: 1fr; } .v2-kpis { flex-wrap: wrap; } .ds-t { display: block; overflow-x: auto; } .ds-type { grid-template-columns: 96px 48px minmax(0, 1fr); } }
+</style>
+</head>
+<body class="v2">
+<div class="ds">
+  <aside class="ds-nav">
+    <b><img src="../assets/bct-logo.svg" alt="Bahwan CyberTek"> CRM design system</b>
+    <nav aria-label="Sections">
+      <a href="#use">How to use</a><a href="#type">Type</a><a href="#colour">Colour</a><a href="#radius">Radius &amp; shadow</a>
+      <a href="#space">Spacing &amp; layout</a><a href="#components">Components</a><a href="#charts">Charts</a><a href="#rules">Rules</a><a href="#responsive">Responsive</a>
+    </nav>
+  </aside>
+
+  <main class="ds-main">
+    <header class="v2-head" style="padding-top:0">
+      <div class="v2-hello">
+        <div class="v2-top"><span class="v2-eyebrow">Design system</span><span class="updated"><i></i>Updated 17 Nov 2026</span></div>
+        <h1>BCT CRM V1</h1>
+        <p>Tokens, components and rules for the CRM redesign. The blue-glass theme (v2) is the standard.</p>
+      </div>
+    </header>
+
+    <section class="ds-sec" id="use">
+      <h2>How to use</h2>
+      <p>Load <code class="ds-k">design-system/tokens.css</code> before <code class="ds-k">assets/crm.css</code> on every page, then use <code class="ds-k">var(--…)</code> for every font size, colour, radius and shadow. If a value is missing, add a token here first. Never copy a raw value from a nearby rule.</p>
+      <table class="ds-t"><thead><tr><th>File</th><th>What it holds</th></tr></thead><tbody>
+        <tr><td>design-system/tokens.css</td><td>All values: type, colour, gradients, radius, shadow, spacing, layout, motion.</td></tr>
+        <tr><td>assets/crm.css</td><td>Shell (sidebar, menus, tooltips) and base components: buttons, selects, pills, cards, tables.</td></tr>
+        <tr><td>assets/dashboard.css</td><td>Dashboard components shared by Pipeline and Performance: KPI strips, bars, quarter chart, drill panel.</td></tr>
+        <tr><td>assets/theme-v2.css</td><td>The blue-glass look on <code class="ds-k">body.v2</code>: glass cards, pill controls, header KPIs.</td></tr>
+        <tr><td>assets/responsive.css</td><td>Breakpoints for every page, from 1440 down to a 390px phone.</td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="ds-sec" id="type">
+      <h2>Type</h2>
+      <p>Inter, eleven sizes and nothing in between. Body text is 14px. Sentence case everywhere. Proper nouns stay capitalised.</p>
+      <div id="type-list"></div>
+    </section>
+
+    <section class="ds-sec" id="colour">
+      <h2>Colour</h2>
+      <p>Blue family only. Red is reserved for overdue and needs attention. Forecast categories keep their colour on every page: Closed won is midnight, Commit is deep, Best case is cyan, Pipeline is blue-gray.</p>
+      <div id="colour-groups"></div>
+    </section>
+
+    <section class="ds-sec" id="radius">
+      <h2>Radius &amp; shadow</h2>
+      <p>Cards and popovers are 16px. Controls on the canvas are pills. Every white object on the canvas uses the card shadow. Controls inside a card stay flat, because the card carries the shadow.</p>
+      <div class="ds-h3">Radius</div><div class="ds-row" id="radius-list"></div>
+      <div class="ds-h3">Shadow</div><div class="ds-row" id="shadow-list"></div>
+    </section>
+
+    <section class="ds-sec" id="space">
+      <h2>Spacing &amp; layout</h2>
+      <p>4px steps. Cards are 24px inside, the grid gap is 16px, and the page side padding is 40px. Text never sits closer than 24px to a card edge.</p>
+      <div id="space-list" style="display:grid;gap:var(--space-2)"></div>
+      <div class="ds-h3">Layout</div>
+      <table class="ds-t"><thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead><tbody id="layout-list"></tbody></table>
+    </section>
+
+    <section class="ds-sec" id="components">
+      <h2>Components</h2>
+      <p>Drawn with the product classes. Change a component in <code class="ds-k">assets/</code> and it changes here too.</p>
+
+      <div class="ds-h3">Buttons and links</div>
+      <div class="ds-row">
+        <button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New sales initiative</button>
+        <button class="btn"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export to Excel</button>
+        <button class="btn ghost">Reset</button>
+        <button class="link">Open in sales initiatives <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+      <p class="ds-note">One primary button per view. Secondary buttons on a white card take a soft blue fill so they still read as buttons.</p>
+      <div class="ds-demo card" style="margin-top:var(--space-3)"><div class="ds-row"><button class="btn primary">Move to contract finalization</button><button class="btn">Set next step</button></div></div>
+
+      <div class="ds-h3">Filter row</div>
+      <div class="filters" style="position:static;margin:0;padding:0">
+        <label class="search" style="width:240px"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input type="search" placeholder="Search ID, name, account" aria-label="Search"></label>
+        <label class="select"><span class="lbl">Fiscal year</span><select aria-label="Fiscal year"><option>FY26-27</option><option>FY27-28</option></select></label>
+        <div class="seg" role="radiogroup" aria-label="Quarter"><button class="on">Full year</button><button>Q1</button><button>Q2</button><button>Q3<small>now</small></button><button>Q4</button></div>
+        <button class="btn"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>More filters<span class="count-badge">2</span></button>
+      </div>
+      <p class="ds-note">One filter row per page. Every card, chart and table on the page responds to it. Selects are custom menus (crm.js), never native.</p>
+
+      <div class="ds-h3">Pills, badges and codes</div>
+      <div class="ds-row">
+        <span class="pill">Neutral</span><span class="pill info">Info</span><span class="pill ok">On track</span><span class="pill warn">At risk</span><span class="pill danger">Overdue</span>
+        <span class="code">L1</span><span class="code">L2</span><span class="code">L3</span>
+        <span class="v2-badge">15 deals</span><span class="v2-badge hot">$2.91M</span>
+        <span class="tab-n">12</span><span class="tab-n hot">7</span><span class="count-badge">2</span>
+      </div>
+
+      <div class="ds-h3">Header KPIs</div>
+      <div class="v2-kpis">
+        <div class="v2-kpi"><div class="v2-kv">$7.07<sup>M</sup><span class="v2-badge">15 deals</span></div><div class="v2-kl">Open pipeline</div><div class="v2-ks">Gross value of open opportunities</div></div>
+        <div class="v2-kpi click"><div class="v2-kv">$3.63<sup>M</sup><span class="v2-badge">51%</span></div><div class="v2-kl"><span class="def">Weighted</span></div><div class="v2-ks">of gross</div></div>
+        <div class="v2-kpi alert"><div class="v2-kv">7<span class="v2-badge hot">$2.91M</span></div><div class="v2-kl">Over 90 days in stage</div><div class="v2-ks">0 past close</div></div>
+      </div>
+
+      <div class="ds-h3">Cards</div>
+      <div class="grid">
+        <div class="card s4"><div class="card-h"><div><h2>Glass card</h2><p>Default for every panel</p></div></div><div class="mid">$2.60<sup>M</sup></div><p class="so-what"><b>51%</b> of open value is still early stage.</p></div>
+        <div class="card s4 tint"><div class="card-h"><div><h2>Tinted card</h2><p>One per page, for the main summary</p></div></div><div class="mid">$3.06<sup>M</sup></div><p class="so-what">won + commit of <b>$3.60M</b> target</p></div>
+        <div class="card s4 ring-card"><div class="card-h"><div><h2>Ring card</h2><p>Progress against a target</p></div></div><div class="mid">85%</div><p class="so-what">Won + commit as a share of target</p></div>
+      </div>
+
+      <div class="ds-h3">Table</div>
+      <div class="card">
+        <div class="tabs"><button class="tab on">All open <span class="tab-n">15</span></button><button class="tab">Needs attention <span class="tab-n hot">12</span></button></div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th><span class="th-sort on">Opportunity <span class="arr">↓</span></span></th><th>Owner / team</th><th>Stage</th><th class="r">Value</th><th class="r">Days in stage</th></tr></thead>
+          <tbody><tr><td><div class="t-main">Lotus – ERP Upgrade</div><div class="t-sub">SI-2026-0024 · Lotus Retail India</div></td>
+            <td><div class="own"><span class="av av-a">VI</span><div class="own-t"><div>Vikram Iyer</div><div class="t-sub">India Strategic Accounts</div></div></div></td>
+            <td><div class="stg"><span class="code">L1</span>Commercial negotiation</div><div class="t-sub cat"><i class="c-commit"></i>Commit</div></td>
+            <td class="r t-val">$1.40M</td><td class="r">15</td></tr>
+          <tr><td><div class="t-main">Desert – Data Platform Modernization</div><div class="t-sub">SI-2026-0011 · Desert Industrial Holdings</div></td>
+            <td><div class="own"><span class="av av-c">OH</span><div class="own-t"><div>Omar Haddad</div><div class="t-sub">Middle East Enterprise</div></div></div></td>
+            <td><div class="stg"><span class="code">L3</span>Opportunity identification</div><div class="t-sub cat"><i class="c-pipe"></i>Pipeline</div></td>
+            <td class="r t-val">$650.0K</td><td class="r hot">107</td></tr></tbody></table></div>
+        <div class="pager"><span>Showing 1–2 of 15</span><span class="sp"></span><button disabled>‹</button><button class="on">1</button><button>2</button><button>›</button></div>
+      </div>
+      <p class="ds-note">Rows open the record. Red numbers mean needs attention. On small screens the table keeps every column and scrolls sideways, with the first column pinned.</p>
+
+      <div class="ds-h3">Owner avatars</div>
+      <div class="ds-row"><span class="av av-a">VI</span><span class="av av-b">ML</span><span class="av av-c">OH</span><span class="av av-d">DT</span><span class="av av-e">AR</span></div>
+
+      <div class="ds-h3">Tooltip and toast</div>
+      <div class="ds-row ds-static">
+        <div class="tip" role="tooltip"><b>Weighted</b>Value × probability, summed over open opportunities.</div>
+        <div class="toast" role="status">Saved. 2 changes applied.</div>
+      </div>
+      <p class="ds-note">A dashed underline means the word has a definition tooltip. It is never a click target. Tooltips hold one short line; longer text opens in place.</p>
+
+      <div class="ds-h3">Empty state</div>
+      <div class="card" style="max-width:420px"><div class="empty"><b>No open opportunities</b>Q1 has closed. Its bookings are in sales performance.</div></div>
+    </section>
+
+    <section class="ds-sec" id="charts">
+      <h2>Charts</h2>
+      <p>Forecast categories, from most to least certain. The legend order and colours are the same in every chart, table dot and drill panel.</p>
+      <div class="legend" style="font-size:var(--text-sm)"><span><i class="c-won"></i>Closed won</span><span><i class="c-commit"></i>Commit</span><span><i class="c-best"></i>Best case</span><span><i class="c-pipe"></i>Pipeline</span><span><i class="line"></i>Target</span></div>
+      <div class="fbar" style="margin-top:var(--space-6);max-width:560px"><div class="fbar-track"><i class="c-won" style="width:18%"></i><i class="c-commit" style="width:49%"></i><i class="c-best" style="width:6%"></i><i class="c-pipe" style="width:12%"></i></div><div class="fbar-target" style="left:85%"><span>Target</span></div></div>
+      <div class="ds-h3">Shade ramp: darker means more value</div>
+      <div class="ds-row"><span class="ds-box" style="background:var(--chart-pipe-soft);width:72px;height:32px"></span><span class="ds-box" style="background:var(--cyan-200);width:72px;height:32px"></span><span class="ds-box" style="background:var(--cyan);width:72px;height:32px"></span><span class="ds-box" style="background:var(--deep);width:72px;height:32px"></span></div>
+      <p class="ds-note">Bars are 4px radius with a 2px gap between segments. Clickable marks show a chevron that darkens on hover; static summaries have no hover.</p>
+    </section>
+
+    <section class="ds-sec" id="rules">
+      <h2>Rules</h2>
+      <div class="ds-rules">
+        <div class="card ds-do"><h4>Do</h4><ul>
+          <li>Use tokens for every font size, colour, radius and shadow.</li>
+          <li>Keep one filter row per page, and make every number on the page answer to it.</li>
+          <li>Show the records behind every number: a row or mark opens the list or the record.</li>
+          <li>Write labels in sentence case, and keep stage names lower case mid-sentence.</li>
+          <li>Let tables scroll sideways on small screens instead of hiding columns.</li>
+          <li>Open menus above everything, so cards and sticky bars never cut them off.</li>
+        </ul></div>
+        <div class="card ds-dont"><h4>Don't</h4><ul>
+          <li>Write px font sizes or raw hex colours in pages or shared CSS.</li>
+          <li>Use red for anything except overdue and needs attention.</li>
+          <li>Add a second tinted card, a dark accent card or decorative arrows.</li>
+          <li>Put shadows on controls inside a card.</li>
+          <li>Use native selects. Use the custom menu from crm.js.</li>
+          <li>Use a dashed underline for anything except a definition tooltip.</li>
+        </ul></div>
+      </div>
+    </section>
+
+    <section class="ds-sec" id="responsive">
+      <h2>Responsive</h2>
+      <p>Designed at 1440. Every page also works down to a 390px phone.</p>
+      <table class="ds-t"><thead><tr><th>Width</th><th>What changes</th></tr></thead><tbody>
+        <tr><td>≤ 1360</td><td>Header KPIs drop under the greeting. The filter row wraps.</td></tr>
+        <tr><td>≤ 1180</td><td>Small cards sit in pairs, wide ones go full width. Funnel KPI tiles go 3 across.</td></tr>
+        <tr><td>≤ 1100</td><td>The sidebar becomes the icon rail. Page padding is 24px. Tables scroll sideways with the first column pinned. On the record and new-initiative pages, the right rail moves under the form.</td></tr>
+        <tr><td>≤ 768</td><td>The sidebar becomes a drawer behind a top bar. Every card is full width. The filter row stops sticking.</td></tr>
+        <tr><td>≤ 480</td><td>Phone: 16px padding inside the page and cards, header KPIs 2 × 2, smaller page title and figures, forms in one column. The save bar shows the status above two full-width buttons.</td></tr>
+      </tbody></table>
+    </section>
+  </main>
+</div>
+<script>
+// Swatches and scales read their values from tokens.css at runtime, so this page always matches it.
+(() => {
+  const css = getComputedStyle(document.documentElement), v = n => css.getPropertyValue('--' + n).trim();
+  const TYPE = [['display', 'The one forecast number'], ['5xl', 'Hero number'], ['4xl', 'Page title, header KPIs'], ['3xl', 'KPI card figures'], ['2xl', 'KPI tile figures'], ['xl', 'Panel title'], ['lg', 'Zone title, small figures'], ['md', 'Card title'], ['sm', 'Body, rows, controls, menus'], ['xs', 'Captions, labels, table headers'], ['2xs', 'Badges, counts, stage codes']];
+  document.getElementById('type-list').innerHTML = TYPE.map(([k, use]) => `<div class="ds-type"><code>--text-${k}</code><code>${v('text-' + k)}</code><span style="font-size:var(--text-${k})">${use}</span></div>`).join('');
+  const GROUPS = {
+    Brand: ['ink', 'midnight', 'deep', 'cyan', 'sky', 'ice'],
+    'Cyan ramp': ['cyan-50', 'cyan-100', 'cyan-200', 'cyan-300', 'cyan-400', 'cyan-text', 'ring-blue'],
+    Text: ['t1', 't2', 't3', 't4'],
+    Surfaces: ['canvas', 'surface', 'surface-faint', 'field', 'track', 'hover', 'selected', 'info-hover'],
+    Lines: ['line', 'line-2', 'line-3'],
+    Status: ['danger', 'danger-bg', 'danger-line', 'danger-soft', 'warn', 'warn-bg', 'ok', 'ok-bg', 'ok-text'],
+    Charts: ['chart-gray', 'chart-track', 'chart-pipe', 'chart-pipe-soft', 'chart-commit-soft', 'chart-best-soft', 'chart-under', 'chart-step', 'chart-hatch-a', 'chart-hatch-b'],
+    'Owner avatars': ['av-a-bg', 'av-b-bg', 'av-c-bg', 'av-d-bg', 'av-e-bg'],
+    'Glass and gradients': ['glass', 'glass-card', 'glass-soft', 'grad-tint', 'grad-ring', 'grad-geo'],
+  };
+  const sw = n => `<div class="sw"><i style="background:var(--${n})"></i><span><b>--${n}</b>${/^grad|^glass/.test(n) ? (n.startsWith('grad') ? 'gradient' : 'white, see tokens.css') : v(n)}</span></div>`;
+  document.getElementById('colour-groups').innerHTML = Object.entries(GROUPS).map(([g, list]) => `<div class="ds-h3">${g}</div><div class="ds-grid">${list.map(sw).join('')}</div>`).join('');
+  const rl = document.getElementById('radius-list');
+  rl.innerHTML = ['radius-2xs', 'radius-xs', 'radius-sm', 'radius-md', 'radius-control', 'radius-lg', 'radius-card', 'radius-xl', 'radius-pill'].map(n => `<div class="ds-box" data-r="${n}">--${n}<br>${v(n)}</div>`).join('');
+  rl.querySelectorAll('[data-r]').forEach(el => { el.style.borderRadius = `var(--${el.dataset.r})`; });
+  document.getElementById('shadow-list').innerHTML = ['shadow-card', 'shadow-soft', 'shadow-raise', 'shadow-pop', 'shadow-panel', 'ring-select'].map(n => `<div class="ds-box" style="box-shadow:var(--${n});border-radius:var(--radius-lg);width:140px">--${n}</div>`).join('');
+  document.getElementById('space-list').innerHTML = ['space-1', 'space-2', 'space-3', 'space-4', 'space-5', 'space-6', 'space-8', 'space-10'].map(n => `<div class="ds-space"><code class="ds-k" style="width:96px">--${n}</code><i style="width:var(--${n})"></i>${v(n)}</div>`).join('');
+  const LAYOUT = [['pad-page', 'Page side padding (24px ≤1100, 16px ≤480)'], ['pad-card', 'Inside every card (16px ≤480)'], ['gap-grid', 'Gap between cards'], ['side-w', 'Sidebar'], ['side-w-collapsed', 'Icon rail'], ['control-h', 'Buttons, selects, search']];
+  document.getElementById('layout-list').innerHTML = LAYOUT.map(([n, use]) => `<tr><td>--${n}</td><td>${v(n)}</td><td>${use}</td></tr>`).join('');
+})();
+</script>
+<script src="../assets/crm.js?v=20261117dt"></script>
+</body>
+</html>

@@ -6,9 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pipeline & forecast · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="assets/crm.css?v=20261116i">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261116c">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261117j">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261117dt">
+<link rel="stylesheet" href="assets/crm.css?v=20261117dt">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261117dt">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261117dt">
+<link rel="stylesheet" href="assets/responsive.css?v=20261117dt">
 </head>
 <body class="v2">
 <div class="app">
@@ -61,7 +63,7 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261117a"></script>
+<script src="assets/crm.js?v=20261117dt"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
@@ -284,7 +286,7 @@ function teamMapCard(list) {
   const shade = (v, m = gmax) => !v ? '#e6eaf0' : v / m > .8 ? '#0042B7' : v / m > .45 ? '#00A0E4' : '#a8dcf4';
   const gOn = (g) => S.drill && S.drill.type === 'geo' && S.drill.v === g;
   const dots = (k, fill) => M.dots[k].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${M.r}"/>`).join('');
-  const regionG = geos.map(x => `<g class="geo-g ${gOn(x.g) ? 'on' : ''} ${S.drill && S.drill.type === 'geo' && !gOn(x.g) ? 'dim' : ''}" style="fill:${shade(x.v)}" data-act="drill" data-type="geo" data-v="${x.g}">${dots(x.k)}</g>`).join('');
+  const regionG = geos.map(x => `<g class="geo-g ${gOn(x.g) ? 'on' : ''} ${S.drill && S.drill.type === 'geo' && !gOn(x.g) ? 'dim' : ''}" style="fill: ${shade(x.v)}" data-act="drill" data-type="geo" data-v="${x.g}">${dots(x.k)}</g>`).join('');
   const labels = geos.map(x => {
     const [ax, ay] = GEO_LABEL[x.k];
     return `<button class="geo-l click ${gOn(x.g) ? 'on' : ''}" style="left:${(ax / M.w * 100).toFixed(1)}%;top:${(ay / M.h * 100).toFixed(1)}%" data-act="drill" data-type="geo" data-v="${x.g}" aria-pressed="${gOn(x.g)}"
@@ -299,7 +301,7 @@ function teamMapCard(list) {
     const segs = catSegs(x.os).map(([v, cls, n]) => `<div class='row'><span>${n}</span><span>${money(v)}</span></div>`).join('');
     return `<button class="tm-r click ${on ? 'on' : ''} ${x.n ? '' : 'zero'}" data-act="team" data-v="${esc(x.t)}" aria-pressed="${on}">
       <span class="tm-n">${esc(x.t)}<small>${TEAMS[x.t].geo}</small></span>
-      <span class="lean-bar" data-tip-html="<b>${esc(x.t)}</b><div class='row'><span>Gross</span><span>${money(x.g)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div>${segs}"><i style="width:${(x.g / max * 100).toFixed(1)}%;background:${shade(x.g, max)}"></i></span>
+      <span class="lean-bar" data-tip-html="<b>${esc(x.t)}</b><div class='row'><span>Gross</span><span>${money(x.g)}</span></div><div class='row'><span>Weighted</span><span>${money(x.w)}</span></div>${segs}"><i style="width:${(x.g / max * 100).toFixed(1)}%;background: ${shade(x.g, max)}"></i></span>
       <span class="tm-v">${x.n ? money(x.g) : '—'}<small>${x.n ? `${x.n} deal${x.n === 1 ? '' : 's'}` : 'No deals'}</small></span>
       <span class="tm-p">${x.n ? pct(x.g, tot) + '%' : ''}</span>${chev}
     </button>`;
@@ -308,9 +310,9 @@ function teamMapCard(list) {
   return `
   <section class="card s6 geo-card" aria-labelledby="tm-h">
     <div class="card-h"><div><h2 id="tm-h">By sales team</h2><p>Share of open value · select to see deals</p></div>
-      <div class="r legend shade-lg" aria-label="Darker means more open value"><span>Less</span><i style="background:#a8dcf4"></i><i style="background:#00A0E4"></i><i style="background:#0042B7"></i><span>More</span></div></div>
+      <div class="r legend shade-lg" aria-label="Darker means more open value"><span>Less</span><i style="background: var(--cyan-200)"></i><i style="background: var(--cyan)"></i><i style="background: var(--deep)"></i><span>More</span></div></div>
     ${list.length ? `
-    <div class="geo-map"><svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="Open pipeline by geography: ${geos.map(x => `${x.g} ${money(x.v)}`).join(', ')}"><g fill="#e6eaf0">${dots('')}</g>${regionG}</svg>${labels}</div>
+    <div class="geo-map"><svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="Open pipeline by geography: ${geos.map(x => `${x.g} ${money(x.v)}`).join(', ')}"><g style="fill: var(--chart-pipe-soft)">${dots('')}</g>${regionG}</svg>${labels}</div>
     <div class="tm-list">${rows}</div>
     <p class="so-what"><b>${topG.g}</b> holds ${pct(topG.v, tot)}% of open value; <b>${esc(teams[0].t)}</b> is the largest team at ${pct(teams[0].g, tot)}%.</p>` : emptyMsg()}
   </section>`;
@@ -412,7 +414,7 @@ function quarterCard(base) {
     const attCls = att != null && past && att >= 100 ? 'met' : '';
     const on = S.drill && S.drill.type === 'quarter' && S.drill.v === x.q;
     const tipRows = [['var(--ink)', 'Closed won', x.won], ['var(--deep)', 'Commit', x.commit], ['var(--cyan)', 'Best case', x.best], ['var(--chart-gray)', 'Pipeline', x.pipe]]
-      .map(([c, n, v]) => `<div class='row'><span><i style='background:${c}'></i>${n}</span><span>${money(v)}</span></div>`).join('') + (x.target ? `<div class='row'><span>Target</span><span>${money(x.target)}</span></div>` : '');
+      .map(([c, n, v]) => `<div class='row'><span><i style='background: ${c}'></i>${n}</span><span>${money(v)}</span></div>`).join('') + (x.target ? `<div class='row'><span>Target</span><span>${money(x.target)}</span></div>` : '');
     return `<button class="qcol ${on ? 'on' : ''}" data-act="q" data-q="${x.q}" aria-pressed="${on}" data-tip-html="<b>Q${x.q} FY26-27</b>${tipRows}">
       <div class="qplot">
         <div class="qtot" style="bottom:calc(${h(Math.max(x.total, x.target || 0))} + 6px)">${money(x.total)}</div>
@@ -478,7 +480,7 @@ function renderDrill(list, base) {
     // The sub-stage detail that version A showed on the page lives here now: one click away, nothing removed.
     const st = STAGES.filter(x => x.code === d.v).map(x => { const os = src.filter(o => o.st === x.id); return { x, n: os.length, g: os.reduce((s, o) => s + o.value, 0), w: os.reduce((s, o) => s + o.w, 0) }; });
     const cls = CODE_INFO[d.v].cls;
-    extra = `<div class="dr-stages"><table><thead><tr><th>Stage</th><th class="r">Deals</th><th class="r">Gross</th><th class="r">Weighted</th></tr></thead><tbody>${st.map(r => `<tr><td>${r.x.name}<div class="muted" style="font-size:12px">${r.x.prob}% default</div></td><td class="r">${r.n}</td><td class="r">${money(r.g)}</td><td class="r"><span class="wbar"><i class="${cls}" style="width:${r.g ? (r.w / r.g * 100).toFixed(0) : 0}%"></i></span>${money(r.w)}</td></tr>`).join('')}</tbody></table></div>`;
+    extra = `<div class="dr-stages"><table><thead><tr><th>Stage</th><th class="r">Deals</th><th class="r">Gross</th><th class="r">Weighted</th></tr></thead><tbody>${st.map(r => `<tr><td>${r.x.name}<div class="muted" style="font-size: var(--text-xs)">${r.x.prob}% default</div></td><td class="r">${r.n}</td><td class="r">${money(r.g)}</td><td class="r"><span class="wbar"><i class="${cls}" style="width:${r.g ? (r.w / r.g * 100).toFixed(0) : 0}%"></i></span>${money(r.w)}</td></tr>`).join('')}</tbody></table></div>`;
   }
   if (d.type === 'quarter') {
     const x = quarterStats(d.v, base);

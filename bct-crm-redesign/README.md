@@ -14,7 +14,9 @@ Redesign of the CRM V1 classic pages, following the old CRMpulse information arc
 | New sales initiative | `initiative-new.html` | Create a prospect, lead or opportunity; shows what each status needs before it can be created |
 | Pipeline (archived layout) | `pipeline_archieve.html` | The first Pipeline layout, kept for reference |
 
-Activities and Tasks are next. Desktop only (1440 px).
+Activities and Tasks are next. Every page works from 1440 down to a 390 px phone.
+
+Design system: `design-system/index.html` (tokens in `design-system/tokens.css`).
 
 ## How to open
 
@@ -31,7 +33,9 @@ then go to `http://localhost:5174/pipeline.html`.
 - `assets/crm-data.js` — shared demo data, so numbers match across pages
 - `assets/crm.css`, `assets/crm.js` — shell (sidebar, menus, tooltips) and the type, spacing and colour rules (top of `crm.css`)
 - `assets/dashboard.css` — dashboard components shared by Pipeline and Performance
+- `design-system/tokens.css` — every value (type, colour, radius, shadow, spacing); loaded first by every page
 - `assets/theme-v2.css` — blue-glass theme (`body.v2`) used by every page except the archived Pipeline
+- `assets/responsive.css` — breakpoints for every page
 - `assets/region-map.js` — dot map generated from world-atlas 110m (ISC licence)
 - `assets/fonts/` — Inter (OFL)
 - `CHANGELOG.md` — what changed in each push to `main`

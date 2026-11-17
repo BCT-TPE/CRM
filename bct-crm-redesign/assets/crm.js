@@ -66,6 +66,39 @@
     try { collapsed = localStorage.getItem('crm-side') === 'collapsed'; } catch (e) {}
     setCollapsed(collapsed);
     document.getElementById('side-toggle').addEventListener('click', () => setCollapsed(!document.body.classList.contains('side-collapsed'), true));
+    if (document.querySelector('link[href*="responsive.css"]')) initResponsive(side);
+  }
+
+  // Responsive shell (2026-11-17), only on pages that load assets/responsive.css:
+  // ≤1100 the sidebar shows as the icon rail (the saved preference comes back when the window is wider);
+  // ≤768 it becomes a drawer opened from a top bar, closed by the scrim, Esc or picking a page.
+  function initResponsive(side) {
+    const main = document.querySelector('.main'); if (!main) return;
+    const bar = document.createElement('div'); bar.className = 'm-bar';
+    bar.innerHTML = `<button class="icon-btn" id="m-menu" aria-label="Open navigation" aria-expanded="false" aria-controls="side"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <a class="brand" href="pipeline.html" aria-label="BCT CRM"><img src="assets/bct-logo.svg" alt="Bahwan CyberTek"><span>CRM</span></a><span class="sp"></span>
+      <img class="avatar-img" src="assets/people/gaurav-shrotriya.webp" alt="">`;
+    main.before(bar); // outside <main>: some pages re-render main with innerHTML
+    const scrim = document.createElement('div'); scrim.className = 'm-scrim'; document.body.appendChild(scrim);
+    const btn = bar.querySelector('#m-menu');
+    const setNav = (on) => {
+      document.body.classList.toggle('nav-open', on);
+      btn.setAttribute('aria-expanded', String(on)); btn.setAttribute('aria-label', on ? 'Close navigation' : 'Open navigation');
+      if (on) side.querySelector('a.nav-item')?.focus();
+    };
+    btn.addEventListener('click', () => setNav(!document.body.classList.contains('nav-open')));
+    scrim.addEventListener('click', () => { setNav(false); btn.focus(); });
+    side.addEventListener('click', (e) => { if (e.target.closest('a')) setNav(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('nav-open')) { setNav(false); btn.focus(); } });
+    const rail = matchMedia('(max-width: 1100px)'), drawer = matchMedia('(max-width: 768px)');
+    const apply = () => {
+      // the drawer always shows labels; the rail shows icons; wider windows get the saved preference back
+      if (drawer.matches) setCollapsed(false);
+      else if (rail.matches) setCollapsed(true);
+      else { let c = false; try { c = localStorage.getItem('crm-side') === 'collapsed'; } catch (e) {} setCollapsed(c); }
+      if (!drawer.matches) setNav(false);
+    };
+    rail.addEventListener('change', apply); drawer.addEventListener('change', apply); apply();
   }
   // Account menu: same content, layout and position as the BCT AI CRM prototype's profile menu.
   // Lucide icons, exactly as the prototype draws them (stroke 2, round caps).
@@ -254,7 +287,11 @@
     Object.defineProperty(sel, 'value', { get() { return desc.get.call(this); }, set(v) { desc.set.call(this, v); sync(); } });
     new MutationObserver(sync).observe(sel, { childList: true, subtree: true, attributes: true });
     sync();
-    const open = () => { closeSel(); build(); menu.hidden = false; wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); selOpen = { menu, btn, wrap };
+    const open = () => { closeSel(); build(); menu.classList.remove('up'); menu.hidden = false; wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); selOpen = { menu, btn, wrap };
+      // no room below (window edge or a sticky bar at the bottom): open upward if there is more room there
+      const bars = [...document.querySelectorAll('.ed-bar')].map(b => b.getBoundingClientRect().top).filter(t => t > 0);
+      const floor = Math.min(innerHeight, ...bars) - 8, r = wrap.getBoundingClientRect(), mh = menu.offsetHeight;
+      if (r.bottom + 6 + mh > floor && r.top - 6 - mh > 8) menu.classList.add('up');
       (menu.querySelector('.on') || menu.firstElementChild)?.focus(); };
     btn.addEventListener('click', (e) => { e.preventDefault(); if (selOpen && selOpen.menu === menu) closeSel(); else open(); });
     btn.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(); } });
@@ -272,6 +309,21 @@
     });
   }
   document.addEventListener('click', (e) => { if (selOpen && !selOpen.wrap.contains(e.target)) closeSel(); });
+  // Filter popovers (More filters) are placed by each page next to their button. When the filter row wraps
+  // on smaller windows, keep an open one inside the window (2026-11-17).
+  function keepPopsInView() {
+    document.querySelectorAll('.filters .pop:not([hidden])').forEach((pop) => {
+      pop.style.translate = '';
+      const r = pop.getBoundingClientRect(), pad = 12;
+      const dx = r.left < pad ? pad - r.left : (r.right > innerWidth - pad ? innerWidth - pad - r.right : 0);
+      if (dx) pop.style.translate = `${Math.round(dx)}px 0`;
+      // below the fold on a phone: bring the whole popover into view once
+      if (r.bottom > innerHeight - pad && r.height < innerHeight - 2 * pad) scrollBy({ top: r.bottom - innerHeight + pad, behavior: 'instant' });
+    });
+  }
+  // capture phase: pages stop propagation on their own buttons
+  document.addEventListener('click', () => requestAnimationFrame(keepPopsInView), true);
+  addEventListener('resize', keepPopsInView);
   function enhanceSelects(root) { (root || document).querySelectorAll('.select select').forEach(enhanceSelect); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => enhanceSelects()); else setTimeout(enhanceSelects);
 

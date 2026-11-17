@@ -1,0 +1,156 @@
+/* BCT CRM V1 redesign · design tokens (2026-11-17)
+   The single source of truth for type, colour, radius, shadow, spacing and layout.
+   Every page loads this file before assets/crm.css. Pages and shared CSS use var(--…) only:
+   no px font sizes, no raw hex colours, radii or shadows. A value that is not here is added here first.
+   The standard is the v2 blue-glass theme (body.v2). Documented in design-system/index.html and README.md. */
+:root {
+  /* ---------- Type: Inter. Nine sizes, nothing in between ---------- */
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Segoe UI", sans-serif;
+  --text-2xs: 11px;   /* badges, counts, stage codes */
+  --text-xs: 12px;    /* captions, labels, table headers, legends */
+  --text-sm: 14px;    /* body, table rows, controls, menus */
+  --text-md: 15px;    /* card titles */
+  --text-lg: 16px;    /* zone titles, small figures */
+  --text-xl: 20px;    /* panel titles, mid figures */
+  --text-2xl: 24px;   /* KPI tile figures */
+  --text-3xl: 28px;   /* KPI card figures */
+  --text-4xl: 34px;   /* page titles, header KPIs, ring value */
+  --text-5xl: 40px;   /* hero number */
+  --text-display: 48px; /* the one forecast number per page */
+
+  /* ---------- Brand ---------- */
+  --ink: #0b1a3a;        /* headings, figures, Closed won */
+  --midnight: #052870;   /* primary buttons, selected pills, won */
+  --deep: #0042b7;       /* links, focus, Commit */
+  --cyan: #00a0e4;       /* Best case, accents */
+  --sky: #7cc6ff;
+  --ice: #d9f1ff;        /* small badges on glass */
+  /* cyan ramp, light to dark: lifecycle and "darker = more value" shading */
+  --cyan-50: #e6f5fc;
+  --cyan-100: #c2e7f8;
+  --cyan-200: #a8dcf4;
+  --cyan-300: #7fcdf0;
+  --cyan-400: #5cc3ee;
+  --cyan-text: #006a99;  /* text on cyan tints */
+  --ring-blue: #0a7cc4;  /* ring card ticks */
+
+  /* ---------- Text ---------- */
+  --t1: #252728;  /* body */
+  --t2: #56595b;  /* secondary */
+  --t3: #6b6e70;  /* captions, labels */
+  --t4: #8a8f96;  /* placeholders, items not built yet */
+  --on-dark: #ffffff;
+
+  /* ---------- Surfaces ---------- */
+  --canvas: #f6f8fc;
+  --surface: #ffffff;
+  --surface-faint: #fbfcfe;   /* hover on white tiles */
+  --field: #f7f8fa;           /* read-only fields */
+  --track: #f4f7fc;           /* segmented track and kanban columns inside white cards */
+  --hover: #e8f0fc;
+  --selected: #dfeaff;
+  --info-bg: #dfeaff;
+  --info-hover: #cfe0fb;
+  --primary-disabled: #a9bddd; /* primary button while required items are missing */
+
+  /* ---------- Lines ---------- */
+  --line: #e3e9f3;
+  --line-2: #dbe3ef;
+  --line-3: #c9d5e6;
+
+  /* ---------- Status: red is reserved for overdue and needs attention ---------- */
+  --danger: #c2412d;  --danger-bg: #fbefec;  --danger-line: #f0c9c1;  --danger-soft: #ffd9d1;
+  --warn: #94600f;    --warn-bg: #faf3e6;    --warn-soft: #fde7b0;  --warn-text: #7a4d00; /* longest stretch in stage history */
+  --ok: #3a6b56;      --ok-bg: #eef4f0;      --ok-text: #1f5a35;
+
+  /* ---------- Charts: forecast categories keep their meaning on every page ---------- */
+  --c-won: var(--midnight);
+  --c-commit: var(--deep);
+  --c-best: var(--cyan);
+  --chart-gray: #b9cbe6;         /* Pipeline, lost */
+  --chart-track: #e4ecf8;
+  --chart-pipe: #98a3b3;         /* weighted pipeline */
+  --chart-pipe-soft: #e4e8ee;    /* gross pipeline, empty map dots */
+  --chart-commit-soft: #c7d5f0;
+  --chart-best-soft: #c2e7f8;
+  --chart-under: #5a86c9;        /* below target, in progress */
+  --chart-step: #6b778a;         /* completed sub-stage */
+  --chart-hatch-a: #c9d8ee;
+  --chart-hatch-b: #bccde8;
+
+  /* ---------- Owner avatars: one tint per person ---------- */
+  --av-a-bg: #dbe8ff;  --av-a-fg: var(--deep);
+  --av-b-bg: #d4f0ff;  --av-b-fg: #006c9c;
+  --av-c-bg: #e3e4ff;  --av-c-fg: #3d3fb0;
+  --av-d-bg: var(--midnight); --av-d-fg: var(--on-dark);
+  --av-e-bg: #c9f0f4;  --av-e-fg: #0b6b78;
+
+  /* ---------- Gradients (glass theme) ---------- */
+  --grad-canvas:
+    radial-gradient(900px 520px at 88% -8%, #e6f0ff 0%, transparent 62%),
+    radial-gradient(760px 480px at 18% -6%, #eaf7ff 0%, transparent 60%),
+    radial-gradient(900px 700px at 70% 105%, #efefff 0%, transparent 60%),
+    linear-gradient(180deg, #f9fbfe 0%, var(--canvas) 100%);
+  --grad-tint: linear-gradient(160deg, #d7e9ff 0%, #e9f3ff 45%, color-mix(in srgb, var(--surface) 85%, transparent) 100%);
+  --grad-ring: linear-gradient(170deg, #dcf0fc 0%, #ebf6fd 50%, color-mix(in srgb, var(--surface) 90%, transparent) 100%);
+  --grad-geo: linear-gradient(180deg, #eef5ff, transparent);
+  --grad-skel: linear-gradient(90deg, var(--chart-track) 0%, var(--field) 50%, var(--chart-track) 100%);
+
+  /* ---------- Glass: white at a set opacity ---------- */
+  --glass: color-mix(in srgb, var(--surface) 80%, transparent);         /* pills, buttons and search on the canvas */
+  --glass-card: color-mix(in srgb, var(--surface) 78%, transparent);    /* cards */
+  --glass-soft: color-mix(in srgb, var(--surface) 70%, transparent);    /* hover on glass, bar tracks */
+  --glass-side: color-mix(in srgb, var(--surface) 55%, transparent);    /* sidebar */
+  --glass-line: color-mix(in srgb, var(--surface) 95%, transparent);    /* card borders */
+  --glass-bar: color-mix(in srgb, #f1f6fd 82%, transparent);            /* stuck filter bar */
+  --on-dark-soft: color-mix(in srgb, var(--surface) 18%, transparent);  /* count pills on dark */
+  --blur-card: blur(14px);
+  --blur-bar: blur(16px);
+  --blur-side: blur(18px);
+
+  /* ---------- Radius ---------- */
+  --radius-2xs: 2px;    /* bar segments, legend keys */
+  --radius-xs: 4px;     /* bars */
+  --radius-sm: 6px;     /* badges, small chips */
+  --radius-md: 8px;     /* menu items, tooltips */
+  --radius-control: 10px; /* buttons and fields off the glass theme, nav items */
+  --radius-lg: 12px;    /* tiles and columns inside a card */
+  --radius-card: 16px;  /* cards, popovers, clickable tiles */
+  --r-card: var(--radius-card); /* old name, kept as an alias; use --radius-card */
+  --radius-xl: 24px;    /* side panels */
+  --radius-pill: 999px; /* pills, filter controls, toggles */
+  --radius-full: 50%;   /* dots, avatars, rings */
+
+  /* ---------- Shadow ---------- */
+  --shadow-card: 0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent), 0 10px 30px color-mix(in srgb, var(--deep) 6%, transparent);
+  --shadow-soft: 0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent);   /* selected nav item, knob, on-tint buttons */
+  --shadow-raise: 0 2px 8px color-mix(in srgb, var(--ink) 8%, transparent);  /* hovered kanban card, map labels */
+  --shadow-pop: 0 12px 32px color-mix(in srgb, var(--ink) 14%, transparent), 0 2px 6px color-mix(in srgb, var(--ink) 6%, transparent);
+  --shadow-panel: -12px 0 32px color-mix(in srgb, var(--ink) 10%, transparent);
+  --shadow-up: 0 -1px 2px color-mix(in srgb, var(--ink) 4%, transparent), 0 -10px 30px color-mix(in srgb, var(--deep) 7%, transparent); /* sticky save and create bars */
+  --ring-select: 0 0 0 1px var(--deep);                                       /* selected KPI */
+  --ring-focus-mark: 0 0 0 2px var(--surface), 0 0 0 4px var(--midnight);     /* selected chart mark */
+
+  /* ---------- Spacing: 4px steps ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* ---------- Layout ---------- */
+  --pad-page: 40px;    /* main side padding; 24px under 1100px, 16px on phones */
+  --pad-card: 24px;    /* inside every card; 16px on phones */
+  --gap-grid: 16px;
+  --side-w: 248px;
+  --side-w-collapsed: 64px;
+  --control-h: 36px;
+
+  /* ---------- Motion ---------- */
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --dur-fast: .15s;
+  --dur: .28s;
+}

@@ -7,6 +7,31 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
+## 2026-11-17 (3) · design system and responsive (Candace)
+
+### Added
+- **`design-system/`:** `tokens.css` (type, colour, gradients, radius, shadow, spacing, layout, motion), `index.html` (visual reference drawn with the product classes) and `README.md`.
+- **`assets/responsive.css`:** breakpoints at 1360, 1180, 1100, 768 and 480, loaded by every page. On the record and new-initiative pages the right rail moves under the form at ≤1100, forms go to one column at ≤480, and the save / create bar shows the status above two full-width buttons.
+- **`crm.js`:** on pages that load `responsive.css`, the sidebar becomes the icon rail at ≤1100 and a drawer behind a top bar at ≤768. Filter popovers stay inside the window when the filter row wraps.
+
+### Changed
+- Every page loads `design-system/tokens.css` before `crm.css`. The `:root` block in `crm.css` and the token overrides in `body.v2` moved there; the v2 values are now the standard.
+- Every page except `pipeline_archieve.html` and all shared CSS use tokens only: no px font sizes, raw colours, radii or shadows (`check-tokens.cjs --strict` passes). New tokens: `--warn-soft`, `--warn-text`, `--primary-disabled`, `--shadow-up`.
+- Off-scale values snapped: font size 13 → 12 in the sidebar, 13 → 14 on the record and new-initiative pages (field labels, back link, key facts), 18 → 20, 10 → 11, 36 → 34 (header KPIs); radius 1 → 2, 3 → 4, 5 → 6, 9 → 10, 14 → 12, 18 → 16. At 1440 the only visible change is the header KPI size.
+- The search field styles moved from `initiatives.html` to `crm.css`.
+- `pipeline_archieve.html` keeps its pre-v2 palette with a small override in its head.
+- Cache-busters: every shared asset is `?v=20261117dt`.
+
+### Fixed
+- Custom select menus on the record edit page and the new-initiative form were cut off by the next card or the sticky bar. An open menu now brings its card forward and opens upward when there is no room below.
+- Edit mode: the "Edit line items" button is 40px, the same height as the fields beside it.
+- Sales performance: the "In progress" and "Below target" legend swatches were gray while the bars are blue (`--chart-under`); they now match.
+
+### Not changed
+- Dates still use `en-GB` formatting, which shows September as "Sept".
+
+---
+
 ## 2026-11-17 (2)
 
 ### Changed
