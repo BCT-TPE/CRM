@@ -87,7 +87,7 @@ body.v2 .fc .fbar-target, body.v2 .fc .fbar-exp { top: 28px; } /* both marker la
 body.v2 .fc .sum-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin-top: 18px; }
 body.v2 .fc .sum-legend .lg { display: grid; grid-template-columns: 10px 1fr; align-items: center; column-gap: 8px; row-gap: 2px; padding: 0; font-size: var(--text-xs); color: var(--t3); }
 body.v2 .fc .sum-legend .lg b { grid-column: 2; margin: 0; font-size: var(--text-lg); font-weight: 500; color: var(--ink); }
-body.v2 .fbar-track { gap: 0; border-radius: var(--radius-lg); background: var(--grad-hatch); } /* hatched like the pipeline mix, so the distance to target reads on tinted cards */
+body.v2 .fbar-track { gap: 0; border-radius: var(--radius-lg); background: var(--grad-hatch-soft); } /* soft hatch, lighter than the pipeline segment, so the distance to target reads on tinted cards */
 body.v2 .fbar-track i { box-shadow: inset -2px 0 0 var(--surface); } /* white seam between segments (the track no longer shows through a gap) */
 body.v2 .fbar-track i:first-child { border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
 body.v2 .fbar-track i:last-child { border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }

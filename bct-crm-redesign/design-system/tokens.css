@@ -94,7 +94,8 @@
   --grad-tint: linear-gradient(160deg, #d7e9ff 0%, #e9f3ff 45%, #f1f7ff 100%); /* ends light blue, not white, so white boxes, buttons and bar tracks stay visible to the bottom */
   --grad-ring: linear-gradient(170deg, #dcf0fc 0%, #ebf6fd 50%, #f2f9fe 100%);
   --grad-geo: linear-gradient(180deg, #eef5ff, transparent);
-  --grad-hatch: repeating-linear-gradient(-45deg, var(--chart-hatch-a) 0 6px, var(--chart-hatch-b) 6px 12px); /* pipeline share and the unfilled part of a bar to target */
+  --grad-hatch: repeating-linear-gradient(-45deg, var(--chart-hatch-a) 0 6px, var(--chart-hatch-b) 6px 12px); /* pipeline share in the pipeline mix */
+  --grad-hatch-soft: repeating-linear-gradient(-45deg, #e8eff9 0 6px, #d9e4f4 6px 12px); /* unfilled part of a bar to target: lighter than the pipeline segment beside it */
   --grad-skel: linear-gradient(90deg, var(--chart-track) 0%, var(--field) 50%, var(--chart-track) 100%);
 
   /* ---------- Glass: white at a set opacity ---------- */

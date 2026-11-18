@@ -7,7 +7,15 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-18
+## 2026-11-18 (2)
+
+### Changed
+- **Q3 forecast bar (Pipeline):** the unfilled part up to the target uses a lighter hatch. It is the new `--grad-hatch-soft` token (`#e8eff9` / `#d9e4f4`), so it no longer looks like the solid "Pipeline" segment beside it. The pipeline mix keeps `--grad-hatch`.
+- Cache-busters: `tokens.css` is now `?v=20261118b` and `theme-v2.css` is `?v=20261118e`.
+
+---
+
+## 2026-11-18 · `842ff95`
 
 ### Changed
 - **Pipeline "Q3 progress" card:** the four minis now share the Q3 forecast legend's rhythm: an 18px label line, a 2px gap, then the value, with 14px between rows. At 1440, "Closed won" lines up with "Weighted forecast", and the values line up too.
