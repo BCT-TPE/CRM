@@ -7,7 +7,7 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-18 (3) · forms, toast, date picker (Candace)
+## 2026-11-18 (3) · `12aaff7` · forms, toast, date picker (Candace)
 
 ### Added
 - **Leave without saving asks first** (`CRM.confirm`, `CRM.guardLeave` in `crm.js`, `.dlg` in `crm.css`).
