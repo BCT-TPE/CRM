@@ -7,6 +7,21 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
+## 2026-11-18 (4) · units and page labels (Candace)
+
+### Changed
+- **Money units (K, M):** one rule everywhere. They sit on the baseline, about half the number's size, grey, 2px from the number. Before, header KPIs raised the unit to the top with an 8px gap, and card figures left it floating mid-height.
+  - Header KPIs (`.v2-kv`): unit 16px on 34px (14 on 28 on phones). `.v2-kv` now aligns on the baseline; its badge keeps to the top (`.v2-kv .v2-badge { align-self: flex-start }`).
+  - Hero number (`.big`): unit 24px on 48px, 20 on 40. Card figure (`.mid`): unit 14px on 28px.
+- **Page label pill** (`.v2-eyebrow`) is the page's name: Sales performance (was "Dashboards") and Sales initiatives (was "Sales"). Pipeline already said "Pipeline & forecast".
+- **Design system:** the unit and page-label rules are on `index.html` (Header KPIs) and in `README.md`.
+- Cache-busters: `crm.css` `?v=20261118h`, `theme-v2.css` `?v=20261118i`, `responsive.css` `?v=20261118g`.
+
+### Open
+- On Sales performance and Sales initiatives the pill now repeats the page title right under it. Proposed: drop the pill on pages whose title is the page name (keep "Updated"). Not decided.
+
+---
+
 ## 2026-11-18 (3) · `12aaff7` · forms, toast, date picker (Candace)
 
 ### Added

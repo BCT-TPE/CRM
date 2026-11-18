@@ -40,8 +40,9 @@ body.v2 .nav-item.active { background: var(--surface); box-shadow: var(--shadow-
 .v2-kpi.click { cursor: pointer; padding: 8px 12px; margin: -8px -12px; border-radius: var(--radius-card); transition: background .15s; }
 .v2-kpi.click:hover { background: var(--glass-soft); }
 .v2-kpi.on { background: var(--surface); box-shadow: var(--ring-select); }
-.v2-kv { display: flex; align-items: flex-start; gap: 6px; font-size: var(--text-4xl); font-weight: 400; line-height: 1; letter-spacing: -.035em; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.v2-kv sup { font-size: var(--text-sm); font-weight: 500; letter-spacing: 0; color: var(--t3); margin-left: 2px; align-self: flex-start; }
+.v2-kv { display: flex; align-items: baseline; gap: 6px; font-size: var(--text-4xl); font-weight: 400; line-height: 1; letter-spacing: -.035em; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.v2-kv sup { font-size: var(--text-lg); font-weight: 500; letter-spacing: 0; line-height: 1; color: var(--t3); margin-left: -4px; } /* on the baseline, 2px from the number (6px gap − 4px) */
+.v2-kv .v2-badge { align-self: flex-start; } /* the badge stays at the top */
 .v2-kpi.alert .v2-kv { color: var(--danger); }
 .v2-badge { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; margin-top: 4px; border-radius: var(--radius-pill); background: var(--ice); color: var(--deep); font-size: var(--text-2xs); font-weight: 600; letter-spacing: 0; }
 .v2-badge.hot { background: var(--danger-bg); color: var(--danger); }
@@ -78,6 +79,7 @@ body.v2 .code { border-color: transparent; background: var(--ice); color: var(--
 
 /* Forecast hero (tinted) */
 body.v2 .fc .hero-num .big { font-size: var(--text-display); }
+body.v2 .fc .hero-num .big sup { font-size: var(--text-2xl); }
 .v2-of { margin-top: 6px; font-size: var(--text-sm); color: var(--t2); }
 .v2-of b { font-weight: 600; color: var(--ink); }
 body.v2 .fc .sum-what { margin-top: 12px; }

@@ -108,12 +108,14 @@
   .v2-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); width: 100%; }
   .v2-kpis .v2-kpi { min-width: 0; }
   .v2-kv { font-size: var(--text-3xl); }
+  .v2-kv sup { font-size: var(--text-sm); }
   .v2-ks { white-space: normal; }
   .main .search { flex: 1 1 100%; width: auto; }
   .card-h { flex-wrap: wrap; }
   .card-h .r { margin-left: 0; }
   .filters .sp { display: none; }
   body.v2 .fc .hero-num .big { font-size: var(--text-5xl); }
+  body.v2 .fc .hero-num .big sup { font-size: var(--text-xl); }
   .mix-cols { grid-template-columns: 1fr; gap: var(--space-4); }
   .qlab small, .qlab .att { white-space: normal; }
   .ad-row { gap: var(--space-1); }

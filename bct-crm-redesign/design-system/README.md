@@ -33,6 +33,10 @@ node ~/.claude/skills/prototype-polish/scripts/check-tokens.cjs --tokens=design-
 | `--text-5xl` | 40 | hero number |
 | `--text-display` | 48 | the one forecast number per page |
 
+**Money units:** K and M sit on the baseline, about half the number's size, `--t3`, 2px from the number. Header KPI 34 → unit 16 (`--text-lg`); hero 48 → 24 (`--text-2xl`); hero 40 → 20; card figure 28 → 14. On phones the KPI is 28 → 14.
+
+**Page label:** the pill above the page title (`.v2-eyebrow`) is the page's own name, as in the sidebar, never the sidebar group.
+
 ## Radius
 
 `--radius-2xs` 2 · `--radius-xs` 4 · `--radius-sm` 6 · `--radius-md` 8 · `--radius-control` 10 · `--radius-lg` 12 · `--radius-card` 16 · `--radius-xl` 24 · `--radius-pill` 999 · `--radius-full` 50%.
