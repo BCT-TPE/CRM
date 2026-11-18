@@ -7,7 +7,7 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-18 (4) · units and page labels (Candace)
+## 2026-11-18 (4) · `6190f7d` · units and page labels (Candace)
 
 ### Changed
 - **Money units (K, M):** one rule everywhere. They sit on the baseline, about half the number's size, grey, 2px from the number. Before, header KPIs raised the unit to the top with an 8px gap, and card figures left it floating mid-height.
