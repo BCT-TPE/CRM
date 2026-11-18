@@ -6,10 +6,10 @@
 <title>New sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
-<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118g">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261118e">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118h">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118f">
 <style>
 /* ---------- Page: new sales initiative ----------
    Same fields and order as CRMpulse /initiatives/new (status & sub-stage, account & ownership, value & forecast,
@@ -62,7 +62,7 @@ textarea.in { height: auto; min-height: 84px; padding: 10px 12px; resize: vertic
 .in-wrap .in-suffix { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: var(--text-sm); color: var(--t3); }
 .money { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; }
 .fld .help { font-size: var(--text-xs); color: var(--t3); }
-.fld.bad .in, .fld.bad .fsel { border-color: var(--danger); }
+.fld.bad .in, .fld.bad .fsel, body.v2 .fld.bad label.select.fsel { border-color: var(--danger); } /* the v2 select rule below would win otherwise */
 .fld .err { font-size: var(--text-xs); color: var(--danger); }
 body.v2 label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: var(--radius-control); border-color: var(--line-2); background: var(--surface); box-shadow: none; }
 body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(--line-3); }
@@ -118,8 +118,8 @@ body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261118a"></script>
-<script src="assets/crm-data.js?v=20261116a"></script>
+<script src="assets/crm.js?v=20261118f"></script>
+<script src="assets/crm-data.js?v=20261118a"></script>
 <script>
 const { money, toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -294,26 +294,30 @@ function rail() {
       <p class="rail-note">Switch the status to see what each stage needs. Attachments can be added after the initiative is created.</p>
     </section>`;
 }
+// One action: Create. Line items are added on the record after it exists (its Line items tab), so there is no
+// "Create & add line items" here (Candace, 2026-11-18). The bar holds the actions only; what is still needed shows in the rail checklist, and pressing Create
+// with something missing marks those fields (Candace, 2026-11-18)
 function bar() {
-  const m = missing(), ready = !m.length;
-  const why = ready ? '' : `Complete ${m.length} required item${m.length === 1 ? '' : 's'} first: ${m.map(x => x[0]).join(', ')}.`;
-  return `<span class="dot"></span><b>${ready ? 'Ready to create' : `${m.length} required item${m.length === 1 ? '' : 's'} left`}</b><span>${ready ? 'You can add line items next.' : esc(m.map(x => x[0]).join(' · '))}</span><span class="sp"></span>
+  return `<span class="sp"></span>
     <a class="btn ghost" href="initiatives.html">Cancel</a>
-    <span ${why ? `data-tip="${esc(why)}"` : ''}><button class="btn" data-act="create" data-v="items" ${ready ? '' : 'disabled'}>Create &amp; add line items</button></span>
-    <span ${why ? `data-tip="${esc(why)}"` : ''}><button class="btn primary" data-act="create" ${ready ? '' : 'disabled'}>Create initiative</button></span>`;
+    <button class="btn primary" data-act="create">Create initiative</button>`;
 }
 
 function render() {
   $('#main').innerHTML = `<div class="back-bar"><a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a></div>
     <header class="nw-head"><h1>New sales initiative</h1><p>One record from first interest to closure. Start with what you know; you can add the rest as it progresses.</p></header>
     <div class="nw-grid"><div class="nw-main">${sStatus()}${sAccount()}${sValue()}${sNext()}${sBant()}${sClass()}</div><aside class="nw-rail" id="rail">${rail()}</aside></div>
-    <div class="ed-bar ${missing().length ? '' : 'ready'}" id="ed-bar">${bar()}</div>`;
+    <div class="ed-bar" id="ed-bar">${bar()}</div>`;
   CRM.enhanceSelects($('#main'));
 }
 // While typing, only redraw what depends on the value so focus stays in the field
 function refresh() {
   $('#rail').innerHTML = rail();
-  const b = $('#ed-bar'); b.innerHTML = bar(); b.classList.toggle('ready', !missing().length);
+  // after a Create attempt, a field's red mark clears (or comes back) as it is filled in
+  if (S.tried) { const tmp = document.createElement('div'); tmp.innerHTML = `${sAccount()}${sValue()}${sNext()}${sBant()}${sClass()}`;
+    document.querySelectorAll('#main [data-fld]').forEach(box => { const n = tmp.querySelector(`[data-fld="${box.dataset.fld}"]`); if (!n || n.classList.contains('bad') === box.classList.contains('bad')) return;
+      box.classList.toggle('bad'); const a = box.querySelector(':scope > .err, :scope > .help'), b = n.querySelector(':scope > .err, :scope > .help');
+      if (a && b) a.replaceWith(b); else if (a) a.remove(); else if (b) box.appendChild(b); }); }
 }
 function autoName() { if (S.nameTouched) return; const off = S.v.offering; S.v.name = S.v.acc && off ? `${S.v.acc.split(' ')[0]} – ${off}` : ''; }
 
@@ -326,7 +330,11 @@ main.addEventListener('click', (e) => {
   else if (act === 'pick') { S.v.next = v; render(); }
   else if (act === 'fold') { S.more = !S.more; render(); }
   else if (act === 'toast') toast(v);
-  else if (act === 'create') toast(v === 'items' ? 'Would create the initiative and open its line items' : 'Would create the initiative and open it');
+  else if (act === 'create') {
+    if (missing().length) { S.tried = true; if (missing().some(m => m[2] === 'sbu')) S.more = true; /* SBU sits in the folded section */ render(); toast('Please complete all required fields.', 'warn');
+      const bad = document.querySelector('.fld.bad'); if (bad) { bad.scrollIntoView({ block: 'center', behavior: 'smooth' }); const f = bad.querySelector('input, textarea, button'); if (f) f.focus({ preventScroll: true }); }
+      return; }
+    toast(isOpp() ? 'Would create the opportunity and open it on Line items' : 'Would create the initiative and open it'); }
 });
 main.addEventListener('input', (e) => {
   const k = e.target.dataset.f; if (!k) return;
@@ -349,6 +357,19 @@ main.addEventListener('change', (e) => {
 CRM.renderShell('initiatives');
 { const t = autoTeam(); if (t) S.v.geo = TEAMS[t].geo; }
 render();
+
+// Leaving with something entered asks first: Cancel, the back link, the sidebar (Candace, 2026-11-18).
+// Nothing is saved until the initiative is created, so the only choice is keep editing or discard. General wording.
+const snap = () => JSON.stringify({ status: S.status, sub: S.sub, v: S.v });
+const START = snap();
+CRM.guardLeave(() => snap() !== START, async (url) => {
+  const v = await CRM.confirm({
+    title: 'Discard this initiative?',
+    body: '<p>What you\'ve entered will be lost.</p>',
+    actions: [{ label: 'Discard', value: 'discard', kind: 'quiet' }, { label: 'Keep editing', value: null, kind: 'primary' }]
+  });
+  if (v === 'discard') CRM.leave(url);
+});
 </script>
 </body>
 </html>

@@ -7,6 +7,35 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
+## 2026-11-18 (3) · forms, toast, date picker (Candace)
+
+### Added
+- **Leave without saving asks first** (`CRM.confirm`, `CRM.guardLeave` in `crm.js`, `.dlg` in `crm.css`).
+  - **Record edit mode:** Cancel, the back link, the sidebar or the browser's back button with unsaved changes opens "Save changes?": Discard · Keep editing · Save. Save only leaves when validation passes.
+  - **New initiative:** leaving with anything entered opens "Discard this initiative?": Discard · Keep editing.
+  - Reload or closing the tab gets the browser's own prompt. With no changes, pages leave without asking.
+- **Date picker** (`enhanceDate` in `crm.js`, `.dt-*` in `crm.css`): every `<input type="date">` becomes a field button and a calendar popover in the select's style. The input stays the data source, so page code is unchanged.
+  - Shortcuts: expected close dates offer the ends of this and next fiscal quarter; follow-up and task due dates offer Tomorrow and Next week.
+  - Keyboard: arrows move the day, PageUp / PageDown change month, Enter picks, Esc closes. Opens upward or scrolls into view when there is no room.
+  - "Today" is the demo's `TODAY` (13 Nov 2026), so it agrees with the overdue flags.
+- **Line items empty state** (`initiative.html`): "No line items yet" with an "Add line items" button. Existing demo records all have items, so it shows only for a new opportunity.
+- **Design system:** toast, confirm dialog, text field, date picker, required fields and the empty state with an action are on `design-system/index.html`; `README.md` has a shared-components table.
+
+### Changed
+- **One date format:** `18 Nov 2026`, or `18 Nov` without the year (`CRM.date`). Replaces `06-Jul-2026` on the record page and fixes "Sept" (Chrome's en-GB month name). `fmtDate` in `crm-data.js` and the list's follow-up dates use it.
+- **Toast:** top centre, white glass with an icon by kind: `warn` (red !), `ok` (green ✓), `info` (blue i, default). Under the top bar on phones. `CRM.toast(text, kind)`; saved, added and exported messages use `ok`, check-the-fields and nothing-to-export use `warn`.
+- **New initiative bottom bar:** Create initiative is always clickable. With required fields missing it shows "Please complete all required fields.", marks each missing field in red and scrolls to the first; marks clear as fields are filled. If SBU is missing, the folded "Classification, team & notes" section opens. The "3 required items left · …" text is gone (the rail checklist still shows it). "Create & add line items" is removed: line items are added on the record after it exists.
+- **Q3 progress ring (Pipeline):** no background rings inside the % ring or between it and its ticks.
+- **Text field `.in`** is now in `crm.css` as well, so the design system and the date picker share it. The copies in `initiative.html` and `initiative-new.html` are identical and can be removed.
+- Cache-busters: `crm.css` `?v=20261118g`, `crm.js` `?v=20261118f`, `crm-data.js` `?v=20261118a`, `theme-v2.css` `?v=20261118h`, `responsive.css` `?v=20261118f`. `design-system/index.html` now loads the current versions.
+
+### Fixed
+- **Record edit:** after typing in a field, the first click on Cancel or Save did nothing (the bar was redrawn on blur). One click works now.
+- **Required dropdowns** (Account, SBU) now get the red border, not only the red line under them.
+- Phone save bar: the status-line rule in `responsive.css` now only applies to bars that have a status (`.dot + * + span`), not to the new-initiative bar.
+
+---
+
 ## 2026-11-18 (2)
 
 ### Changed

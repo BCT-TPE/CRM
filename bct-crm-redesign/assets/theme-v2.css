@@ -183,7 +183,8 @@ body.v2 .card.ring-card { position: relative; overflow: hidden; isolation: isola
   background: var(--grad-ring); } /* light sky blue */
 body.v2 .ring-card .ring::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; width: 560px; height: 560px; transform: translate(-50%, -50%); border-radius: var(--radius-full);
   background: repeating-radial-gradient(circle, transparent 0 22px, color-mix(in srgb, var(--ring-blue) 9%, transparent) 22px 23px);
-  -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); mask: radial-gradient(circle, #000 30%, transparent 70%); pointer-events: none; }
+  /* no lines inside the % ring or between it and its ticks (0–72px), so the number sits on a clean field (Candace, 2026-11-18) */
+  -webkit-mask: radial-gradient(circle, transparent 0 72px, #000 72px 30%, transparent 70%); mask: radial-gradient(circle, transparent 0 72px, #000 72px 30%, transparent 70%); pointer-events: none; }
 body.v2 .ring-card .ring .trk { stroke: color-mix(in srgb, var(--surface) 90%, transparent); }
 body.v2 .ring-card .ring .ticks line { stroke: color-mix(in srgb, var(--ring-blue) 16%, transparent); }
 body.v2 .ring-card .ring .ticks line.on { stroke: var(--ring-blue); }
@@ -205,3 +206,7 @@ body.v2 .search { border-radius: var(--radius-pill); border-color: var(--surface
 body.v2 .search:focus-within { border-color: var(--deep); }
 body.v2 .card .search { box-shadow: none; }
 body.v2 .card .btn.primary, body.v2 .card .select { box-shadow: none; } /* inside a card, controls stay flat; the card carries the shadow */
+/* Confirm dialog: buttons follow the white-card rules above (2026-11-18) */
+body.v2 .dlg .btn:not(.primary):not(.quiet) { background: var(--info-bg); border-color: transparent; color: var(--deep); box-shadow: none; }
+body.v2 .dlg .btn:not(.primary):not(.quiet):hover { background: var(--info-hover); }
+body.v2 .dlg .btn.primary { box-shadow: none; }

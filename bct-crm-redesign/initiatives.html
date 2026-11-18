@@ -6,10 +6,10 @@
 <title>Sales initiatives · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
-<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118g">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261118e">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118h">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118f">
 <style>
 /* ---------- Page: Sales initiatives (list page) ---------- */
 /* Lifecycle strip: status tiles filter the list (list-page behaviour, as in the old CRM) */
@@ -165,8 +165,8 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261118a"></script>
-<script src="assets/crm-data.js?v=20261116a"></script>
+<script src="assets/crm.js?v=20261118f"></script>
+<script src="assets/crm-data.js?v=20261118a"></script>
 <script>
 /* Sales initiatives — the list behind every number on the dashboards (requirement 5.12: list, kanban and funnel views). */
 const { money, moneyBig, icon, toast } = CRM;
@@ -183,7 +183,7 @@ const STATUS = [
   ['all', 'All', 'dot-all', () => true]
 ];
 const NOUN = { open: 'open initiatives', Prospect: 'prospects', Lead: 'leads', Opportunity: 'open opportunities', won: 'closed won', lost: 'closed lost', all: 'initiatives' };
-const fu = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : null;
+const fu = (d) => CRM.date(d, false); // "18 Nov"
 function needs(o) {
   if (o.kind !== 'open') return [];
   const r = [];
@@ -505,7 +505,7 @@ $('#export').addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
   a.download = 'sales-initiatives.csv'; a.click();
-  toast(`Exported ${rows.length} initiatives`);
+  toast(`Exported ${rows.length} initiatives`, 'ok');
 });
 
 CRM.renderShell('initiatives');

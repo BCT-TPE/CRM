@@ -38,6 +38,22 @@ node ~/.claude/skills/prototype-polish/scripts/check-tokens.cjs --tokens=design-
 `--radius-2xs` 2 · `--radius-xs` 4 · `--radius-sm` 6 · `--radius-md` 8 · `--radius-control` 10 · `--radius-lg` 12 · `--radius-card` 16 · `--radius-xl` 24 · `--radius-pill` 999 · `--radius-full` 50%.
 `--r-card` is the old name of `--radius-card`; it is kept as an alias so older code still works. Use `--radius-card`.
 
+## Shared components (crm.js / crm.css)
+
+Use these instead of building a new one. They are drawn on `index.html`.
+
+| Component | How | Rules |
+|---|---|---|
+| Custom select | any `.select select` | Never the native select. |
+| Date picker | any `<input type="date">` (made by `CRM.enhanceSelects`) | Never the browser's picker. Close dates (`data-f="close"` or `data-dt="quarter"`) offer the fiscal quarter ends; other dates offer Tomorrow and Next week. |
+| Date format | `CRM.date(d)` → `18 Nov 2026`; `CRM.date(d, false)` → `18 Nov` | One format on every page. Fixed month names (no "Sept"). |
+| Toast | `CRM.toast(text, kind)` | Top centre, white glass. `kind`: `warn` needs attention (red !), `ok` done (green ✓), `info` default (blue i). |
+| Confirm dialog | `CRM.confirm({ title, body, actions })` → the chosen `value`, or `null` | Short, general wording, no field lists. Destructive choice `kind: 'quiet'` (red text, left); main choice `kind: 'primary'`. Esc and outside click = keep editing. |
+| Leave guard | `CRM.guardLeave(isDirty, ask)`, `CRM.leave(url)` | Ask before leaving a page with unsaved input: links, Cancel, the browser's back button; reload / close gets the browser's prompt. |
+| Text field | `.in` | 40px high, 10px radius. Shared in `crm.css` since 18 Nov 2026. |
+
+**Required fields:** create and save buttons are never disabled. Pressing one with something missing shows `Please complete all required fields.` (warn toast), marks each missing field in red with a line under it, and scrolls to the first. The mark clears as the field is filled.
+
 ## Responsive
 
 Designed at 1440. `assets/responsive.css` makes every page work down to a 390 px phone:

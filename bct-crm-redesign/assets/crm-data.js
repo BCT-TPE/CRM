@@ -145,6 +145,6 @@ function attention(o) {
   if (o.open > 90) r.push(`Open ${o.open} days`);
   return r;
 }
-const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+const fmtDate = (d) => CRM.date(d); // "18 Nov 2026", shared with the date picker (crm.js)
 const pct = (a, b) => b ? Math.round(a / b * 100) : null;
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

@@ -73,6 +73,7 @@
   .filters { position: relative; } /* not sticky on small screens; keeps its layer so menus open above the cards */
   .main .lt-bar { flex-wrap: wrap; }
   .drill { width: min(480px, 100vw); }
+  .toast { top: calc(56px + var(--space-3)); } /* under the top bar */
   .main .fnc-row { grid-template-columns: repeat(6, minmax(112px, 1fr)); overflow-x: auto; padding-bottom: var(--space-1); }
   /* record page: title, actions and stage stepper */
   .main .rec-head { flex-wrap: wrap; row-gap: var(--space-3); }
@@ -122,7 +123,7 @@
   /* sticky save / create bar: status on top, the two main buttons side by side; Cancel is the back link at the top */
   .main .ed-bar { gap: var(--space-1) var(--space-2); padding-top: var(--space-3); padding-bottom: var(--space-3); }
   .main .ed-bar .sp, .main .ed-bar .btn.ghost { display: none; }
-  .main .ed-bar > :nth-child(3) { flex-basis: 100%; padding-left: var(--space-4); font-size: var(--text-xs); }
+  .main .ed-bar > .dot + * + span { flex-basis: 100%; padding-left: var(--space-4); font-size: var(--text-xs); } /* status line, on bars that have one */
   .main .ed-bar > :nth-last-child(-n+2) { flex: 1 1 0; margin-top: var(--space-1); }
   .main .ed-bar > :nth-last-child(-n+2) .btn, .main .ed-bar > .btn { width: 100%; justify-content: center; }
   .main .life-open .life-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }

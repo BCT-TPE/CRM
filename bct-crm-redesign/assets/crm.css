@@ -166,6 +166,48 @@ body.scrolled .back-bar::after { opacity: 1; }
    when there is no room below (crm.js adds .up). 2026-11-17 */
 .card:has(.select.open) { position: relative; z-index: 40; }
 .sel-pop.up { top: auto; bottom: calc(100% + 6px); }
+/* Text field (2026-11-18): the form pages had this in their own <style>; shared here so the design system and the
+   date picker draw the same field. The pages' copies are identical and can be removed later. */
+.in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); outline: none; }
+.in::placeholder { color: var(--t3); }
+.in:hover { border-color: var(--line-3); }
+.in:focus { border-color: var(--deep); }
+textarea.in { height: auto; min-height: 84px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.in:disabled, .in[readonly] { background: var(--field); color: var(--t2); border-color: var(--line); cursor: not-allowed; }
+/* Date picker: crm.js enhanceDate (Candace, 2026-11-18). The button takes the replaced input's classes (.in). */
+.dt { position: relative; display: block; min-width: 0; }
+.card:has(.dt.open) { position: relative; z-index: 40; }
+.dt-btn { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); width: 100%; text-align: left; cursor: pointer; }
+.dt-btn .dt-v { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dt-btn.ph .dt-v { color: var(--t3); }
+.dt-btn .dt-ic { flex: none; width: 18px; height: 18px; fill: none; stroke: var(--t3); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dt-btn:hover:not(:disabled) { border-color: var(--line-3); }
+.dt-btn:focus-visible, .dt.open .dt-btn { border-color: var(--deep); }
+.dt-btn:disabled { cursor: not-allowed; background: var(--field); color: var(--t3); }
+.dt-pop { top: calc(100% + 6px); left: 0; width: 304px; max-width: calc(100vw - 2 * var(--space-4)); min-width: 0; padding: var(--space-3); }
+.dt-pop.up { top: auto; bottom: calc(100% + 6px); }
+.dt-quick { display: flex; flex-wrap: wrap; gap: var(--space-2); padding-bottom: var(--space-3); border-bottom: 1px solid var(--line); }
+.dt-quick button { display: inline-flex; align-items: baseline; gap: var(--space-1); height: 30px; padding: 0 var(--space-3); border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface); font: inherit; font-size: var(--text-xs); font-weight: 500; line-height: 28px; color: var(--t1); cursor: pointer; }
+.dt-quick button small { font-size: var(--text-xs); font-weight: 400; color: var(--t3); }
+.dt-quick button:hover { border-color: var(--hover); background: var(--hover); }
+.dt-head { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-1) var(--space-2); }
+.dt-head b { font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
+.dt-nav { display: flex; gap: 2px; }
+.dt-nav button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: var(--radius-full); background: none; color: var(--t2); cursor: pointer; }
+.dt-nav button:hover { background: var(--hover); color: var(--ink); }
+.dt-nav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.dt-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: 2px; }
+.dt-grid .wd { display: grid; place-items: center; height: 26px; font-size: var(--text-2xs); font-weight: 600; color: var(--t3); }
+.dt-grid button { justify-self: center; width: 36px; height: 36px; border: 0; border-radius: var(--radius-full); background: none; font: inherit; font-size: var(--text-sm); color: var(--t1); font-variant-numeric: tabular-nums; cursor: pointer; }
+.dt-grid button:hover { background: var(--hover); }
+.dt-grid button.out { color: var(--t4); }
+.dt-grid button.today { box-shadow: inset 0 0 0 1px var(--deep); color: var(--deep); font-weight: 600; }
+.dt-grid button.on { background: var(--midnight); box-shadow: none; color: var(--on-dark); font-weight: 600; }
+.dt-pop button:focus-visible { outline: 2px solid var(--deep); outline-offset: 1px; }
+.dt-foot { display: flex; justify-content: space-between; margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--line); }
+.dt-foot button { height: 30px; padding: 0 var(--space-2); border: 0; border-radius: var(--radius-md); background: none; font: inherit; font-size: var(--text-sm); font-weight: 500; color: var(--deep); cursor: pointer; }
+.dt-foot button:hover { background: var(--hover); }
+.dt-foot [data-clear] { color: var(--t2); }
 .sel-opt { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; height: 36px; padding: 0 10px; border: 0; border-radius: var(--radius-md); background: transparent; font-size: var(--text-sm); text-align: left; white-space: nowrap; cursor: pointer; outline: none; }
 .sel-opt:hover, .sel-opt:focus-visible { background: var(--hover); }
 .sel-opt svg { width: 16px; height: 16px; flex: none; fill: none; stroke: var(--deep); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; visibility: hidden; }
@@ -273,8 +315,34 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 @keyframes skel { to { background-position: -200% 0; } }
 
 /* Toast */
-.toast { position: fixed; left: 50%; bottom: 28px; z-index: 120; transform: translate(-50%, 12px); padding: 10px 16px; border-radius: var(--radius-control); background: var(--midnight); color: var(--on-dark); font-size: var(--text-sm); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s var(--ease); }
+/* Toast: top centre, white glass with an icon by kind (Candace, 2026-11-18). Below the phone top bar at ≤768 (responsive.css). */
+.toast { position: fixed; left: 50%; top: var(--space-6); z-index: 120; display: flex; align-items: center; gap: var(--space-2); width: max-content; max-width: calc(100vw - 2 * var(--space-4));
+  transform: translate(-50%, -8px); padding: 10px 16px 10px 10px; border: 1px solid var(--glass-line); border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: var(--blur-card); -webkit-backdrop-filter: var(--blur-card); box-shadow: var(--shadow-pop);
+  color: var(--ink); font-size: var(--text-sm); font-weight: 500; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s var(--ease); }
+.toast i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: var(--radius-full); background: var(--info-bg); color: var(--deep); }
+.toast i svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.toast.t-ok i { background: var(--ok-bg); color: var(--ok); }
+.toast.t-warn i { background: var(--danger-bg); color: var(--danger); }
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .toast { transition: opacity .2s; } }
+/* Confirm dialog: CRM.confirm() in crm.js (2026-11-18) */
+.dlg-scrim { position: fixed; inset: 0; z-index: 110; display: grid; place-items: center; padding: var(--space-4); background: color-mix(in srgb, var(--ink) 30%, transparent); opacity: 0; transition: opacity var(--dur-fast) var(--ease); }
+.dlg-scrim.on { opacity: 1; }
+.dlg { width: min(440px, 100%); padding: var(--space-6); border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--shadow-pop); transform: translateY(6px); transition: transform var(--dur) var(--ease); }
+.dlg-scrim.on .dlg { transform: none; }
+.dlg h2 { margin: 0; font-size: var(--text-xl); font-weight: 600; color: var(--ink); letter-spacing: -.01em; }
+.dlg-b { margin-top: var(--space-2); font-size: var(--text-sm); line-height: 1.5; color: var(--t2); }
+.dlg-b p { margin: 0; }
+.dlg-b ul { margin: var(--space-3) 0 0; padding: var(--space-3) var(--space-4); list-style: none; border-radius: var(--radius-lg); background: var(--field); }
+.dlg-b li + li { margin-top: var(--space-1); }
+.dlg-b li b { font-weight: 500; color: var(--t1); }
+.dlg-acts { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: flex-end; margin-top: var(--space-6); }
+.dlg-acts .btn.quiet { margin-right: auto; padding-left: 0; padding-right: 0; border-color: transparent; background: transparent; box-shadow: none; color: var(--danger); }
+.dlg-acts .btn.quiet:hover { text-decoration: underline; }
+body.dlg-open { overflow: hidden; }
+@media (max-width: 480px) { .dlg-acts .btn:not(.quiet) { flex: 1 1 0; justify-content: center; } .dlg-acts .btn.quiet { flex-basis: 100%; order: 1; justify-content: center; margin: 0; } }
+@media (prefers-reduced-motion: reduce) { .dlg-scrim, .dlg { transition: none; } }
 
 /* Enter motion */
 .rise { animation: rise .32s var(--ease) both; }

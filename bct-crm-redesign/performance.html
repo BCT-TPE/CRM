@@ -6,10 +6,10 @@
 <title>Sales performance · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
-<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118g">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261118e">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118h">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118f">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
@@ -133,8 +133,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261118a"></script>
-<script src="assets/crm-data.js?v=20261116a"></script>
+<script src="assets/crm.js?v=20261118f"></script>
+<script src="assets/crm-data.js?v=20261118a"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
    Data and rules are shared with Pipeline & forecast (assets/crm-data.js), so Q1–Q3 bookings match on both pages. */
@@ -567,7 +567,7 @@ document.querySelector('.main').addEventListener('click', (e) => {
 page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-act]')) e.target.click(); });
 
 $('#export').addEventListener('click', () => {
-  if (S.fy !== '2627') { toast('Nothing to export for this fiscal year'); return; }
+  if (S.fy !== '2627') { toast('Nothing to export for this fiscal year', 'warn'); return; }
   const rows = periodStats(S.q).rows;
   const head = ['Initiative', 'Name', 'Account', 'Owner', 'Team', 'Result', 'Loss reason', 'Value (USD)', 'Closed', 'Quarter'];
   const csv = [head, ...rows.map(o => [o.id, o.name, o.acc, o.owner, o.team, o.result, o.reason || '', Math.round(o.value), o.closed, 'Q' + o.q])]
@@ -575,7 +575,7 @@ $('#export').addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
   a.download = `closed-FY26-27${S.q ? '-Q' + S.q : ''}.csv`; a.click();
-  toast(`Exported ${rows.length} closed opportunities`);
+  toast(`Exported ${rows.length} closed opportunities`, 'ok');
 });
 
 CRM.renderShell('performance');

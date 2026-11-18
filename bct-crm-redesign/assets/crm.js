@@ -252,12 +252,24 @@
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideTip(); });
 
   // Toast
+  // Toast (Candace, 2026-11-18): white glass at the top centre with an icon by kind.
+  // kind: 'ok' (done: saved, added, exported), 'warn' (needs attention), 'info' (default: what the prototype would do)
+  const TOAST_IC = {
+    ok: '<path d="M7.5 12.5l3 3 6-6.5"/>',
+    warn: '<path d="M12 7v6M12 16.5h.01"/>',
+    info: '<path d="M12 11v5M12 7.5h.01"/>'
+  };
   let toastEl, toastT;
-  function toast(msg) {
+  function toast(msg, kind = 'info') {
     if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'toast'; toastEl.setAttribute('role', 'status'); document.body.appendChild(toastEl); }
-    toastEl.textContent = msg; toastEl.classList.add('on');
+    const k = TOAST_IC[kind] ? kind : 'info';
+    toastEl.className = `toast t-${k}${toastEl.classList.contains('on') ? ' on' : ''}`; // a toast already showing swaps its text without fading out
+    toastEl.innerHTML = `<i aria-hidden="true"><svg viewBox="0 0 24 24">${TOAST_IC[k]}</svg></i><span></span>`;
+    toastEl.querySelector('span').textContent = msg;
+    requestAnimationFrame(() => toastEl.classList.add('on'));
     clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('on'), 2600);
   }
+
 
   // Sticky filter bar hairline
   function watchSticky(el) {
@@ -294,7 +306,7 @@
     Object.defineProperty(sel, 'value', { get() { return desc.get.call(this); }, set(v) { desc.set.call(this, v); sync(); } });
     new MutationObserver(sync).observe(sel, { childList: true, subtree: true, attributes: true });
     sync();
-    const open = () => { closeSel(); build(); menu.classList.remove('up'); menu.hidden = false; wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); selOpen = { menu, btn, wrap };
+    const open = () => { closeSel(); closeDate(); build(); menu.classList.remove('up'); menu.hidden = false; wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); selOpen = { menu, btn, wrap };
       // no room below (window edge or a sticky bar at the bottom): open upward if there is more room there
       const bars = [...document.querySelectorAll('.ed-bar')].map(b => b.getBoundingClientRect().top).filter(t => t > 0);
       const floor = Math.min(innerHeight, ...bars) - 8, r = wrap.getBoundingClientRect(), mh = menu.offsetHeight;
@@ -331,7 +343,116 @@
   // capture phase: pages stop propagation on their own buttons
   document.addEventListener('click', () => requestAnimationFrame(keepPopsInView), true);
   addEventListener('resize', keepPopsInView);
-  function enhanceSelects(root) { (root || document).querySelectorAll('.select select').forEach(enhanceSelect); }
+
+  // ---------- Dates (Candace, 2026-11-18) ----------
+  // One format everywhere: "18 Nov 2026" ("18 Nov" without the year). Fixed month names, because en-GB in Chrome
+  // writes September as "Sept". "YYYY-MM-DD" strings are read as local dates, so the day never shifts by time zone.
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const MON_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  function toDate(d) {
+    if (d instanceof Date) return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const m = typeof d === 'string' && d.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+    const x = new Date(d); return new Date(x.getFullYear(), x.getMonth(), x.getDate());
+  }
+  function fmtDate(d, year = true) { if (!d) return null; const x = toDate(d); if (isNaN(x)) return null; return `${x.getDate()} ${MON[x.getMonth()]}${year ? ' ' + x.getFullYear() : ''}`; }
+  const isoDate = (x) => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
+  // the demo's "today" (TODAY in crm-data.js) when it is loaded, so Today and the shortcuts agree with overdue flags
+  const today = () => toDate(typeof TODAY !== 'undefined' ? TODAY : new Date());
+
+  // Date picker: every <input type="date"> becomes a field button + calendar popover in the select's style.
+  // The input stays as the data source (pages keep reading .value and listening to input / change).
+  // Shortcuts: expected close dates (data-f="close", or data-dt="quarter") get the fiscal quarter ends;
+  // other dates (follow-ups, task due dates) get Tomorrow and Next week.
+  const DT_IC = {
+    cal: '<rect x="4" y="5.5" width="16" height="14" rx="3"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+    prev: '<path d="M14.5 6l-6 6 6 6"/>', next: '<path d="M9.5 6l6 6-6 6"/>'
+  };
+  const svg = (p, c = '') => `<svg viewBox="0 0 24 24" aria-hidden="true" ${c ? `class="${c}"` : ''}>${p}</svg>`;
+  let dtOpen = null;
+  function closeDate(focus) { if (!dtOpen) return; const o = dtOpen; dtOpen = null; o.pop.hidden = true; o.wrap.classList.remove('open'); o.btn.setAttribute('aria-expanded', 'false'); if (focus) o.btn.focus(); }
+  function quarterEnd(d, ahead) { const qm = d.getMonth() - (d.getMonth() % 3) + 3 * ahead; return new Date(d.getFullYear(), qm + 3, 0); }
+  function shortcuts(inp) {
+    const t = today(), add = (n) => new Date(t.getFullYear(), t.getMonth(), t.getDate() + n);
+    if ((inp.dataset.dt || (inp.dataset.f === 'close' ? 'quarter' : '')) === 'quarter') {
+      const q = (x, a) => typeof fyq === 'function' ? `Q${fyq(x).q}` : (a ? 'next quarter' : 'this quarter'); // fiscal quarter when crm-data.js is loaded
+      return [0, 1].map(a => { const e = quarterEnd(t, a); return [`End of ${q(e, a)}`, e]; });
+    }
+    return [['Tomorrow', add(1)], ['Next week', add(7)]];
+  }
+  function enhanceDate(inp) {
+    if (inp._enh) return; inp._enh = true;
+    const label = inp.getAttribute('aria-label') || 'Date';
+    const wrap = document.createElement('span'); wrap.className = 'dt';
+    inp.before(wrap); wrap.appendChild(inp);
+    const btn = document.createElement('button'); btn.type = 'button';
+    btn.className = `${inp.className} dt-btn`.trim(); // looks like the field it stands in for
+    if (inp.id) btn.dataset.for = inp.id;
+    btn.setAttribute('aria-haspopup', 'dialog'); btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = `<span class="dt-v"></span>${svg(DT_IC.cal, 'dt-ic')}`;
+    const pop = document.createElement('div'); pop.className = 'pop dt-pop'; pop.hidden = true;
+    pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', `Choose ${label.toLowerCase()}`);
+    wrap.append(btn, pop); inp.hidden = true; inp.tabIndex = -1;
+    const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    const sync = () => { const v = desc.get.call(inp);
+      btn.querySelector('.dt-v').textContent = v ? fmtDate(v) : (inp.getAttribute('placeholder') || 'Select a date');
+      btn.classList.toggle('ph', !v); btn.disabled = inp.disabled; btn.setAttribute('aria-label', `${label}: ${v ? fmtDate(v) : 'not set'}`); };
+    Object.defineProperty(inp, 'value', { get() { return desc.get.call(this); }, set(v) { desc.set.call(this, v); sync(); } });
+    new MutationObserver(sync).observe(inp, { attributes: true, attributeFilter: ['disabled', 'placeholder'] });
+    sync();
+    let view, focusD; // first of the month on show; the day that has keyboard focus
+    const commit = (iso) => { closeDate(true); if (iso === desc.get.call(inp)) return;
+      desc.set.call(inp, iso); sync();
+      inp.dispatchEvent(new Event('input', { bubbles: true })); inp.dispatchEvent(new Event('change', { bubbles: true })); };
+    const build = () => {
+      const sel = desc.get.call(inp), t = isoDate(today()), y = view.getFullYear(), m = view.getMonth();
+      const start = new Date(y, m, 1 - new Date(y, m, 1).getDay());
+      const days = Array.from({ length: 42 }, (_, i) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + i));
+      pop.innerHTML = `<div class="dt-quick">${shortcuts(inp).map(([n, d]) => `<button type="button" data-d="${isoDate(d)}">${n}<small>${fmtDate(d, false)}</small></button>`).join('')}</div>
+        <div class="dt-head"><b aria-live="polite">${MON_LONG[m]} ${y}</b><span class="dt-nav">
+          <button type="button" data-m="-1" aria-label="Previous month">${svg(DT_IC.prev)}</button><button type="button" data-m="1" aria-label="Next month">${svg(DT_IC.next)}</button></span></div>
+        <div class="dt-grid" role="grid">${['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(w => `<span class="wd" aria-hidden="true">${w}</span>`).join('')}
+          ${days.map(d => { const iso = isoDate(d), cls = [d.getMonth() !== m && 'out', iso === t && 'today', iso === sel && 'on'].filter(Boolean).join(' ');
+            return `<button type="button" class="${cls}" data-d="${iso}" tabindex="${iso === focusD ? 0 : -1}" aria-label="${fmtDate(d)}${iso === t ? ', today' : ''}" ${iso === sel ? 'aria-pressed="true"' : ''}>${d.getDate()}</button>`; }).join('')}</div>
+        <div class="dt-foot"><button type="button" data-clear>Clear</button><button type="button" data-d="${t}">Today</button></div>`;
+    };
+    const show = (iso, focus) => { const d = toDate(iso); view = new Date(d.getFullYear(), d.getMonth(), 1); focusD = isoDate(d); build();
+      if (focus) pop.querySelector(`.dt-grid [data-d="${focusD}"]`)?.focus(); };
+    const open = () => {
+      closeDate(); if (typeof closeSel === 'function') closeSel();
+      show(desc.get.call(inp) || isoDate(today()), false);
+      pop.hidden = false; pop.classList.remove('up'); pop.style.translate = ''; wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true');
+      dtOpen = { pop, btn, wrap };
+      // no room below (window edge or a sticky bar at the bottom): open upward; keep inside the window sideways
+      const bars = [...document.querySelectorAll('.ed-bar')].map(b => b.getBoundingClientRect().top).filter(v => v > 0);
+      const floor = Math.min(innerHeight, ...bars) - 8, r = wrap.getBoundingClientRect(), ph = pop.offsetHeight;
+      if (r.bottom + 6 + ph > floor && r.top - 6 - ph > 8) pop.classList.add('up');
+      const pr = pop.getBoundingClientRect(), pad = 12;
+      if (pr.right > innerWidth - pad) pop.style.translate = `${Math.round(Math.max(pad - pr.left, innerWidth - pad - pr.right))}px 0`;
+      if (pr.bottom > floor && !pop.classList.contains('up')) scrollBy({ top: pr.bottom - floor + pad, behavior: 'instant' }); // phone: bring the whole calendar into view
+      pop.querySelector(`.dt-grid [data-d="${focusD}"]`)?.focus();
+    };
+    btn.addEventListener('click', (e) => { e.preventDefault(); if (dtOpen && dtOpen.pop === pop) closeDate(); else open(); });
+    btn.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); open(); } });
+    pop.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.m) { view = new Date(view.getFullYear(), view.getMonth() + +b.dataset.m, 1); focusD = isoDate(view); build(); pop.querySelector(`[data-m="${b.dataset.m}"]`).focus(); }
+      else if ('clear' in b.dataset) commit('');
+      else if (b.dataset.d) commit(b.dataset.d);
+    });
+    pop.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeDate(true); return; }
+      const cell = e.target.closest('.dt-grid [data-d]'); if (!cell) return;
+      const d = toDate(cell.dataset.d), step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+      if (step) { e.preventDefault(); show(isoDate(new Date(d.getFullYear(), d.getMonth(), d.getDate() + step)), true); }
+      else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); show(isoDate(new Date(d.getFullYear(), d.getMonth() + (e.key === 'PageUp' ? -1 : 1), Math.min(d.getDate(), 28))), true); }
+    });
+  }
+  document.addEventListener('click', (e) => { if (dtOpen && !dtOpen.wrap.contains(e.target)) closeDate(); });
+  function enhanceDates(root) { (root || document).querySelectorAll('input[type="date"]').forEach(enhanceDate); }
+  // pages call this after each render; it also turns date inputs into the date picker
+  function enhanceSelects(root) { (root || document).querySelectorAll('.select select').forEach(enhanceSelect); enhanceDates(root); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => enhanceSelects()); else setTimeout(enhanceSelects);
 
   // Owner avatar: initials on a blue-family tint, fixed per person (styles .av / .av-a…e in theme-v2.css)
@@ -341,5 +462,47 @@
     return `<span class="av av-${'abcde'[h % 5]}" aria-hidden="true">${ini}</span>`;
   }
 
-  window.CRM = { icon, renderShell, money, moneyBig, toast, watchSticky, enhanceSelects, avatar };
+  // Confirm dialog (Candace, 2026-11-18). CRM.confirm({ title, body, actions: [{ label, value, kind }] }) resolves to the
+  // chosen action's value, or null when closed with Esc or a click outside. kind: 'primary' (focused first), 'quiet'
+  // (red text, sits on the left: the destructive choice). Styles: .dlg in crm.css.
+  function confirmDlg({ title, body = '', actions }) {
+    return new Promise((resolve) => {
+      const prev = document.activeElement;
+      const wrap = document.createElement('div'); wrap.className = 'dlg-scrim';
+      wrap.innerHTML = `<div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-b">
+        <h2 id="dlg-t">${title}</h2><div class="dlg-b" id="dlg-b">${body}</div>
+        <div class="dlg-acts">${actions.map((a, i) => `<button type="button" class="btn ${a.kind || ''}" data-i="${i}">${a.label}</button>`).join('')}</div></div>`;
+      document.body.appendChild(wrap); document.body.classList.add('dlg-open');
+      const btns = [...wrap.querySelectorAll('button')];
+      const key = (e) => {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(null); }
+        else if (e.key === 'Tab') { // keep focus inside the dialog
+          const i = btns.indexOf(document.activeElement), n = btns.length;
+          e.preventDefault(); btns[((i < 0 ? 0 : i) + (e.shiftKey ? n - 1 : 1)) % n].focus();
+        }
+      };
+      function done(v) { document.removeEventListener('keydown', key, true); wrap.remove(); document.body.classList.remove('dlg-open'); if (prev && prev.focus) prev.focus(); resolve(v); }
+      wrap.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) done(actions[+b.dataset.i].value); else if (e.target === wrap) done(null); });
+      document.addEventListener('keydown', key, true);
+      requestAnimationFrame(() => wrap.classList.add('on'));
+      (btns.find(b => b.classList.contains('primary')) || btns[btns.length - 1]).focus();
+    });
+  }
+
+  // Unsaved changes (2026-11-18). CRM.guardLeave(isDirty, ask): while isDirty() is true, links that leave the page
+  // (back link, Cancel link, sidebar, logo) call ask(url) instead of navigating; closing or reloading the tab gets the
+  // browser's own "Leave site?" prompt. CRM.leave(url) navigates without asking again.
+  let leaving = false;
+  function guardLeave(isDirty, ask) {
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a || e.button || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
+      const href = a.getAttribute('href'); if (!href || href[0] === '#' || !isDirty()) return;
+      e.preventDefault(); e.stopPropagation(); document.body.classList.remove('nav-open'); ask(a.href);
+    }, true); // capture: runs before the page's own handlers
+    addEventListener('beforeunload', (e) => { if (!leaving && isDirty()) { e.preventDefault(); e.returnValue = ''; } });
+  }
+  function leave(url) { leaving = true; location.href = url; }
+
+  window.CRM = { icon, renderShell, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
 })();

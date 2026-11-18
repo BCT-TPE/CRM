@@ -7,10 +7,10 @@
 <title>Pipeline & forecast · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
-<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118g">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261118e">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118h">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118f">
 </head>
 <body class="v2">
 <div class="app">
@@ -63,8 +63,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261118a"></script>
-<script src="assets/crm-data.js?v=20261116a"></script>
+<script src="assets/crm.js?v=20261118f"></script>
+<script src="assets/crm-data.js?v=20261118a"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
 /* Data lives in assets/crm-data.js (shared with Sales performance). */
@@ -802,7 +802,7 @@ function keepTable() { const t = $('#opp-table'); if (t && t.getBoundingClientRe
 
 // Export: CSV of the opportunities currently in the list (same filters as the page)
 $('#export').addEventListener('click', () => {
-  if (S.fy !== '2627') { toast('Nothing to export for this fiscal year'); return; }
+  if (S.fy !== '2627') { toast('Nothing to export for this fiscal year', 'warn'); return; }
   const rows = applyDrill(inQuarter(scoped()));
   const head = ['Initiative', 'Name', 'Account', 'Owner', 'Team', 'Funnel', 'Stage', 'Forecast', 'Value (USD)', 'Probability %', 'Weighted (USD)', 'Expected close', 'Days in stage'];
   const csv = [head, ...rows.map(o => [o.id, o.name, o.acc, o.owner, o.team, o.code, o.stage, o.cat, Math.round(o.value), o.prob, Math.round(o.w), o.close || '', o.days])]
@@ -810,7 +810,7 @@ $('#export').addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
   a.download = `pipeline-FY26-27${S.q ? '-Q' + S.q : ''}.csv`; a.click();
-  toast(`Exported ${rows.length} opportunities`);
+  toast(`Exported ${rows.length} opportunities`, 'ok');
 });
 
 CRM.renderShell('pipeline');

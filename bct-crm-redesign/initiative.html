@@ -6,10 +6,10 @@
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
-<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118g">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261118e">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118h">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118f">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
    Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
@@ -213,7 +213,7 @@ textarea.in { height: auto; min-height: 84px; padding: 10px 12px; resize: vertic
 .fld .help { font-size: var(--text-xs); color: var(--t3); }
 .fld .help .link { font-size: var(--text-xs); }
 .fld .err { font-size: var(--text-xs); color: var(--danger); }
-.fld.bad .in, .fld.bad .fsel { border-color: var(--danger); }
+.fld.bad .in, .fld.bad .fsel, body.v2 .fld.bad label.select.fsel { border-color: var(--danger); } /* the v2 select rule would win otherwise */
 body.v2 label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: var(--radius-control); border-color: var(--line-2); background: var(--surface); box-shadow: none; }
 body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(--line-3); }
 .fsel .sel-btn { max-width: none; width: 100%; padding-left: 12px; font-weight: 400; color: var(--ink); }
@@ -348,8 +348,8 @@ body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261118a"></script>
-<script src="assets/crm-data.js?v=20261116a"></script>
+<script src="assets/crm.js?v=20261118f"></script>
+<script src="assets/crm-data.js?v=20261118a"></script>
 <script>
 /* Data for one record. Everything shown comes from the shared demo data (assets/crm-data.js); details the list doesn't
    carry (line items, BANT, contacts, activities, stage path) are derived here so every record opens, and the Lotus
@@ -359,7 +359,7 @@ const $ = (s) => document.querySelector(s);
 const DAY = 864e5;
 const addDays = (d, n) => new Date(new Date(d).getTime() + n * DAY);
 const iso = (d) => new Date(d).toISOString().slice(0, 10);
-const dd = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : '—';
+const dd = (d) => CRM.date(d) || '—'; // "18 Nov 2026" everywhere (2026-11-18)
 const hash = (s) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
 const pick = (arr, s) => arr[hash(s) % arr.length];
 const ini = (n) => n.split(/\s+/).map(x => x[0]).slice(0, 2).join('').toUpperCase();
@@ -606,6 +606,10 @@ function overview() {
 }
 
 function itemsTab() {
+  // a new opportunity lands here with no items yet: the one thing to do is add them (Candace, 2026-11-18)
+  if (!D.items.length) return `<section class="card li-card"><div class="card-h"><div><h2>Line items</h2><p>The initiative value is the sum of these items</p></div></div>
+    <div class="empty"><b>No line items yet</b>Until you add them, the value is the estimate entered when the initiative was created.
+      <div style="margin-top: var(--space-4)"><button class="btn primary" data-act="toast" data-v="Would open the line item editor">${SVG.plus}Add line items</button></div></div></section>`;
   return `<section class="card li-card"><div class="card-h"><div><h2>Line items</h2><p>The initiative value is the sum of these items</p></div><div class="r"><button class="btn" data-act="toast" data-v="Would open the line item editor">${SVG.edit}Edit line items</button></div></div>
     <div class="tbl-wrap"><table class="tbl li">
       <colgroup><col class="c-i"><col class="c-n"><col class="c-c"><col class="c-q"><col class="c-u"><col class="c-a"><col class="c-t"></colgroup>
@@ -629,7 +633,7 @@ function activitiesTab() {
   const rows = D.acts.filter(a => T.actType === 'All' || a.type === T.actType);
   return `<section class="card"><div class="card-h"><div><h2>Activity timeline</h2><p>Calls, emails, meetings and notes on this initiative</p></div><div class="r"><button class="btn primary" data-act="toast" data-v="Would open log activity">${SVG.plus}Log activity</button></div></div>
     <div class="chips">${types.map(t => `<button class="chip ${T.actType === t ? 'on' : ''}" data-act="atype" data-v="${esc(t)}">${t}<small>${t === 'All' ? D.acts.length : D.acts.filter(a => a.type === t).length}</small></button>`).join('')}</div>
-    ${rows.length ? `<p class="tl-g">PAST</p>${rows.map(a => { const d = new Date(a.d); return `<div class="tl"><div class="tl-d"><b>${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</b>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div><div class="tl-dot"></div>
+    ${rows.length ? `<p class="tl-g">PAST</p>${rows.map(a => { const d = new Date(a.d); return `<div class="tl"><div class="tl-d"><b>${CRM.date(d, false)}</b>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div><div class="tl-dot"></div>
       <div class="tl-b"><b>${esc(a.t)}</b>${a.note ? `<p>${esc(a.note)}</p>` : ''}<div class="tl-tags"><span>${a.type}</span>${a.purpose ? `<span>${a.purpose}</span>` : ''}</div></div></div>`; }).join('')}` : '<div class="empty"><b>No activities</b>Nothing of this type yet.</div>'}
   </section>`;
 }
@@ -776,7 +780,7 @@ function editSave() {
   if (isOpp && !E.v.need.trim()) E.err.need = 'Describe the requirement · needed for an opportunity.';
   const p = +E.v.prob; if (E.v.prob === '' || isNaN(p) || p < 0 || p > 100) E.err.prob = 'Enter 0 to 100.';
   if (!E.v.sbu) E.err.sbu = 'Choose an SBU.';
-  if (Object.keys(E.err).length) { render(); toast('Check the highlighted fields'); const bad = document.querySelector('.fld.bad'); if (bad) bad.scrollIntoView({ block: 'center' }); return; }
+  if (Object.keys(E.err).length) { render(); toast('Check the highlighted fields', 'warn'); const bad = document.querySelector('.fld.bad'); if (bad) bad.scrollIntoView({ block: 'center' }); return; }
   const v = E.v;
   Object.assign(o, { owner: v.owner, name: v.name.trim(), close: v.close || null, prob: +v.prob, next: v.next.trim(), follow: v.follow || null, team: v.team });
   o.w = o.value * o.prob / 100;
@@ -784,8 +788,24 @@ function editSave() {
   Object.assign(D.sell, { off: v.offering, sbu: v.sbu, practice: v.practice, tech: v.tech, vertical: v.vertical });
   D.bant = [['Budget', v.budget || null], ['Authority', v.authority || null], ['Need', v.need || null], ['Timeline', v.timeline || null]];
   T.edit = false; history.replaceState(null, '', `?id=${encodeURIComponent(o.id)}`); document.title = `${o.name} · BCT CRM`;
-  render(); scrollTo(0, 0); toast(`Changes to ${o.id} saved`);
+  render(); scrollTo(0, 0); toast(`Changes to ${o.id} saved`, 'ok');
 }
+// Leaving edit mode with unsaved changes asks first: Cancel, the back link, the sidebar, the browser's back button
+// (Candace, 2026-11-18). then() runs after the user discards, or after a save that passed validation.
+function exitEdit() { T.edit = false; history.replaceState(null, '', `?id=${encodeURIComponent(o.id)}`); render(); scrollTo(0, 0); }
+const editDirty = () => T.edit && !!E.v && changed().length > 0;
+async function askUnsaved(then) {
+  E.list = false; refreshEdit();
+  // general wording, no field list (Candace, 2026-11-18)
+  const v = await CRM.confirm({
+    title: 'Save changes?',
+    body: '<p>Your changes will be lost if you leave without saving.</p>',
+    actions: [{ label: 'Discard', value: 'discard', kind: 'quiet' }, { label: 'Keep editing', value: null }, { label: 'Save', value: 'save', kind: 'primary' }]
+  });
+  if (v === 'discard') { E.v = { ...E.init }; E.err = {}; then(); toast('Changes discarded'); }
+  else if (v === 'save') { editSave(); if (!T.edit) then(); }
+}
+CRM.guardLeave(editDirty, (url) => askUnsaved(() => CRM.leave(url)));
 const STAGE_BY_NAME = Object.fromEntries(STAGES.map(x => [x.name, x]));
 function closeHelp() { if (o.kind !== 'open') return 'Set when the initiative closed.'; if (!E.v.close) return 'Not set · it stays out of every quarter.'; const q = fyq(E.v.close); return `Forecast in Q${q.q} FY${q.fy.slice(0, 2)}-${q.fy.slice(2)}.`; }
 function probHelp() { const st = STAGE_BY_NAME[o.sub], w = `Weighted ${money(o.value * (+E.v.prob || 0) / 100)}`; if (!st) return w; return +E.v.prob === st.prob ? `${w} · stage default` : `${w} · default ${st.prob}%`; }
@@ -806,7 +826,7 @@ $('#main').addEventListener('click', (e) => {
   if (act === 'more') { T.more = !T.more; render(); }
   else if (act === 'edit') { editStart(); T.edit = true; history.pushState(null, '', `?id=${encodeURIComponent(o.id)}&mode=edit`); render(); if (a.dataset.v) { const f = document.querySelector(`[data-f="${a.dataset.v}"]`); if (f) { f.scrollIntoView({ block: 'center' }); f.focus(); } } else scrollTo(0, 0); }
   else if (act === 'chgs') { E.list = !E.list; refreshEdit(); }
-  else if (act === 'cancel') { T.edit = false; history.replaceState(null, '', `?id=${encodeURIComponent(o.id)}`); render(); scrollTo(0, 0); if (changed().length) toast('Changes discarded'); }
+  else if (act === 'cancel') { if (changed().length) askUnsaved(exitEdit); else exitEdit(); }
   else if (act === 'discard') { E.v = { ...E.init }; E.err = {}; render(); toast('Changes discarded'); }
   else if (act === 'save') editSave();
   else if (act === 'pick') { E.v.next = a.dataset.v; const i = document.querySelector('[data-f="next"]'); if (i) i.value = a.dataset.v; refreshEdit(); }
@@ -823,7 +843,7 @@ $('#main').addEventListener('submit', (e) => {
   const t = $('#tk-t').value.trim(), d = $('#tk-d').value, err = $('#tk-err');
   const miss = [!t && 'a title', !d && 'a due date'].filter(Boolean);
   if (miss.length) { err.textContent = `Enter ${miss.join(' and ')} first.`; err.hidden = false; return; }
-  T.tasks.unshift({ t, d, a: $('#tk-a').value, done: false }); render(); toast('Task added');
+  T.tasks.unshift({ t, d, a: $('#tk-a').value, done: false }); render(); toast('Task added', 'ok');
 });
 const onField = (e) => {
   const f = e.target.dataset && e.target.dataset.f; if (!f || !T.edit) return;
@@ -834,6 +854,8 @@ const onField = (e) => {
   if (f === 'owner' && PERSON_TEAM[E.v.owner]) { E.v.team = PERSON_TEAM[E.v.owner]; }
   if (f === 'prob' || f === 'close') { const h = box && box.querySelector('.help'); if (h) h.textContent = f === 'prob' ? probHelp() : closeHelp(); }
   if (e.target.tagName === 'SELECT') { render(); return; }
+  // text fields already refreshed on input; redrawing the bar again on blur would swallow the click on Cancel / Save
+  if (e.type === 'change') return;
   refreshEdit();
 };
 $('#main').addEventListener('input', onField);
@@ -841,7 +863,11 @@ $('#main').addEventListener('change', onField);
 $('#main').addEventListener('input', (e) => { if (e.target.closest('#tk-form')) { const err = $('#tk-err'); if (err) err.hidden = true; } });
 
 document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (T.more) { T.more = false; render(); } if (E.list) { E.list = false; refreshEdit(); } });
-window.addEventListener('popstate', () => { T.edit = new URLSearchParams(location.search).get('mode') === 'edit'; if (T.edit && !E.v) editStart(); render(); });
+window.addEventListener('popstate', () => {
+  const toEdit = new URLSearchParams(location.search).get('mode') === 'edit';
+  // browser back out of edit mode with unsaved changes: stay in edit mode and ask
+  if (!toEdit && editDirty()) { history.pushState(null, '', `?id=${encodeURIComponent(o.id)}&mode=edit`); askUnsaved(exitEdit); return; }
+  T.edit = toEdit; if (T.edit && !E.v) editStart(); render(); });
 if (o) { D = details(o); document.title = `${o.name} · BCT CRM`; }
 CRM.renderShell('initiatives');
 if (o && T.edit) editStart();
