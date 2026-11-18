@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261117dt">
-<link rel="stylesheet" href="assets/crm.css?v=20261117dt">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261117dt">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261117dt">
-<link rel="stylesheet" href="assets/responsive.css?v=20261117dt">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
    Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
    and a right rail with next steps, account and team. Visual language = the rest of the redesign. */
-.back { display: inline-flex; align-items: center; gap: 6px; margin-top: 28px; font-size: var(--text-sm); color: var(--t3); text-decoration: none; }
+.back { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--t3); text-decoration: none; }
 .back:hover { color: var(--deep); }
 .back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .back b { font-weight: 500; color: var(--t2); }
-.rec-head { display: flex; align-items: flex-start; gap: 24px; margin: 10px 0 20px; }
+.rec-head { display: flex; align-items: flex-start; gap: 24px; margin: 4px 0 20px; }
 .rec-t { flex: 1; min-width: 0; }
 .rec-t h1 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 8px; font-size: var(--text-4xl); font-weight: 400; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
 .rec-t h1 .st { transform: translateY(3px); }
@@ -230,7 +230,7 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .fold svg { margin-left: auto; width: 18px; height: 18px; flex: none; fill: none; stroke: var(--t3); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
 .fold.open svg { transform: rotate(180deg); }
 .contrib { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.ed-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+.ed-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 56px; /* below the 40px back bar */ }
 .ed-rail h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: var(--text-md); font-weight: 600; color: var(--ink); }
 .ed-rail h3 .pill { margin-left: auto; }
 .ed-rail p { margin: 0; font-size: var(--text-xs); color: var(--t3); }
@@ -314,7 +314,7 @@ body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(
 .rec-grid.editing { padding-bottom: 8px; }
 
 /* Rail */
-.rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+.rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 56px; /* below the 40px back bar */ }
 .ns { border-color: color-mix(in srgb, var(--deep) 30%, transparent); background: linear-gradient(180deg, var(--info-bg), var(--surface) 40%); }
 .ns-h { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
 .ns-h i { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--radius-md); background: var(--deep); color: var(--on-dark); }
@@ -348,7 +348,7 @@ body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261117dt"></script>
+<script src="assets/crm.js?v=20261118a"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script>
 /* Data for one record. Everything shown comes from the shared demo data (assets/crm-data.js); details the list doesn't
@@ -525,7 +525,7 @@ function header() {
   const won = o.kind === 'won', closed = o.kind !== 'open', ed = ED();
   const factEdit = (k, ctl, help) => `<div class="f">${fld(k, ctl, { help })}</div>`;
   return `
-    <a class="back" href="initiatives.html">${SVG.back}Sales initiatives<span>·</span><b>${o.id}</b>${ed ? '<span>·</span>Edit' : ''}</a>
+    <div class="back-bar"><a class="back" href="initiatives.html">${SVG.back}Sales initiatives<span>·</span><b>${o.id}</b>${ed ? '<span>·</span>Edit' : ''}</a></div>
     <header class="rec-head">
       <div class="rec-t">
         <h1>${esc(o.name)}<span class="st ${o.kind === 'open' ? o.status : o.kind}">${o.kind === 'open' ? o.status : won ? 'Closed won' : 'Closed lost'}</span>${ed ? '<span class="pill info editing">Editing</span>' : ''}</h1>
@@ -740,7 +740,7 @@ function editStart() { E.init = saved(); E.v = { ...E.init }; E.err = {}; E.list
 const changed = () => Object.keys(E.v).filter(k => E.v[k] !== E.init[k]);
 function fld(k, ctl, { req, help, full, lock } = {}) {
   const ch = E.v && E.v[k] !== E.init[k];
-  return `<div class="fld ${full ? 'full' : ''} ${E.err[k] ? 'bad' : ''}" data-fld="${k}"><span class="lab">${LABEL[k] || k}${req ? '<span class="rq">*</span>' : ''}${ch ? '<span class="chg" title="Changed"></span>' : ''}${lock ? `<span class="lk">${LOCK}</span>` : ''}</span>${ctl}${E.err[k] ? `<span class="err">${E.err[k]}</span>` : help ? `<span class="help">${help}</span>` : ''}</div>`;
+  return `<div class="fld ${full ? 'full' : ''} ${E.err[k] ? 'bad' : ''}" data-fld="${k}"><span class="lab">${LABEL[k] || k}${req ? '<span class="rq">*</span>' : ''}${ch ? '<span class="chg" aria-label="Changed"></span>' : ''}${lock ? `<span class="lk">${LOCK}</span>` : ''}</span>${ctl}${E.err[k] ? `<span class="err">${E.err[k]}</span>` : help ? `<span class="help">${help}</span>` : ''}</div>`;
 }
 const inp = (k, type = 'text', ph = '', dis = false) => !E.v ? '' : `<input class="in" type="${type}" data-f="${k}" value="${esc(E.v[k])}" placeholder="${esc(ph)}" ${dis ? 'disabled' : ''} aria-label="${LABEL[k]}">`;
 const txa = (k, ph = '') => !E.v ? '' : `<textarea class="in" data-f="${k}" placeholder="${esc(ph)}" aria-label="${LABEL[k]}">${esc(E.v[k])}</textarea>`;
@@ -765,7 +765,7 @@ function refreshEdit() { // keep focus while typing: only the bar, the readiness
   const g = $('#gate'); if (g) g.innerHTML = gateHtml();
   const bn = $('#bant-n'); if (bn) { const r = ['budget', 'authority', 'need', 'timeline'].filter(k => (E.v[k] || '').trim()).length; bn.textContent = `${r} of 4 recorded`; bn.className = `pill ${r === 4 ? 'ok' : ''}`; }
   document.querySelectorAll('[data-fld]').forEach(f => { const k = f.dataset.fld, lab = f.querySelector('.lab'), dot = lab.querySelector('.chg');
-    if (E.v[k] !== E.init[k] && !dot) lab.insertAdjacentHTML('beforeend', '<span class="chg" title="Changed"></span>'); else if (E.v[k] === E.init[k] && dot) dot.remove(); });
+    if (E.v[k] !== E.init[k] && !dot) lab.insertAdjacentHTML('beforeend', '<span class="chg" aria-label="Changed"></span>'); else if (E.v[k] === E.init[k] && dot) dot.remove(); });
 }
 function editSave() {
   const isOpp = o.status === 'Opportunity', closed = o.kind !== 'open';
@@ -791,7 +791,7 @@ function closeHelp() { if (o.kind !== 'open') return 'Set when the initiative cl
 function probHelp() { const st = STAGE_BY_NAME[o.sub], w = `Weighted ${money(o.value * (+E.v.prob || 0) / 100)}`; if (!st) return w; return +E.v.prob === st.prob ? `${w} · stage default` : `${w} · default ${st.prob}%`; }
 
 function render() {
-  if (!o) { $('#main').innerHTML = `<a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a><div class="card" style="margin-top:20px"><div class="empty" style="padding:72px 12px"><b>Initiative not found</b>No record ${esc(id)} in this demo.</div></div>`; return; }
+  if (!o) { $('#main').innerHTML = `<div class="back-bar"><a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a></div><div class="card" style="margin-top:20px"><div class="empty" style="padding:72px 12px"><b>Initiative not found</b>No record ${esc(id)} in this demo.</div></div>`; return; }
   const body = ED() ? overview : ({ overview, items: itemsTab, contacts: contactsTab, activities: activitiesTab, tasks: tasksTab, history: historyTab, files: filesTab }[T.tab] || overview);
   $('#main').innerHTML = `${header()}<div class="rec-grid ${ED() ? 'editing' : ''}"><div class="rec-main">${tabsBar()}${body()}</div><aside class="rail">${rail()}</aside></div>${ED() ? `<div class="ed-bar ${changed().length ? 'dirty' : ''}" id="ed-bar">${editBar()}</div>` : ''}`;
   CRM.enhanceSelects($('#main')); // every select on the page (edit form, task assignee) uses the custom menu

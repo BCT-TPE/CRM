@@ -6,11 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pipeline & forecast · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261117dt">
-<link rel="stylesheet" href="assets/crm.css?v=20261117dt">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261117dt">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261117dt">
-<link rel="stylesheet" href="assets/responsive.css?v=20261117dt">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
 </head>
 <body class="v2">
 <div class="app">
@@ -24,7 +24,7 @@
         <h1 id="hello">Good morning, Gaurav</h1>
         <p id="page-meta">Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · Q3 in progress, week 7 of 14</p>
       </div>
-      <div class="v2-kpis" id="hero-kpis" aria-label="Open pipeline KPIs"></div>
+      <div class="v2-kpis kpis-pipe" id="hero-kpis" aria-label="Open pipeline KPIs"></div>
     </header>
 
     <!-- One filter row for the whole page; KPI cards, charts and the table all respond. -->
@@ -63,7 +63,7 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261117dt"></script>
+<script src="assets/crm.js?v=20261118a"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
@@ -115,6 +115,7 @@ function render() {
   const qLabel = `Q${heroQ} FY26-27 · ${heroQ < CUR_Q ? 'closed quarter' : heroQ === CUR_Q ? 'current quarter' : 'next quarter'}`;
   const h = quarterStats(heroQ, base);
   $('#hero-kpis').innerHTML = heroKpis(list);
+  { const h = $('#hero-kpis'); h.classList.toggle('is-empty', [...h.querySelectorAll('.v2-kv')].every(v => { const c = v.cloneNode(true); c.querySelectorAll('.v2-badge').forEach(b => b.remove()); return /^(\$0|0|N\/A)$/.test(c.textContent.trim()); })); } // empty: slots collapse
   page.innerHTML = `
     <div class="grid">
       ${zoneHead(1, 'Target &amp; forecast', `${qLabel} · bookings, targets and deals closing in the quarter`)}
@@ -528,9 +529,9 @@ const SORTS = {
 function th(key, label, cls = '', tip = '') {
   if (!SORTS[key]) return `<th class="${cls}">${tip ? `<span class="def" tabindex="0" data-tip="${tip}">${label}</span>` : label}</th>`;
   const on = S.sort === key;
-  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↕'}</span></button></th>`;
+  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↑'}</span></button></th>`;
 }
-const ell = (txt, cls = '') => `<div class="ell ${cls}" title="${esc(txt)}">${esc(txt)}</div>`;
+const ell = (txt, cls = '') => `<div class="ell ${cls}">${esc(txt)}</div>`;
 
 const TABS = [
   ['all', 'All open', () => true],
@@ -563,9 +564,9 @@ function tableCard(all) {
         return `
         <tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
           <td>${ell(o.name, 't-main')}${ell(`${o.id} · ${o.acc}`, 't-sub')}</td>
-          ${why ? `<td><div class="why-l" title="${esc(r.join(' · '))}">${r.slice(0, 2).map((x, i) => `<span class="${/No next|passed|No close/.test(x) ? 'hot' : ''}">${x}${i === 1 && r.length > 2 ? ` <em class="more">+${r.length - 2}</em>` : ''}</span>`).join('')}</div></td>` : ''}
+          ${why ? `<td><div class="why-l">${r.slice(0, 2).map((x, i) => `<span class="${/No next|passed|No close/.test(x) ? 'hot' : ''}">${x}${i === 1 && r.length > 2 ? ` <em class="more">+${r.length - 2}</em>` : ''}</span>`).join('')}</div></td>` : ''}
           <td><div class="own">${avatar(o.owner)}<div class="own-t">${ell(o.owner)}${ell(o.team, 't-sub')}</div></div></td>
-          <td><div class="stg"><span class="code">${o.code}</span><span class="ell" title="${esc(o.stage)}">${o.stage}</span></div><div class="t-sub cat"><i class="${CODE_INFO[o.code].cls}"></i>${o.cat}</div></td>
+          <td><div class="stg"><span class="code">${o.code}</span><span class="ell">${o.stage}</span></div><div class="t-sub cat"><i class="${CODE_INFO[o.code].cls}"></i>${o.cat}</div></td>
           <td class="r num t-val">${money(o.value)}</td>
           <td class="r num ${ovr ? 'prob-ovr' : ''}" ${ovr ? `data-tip="Overridden from the ${STAGE[o.st].prob}% stage default"` : ''}>${o.prob}%</td>
           <td class="r num">${money(o.w)}</td>
@@ -666,11 +667,11 @@ function ringCard(h) {
         <circle cx="90" cy="90" r="${R}" class="val" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 90 90)"/></svg>
       <div class="ring-c"><b>${p == null ? 'N/A' : p + '%'}</b><span>${p == null ? 'No target for this filter' : 'of target'}</span></div>
     </div>
-    <div class="minis">
+    <div class="minis one-line">
       ${mini('<span class="def" tabindex="0" data-tip-h="Weighted forecast" data-tip="Σ value × probability for open deals closing in this quarter.">Weighted forecast</span>', money(h.weighted))}
       ${mini(gap != null && gap >= 0 ? 'Ahead of target' : 'Gap to target', gap == null ? 'N/A' : money(Math.abs(gap)), gap == null ? '' : gap < 0 ? 'neg' : 'pos')}
-      ${mini('<span class="def" tabindex="0" data-tip-h="Pipeline coverage" data-tip="Open pipeline closing this quarter ÷ target still to win. Below 1× means even winning every open deal would not reach target.">Coverage</span>', past ? '—' : coverage == null ? (h.target == null ? 'N/A' : 'Met') : coverage.toFixed(1) + '×')}
       ${mini('Open deals in quarter', h.n)}
+      ${mini('<span class="def" tabindex="0" data-tip-h="Pipeline coverage" data-tip="Open pipeline closing this quarter ÷ target still to win. Below 1× means even winning every open deal would not reach target.">Coverage</span>', past ? '—' : coverage == null ? (h.target == null ? 'N/A' : 'Met') : coverage.toFixed(1) + '×')}
     </div>
   </section>`;
 }

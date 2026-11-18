@@ -138,6 +138,14 @@ body.side-collapsed .notes-btn { position: relative; }
 .filters.stuck { background: var(--surface); }
 .filters::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--line); opacity: 0; transition: opacity .2s; }
 .filters.stuck::after { opacity: 1; }
+/* Collapsed sidebar: the page name leads the stuck filter bar, so it's clear which page you're on */
+.filters::before { content: attr(data-page); display: none; flex: none; margin-right: var(--space-2); font-size: var(--text-lg); font-weight: 600; color: var(--ink); white-space: nowrap; }
+body.side-collapsed .filters.stuck::before { display: block; }
+/* Record pages: the back row is the sticky top bar */
+.back-bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; margin: 18px -40px 0; padding: 10px 40px; transition: background .2s; }
+.back-bar::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--line-2); opacity: 0; transition: opacity .2s; }
+body.scrolled .back-bar { background: var(--glass-bar); backdrop-filter: var(--blur-bar); -webkit-backdrop-filter: var(--blur-bar); }
+body.scrolled .back-bar::after { opacity: 1; }
 .select { position: relative; display: inline-flex; align-items: center; height: 36px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); }
 .select:hover { border-color: var(--line-3); }
 .select select { appearance: none; -webkit-appearance: none; height: 100%; max-width: 168px; border: 0; background: transparent; padding: 0 30px 0 12px; font-size: var(--text-sm); cursor: pointer; outline: none; text-overflow: ellipsis; }

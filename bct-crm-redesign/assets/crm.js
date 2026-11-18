@@ -262,9 +262,16 @@
   // Sticky filter bar hairline
   function watchSticky(el) {
     if (!el) return;
+    // page name, shown at the start of the stuck bar when the sidebar is collapsed (CSS: .filters::before)
+    const cur = document.querySelector('.nav-item[aria-current="page"]');
+    el.dataset.page = cur ? cur.dataset.name : document.title.split(' · ')[0];
     const s = document.createElement('div'); s.style.height = '1px'; el.before(s);
     new IntersectionObserver(([en]) => el.classList.toggle('stuck', !en.isIntersecting)).observe(s);
   }
+
+  // body.scrolled: lets sticky bars that pages re-render (the record back bar) pick up the glass background
+  const onScroll = () => document.body.classList.toggle('scrolled', scrollY > 4);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
   // Custom select: the native <select> stays as the data source (pages keep using .value / 'change'),
   // but is hidden and driven by a button + listbox styled like the filter popover.

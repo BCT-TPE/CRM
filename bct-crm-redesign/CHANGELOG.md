@@ -7,7 +7,42 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-17 (3) · design system and responsive (Candace)
+## 2026-11-18
+
+### Changed
+- **Pipeline "Q3 progress" card:** the four minis now share the Q3 forecast legend's rhythm: an 18px label line, a 2px gap, then the value, with 14px between rows. At 1440, "Closed won" lines up with "Weighted forecast", and the values line up too.
+  - **Labels on one line:** labels stay on one line (`.minis.one-line`, Pipeline only).
+  - **New order:** "Open deals in quarter" now comes before "Coverage". Weighted forecast and open deals share the wide column, and gap and coverage the narrow one.
+  - **1181–1360:** the card is too narrow, so labels wrap again (`responsive.css`).
+- **Q3 forecast bar (Pipeline):** the unfilled part up to the target is now hatched (`--grad-hatch`, the same pattern as "Pipeline" in the pipeline mix). Before, it was translucent white and disappeared on the tinted card. Segments are now separated by a 2px white inset seam instead of a gap.
+- **Tinted card gradients:** `--grad-tint` and `--grad-ring` now end in light blue (`#f1f7ff`, `#f2f9fe`) instead of near-white. White items near the bottom of a tinted card now stay visible, for example the "Set next step & follow-up" button and the read-only boxes in Next steps.
+- **Header KPIs (Pipeline, Sales performance):** switching quarters no longer shifts the KPI row.
+  - **Fixed slots:** each KPI slot has a fixed `min-width`, set to the widest non-empty value on that page (`.kpis-pipe` and `.kpis-perf`, set by nth-child).
+  - **Empty state:** when every value is empty (`$0`, `0` or `N/A`, badges ignored), JS adds `.is-empty` and the slots collapse, so the empty state isn't spread out.
+  - **Mobile:** below the mobile breakpoint, the 2-column KPI grid resets `min-width`.
+- **Collapsed sidebar:** when the sidebar is collapsed and the filter bar is stuck, the page name now leads the bar, so you can tell which page you are on. How it works:
+  - `CRM.watchSticky` sets `data-page` from the active nav item.
+  - `.filters::before` shows it with `body.side-collapsed .filters.stuck`.
+  - It is hidden on mobile, where the top bar already shows the brand.
+- **Record pages** (`initiative.html`, `initiative-new.html): the back row ("‹ Sales initiatives · SI-…") is now a sticky top bar, `.back-bar`.
+  - It turns glass when the page is scrolled. `crm.js` adds `body.scrolled`, because these pages re-render `#main`.
+  - The right rails now stick at `top: 56px` so they clear the bar.
+  - On mobile it sits under the 56px top bar.
+- **Native tooltips removed:** the `title` attributes on truncated table text are gone (initiative subtitle, stage, next step). The "Changed" dot uses `aria-label` instead.
+- **Table sort icons:** unsorted columns now show the same ↑ arrow as the sorted column, faded (opacity .45, .8 on hover), instead of ↕.
+- **Sales initiatives list, stage column:** the lifecycle dashes now have a tooltip and can be focused. The tooltip shows:
+  - "Lifecycle · step N of 13"
+  - The three groups (prospect 3, lead 3, opportunity 7), with the current group marked
+  - The now and next sub-stages
+  - A one-line key
+
+  The dashes also have a taller hit area, padding 6px above, and an `aria-label`.
+- **New token:** `--grad-hatch` in `design-system/tokens.css`. `.mp-b.c-pipe` now uses it.
+- Cache-busters: `tokens.css`, `crm.css`, `crm.js` and `dashboard.css` are now `?v=20261118a`, `theme-v2.css` is `?v=20261118d`, and `responsive.css` is `?v=20261118d`.
+
+---
+
+## 2026-11-17 · `11ca384` · design system and responsive (Candace)
 
 ### Added
 - **`design-system/`:** `tokens.css` (type, colour, gradients, radius, shadow, spacing, layout, motion), `index.html` (visual reference drawn with the product classes) and `README.md`.
@@ -32,7 +67,7 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-17 (2)
+## 2026-11-17 · `c0f47fb`
 
 ### Changed
 - **Sales initiatives lifecycle:** the decorative › arrows between prospects, leads and opportunities in the Open card were removed. They carried no data and read as conversion or as clickable. The flow order is still stated in the section subtitle.

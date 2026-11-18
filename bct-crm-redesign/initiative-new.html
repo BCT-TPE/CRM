@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>New sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261117dt">
-<link rel="stylesheet" href="assets/crm.css?v=20261117dt">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261117dt">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261117dt">
-<link rel="stylesheet" href="assets/responsive.css?v=20261117dt">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
 <style>
 /* ---------- Page: new sales initiative ----------
    Same fields and order as CRMpulse /initiatives/new (status & sub-stage, account & ownership, value & forecast,
    next step, BANT, classification). Inputs, labels, quick picks, readiness checks and the sticky bar are the
    ones from the initiative edit form, so creating and editing look the same. */
-.back { display: inline-flex; align-items: center; gap: 6px; margin-top: 28px; font-size: var(--text-sm); color: var(--t3); text-decoration: none; }
+.back { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--t3); text-decoration: none; }
 .back:hover { color: var(--deep); }
 .back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.nw-head { margin: 10px 0 20px; }
+.nw-head { margin: 4px 0 20px; }
 .nw-head h1 { margin: 0 0 8px; font-size: var(--text-4xl); font-weight: 400; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
 .nw-head p { margin: 0; font-size: var(--text-sm); color: var(--t3); }
 
@@ -80,7 +80,7 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .contrib .btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 
 /* Rail: preview (tinted, like Next steps) + what's needed */
-.nw-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+.nw-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 56px; /* below the 40px back bar */ }
 .pv-k { margin: 0 0 10px; font-size: var(--text-xs); color: var(--t3); }
 .pv-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .st { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: 600; white-space: nowrap; }
@@ -118,7 +118,7 @@ body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261117dt"></script>
+<script src="assets/crm.js?v=20261118a"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script>
 const { money, toast } = CRM;
@@ -304,7 +304,7 @@ function bar() {
 }
 
 function render() {
-  $('#main').innerHTML = `<a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a>
+  $('#main').innerHTML = `<div class="back-bar"><a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a></div>
     <header class="nw-head"><h1>New sales initiative</h1><p>One record from first interest to closure. Start with what you know; you can add the rest as it progresses.</p></header>
     <div class="nw-grid"><div class="nw-main">${sStatus()}${sAccount()}${sValue()}${sNext()}${sBant()}${sClass()}</div><aside class="nw-rail" id="rail">${rail()}</aside></div>
     <div class="ed-bar ${missing().length ? '' : 'ready'}" id="ed-bar">${bar()}</div>`;

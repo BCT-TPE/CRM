@@ -91,9 +91,10 @@
     radial-gradient(760px 480px at 18% -6%, #eaf7ff 0%, transparent 60%),
     radial-gradient(900px 700px at 70% 105%, #efefff 0%, transparent 60%),
     linear-gradient(180deg, #f9fbfe 0%, var(--canvas) 100%);
-  --grad-tint: linear-gradient(160deg, #d7e9ff 0%, #e9f3ff 45%, color-mix(in srgb, var(--surface) 85%, transparent) 100%);
-  --grad-ring: linear-gradient(170deg, #dcf0fc 0%, #ebf6fd 50%, color-mix(in srgb, var(--surface) 90%, transparent) 100%);
+  --grad-tint: linear-gradient(160deg, #d7e9ff 0%, #e9f3ff 45%, #f1f7ff 100%); /* ends light blue, not white, so white boxes, buttons and bar tracks stay visible to the bottom */
+  --grad-ring: linear-gradient(170deg, #dcf0fc 0%, #ebf6fd 50%, #f2f9fe 100%);
   --grad-geo: linear-gradient(180deg, #eef5ff, transparent);
+  --grad-hatch: repeating-linear-gradient(-45deg, var(--chart-hatch-a) 0 6px, var(--chart-hatch-b) 6px 12px); /* pipeline share and the unfilled part of a bar to target */
   --grad-skel: linear-gradient(90deg, var(--chart-track) 0%, var(--field) 50%, var(--chart-track) 100%);
 
   /* ---------- Glass: white at a set opacity ---------- */

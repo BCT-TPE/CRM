@@ -30,6 +30,13 @@ body.v2 .nav-item.active { background: var(--surface); box-shadow: var(--shadow-
 .v2-hello p { margin: 0; font-size: var(--text-sm); color: var(--t3); }
 .v2-kpis { display: flex; gap: 24px; flex: none; }
 .v2-kpi { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; }
+/* Header KPIs: each slot keeps a fixed minimum width (the widest non-empty value on that page), so switching
+   quarter / team / owner doesn't shift the row. When every value is empty the slots collapse, so "$0 / N/A" isn't spread out. */
+.kpis-pipe .v2-kpi:nth-child(1) { min-width: 192px; } .kpis-pipe .v2-kpi:nth-child(2) { min-width: 176px; }
+.kpis-pipe .v2-kpi:nth-child(3) { min-width: 132px; } .kpis-pipe .v2-kpi:nth-child(4) { min-width: 170px; }
+.kpis-perf .v2-kpi:nth-child(1) { min-width: 128px; } .kpis-perf .v2-kpi:nth-child(2) { min-width: 112px; }
+.kpis-perf .v2-kpi:nth-child(3) { min-width: 168px; } .kpis-perf .v2-kpi:nth-child(4) { min-width: 132px; }
+.v2-kpis.is-empty .v2-kpi { min-width: 0; }
 .v2-kpi.click { cursor: pointer; padding: 8px 12px; margin: -8px -12px; border-radius: var(--radius-card); transition: background .15s; }
 .v2-kpi.click:hover { background: var(--glass-soft); }
 .v2-kpi.on { background: var(--surface); box-shadow: var(--ring-select); }
@@ -80,7 +87,8 @@ body.v2 .fc .fbar-target, body.v2 .fc .fbar-exp { top: 28px; } /* both marker la
 body.v2 .fc .sum-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin-top: 18px; }
 body.v2 .fc .sum-legend .lg { display: grid; grid-template-columns: 10px 1fr; align-items: center; column-gap: 8px; row-gap: 2px; padding: 0; font-size: var(--text-xs); color: var(--t3); }
 body.v2 .fc .sum-legend .lg b { grid-column: 2; margin: 0; font-size: var(--text-lg); font-weight: 500; color: var(--ink); }
-body.v2 .fbar-track { border-radius: var(--radius-lg); background: var(--glass-soft); }
+body.v2 .fbar-track { gap: 0; border-radius: var(--radius-lg); background: var(--grad-hatch); } /* hatched like the pipeline mix, so the distance to target reads on tinted cards */
+body.v2 .fbar-track i { box-shadow: inset -2px 0 0 var(--surface); } /* white seam between segments (the track no longer shows through a gap) */
 body.v2 .fbar-track i:first-child { border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
 body.v2 .fbar-track i:last-child { border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
 body.v2 .fbar-target { border-left-color: var(--midnight); }
@@ -97,8 +105,14 @@ body.v2 .fbar-target span { color: var(--midnight); }
 .ring-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .ring-c b { font-size: var(--text-4xl); font-weight: 400; letter-spacing: -.03em; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 .ring-c span { margin-top: 6px; max-width: 110px; font-size: var(--text-xs); color: var(--t3); }
+/* Ring card minis share the forecast card's legend rhythm (label line, 2px, value; 14px between rows), so both rows line up across the two cards.
+   On Pipeline the labels stay on one line (.one-line): the wide column holds weighted forecast / open deals, the narrow one gap / coverage. */
 .ring-card .minis { grid-template-columns: 1fr 1fr; gap: 14px 12px; margin-top: auto; padding-top: 18px; }
-.ring-card .mini .k { white-space: normal; }
+.ring-card .mini .k { white-space: normal; line-height: 18px; }
+.ring-card .mini .v { margin-top: 2px; }
+/* Pipeline: one-line labels so the rows line up with the forecast card's legend */
+.ring-card .minis.one-line { grid-template-columns: max-content max-content; justify-content: space-between; }
+.ring-card .minis.one-line .mini .k { white-space: nowrap; }
 
 /* Quarter chart */
 body.v2 .qstack i:last-child { border-radius: var(--radius-control) var(--radius-control) 0 0; }
@@ -114,7 +128,7 @@ body.v2 .qcol { border-radius: var(--radius-card); }
 .mp { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; transition: opacity .15s; }
 .mp-p { font-size: var(--text-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .mp-b { display: block; height: 44px; border-radius: var(--radius-lg); transition: filter .15s; }
-.mp-b.c-pipe { background: repeating-linear-gradient(-45deg, var(--chart-hatch-a) 0 6px, var(--chart-hatch-b) 6px 12px); }
+.mp-b.c-pipe { background: var(--grad-hatch); }
 .mp:hover .mp-b { filter: brightness(.94); }
 .mp.on .mp-b { box-shadow: var(--ring-focus-mark); }
 .mp.dim { opacity: .35; }

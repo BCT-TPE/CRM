@@ -146,7 +146,8 @@
 .th-sort { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; white-space: nowrap; }
 .th-sort:hover { color: var(--t1); }
 .th-sort.on { color: var(--ink); font-weight: 600; }
-.th-sort .arr { font-size: var(--text-2xs); color: var(--t3); opacity: .55; }
+.th-sort .arr { font-size: var(--text-2xs); color: var(--t3); opacity: .45; } /* unsorted columns show the same arrow, faded */
+.th-sort:hover .arr { opacity: .8; }
 .th-sort.on .arr { opacity: 1; color: var(--deep); }
 .tbl th.r .th-sort { flex-direction: row; }
 .prob-ovr { color: var(--deep); }

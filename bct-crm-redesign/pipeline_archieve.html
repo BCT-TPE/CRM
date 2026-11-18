@@ -6,9 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pipeline & forecast (archive) · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261117dt">
-<link rel="stylesheet" href="assets/crm.css?v=20261117dt">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261117dt">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
 <style>
 /* Archived layout keeps its original (pre-v2) palette; the standard is design-system/tokens.css. */
 :root { --ink: #10182a; --canvas: #f5f6f8; --hover: #eef1f5; --selected: #e8effb; --info-bg: #e8effb; --line: #e8e8e6; --line-2: #dededc; --line-3: #d6d7d3;
@@ -67,7 +67,7 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261117dt"></script>
+<script src="assets/crm.js?v=20261118a"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
@@ -530,7 +530,7 @@ const SORTS = {
 function th(key, label, cls = '', tip = '') {
   if (!SORTS[key]) return `<th class="${cls}">${tip ? `<span class="def" tabindex="0" data-tip="${tip}">${label}</span>` : label}</th>`;
   const on = S.sort === key;
-  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↕'}</span></button></th>`;
+  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↑'}</span></button></th>`;
 }
 const ell = (txt, cls = '') => `<div class="ell ${cls}" title="${esc(txt)}">${esc(txt)}</div>`;
 

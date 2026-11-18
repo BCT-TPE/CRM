@@ -23,6 +23,12 @@
   .filters { flex-wrap: wrap; row-gap: var(--space-2); }
 }
 
+/* 1181–1360: the ring card is too narrow for one-line mini labels, so they wrap (rows may not line up with the forecast card here) */
+@media (min-width: 1181px) and (max-width: 1360px) {
+  .ring-card .minis.one-line { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ring-card .minis.one-line .mini .k { white-space: normal; }
+}
+
 @media (max-width: 1180px) {
   .grid > .s2, .grid > .s3, .grid > .s4 { grid-column: span 6; }
   .grid > .s5, .grid > .s7, .grid > .s8 { grid-column: span 12; }
@@ -55,6 +61,8 @@
   body.nav-open .side { transform: none; visibility: visible; transition: transform var(--dur) var(--ease); }
   body.nav-open .m-scrim { display: block; position: fixed; inset: 0; z-index: 70; background: color-mix(in srgb, var(--ink) 30%, transparent); }
   .side-toggle { display: none; }
+  .back-bar { top: 56px; margin-left: calc(-1 * var(--pad-page)); margin-right: calc(-1 * var(--pad-page)); padding-left: var(--pad-page); padding-right: var(--pad-page); } /* under the 56px top bar */
+  body.side-collapsed .filters.stuck::before { display: none; }
   .m-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: var(--space-3); height: 56px; padding: 0 var(--pad-page);
     background: var(--glass-bar); backdrop-filter: var(--blur-bar); -webkit-backdrop-filter: var(--blur-bar); border-bottom: 1px solid var(--line); }
   .m-bar .brand { padding: 0; flex: none; }
@@ -97,6 +105,7 @@
   .tabs, body.v2 .tabs { margin-left: calc(-1 * var(--pad-card)); margin-right: calc(-1 * var(--pad-card)); padding-left: var(--pad-card); padding-right: var(--pad-card); overflow-x: auto; }
   .v2-hello h1 { font-size: var(--text-3xl); }
   .v2-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); width: 100%; }
+  .v2-kpis .v2-kpi { min-width: 0; }
   .v2-kv { font-size: var(--text-3xl); }
   .v2-ks { white-space: normal; }
   .main .search { flex: 1 1 100%; width: auto; }

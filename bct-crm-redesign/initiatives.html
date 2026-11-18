@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales initiatives · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261117dt">
-<link rel="stylesheet" href="assets/crm.css?v=20261117dt">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261117dt">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261117dt">
-<link rel="stylesheet" href="assets/responsive.css?v=20261117dt">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
 <style>
 /* ---------- Page: Sales initiatives (list page) ---------- */
 /* Lifecycle strip: status tiles filter the list (list-page behaviour, as in the old CRM) */
@@ -49,7 +49,7 @@
 .st.won { background: var(--chart-pipe-soft); color: var(--ink); } .st.lost { background: var(--hover); color: var(--t3); }
 .stg2 { display: flex; align-items: center; gap: 7px; min-width: 0; }
 /* 13-step progress: 3 prospect · 3 lead · 7 opportunity sub-stages */
-.prog { display: flex; gap: 2px; margin-top: 6px; }
+.prog { display: flex; gap: 2px; width: max-content; margin-top: 0; padding: 6px 0 2px; cursor: help; } /* taller hit area for the tooltip */
 .prog i { width: 8px; height: 4px; border-radius: var(--radius-2xs); background: var(--chart-track); }
 .prog i.f { background: var(--chart-step); }
 .prog i.c { background: var(--ink); }
@@ -165,7 +165,7 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261117dt"></script>
+<script src="assets/crm.js?v=20261118a"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script>
 /* Sales initiatives — the list behind every number on the dashboards (requirement 5.12: list, kanban and funnel views). */
@@ -293,12 +293,20 @@ const SORTS = {
 function th(key, label, cls = '', tip = '') {
   if (!key) return `<th class="${cls}">${tip ? `<span class="def" tabindex="0" data-tip="${tip}">${label}</span>` : label}</th>`;
   const on = S.sort === key;
-  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↕'}</span></button></th>`;
+  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↑'}</span></button></th>`;
 }
-const ell = (txt, cls = '') => `<div class="ell ${cls}" title="${esc(txt)}">${esc(txt)}</div>`;
+const ell = (txt, cls = '') => `<div class="ell ${cls}">${esc(txt)}</div>`;
 function prog(o) {
   if (o.kind !== 'open') return '';
-  return `<div class="prog" aria-label="Step ${o.step + 1} of ${ALL_STEPS.length}">${ALL_STEPS.map((_, i) => `<i class="${i < o.step ? 'f' : i === o.step ? 'c' : ''} ${i === 3 || i === 6 ? 'sep' : ''}"></i>`).join('')}</div>`;
+  // Tooltip explains the dashes: one per sub-stage across the lifecycle, grouped prospect · lead · opportunity
+  const n = ALL_STEPS.length, next = ALL_STEPS[o.step + 1];
+  const grp = (name, list) => `<div class='row'><span>${name}${name === o.status ? ' · now' : ''}</span><span>${list.length} sub-stages</span></div>`;
+  const tip = `<b>Lifecycle · step ${o.step + 1} of ${n}</b>`
+    + grp('Prospect', PRE_STAGES.Prospect) + grp('Lead', PRE_STAGES.Lead) + grp('Opportunity', STAGES)
+    + `<div class='row'><span>Now</span><span>${esc(o.sub)}</span></div>`
+    + (next ? `<div class='row'><span>Next</span><span>${esc(next)}</span></div>` : '')
+    + `<div class='row'><span>One dash per sub-stage · dark = now</span></div>`;
+  return `<div class="prog" tabindex="0" aria-label="Lifecycle step ${o.step + 1} of ${n}: ${esc(o.sub)}" data-tip-html="${tip}">${ALL_STEPS.map((_, i) => `<i class="${i < o.step ? 'f' : i === o.step ? 'c' : ''} ${i === 3 || i === 6 ? 'sep' : ''}"></i>`).join('')}</div>`;
 }
 function stagePill(o) { return o.kind === 'open' ? `<span class="st ${o.status}">${o.status}</span>` : `<span class="st ${o.kind}">${o.kind === 'won' ? 'Won' : 'Lost'}</span>`; }
 function listView(rows) {
@@ -315,13 +323,13 @@ function listView(rows) {
         const local = localAmount(o.value, o.cur), late = o.follow && new Date(o.follow) < TODAY, passed = o.kind === 'open' && o.close && new Date(o.close) < TODAY;
         return `<tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
           <td>${ell(o.name, 't-main')}${ell(`${o.id} · ${o.acc}`, 't-sub')}</td>
-          <td><div class="stg2">${stagePill(o)}${o.kind === 'open' ? `<span class="ell" title="${esc(o.sub)}">${o.sub}</span>${o.code ? `<span class="code">${o.code}</span>` : ''}` : `<span class="muted">${o.kind === 'won' ? 'Closed won · L0' : 'Closed lost'}</span>`}</div>
+          <td><div class="stg2">${stagePill(o)}${o.kind === 'open' ? `<span class="ell">${o.sub}</span>${o.code ? `<span class="code">${o.code}</span>` : ''}` : `<span class="muted">${o.kind === 'won' ? 'Closed won · L0' : 'Closed lost'}</span>`}</div>
             ${o.kind === 'open' ? `${prog(o)}<div class="t-sub ${o.days > 30 ? 'hot' : ''}" style="margin-top:4px">${o.days} days in stage</div>` : `<div class="t-sub">${o.kind === 'lost' ? esc(o.reason) : 'Booked'}</div>`}</td>
           <td><div class="own">${CRM.avatar(o.owner)}<div class="own-t">${ell(o.owner)}${ell(o.team, 't-sub')}</div></div></td>
           <td class="r num"><div class="t-val">${money(o.value)}</div>${local ? `<div class="t-sub">${local}</div>` : ''}</td>
           <td class="r num">${o.prob}%</td>
           <td class="num">${o.close ? `<span class="${passed ? 'hot' : ''}">${fmtDate(o.close)}</span>` : '<span class="muted">Not set</span>'}</td>
-          <td>${o.kind !== 'open' ? '<span class="muted">—</span>' : o.next ? `<div class="next-t" title="${esc(o.next)}">${esc(o.next)}</div>${o.follow ? `<div class="fu ${late ? 'late' : ''}">${late ? 'Overdue' : 'Follow-up'} ${fu(o.follow)}</div>` : ''}` : '<span class="next-none">No next step</span>'}</td>
+          <td>${o.kind !== 'open' ? '<span class="muted">—</span>' : o.next ? `<div class="next-t">${esc(o.next)}</div>${o.follow ? `<div class="fu ${late ? 'late' : ''}">${late ? 'Overdue' : 'Follow-up'} ${fu(o.follow)}</div>` : ''}` : '<span class="next-none">No next step</span>'}</td>
         </tr>`;
       }).join('')}</tbody>
     </table></div>

@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales performance · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261117dt">
-<link rel="stylesheet" href="assets/crm.css?v=20261117dt">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261117dt">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261117dt">
-<link rel="stylesheet" href="assets/responsive.css?v=20261117dt">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118a">
+<link rel="stylesheet" href="assets/crm.css?v=20261118a">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261118d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118d">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
@@ -95,7 +95,7 @@
         <h1>Sales performance</h1>
         <p id="page-meta">Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD</p>
       </div>
-      <div class="v2-kpis" id="hero-kpis" aria-label="Win and loss KPIs"></div>
+      <div class="v2-kpis kpis-perf" id="hero-kpis" aria-label="Win and loss KPIs"></div>
     </header>
 
     <!-- Same filter row as Pipeline & forecast (requirement 11.1: both dashboards use common filters). -->
@@ -133,7 +133,7 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261117dt"></script>
+<script src="assets/crm.js?v=20261118a"></script>
 <script src="assets/crm-data.js?v=20261116a"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
@@ -187,6 +187,7 @@ function render() {
   const P = periodStats(S.q);
   const label = S.q ? `Q${S.q} FY26-27` : 'FY26-27';
   $('#hero-kpis').innerHTML = heroKpis(P);
+  { const h = $('#hero-kpis'); h.classList.toggle('is-empty', [...h.querySelectorAll('.v2-kv')].every(v => { const c = v.cloneNode(true); c.querySelectorAll('.v2-badge').forEach(b => b.remove()); return /^(\$0|0|N\/A)$/.test(c.textContent.trim()); })); } // empty: slots collapse
   page.innerHTML = `
     <div class="grid">
       ${zoneHead(1, 'Target attainment', `${label} · closed won bookings against target`)}
@@ -413,9 +414,9 @@ const SORTS = {
 function th(key, label, cls = '') {
   if (!SORTS[key]) return `<th class="${cls}">${label}</th>`;
   const on = S.sort === key;
-  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↕'}</span></button></th>`;
+  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? (SORTS[key].dir === 'asc' ? '↑' : '↓') : '↑'}</span></button></th>`;
 }
-const ell = (txt, cls = '') => `<div class="ell ${cls}" title="${esc(txt)}">${esc(txt)}</div>`;
+const ell = (txt, cls = '') => `<div class="ell ${cls}">${esc(txt)}</div>`;
 const resCell = (o) => o.result === 'won' ? '<span class="res"><i></i>Won</span>' : `<span class="res lost"><i></i>Lost</span><div class="t-sub ell">${esc(o.reason)}</div>`;
 function closedTable(P) {
   const TABS = [['all', 'All closed', () => true], ['won', 'Won', o => o.result === 'won'], ['lost', 'Lost', o => o.result === 'lost']];
