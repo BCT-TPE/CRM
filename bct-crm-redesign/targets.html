@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales targets · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="assets/crm.css?v=20261119c">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<style>
+/* ---------- Page: Sales targets & allocation (CRM V1 §10) ----------
+   Same IA as CRMpulse /targets: fiscal year + search, one tab per dimension, quarterly targets with what each
+   quarter has achieved, annual target, achieved and %, edit per row. Visual language = the other list pages. */
+.tbl.tg { table-layout: fixed; }
+.tbl.tg col.c-n { width: 16%; } .tbl.tg col.c-q { width: 13.5%; } .tbl.tg col.c-a { width: 11%; } .tbl.tg col.c-h { width: 9%; } .tbl.tg col.c-p { width: 5%; } .tbl.tg col.c-e { width: 5%; }
+.tbl.tg tbody tr { cursor: default; }
+.tbl.tg td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
+.tbl.tg td.qt { padding-right: 6px; }
+.tbl.tg th .now { font-weight: 400; color: var(--t3); }
+.qt b { display: block; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.qt small { display: block; margin-top: 2px; font-size: var(--text-xs); color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc { font-weight: 600; font-variant-numeric: tabular-nums; }
+.pc.ok { color: var(--ok); } .pc.warn { color: var(--warn); } .pc.low { color: var(--danger); }
+.tbl.tg td.cur { background: var(--surface-faint); }
+.no-t { color: var(--t3); }
+.ed-q { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.ed-q label { display: flex; flex-direction: column; gap: 6px; font-size: var(--text-xs); font-weight: 500; color: var(--t2); }
+.ed-q .in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); }
+.ed-q .in:focus { outline: none; border-color: var(--deep); }
+.ed-sum { margin: 12px 0 0; font-size: var(--text-xs); color: var(--t3); }
+.icon-only svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn.icon-only { width: 32px; height: 32px; padding: 0; justify-content: center; }
+@media (max-width: 768px) { .tbl.tg { min-width: 980px; } }
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+    <header class="v2-head">
+      <div class="v2-hello">
+        <div class="v2-top"><span class="v2-eyebrow">Sales targets</span></div>
+        <h1>Sales targets &amp; allocation</h1>
+        <p>Quarterly booking targets per dimension, compared with closed won bookings (USD). Each dimension is planned independently; targets are never combined or added across dimensions.</p>
+      </div>
+    </header>
+
+    <div class="filters" id="filters" role="toolbar" aria-label="Filters">
+      <label class="select"><span class="lbl">Fiscal year</span><select id="f-fy" aria-label="Fiscal year"><option value="2627">FY26-27</option><option value="2728">FY27-28</option></select></label>
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="f-search" type="search" placeholder="Search geography" aria-label="Search"></label>
+      <button class="btn ghost" id="reset" hidden>Reset</button>
+      <span class="sp"></span>
+    </div>
+
+    <div id="page"></div>
+  </main>
+</div>
+
+<script src="assets/crm.js?v=20261119h"></script>
+<script src="assets/crm-data.js?v=20261119f"></script>
+<script>
+const { money, toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const PER_PAGE = 10;
+const S = { dim: 'geography', fy: '2627', q: '', page: 1 };
+const EDITS = {}; // `${fy}|${dim}|${name}` → quarterly targets edited in this session
+const NOUN = { geography: ['geography', 'geographies'], region: ['region', 'regions'], salesperson: ['salesperson', 'salespeople'], sbu: ['SBU', 'SBUs'], practice: ['practice', 'practices'], offering: ['offering', 'offerings'], technology: ['technology', 'technologies'], vertical: ['vertical', 'verticals'] };
+const EDIT_IC = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>';
+const pctCls = (p) => p >= 90 ? 'ok' : p >= 50 ? 'warn' : 'low';
+const curQ = () => S.fy === '2627' ? CUR_Q : 0; // FY27-28 hasn't started
+
+function rows() {
+  const q = S.q.trim().toLowerCase();
+  return targetRows(S.dim, S.fy).map(r => { const e = EDITS[`${S.fy}|${S.dim}|${r.name}`]; return e ? { ...r, q: e, annual: e.reduce((t, x) => t + x, 0) } : r; })
+    .filter(r => !q || r.name.toLowerCase().includes(q));
+}
+function qCell(r, i) {
+  const cq = curQ(), t = r.q[i], a = r.ach[i], qn = i + 1;
+  if (t == null) return `<td class="qt ${qn === cq ? 'cur' : ''}"><b class="no-t">—</b><small>${a ? `${money(a)} won` : 'No target'}</small></td>`;
+  const p = t ? Math.round(a / t * 100) : 0;
+  const sub = qn > cq ? 'Not started' : `${money(a)} won · <span class="pc ${pctCls(p)}">${p}%</span>`;
+  return `<td class="qt ${qn === cq ? 'cur' : ''}"><b>${money(t)}</b><small>${sub}</small></td>`;
+}
+function body() {
+  const list = rows(), cq = curQ();
+  const pages = Math.max(1, Math.ceil(list.length / PER_PAGE)); S.page = Math.min(S.page, pages);
+  const shown = list.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
+  const [one, many] = NOUN[S.dim];
+  const tabs = `<div class="tabs" role="tablist" aria-label="Dimension">${TARGET_DIMS.map(([k, l]) => `<button class="tab ${S.dim === k ? 'on' : ''}" role="tab" aria-selected="${S.dim === k}" data-act="dim" data-v="${k}">${l}</button>`).join('')}</div>`;
+  const table = list.length ? `<div class="tbl-wrap"><table class="tbl tg">
+      <colgroup><col class="c-n"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-q"><col class="c-a"><col class="c-h"><col class="c-p"><col class="c-e"></colgroup>
+      <thead><tr><th>${TARGET_DIMS.find(d => d[0] === S.dim)[1]}</th>${[1, 2, 3, 4].map(q => `<th>Q${q}${q === cq ? ' <span class="now">· now</span>' : ''}</th>`).join('')}<th class="r">Annual target</th><th class="r">Achieved</th><th class="r">%</th><th class="r" aria-label="Edit"></th></tr></thead>
+      <tbody>${shown.map(r => { const h = r.ach.reduce((x, y) => x + y, 0), p = r.annual ? Math.round(h / r.annual * 100) : null;
+        return `<tr><td><div class="ell t-main">${esc(r.name)}</div>${S.dim === 'salesperson' ? `<div class="ell t-sub">${esc(PERSON_TEAM[r.name] || '')}</div>` : ''}</td>
+          ${[0, 1, 2, 3].map(i => qCell(r, i)).join('')}
+          <td class="r num"><b class="${r.annual ? '' : 'no-t'}">${r.annual ? money(r.annual) : 'No target'}</b></td>
+          <td class="r num">${money(h)}</td>
+          <td class="r num">${p == null ? '<span class="no-t">—</span>' : `<span class="pc ${pctCls(p)}">${p}%</span>`}</td>
+          <td class="r"><button class="btn icon-only" data-act="edit" data-v="${esc(r.name)}" aria-label="Edit targets for ${esc(r.name)}" data-tip="Edit targets">${EDIT_IC}</button></td></tr>`; }).join('')}</tbody>
+    </table></div>
+    <div class="pager"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, list.length)} of ${list.length}</span><span class="sp"></span>
+      <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
+      ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}
+      <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>`
+    : `<div class="empty" style="padding:48px 12px"><b>No ${many} match</b>Try another search.</div>`;
+  return `<section class="card" aria-label="Targets by ${one}">${tabs}
+    ${table}</section>`;
+}
+function render() {
+  $('#page').innerHTML = body();
+  $('#f-search').placeholder = `Search ${NOUN[S.dim][0]}`;
+  $('#reset').hidden = !S.q;
+}
+
+async function edit(name) {
+  const r = rows().find(x => x.name === name); if (!r) return;
+  const vals = r.q.map(x => x == null ? '' : Math.round(x / 1000));
+  const onInput = (e) => { const i = e.target.dataset.q; if (i == null) return; vals[+i] = e.target.value; const t = vals.reduce((s, v) => s + (+v || 0), 0); const el = document.getElementById('ed-sum'); if (el) el.textContent = `Annual target: ${money(t * 1000)}`; };
+  document.addEventListener('input', onInput);
+  const v = await CRM.confirm({ title: `Targets · ${esc(name)}`,
+    body: `<p style="margin:0">${TARGET_DIMS.find(d => d[0] === S.dim)[1]} · FY${S.fy.slice(0, 2)}-${S.fy.slice(2)} · in thousands of USD</p>
+      <div class="ed-q">${[0, 1, 2, 3].map(i => `<label>Q${i + 1}<input class="in" type="number" min="0" step="10" data-q="${i}" value="${vals[i]}" aria-label="Q${i + 1} target in thousands"></label>`).join('')}</div>
+      <p class="ed-sum" id="ed-sum">Annual target: ${money(vals.reduce((s, x) => s + (+x || 0), 0) * 1000)}</p>`,
+    actions: [{ label: 'Cancel', value: null, kind: 'ghost' }, { label: 'Save targets', value: 'ok', kind: 'primary' }] });
+  document.removeEventListener('input', onInput);
+  if (!v) return;
+  EDITS[`${S.fy}|${S.dim}|${name}`] = vals.map(x => (+x || 0) * 1000);
+  render(); toast(`Targets saved for ${name}`, 'ok');
+}
+
+$('#page').addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'dim') { S.dim = a.dataset.v; S.q = ''; $('#f-search').value = ''; S.page = 1; render(); }
+  else if (act === 'page') { S.page = +a.dataset.v; render(); }
+  else if (act === 'edit') edit(a.dataset.v);
+});
+$('#f-fy').addEventListener('change', (e) => { S.fy = e.target.value; S.page = 1; render(); });
+$('#f-search').addEventListener('input', (e) => { S.q = e.target.value; S.page = 1; render(); });
+$('#reset').addEventListener('click', () => { S.q = ''; $('#f-search').value = ''; render(); });
+
+CRM.renderShell('targets');
+CRM.watchSticky($('#filters'));
+render();
+</script>
+</body>
+</html>

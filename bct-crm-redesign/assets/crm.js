@@ -36,7 +36,7 @@
     ['Plan & report', [['targets', 'Sales targets', 'flag', 1], ['reports', 'Reports', 'report', 1]]],
     ['Setup', [['structure', 'Sales structure', 'tree', 1]]]
   ];
-  const BUILT = { pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html' };
+  const BUILT = { pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html', accounts: 'accounts.html', contacts: 'contacts.html', targets: 'targets.html' };
 
   function renderShell(active) {
     const side = document.getElementById('side');
@@ -456,10 +456,18 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => enhanceSelects()); else setTimeout(enhanceSelects);
 
   // Owner avatar: initials on a blue-family tint, fixed per person (styles .av / .av-a…e in theme-v2.css)
-  function avatar(name) {
+  // Photo when the person has one in assets/people (sales owners), initials otherwise (contacts, cross-functional staff).
+  // Sales-owner photos: Gaurav, Omar, Ahmed, Karthik and Vikram from the manager's prototype set; Daniel, Mei Lin,
+  // Priya and Ananya are AI-generated portraits of these fictional people (2026-11-19).
+  const PHOTOS = ['Gaurav Shrotriya', 'Omar Haddad', 'Ahmed Al-Mansoori', 'Karthik Menon', 'Vikram Iyer', 'Daniel Tan', 'Mei Lin Wong', 'Priya Sharma', 'Ananya Reddy'];
+  const PEOPLE_DIR = (document.currentScript && document.currentScript.src || '').replace(/crm\.js.*$/, 'people/');
+  // avatar(name, contactId): contacts have one portrait each, by ID (assets/people/contacts/CON-….webp, AI-generated),
+  // because the demo reuses some names across accounts.
+  function avatar(name, contactId) {
     const ini = name.split(/\s+/).map(s => s[0]).slice(0, 2).join('');
     let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-    return `<span class="av av-${'abcde'[h % 5]}" aria-hidden="true">${ini}</span>`;
+    const src = contactId && typeof CONTACT_PHOTOS !== 'undefined' && CONTACT_PHOTOS.has(contactId) ? `${PEOPLE_DIR}contacts/${contactId}.webp` : PHOTOS.includes(name) ? `${PEOPLE_DIR}${name.toLowerCase().replace(/[^a-z]+/g, '-')}.webp` : '';
+    return `<span class="av av-${'abcde'[h % 5]} ${src ? 'ph' : ''}" aria-hidden="true">${src ? `<img src="${src}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('ph');this.replaceWith('${ini}')">` : ini}</span>`;
   }
 
   // Confirm dialog (Candace, 2026-11-18). CRM.confirm({ title, body, actions: [{ label, value, kind }] }) resolves to the

@@ -12,9 +12,14 @@ Redesign of the CRM V1 classic pages, following the old CRMpulse information arc
 | Sales initiative record | `initiative.html?id=SI-2026-0024` | One initiative: stage, line items, contacts, activities, tasks, stage history, attachments, next steps. Every row on the other pages opens it |
 | Sales initiative record · edit | `initiative.html?id=SI-2026-0024&mode=edit` | The same record with every field editable; locked fields show why |
 | New sales initiative | `initiative-new.html` | Create a prospect, lead or opportunity; shows what each status needs before it can be created |
+| Activities | `activities.html` | Every call, meeting, visit and email, newest first: log one, see the week at a glance, filter by type, purpose and period |
+| Tasks | `tasks.html` | Follow-ups for anyone (sales, presales, delivery, finance, legal): my tasks, ones I gave, team overdue, due this week; quick add, complete, edit |
+| Accounts | `accounts.html` | Every customer and prospect organisation: lifecycle, owner, open pipeline, customer value, last interaction, what needs attention |
+| Contacts | `contacts.html` | People at each account, by account or as a list; accounts without an active decision maker; contact details beside the list |
+| Sales targets | `targets.html` | Quarterly booking targets per dimension (geography, region, salesperson, SBU, practice, offering, technology, vertical) against closed won; edit a row's targets |
 | Pipeline (archived layout) | `pipeline_archieve.html` | The first Pipeline layout, kept for reference |
 
-Activities and Tasks are next. Every page works from 1440 down to a 390 px phone.
+Every page works from 1440 down to a 390 px phone.
 
 Design system: `design-system/index.html` (tokens in `design-system/tokens.css`).
 

@@ -54,13 +54,13 @@ body.v2 .nav-item.active { background: var(--surface); box-shadow: var(--shadow-
 body.v2 .filters { background: transparent; gap: 8px; }
 body.v2 .filters.stuck { background: var(--glass-bar); backdrop-filter: var(--blur-bar); -webkit-backdrop-filter: var(--blur-bar); }
 body.v2 .filters::after { background: var(--line-2); }
-body.v2 .select, body.v2 .btn { border-radius: var(--radius-pill); border-color: var(--surface); background: var(--glass); box-shadow: var(--shadow-card); }
-body.v2 .select:hover, body.v2 .btn:hover { background: var(--surface); }
+
+body.v2 .select { border-radius: var(--radius-pill); border-color: var(--surface); background: var(--glass); box-shadow: var(--shadow-card); }
+body.v2 .select:hover { background: var(--surface); }
+body.v2 .card .select { box-shadow: none; } /* inside a card, controls stay flat; the card carries the shadow */
 body.v2 .select .lbl { padding-left: 14px; }
 body.v2 .select.set, body.v2 .select.open { border-color: var(--deep); background: var(--surface); }
-body.v2 .btn.primary { background: var(--midnight); border-color: var(--midnight); color: var(--on-dark); }
-body.v2 .btn.primary:hover { background: var(--deep); border-color: var(--deep); }
-body.v2 .btn.ghost { background: transparent; border-color: transparent; box-shadow: none; }
+
 body.v2 .seg { border-radius: var(--radius-pill); padding: 3px; background: var(--glass); box-shadow: var(--shadow-card); }
 body.v2 .seg button { border-radius: var(--radius-pill); padding: 0 14px; }
 body.v2 .seg button.on { background: var(--midnight); color: var(--on-dark); box-shadow: none; }
@@ -98,6 +98,8 @@ body.v2 .fbar-target span { color: var(--midnight); }
 
 /* Ring card: light, same glass as the other cards, so it doesn't pull focus (user, 2026-11-16) */
 .ring { position: relative; width: 176px; height: 176px; margin: 4px auto 0; }
+.ring-card .ring { margin: auto; } /* centred in the space between the heading and the minis */
+.ring-card .ring + .minis, .ring-card .minis { margin-top: 0; }
 .ring svg { width: 100%; height: 100%; overflow: visible; }
 .ring .ticks line { stroke: var(--line-2); stroke-width: 2; stroke-linecap: round; }
 .ring .ticks line.on { stroke: var(--sky); }
@@ -160,7 +162,7 @@ body.v2 .tm-r { border-radius: var(--radius-lg); }
 /* Table */
 body.v2 .tbl th { background: transparent; }
 body.v2 .tbl tbody tr:hover td { background: color-mix(in srgb, var(--hover) 70%, transparent); }
-body.v2 .tabs { border-bottom: 0; gap: 6px; padding: 0 24px 12px; }
+body.v2 .tabs { flex-wrap: wrap; border-bottom: 0; gap: 6px; padding: 0 24px 12px; } /* one tab style site-wide: pills at the top of the card they filter */
 body.v2 .tab { height: 32px; padding: 0 14px; border-radius: var(--radius-pill); background: var(--glass-soft); border: 1px solid var(--line); }
 body.v2 .tab.on { background: var(--midnight); border-color: var(--midnight); color: var(--on-dark); }
 body.v2 .tab.on::after { display: none; }
@@ -174,6 +176,8 @@ body.v2 .tab.on .tab-n.hot { background: var(--danger-soft); color: var(--danger
 .av-c { background: var(--av-c-bg); color: var(--av-c-fg); }
 .av-d { background: var(--av-d-bg); color: var(--av-d-fg); }
 .av-e { background: var(--av-e-bg); color: var(--av-e-fg); }
+.av.ph { overflow: hidden; background: var(--field); } /* photo avatar */
+.av.ph img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 body.v2 .pager button.on { background: var(--midnight); color: var(--on-dark); border-color: var(--midnight); }
 
 /* Drill panel */
@@ -192,13 +196,7 @@ body.v2 .ring-card .ring .ticks line { stroke: color-mix(in srgb, var(--ring-blu
 body.v2 .ring-card .ring .ticks line.on { stroke: var(--ring-blue); }
 body.v2 .ring-card .minis { border-top: 0; }
 
-/* Secondary buttons: any non-primary button sitting on a white card gets a soft blue fill so it reads as a button (2026-11-17) */
-body.v2 .card .btn:not(.primary):not(.ghost):not(:disabled):not([aria-disabled="true"]) { background: var(--info-bg); border-color: transparent; color: var(--deep); box-shadow: none; }
-body.v2 .card .btn:not(.primary):not(.ghost):not(:disabled):not([aria-disabled="true"]):hover { background: var(--info-hover); }
 
-/* Secondary buttons off white cards (page header, tinted cards) use the header Edit button's look: translucent white, ink text (2026-11-17) */
-body.v2 .card.tint .btn:not(.primary):not(.ghost):not(:disabled) { background: var(--glass); border-color: var(--surface); color: var(--t1); box-shadow: var(--shadow-soft); }
-body.v2 .card.tint .btn:not(.primary):not(.ghost):not(:disabled):hover { background: var(--surface); }
 /* Segmented toggle inside a white card: tinted track so it reads against the card */
 body.v2 .card:not(.tint) .seg { background: var(--track); box-shadow: none; } /* same tone as the page canvas, no border */
 body.v2 .card:not(.tint) .seg button:not(.on) { color: var(--t1); }
@@ -207,8 +205,23 @@ body.v2 .kb-col { background: var(--track); } /* same tone as the toggle track a
 body.v2 .search { border-radius: var(--radius-pill); border-color: var(--surface); background: var(--glass); box-shadow: var(--shadow-card); }
 body.v2 .search:focus-within { border-color: var(--deep); }
 body.v2 .card .search { box-shadow: none; }
-body.v2 .card .btn.primary, body.v2 .card .select { box-shadow: none; } /* inside a card, controls stay flat; the card carries the shadow */
-/* Confirm dialog: buttons follow the white-card rules above (2026-11-18) */
-body.v2 .dlg .btn:not(.primary):not(.quiet) { background: var(--info-bg); border-color: transparent; color: var(--deep); box-shadow: none; }
-body.v2 .dlg .btn:not(.primary):not(.quiet):hover { background: var(--info-hover); }
-body.v2 .dlg .btn.primary { box-shadow: none; }
+
+
+/* ---------- Buttons: three kinds, plus text links (2026-11-19) ----------
+   Primary    .btn.primary  midnight fill, white text. One per area: the main action.
+   Secondary  .btn          white, 1px line-2 border, ink text; hover darkens the border. Same on the canvas, white cards,
+                            tinted cards, dialogs and the sticky bars; only on the page canvas does it carry the card shadow.
+   Ghost      .btn.ghost    no fill or border, t2 text; hover shows a soft fill (Cancel, Reset). .btn.quiet = ghost in red.
+   Link       .link, text links in content  deep blue text, underline on hover. Not a button: it goes somewhere. */
+body.v2 .btn { border-radius: var(--radius-pill); border: 1px solid var(--line-2); background: var(--surface); color: var(--t1); box-shadow: var(--shadow-card); }
+body.v2 .btn:hover { background: var(--surface); border-color: var(--line-3); color: var(--ink); }
+body.v2 .card .btn, body.v2 .dlg .btn, body.v2 .ed-bar .btn, body.v2 .pop .btn, body.v2 .qa .btn, body.v2 .tk-form .btn { box-shadow: none; }
+body.v2 .btn.primary { background: var(--midnight); border-color: var(--midnight); color: var(--on-dark); }
+body.v2 .btn.primary:hover { background: var(--deep); border-color: var(--deep); color: var(--on-dark); }
+body.v2 .btn.ghost, body.v2 .btn.quiet { background: transparent; border-color: transparent; box-shadow: none; color: var(--t2); }
+body.v2 .btn.ghost:hover { background: var(--hover); border-color: transparent; color: var(--ink); }
+body.v2 .btn.quiet { color: var(--danger); }
+body.v2 .btn:disabled, body.v2 .btn:disabled:hover, body.v2 .btn[aria-disabled="true"] { color: var(--t3); background: var(--field); border-color: var(--line); box-shadow: none; cursor: not-allowed; }
+body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(--on-dark); background: var(--primary-disabled); border-color: var(--primary-disabled); }
+body.v2 .link, body.v2 .rec-meta a, body.v2 .acc a, body.v2 .cp-in a, body.v2 .rel a { color: var(--deep); font-weight: 500; text-decoration: none; cursor: pointer; }
+body.v2 .link:hover, body.v2 .rec-meta a:hover, body.v2 .acc a:hover, body.v2 .cp-in a:hover, body.v2 .rel a:hover { text-decoration: underline; text-underline-offset: 3px; }

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accounts · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="assets/crm.css?v=20261119c">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<style>
+/* ---------- Page: Accounts ----------
+   Same IA as CRMpulse /accounts: five scope tiles, search / owner / geography filters, one table with quick actions.
+   Visual language = Sales initiatives (tiles in a tinted card, glass filters, 64px rows, pager). */
+.sc-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 8px; }
+.tt { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 16px; border: 0; border-radius: var(--radius-lg); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.tt:hover { background: var(--hover); }
+.tt.on { background: var(--surface); box-shadow: var(--shadow-soft); }
+.tt-k { font-size: var(--text-xs); color: var(--t3); white-space: nowrap; }
+.tt-n { font-size: var(--text-3xl); font-weight: 400; letter-spacing: -.03em; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tt-n.warn { color: var(--warn); }
+.tt-s { font-size: var(--text-xs); color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+
+.tbl.ac { table-layout: fixed; }
+.tbl.ac col.c-n { width: 30%; } .tbl.ac col.c-l { width: 10%; } .tbl.ac col.c-o { width: 16%; } .tbl.ac col.c-p { width: 11%; }
+.tbl.ac col.c-v { width: 11%; } .tbl.ac col.c-i { width: 12%; } .tbl.ac col.c-q { width: 10%; }
+.tbl.ac tbody tr { cursor: default; }
+.tbl.ac td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
+.an { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.an .ell { min-width: 0; }
+.tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; letter-spacing: .01em; white-space: nowrap; flex: none; }
+.tag.strat { background: var(--info-bg); color: var(--deep); }
+.tag.Customer { background: var(--ok-bg); color: var(--ok-text); }
+.tag.Prospect { background: var(--cyan-50); color: var(--cyan-text); }
+.attn { display: inline-flex; align-items: center; max-width: 100%; height: 20px; margin-top: 4px; padding: 0 7px; border-radius: var(--radius-sm); background: var(--warn-bg); color: var(--warn-text); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.late { color: var(--danger); }
+.qa-acts { display: flex; justify-content: flex-end; gap: 6px; }
+.qa-acts .btn.icon-only { width: 32px; height: 32px; padding: 0; justify-content: center; }
+.qa-acts svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 1180px) { .sc-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 768px) {
+  .sc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tt-s { white-space: normal; }
+  .tbl.ac { min-width: 940px; }
+}
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+    <header class="v2-head">
+      <div class="v2-hello">
+        <div class="v2-top"><span class="v2-eyebrow">Accounts</span></div>
+        <h1>Accounts</h1>
+        <p>Prospective and existing customer organisations</p>
+      </div>
+      <div class="acts" style="display:flex;gap:8px">
+        <button class="btn primary" id="new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New account</button>
+      </div>
+    </header>
+
+    <div class="filters" id="filters" role="toolbar" aria-label="Filters">
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="f-search" type="search" placeholder="Name, code or HQ" aria-label="Search accounts"></label>
+      <label class="select"><span class="lbl">Owner</span><select id="f-owner" aria-label="Owner"></select></label>
+      <label class="select"><span class="lbl">Geography</span><select id="f-geo" aria-label="Geography"></select></label>
+      <button class="btn ghost" id="reset" hidden>Reset</button>
+      <span class="sp"></span>
+    </div>
+
+    <div id="page"></div>
+  </main>
+</div>
+
+<script src="assets/crm.js?v=20261119h"></script>
+<script src="assets/crm-data.js?v=20261119f"></script>
+<script>
+/* Accounts — every company that appears in the sales initiatives. Lifecycle: customer (has won business) or prospect.
+   Open pipeline = open opportunities; customer value = won business; last interaction = latest activity. */
+const { money, toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const IC = {
+  edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
+};
+const TILES = [
+  ['all', 'All accounts', () => true, 'Prospects and customers'],
+  ['Customer', 'Customers', (a) => a.lifecycle === 'Customer', 'Won business or confirmed orders'],
+  ['Prospect', 'Prospects', (a) => a.lifecycle === 'Prospect', 'No won business yet'],
+  ['strat', 'Strategic', (a) => a.strategic, 'Flagged by sales leadership'],
+  ['attn', 'Need attention', (a) => a.attn.length > 0, 'Draft orders, quiet accounts']
+];
+const S = { tile: 'all', q: '', owner: '', geo: '', sort: 'name', page: 1 };
+const PER_PAGE = 10;
+const SORTS = {
+  name: { fn: (a, b) => a.name.localeCompare(b.name), dir: 'asc' },
+  pipeline: { fn: (a, b) => b.pipeline - a.pipeline, dir: 'desc' },
+  value: { fn: (a, b) => b.value - a.value, dir: 'desc' },
+  last: { fn: (a, b) => a.last - b.last, dir: 'asc' }
+};
+const anyFilter = () => S.q || S.owner || S.geo;
+
+function rows() {
+  const fn = TILES.find(t => t[0] === S.tile)[2], q = S.q.trim().toLowerCase();
+  return ACCOUNTS.filter(a => fn(a) && (!S.owner || a.owner === S.owner) && (!S.geo || a.geo === S.geo)
+    && (!q || [a.name, a.id, a.hq].some(v => v.toLowerCase().includes(q))));
+}
+function tiles() {
+  return `<section class="card tint sc-tiles" aria-label="Account scope">${TILES.map(([k, label, fn, sub]) => {
+    const n = ACCOUNTS.filter(fn).length;
+    return `<button class="tt ${S.tile === k ? 'on' : ''}" data-act="tile" data-v="${k}" aria-pressed="${S.tile === k}"><span class="tt-k">${label}</span><span class="tt-n ${k === 'attn' && n ? 'warn' : ''}">${n}</span><span class="tt-s">${sub}</span></button>`;
+  }).join('')}</section>`;
+}
+function th(key, label, cls = '') {
+  if (!key) return `<th class="${cls}">${label}</th>`;
+  const on = S.sort === key;
+  return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on && SORTS[key].dir === 'desc' ? '↓' : '↑'}</span></button></th>`;
+}
+const ell = (html, cls = '') => `<div class="ell ${cls}">${html}</div>`;
+function row(a) {
+  return `<tr data-id="${a.id}">
+    <td><div class="an">${ell(esc(a.name), 't-main')}${a.strategic ? '<span class="tag strat">Strategic</span>' : ''}</div>
+      ${ell(`${a.id} · ${a.type} · ${a.vertical} · ${a.geo}`, 't-sub')}
+      ${a.attn.map(x => `<span class="attn">${esc(x)}</span>`).join(' ')}</td>
+    <td><span class="tag ${a.lifecycle}">${a.lifecycle}</span><div class="t-sub">Active</div></td>
+    <td><div class="own">${CRM.avatar(a.owner)}<div class="own-t">${ell(esc(a.owner))}${ell(esc(a.team), 't-sub')}</div></div></td>
+    <td class="r num"><div class="t-val">${money(a.pipeline)}</div>${a.pipeline ? `<div class="t-sub">${a.inits.filter(id => { const o = INITS.find(x => x.id === id); return o.kind === 'open' && o.status === 'Opportunity'; }).length} open</div>` : ''}</td>
+    <td class="r num">${money(a.value)}</td>
+    <td class="num"><div class="${a.last > 60 ? 'late' : ''}">${a.last} days ago</div><div class="t-sub">${CRM.date(a.lastDate)}</div></td>
+    <td><div class="qa-acts">
+      <button class="btn icon-only" data-act="edit" data-v="${a.id}" aria-label="Edit ${esc(a.name)}" data-tip="Edit account">${IC.edit}</button>
+      <button class="btn icon-only" data-act="newsi" data-v="${esc(a.name)}" aria-label="New sales initiative for ${esc(a.name)}" data-tip="New sales initiative">${IC.plus}</button>
+    </div></td>
+  </tr>`;
+}
+function listCard() {
+  let list = rows();
+  list = list.slice().sort(SORTS[S.sort].fn);
+  const pages = Math.max(1, Math.ceil(list.length / PER_PAGE)); S.page = Math.min(S.page, pages);
+  const shown = list.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
+  const body = list.length ? `<div class="tbl-wrap"><table class="tbl ac">
+      <colgroup><col class="c-n"><col class="c-l"><col class="c-o"><col class="c-p"><col class="c-v"><col class="c-i"><col class="c-q"></colgroup>
+      <thead><tr>${th('name', 'Account')}${th('', 'Lifecycle')}${th('', 'Owner')}${th('pipeline', 'Open pipeline', 'r')}${th('value', 'Customer value', 'r')}${th('last', 'Last interaction')}${th('', 'Quick actions', 'r')}</tr></thead>
+      <tbody>${shown.map(row).join('')}</tbody></table></div>
+    <div class="pager"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, list.length)} of ${list.length}</span><span class="sp"></span>
+      <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
+      ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}
+      <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>`
+    : `<div class="empty" style="padding:48px 12px"><b>No accounts here</b>Nothing matches these filters.${anyFilter() ? '<br><button class="link" data-act="reset">Clear filters</button>' : ''}</div>`;
+  return `<section class="card" aria-label="Accounts">
+    ${body}</section>`;
+}
+function render() {
+  $('#page').innerHTML = tiles() + '<div style="height:16px"></div>' + listCard();
+  $('#reset').hidden = !anyFilter();
+}
+
+const page = $('#page');
+page.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'tile') { S.tile = a.dataset.v; S.page = 1; render(); }
+  else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
+  else if (act === 'page') { S.page = +a.dataset.v; render(); }
+  else if (act === 'edit') toast('Would open the account editor');
+  else if (act === 'newsi') location.href = `initiative-new.html?acc=${encodeURIComponent(a.dataset.v)}`;
+  else if (act === 'reset') resetAll();
+});
+function fill(sel, opts) { sel.innerHTML = opts.map(([k, l]) => `<option value="${esc(k)}">${esc(l)}</option>`).join(''); }
+fill($('#f-owner'), [['', 'All'], ...[...new Set(ACCOUNTS.map(a => a.owner))].sort().map(p => [p, p === ME ? `${p} (you)` : p])]);
+fill($('#f-geo'), [['', 'All'], ...[...new Set(ACCOUNTS.map(a => a.geo))].sort().map(g => [g, g])]);
+$('#f-search').addEventListener('input', (e) => { S.q = e.target.value; S.page = 1; render(); });
+$('#f-owner').addEventListener('change', (e) => { S.owner = e.target.value; S.page = 1; render(); });
+$('#f-geo').addEventListener('change', (e) => { S.geo = e.target.value; S.page = 1; render(); });
+function resetAll() { S.q = S.owner = S.geo = ''; $('#f-search').value = ''; ['#f-owner', '#f-geo'].forEach(s => $(s).value = ''); S.page = 1; render(); }
+$('#reset').addEventListener('click', resetAll);
+$('#new').addEventListener('click', () => toast('Would open the new account form'));
+
+CRM.renderShell('accounts');
+CRM.watchSticky($('#filters'));
+render();
+</script>
+</body>
+</html>

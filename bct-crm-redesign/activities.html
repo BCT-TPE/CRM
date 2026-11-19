@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Activities · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="assets/crm.css?v=20261119c">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<style>
+/* ---------- Page: Activities (CRM V1 §6) ----------
+   Same IA as CRMpulse /activities: Mine / My teams / Everyone, a "Log what happened" composer, four summary tiles,
+   type chips, search / purpose / period / more filters, and the timeline grouped by week and month, newest first. */
+.v2-head .seg { flex: none; }
+/* Composer */
+.lg-card { display: flex; flex-direction: column; gap: 12px; }
+.lg-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.lg-top b { flex-basis: 100%; font-size: var(--text-md); font-weight: 600; color: var(--ink); } /* title on its own line, type chips under it */
+.tchip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface); font: inherit; font-size: var(--text-xs); font-weight: 500; color: var(--t1); cursor: pointer; }
+.tchip:hover { border-color: var(--line-3); }
+.tchip.on { border-color: var(--midnight); background: var(--midnight); color: var(--on-dark); }
+.tchip svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tchip small { font-size: var(--text-2xs); opacity: .75; font-variant-numeric: tabular-nums; }
+.lg-form { display: grid; grid-template-columns: 180px minmax(0, 1fr) minmax(0, 2fr) auto; gap: 8px; align-items: center; }
+.lg-form .in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); outline: none; }
+.lg-form .in:focus { border-color: var(--deep); }
+.lg-form .btn { height: 40px; }
+body.v2 .lg-form label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: var(--radius-control); border-color: var(--line-2); background: var(--surface); box-shadow: none; }
+.lg-form .fsel .sel-btn { max-width: none; width: 100%; padding-left: 12px; font-weight: 400; color: var(--ink); }
+.lg-note { margin: 0; font-size: var(--text-xs); color: var(--t2); }
+/* Summary tiles */
+.sm4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap-grid); }
+.sm4 small { display: block; font-size: var(--text-xs); color: var(--t3); }
+.sm4 b { display: block; margin: 6px 0 4px; font-size: var(--text-3xl); font-weight: 400; letter-spacing: -.03em; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; } /* same as every scope tile figure */
+.sm4 span { display: block; font-size: var(--text-xs); color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm4 .card.warn { background: var(--warn-bg); border-color: var(--warn-soft); }
+.sm4 .card.warn b { color: var(--warn-text); }
+/* Timeline */
+/* Period blocks: a clear heading and a rule between blocks; inside a block the line runs dot to dot */
+.feed .tabs { padding-bottom: 0; }
+.wkg:first-of-type { padding-top: 16px; } /* 16px between the type tabs and the first period */
+.wkg + .wkg { margin-top: 28px; }
+.wk { display: flex; align-items: baseline; gap: 8px; margin: 0 0 14px; font-size: var(--text-lg); font-weight: 600; color: var(--ink); }
+.wk small { font-size: var(--text-xs); font-weight: 500; color: var(--t3); font-variant-numeric: tabular-nums; }
+.ai { display: grid; grid-template-columns: 96px 28px minmax(0, 1fr); gap: 14px; padding-bottom: 14px; }
+.ai:last-child { padding-bottom: 0; }
+.ai-d { text-align: left; font-size: var(--text-xs); color: var(--t3); line-height: 1.4; padding-top: 12px; white-space: nowrap; } /* date + weekday · time: two lines, no wrapping */
+.ai-d b { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--t1); }
+.ai-d .wd { font-weight: 400; color: var(--t3); } /* weekday on the date line */
+.ai-ic { position: relative; display: flex; justify-content: center; padding-top: 12px; }
+.ai-ic span { position: relative; z-index: 1; display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--radius-full); background: var(--info-bg); color: var(--deep); }
+.ai-ic svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ai:not(:last-child) .ai-ic::after { content: ""; position: absolute; top: 26px; bottom: -40px; width: 2px; border-radius: 1px; background: var(--line-2); } /* this dot's centre to the next dot's centre (12px + 14px half dot; 14px row gap) */
+.ai-c { min-width: 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.ai-h { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ai-h b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
+.ai-h .sp { flex: 1; }
+.ai-h small { flex: none; font-size: var(--text-xs); color: var(--t3); font-variant-numeric: tabular-nums; }
+.ai-h .btn.icon-only { width: 28px; height: 28px; padding: 0; justify-content: center; }
+.ai-h .btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ptag { flex: none; display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); background: var(--hover); font-size: var(--text-2xs); font-weight: 600; color: var(--t2); white-space: nowrap; }
+.ai-m { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 6px; font-size: var(--text-xs); color: var(--t3); }
+.ai-m .acc { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); background: var(--field); color: var(--t1); font-weight: 500; }
+.ai-m .fu { color: var(--deep); font-weight: 500; }
+.ai-n { margin: 6px 0 0; font-size: var(--text-sm); color: var(--t2); }
+.more-wrap { position: relative; }
+#more-pop { top: 44px; left: 0; width: 280px; }
+#more-pop .grp + .grp { margin-top: 12px; }
+#more-pop h4 { margin: 0 0 6px; font-size: var(--text-xs); font-weight: 600; color: var(--t2); }
+body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; border-radius: var(--radius-control); border-color: var(--line-2); box-shadow: none; }
+#more-pop .fsel .sel-btn { max-width: none; width: 100%; font-weight: 400; }
+@media (max-width: 1180px) { .sm4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lg-form { grid-template-columns: 160px minmax(0, 1fr); } .lg-form .in.what { grid-column: 1 / -1; } }
+@media (max-width: 768px) {
+  .lg-form { grid-template-columns: 1fr; }
+  /* phone: date on one line above the card; title + edit, then purpose + ID */
+  .ai { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .ai-d { display: flex; align-items: baseline; gap: 6px; padding-top: 0; text-align: left; }
+  .ai-d b { display: inline; }
+  .ai-h b { flex: 1 1 calc(100% - 40px); white-space: normal; }
+  .ai-h .btn { order: 1; }
+  .ai-h .ptag { order: 2; }
+  .ai-h .sp { display: none; }
+  .ai-h small { order: 3; }
+  .ai-ic { display: none; }
+    .ai-h { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+    <header class="v2-head">
+      <div class="v2-hello">
+        <div class="v2-top"><span class="v2-eyebrow">Activities</span></div>
+        <h1>Activities</h1>
+        <p>Every call, meeting, visit and email with customers, newest first.</p>
+      </div>
+      <div class="seg" id="f-who" role="radiogroup" aria-label="Whose activities">
+        <button data-v="mine" role="radio" aria-checked="false">Mine</button>
+        <button data-v="team" role="radio" aria-checked="false">My teams</button>
+        <button data-v="all" role="radio" aria-checked="false">Everyone</button>
+      </div>
+    </header>
+
+    <div id="top"></div>
+
+    <div class="filters" id="filters" role="toolbar" aria-label="Filters">
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="f-search" type="search" placeholder="Search subject or number" aria-label="Search"></label>
+      <label class="select"><span class="lbl">Purpose</span><select id="f-purpose" aria-label="Purpose"></select></label>
+      <label class="select"><span class="lbl">Period</span><select id="f-period" aria-label="Period"></select></label>
+      <div class="more-wrap">
+        <button class="btn" id="more-btn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>More filters<span class="count-badge" id="more-n" hidden></span></button>
+        <div class="pop" id="more-pop" role="dialog" aria-label="More filters" hidden>
+          <div class="grp"><h4>Owner</h4><label class="select fsel"><select id="f-owner" aria-label="Owner"></select></label></div>
+          <div class="grp"><h4>Context</h4><label class="select fsel"><select id="f-ctx" aria-label="Context"><option value="">All</option><option value="account">Account-level only</option><option value="initiative">Sales initiative only</option></select></label></div>
+        </div>
+      </div>
+      <button class="btn ghost" id="reset" hidden>Reset</button>
+      <span class="sp"></span>
+    </div>
+
+    <div id="page"></div>
+  </main>
+</div>
+
+<script src="assets/crm.js?v=20261119h"></script>
+<script src="assets/crm-data.js?v=20261119f"></script>
+<script>
+const { toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const DAY = 864e5;
+const P = (d) => `<path d="${d}"/>`;
+const TICON = {
+  'Customer / prospect visit': '<path d="M12 21s-6-5.3-6-11a6 6 0 0112 0c0 5.7-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',
+  'Phone call': P('M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2'),
+  'Virtual meeting': '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/>',
+  'Email': '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/>',
+  'Messaging': P('M4 5h16v11H8l-4 4z'),
+  'Internal meeting': '<circle cx="9" cy="8" r="3"/><path d="M3 19c.8-3 3.2-5 6-5s5.2 2 6 5M16 5.5a3 3 0 010 5.5M18 14c1.6.6 2.7 2.4 3 5"/>',
+  'Event / conference': '<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  'Other': '<circle cx="12" cy="12" r="8.5"/><path d="M8 12h8"/>'
+};
+const ic = (t) => `<svg viewBox="0 0 24 24" aria-hidden="true">${TICON[t] || TICON.Other}</svg>`;
+const EDIT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>';
+const PERIODS = [['60', 'Last 60 days'], ['week', 'This week'], ['month', 'This month'], ['quarter', 'This quarter'], ['all', 'Any time']];
+const WEEK_START = new Date(TODAY.getTime() - ((TODAY.getDay() + 6) % 7) * DAY); // Monday
+const MY_TEAM = PERSON_TEAM[ME];
+// Gaurav is a salesperson: CRMpulse opens on "Mine" for salespeople, "My teams" for managers, "Everyone" for leadership
+const S = { who: 'mine', type: '', q: '', purpose: '', period: '60', owner: '', ctx: '', logType: '', logCtx: 'account', logTo: '', logWhat: '' };
+
+const day = (a) => new Date(a.d.slice(0, 10));
+function inPeriod(a, p) {
+  const d = day(a), ago = (TODAY - d) / DAY;
+  if (p === '60') return ago <= 60; if (p === 'week') return d >= WEEK_START;
+  if (p === 'month') return d.getMonth() === TODAY.getMonth() && d.getFullYear() === TODAY.getFullYear();
+  if (p === 'quarter') return qOf(a.d.slice(0, 10)) === CUR_Q && fyq(a.d).fy === '2627';
+  return true;
+}
+const whoMatch = (a, w = S.who) => w === 'all' || (w === 'mine' ? a.owner === ME : PERSON_TEAM[a.owner] === MY_TEAM);
+function rows(ignoreType) {
+  const q = S.q.trim().toLowerCase();
+  return ACTIVITIES.filter(a => whoMatch(a) && inPeriod(a, S.period) && (ignoreType || !S.type || a.type === S.type) && (!S.purpose || a.purpose === S.purpose)
+    && (!S.owner || a.owner === S.owner) && (!S.ctx || (S.ctx === 'account' ? !a.si : !!a.si))
+    && (!q || [a.t, a.id, a.acc, a.siName].some(v => v.toLowerCase().includes(q))));
+}
+
+// Composer: type, context (account or initiative) and what happened; Log adds it to the timeline
+function composer() {
+  const opts = S.logCtx === 'account' ? ACCOUNTS.map(a => [a.name, a.name]) : INITS.filter(o => o.kind === 'open').map(o => [o.id, o.name]);
+  return `<section class="card tint lg-card" aria-label="Log an activity">
+    <div class="lg-top"><b>Log what happened</b>${ACT_TYPES.map(t => `<button type="button" class="tchip ${S.logType === t ? 'on' : ''}" data-act="ltype" data-v="${t}" aria-pressed="${S.logType === t}">${ic(t)}${t}</button>`).join('')}</div>
+    <form class="lg-form" id="lg-form" novalidate>
+      <label class="select fsel"><select id="lg-ctx" aria-label="Log against"><option value="account" ${S.logCtx === 'account' ? 'selected' : ''}>Account</option><option value="initiative" ${S.logCtx === 'initiative' ? 'selected' : ''}>Sales initiative</option></select></label>
+      <label class="select fsel"><select id="lg-to" aria-label="${S.logCtx === 'account' ? 'Account' : 'Sales initiative'}"><option value="">${S.logCtx === 'account' ? 'Select account…' : 'Select initiative…'}</option>${opts.map(([v, l]) => `<option value="${esc(v)}" ${S.logTo === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>
+      <input class="in what" id="lg-what" value="${esc(S.logWhat)}" placeholder="e.g. Called Layla about the proposal; she wants a demo next week" aria-label="What happened">
+      <button class="btn primary" type="submit">Log</button>
+    </form>
+    <p class="lg-note">Faster from the record itself: every initiative, account and contact has a Log activity button with the details already filled in.</p>
+  </section>`;
+}
+function tiles() {
+  const mine = ACTIVITIES.filter(a => whoMatch(a));
+  const wk = mine.filter(a => day(a) >= WEEK_START), m30 = mine.filter(a => (TODAY - day(a)) / DAY <= 30);
+  const accs = (l) => new Set(l.map(a => a.acc)).size, pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const scope = S.who === 'all' ? ACCOUNTS : ACCOUNTS.filter(a => whoMatch({ owner: a.owner }));
+  const quiet = scope.filter(a => !ACTIVITIES.some(x => x.acc === a.name && (TODAY - day(x)) / DAY <= 30));
+  const fu = TASKS.filter(t => t.act && m30.some(a => a.id === t.act)).length;
+  return `<div class="sm4">
+    <div class="card"><small>This week</small><b>${wk.length}</b><span>activities logged · ${pl(accs(wk), 'account')}</span></div>
+    <div class="card"><small>Last 30 days</small><b>${m30.length}</b><span>activities across ${pl(accs(m30), 'account')}</span></div>
+    <div class="card ${quiet.length ? 'warn' : ''}"><small>Accounts with no interaction in 30 days</small><b>${quiet.length}</b><span>${quiet.length ? quiet.slice(0, 3).map(a => esc(a.name)).join(', ') + (quiet.length > 3 ? ` + ${quiet.length - 3} more` : '') : 'Every account was contacted recently'}</span></div>
+    <div class="card"><small>Follow-ups created</small><b>${fu}</b><span>tasks from activities in the last 30 days</span></div>
+  </div>`;
+}
+function typeChips() {
+  const base = rows(true), counts = ACT_TYPES.map(t => [t, base.filter(a => a.type === t).length]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
+  return `<div class="tabs" role="tablist" aria-label="Filter by type"><button class="tab ${!S.type ? 'on' : ''}" role="tab" aria-selected="${!S.type}" data-act="type" data-v="">All<span class="tab-n">${base.length}</span></button>${counts.map(([t, n]) => `<button class="tab ${S.type === t ? 'on' : ''}" role="tab" aria-selected="${S.type === t}" data-act="type" data-v="${t}">${t}<span class="tab-n">${n}</span></button>`).join('')}</div>`;
+}
+function groupOf(a) {
+  const d = day(a);
+  if (d >= WEEK_START) return 'This week';
+  if (d >= new Date(WEEK_START.getTime() - 7 * DAY)) return 'Last week';
+  return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+}
+function feed() {
+  const list = rows();
+  if (!list.length) return `<section class="card">${typeChips()}<div class="empty" style="padding:48px 12px"><b>No activities here</b>Nothing matches these filters.${S.period !== 'all' ? '<br><button class="link" data-act="anytime">Show any time</button>' : ''}</div></section>`;
+  const groups = [];
+  list.forEach(a => { const k = groupOf(a); if (!groups.length || groups[groups.length - 1][0] !== k) groups.push([k, []]); groups[groups.length - 1][1].push(a); });
+  const item = (a) => {
+    const d = new Date(a.d), n = actTasks(a.id);
+    return `<div class="ai">
+      <div class="ai-d"><b>${CRM.date(a.d, false)} <span class="wd">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</span></b><span>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span></div>
+      <div class="ai-ic"><span>${ic(a.type)}</span></div>
+      <div class="ai-c">
+        <div class="ai-h"><b>${esc(a.t)}</b><span class="ptag">${a.purpose}</span><span class="sp"></span><small>${a.id}</small><button class="btn icon-only" data-act="edit" data-v="${a.id}" aria-label="Edit ${a.id}" data-tip="Edit or delete">${EDIT}</button></div>
+        <div class="ai-m"><span class="acc">${esc(a.acc)}</span>${a.si ? `<a class="link" href="initiative.html?id=${encodeURIComponent(a.si)}#activities">${esc(a.siName)}</a>` : ''}<span>by ${a.owner === ME ? 'you' : esc(a.owner)}</span>${n ? `<span class="fu">${n} follow-up task${n === 1 ? '' : 's'}</span>` : ''}</div>
+        ${a.note ? `<p class="ai-n">${esc(a.note)}</p>` : ''}
+      </div></div>`;
+  };
+  const items = groups.map(([k, l]) => `<section class="wkg" aria-label="${k}"><h3 class="wk">${k}<small>${l.length}</small></h3>${l.map(item).join('')}</section>`).join('');
+  return `<section class="card feed" aria-label="Activity timeline">${typeChips()}${items}</section>`;
+}
+function renderTop() { $('#top').innerHTML = `<div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px">${composer()}${tiles()}</div>`; CRM.enhanceSelects($('#top')); }
+function render() {
+  renderTop();
+  $('#page').innerHTML = feed();
+  $('#f-who').querySelectorAll('button').forEach(b => { const on = b.dataset.v === S.who; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
+  const more = [S.owner, S.ctx].filter(Boolean).length; $('#more-n').hidden = !more; $('#more-n').textContent = more;
+  $('#reset').hidden = !(S.q || S.purpose || S.period !== '60' || S.owner || S.ctx || S.type);
+}
+
+// ---- Events ----
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a || !a.closest('#top, #page')) return;
+  const act = a.dataset.act;
+  if (act === 'ltype') { S.logType = S.logType === a.dataset.v ? '' : a.dataset.v; renderTop(); }
+  else if (act === 'type') { S.type = a.dataset.v; render(); }
+  else if (act === 'anytime') { S.period = 'all'; $('#f-period').value = 'all'; render(); }
+  else if (act === 'edit') toast(`Would open ${a.dataset.v} to edit or delete`);
+});
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'lg-ctx') { S.logCtx = e.target.value; S.logTo = ''; renderTop(); }
+  else if (e.target.id === 'lg-to') S.logTo = e.target.value;
+});
+document.addEventListener('input', (e) => { if (e.target.id === 'lg-what') S.logWhat = e.target.value; });
+document.addEventListener('submit', (e) => {
+  if (e.target.id !== 'lg-form') return; e.preventDefault();
+  if (!S.logTo) { toast(S.logCtx === 'account' ? 'Pick the account first' : 'Pick the initiative first', 'warn'); return; }
+  const o = S.logCtx === 'initiative' ? INITS.find(x => x.id === S.logTo) : null, acc = o ? o.acc : S.logTo, type = S.logType || 'Other';
+  const id = 'ACT-2026-' + String(Math.max(...ACTIVITIES.map(x => +x.id.slice(-4))) + 1).padStart(4, '0');
+  ACTIVITIES.unshift({ id, d: `${TODAY.toISOString().slice(0, 10)}T${String(new Date().getHours()).padStart(2, '0')}:00`, type, purpose: 'Follow-up', acc, si: o ? o.id : null, siName: o ? o.name : '', owner: ME, who: [],
+    t: `${ACT_SUBJECT[type]} ${acc}`, note: S.logWhat.trim() });
+  S.logType = ''; S.logTo = ''; S.logWhat = ''; if (S.who !== 'all' && S.who !== 'mine') S.who = 'mine';
+  render(); toast(`Logged ${id}`, 'ok');
+});
+$('#f-who').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { S.who = b.dataset.v; render(); } });
+function fill(sel, opts, v = '') { sel.innerHTML = opts.map(([k, l]) => `<option value="${esc(k)}" ${k === v ? 'selected' : ''}>${esc(l)}</option>`).join(''); }
+fill($('#f-purpose'), [['', 'All'], ...ACT_PURPOSES.map(p => [p, p])]);
+fill($('#f-period'), PERIODS, '60');
+fill($('#f-owner'), [['', 'All'], ...[...new Set(ACTIVITIES.map(a => a.owner))].sort().map(p => [p, p === ME ? `${p} (you)` : p])]);
+$('#f-search').addEventListener('input', (e) => { S.q = e.target.value; render(); });
+$('#f-purpose').addEventListener('change', (e) => { S.purpose = e.target.value; render(); });
+$('#f-period').addEventListener('change', (e) => { S.period = e.target.value; render(); });
+$('#f-owner').addEventListener('change', (e) => { S.owner = e.target.value; render(); });
+$('#f-ctx').addEventListener('change', (e) => { S.ctx = e.target.value; render(); });
+const setMore = (on) => { $('#more-pop').hidden = !on; $('#more-btn').setAttribute('aria-expanded', String(on)); };
+$('#more-btn').addEventListener('click', (e) => { e.stopPropagation(); setMore($('#more-pop').hidden); });
+$('#more-pop').addEventListener('click', (e) => e.stopPropagation());
+document.addEventListener('click', () => setMore(false));
+$('#reset').addEventListener('click', () => { Object.assign(S, { q: '', purpose: '', period: '60', owner: '', ctx: '', type: '' }); $('#f-search').value = ''; $('#f-purpose').value = ''; $('#f-period').value = '60'; $('#f-owner').value = ''; $('#f-ctx').value = ''; render(); });
+
+CRM.renderShell('activities');
+CRM.watchSticky($('#filters'));
+render();
+</script>
+</body>
+</html>

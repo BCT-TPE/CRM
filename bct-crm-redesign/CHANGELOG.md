@@ -7,6 +7,147 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
+## 2026-11-19
+
+### Added
+- **`accounts.html`: Accounts page.** It follows the CRMpulse `/accounts` layout:
+  - **Scope tiles:** all accounts, customers, prospects, strategic, need attention.
+  - **Filters:** search (name, code, HQ), owner, geography.
+  - **Table:** the same table as Sales initiatives, with a pager. Columns:
+    - Account: Strategic tag, then ID · type · vertical · geography, plus attention chips such as "Won deal with a draft order · confirm the PO" and "No interaction for N days".
+    - Lifecycle
+    - Owner
+    - Open pipeline
+    - Customer value
+    - Last interaction
+    - Quick actions: edit, and + new sales initiative, which opens `initiative-new.html?acc=…` with the account preselected.
+- **`contacts.html`: Contacts page.** It follows the CRMpulse `/contacts` layout:
+  - **Filters:** search, role, status, and a By account / List toggle.
+  - **Warning banner:** shows how many accounts have no active decision maker, with "Show only these".
+  - **By account view:** one card per account, with a "Decision maker" or "Needs a decision maker" tag.
+  - **List view:** a sortable table.
+  - **Detail panel:** sticky, beside the list, for the selected contact. It has an icon-only Edit button, role, status and ID chips, Email / Call / Meeting buttons with icons, contact fields, a department check note, and the initiatives at this account.
+  - Both views page 20 contacts at a time.
+- **`tasks.html`: Tasks, rebuilt to match CRMpulse `/tasks`** (checked against the old app and its `tasks-view`, `task-quick-add` and `task-board`). It is visible again in the sidebar, and the record page's Tasks tab links to it.
+  - **Five view tiles:** my open tasks, assigned by me, team overdue, due this week, all open.
+    - The selected tile has a midnight outline. Team overdue turns red when anything is overdue.
+    - A salesperson opens on My open tasks. With none open, the page shows the finished ones instead, with the CRMpulse note.
+  - **No quick-add row** (CRMpulse has one). It repeated New task and couldn't link an account or initiative, so tasks added there had no record. New task is the one way in. Its form starts with due tomorrow and you as assignee, so a simple task is still title + Create.
+  - **Filters:** search title or number, assignee, and "Show completed and cancelled".
+  - **List:** the same table as the other list pages, not CRMpulse's grouped list. It has a fixed layout, 64px rows, and sortable headers (task, assigned to, status, due; due by default, so overdue comes first). It pages 10 at a time. Open tasks come first, then completed and cancelled when "Show completed and cancelled" is on. Columns:
+    - **Task:** a checkbox to complete (completed and cancelled tasks are final). Then the title, which opens the task form, with the number, the initiative (or account) link and "from ACT-…" under it.
+    - **Assigned to:** avatar and name, with the function and "by" under them.
+    - **Status:** a badge.
+    - **Due:** the date, with days overdue, Today or "In N days" under it, red when overdue.
+    - **Edit.**
+  - **Task form** (stands in for CRMpulse's task drawer). It is a side panel that slides in from the right, the same `.drill` panel as the Pipeline / Performance drill-downs: a header with a label, title and close button, a scrolling body, and a footer with the primary button then Cancel. Esc closes it.
+    - **New task:** opens it with due tomorrow and you as assignee, plus account and sales initiative (both optional; picking an initiative sets the account), what needs doing, who should do it, when it is due, and details.
+    - **Existing task:** clicking its title or the edit button opens it filled, with the status as a segmented control.
+    - **Cancelling:** requires "Why is it cancelled?". **Completing:** takes an optional outcome.
+    - **Completed and cancelled tasks:** open read-only, with their outcome or reason.
+    - **Validation:** missing fields are marked in red, with a message under each.
+  - **Consistent with the other list pages:**
+    - The filter bar sits under the header, above the tiles.
+    - The scope tiles are the tinted card of tiles used on Accounts and Sales initiatives, and the selected tile is white.
+    - Overdue tasks show red text only; the red row tint is gone.
+    - "Show completed and cancelled" is a filter-bar pill toggle, not a native checkbox.
+  - The earlier version's extras are gone: the status and due filters, the status menu, and the table with pager.
+- **`activities.html`: Activities** (CRM V1 §6). It mirrors CRMpulse `/activities`, checked against the old app running locally and its source:
+  - Mine / My teams / Everyone. The demo user is a salesperson, so the page opens on Mine.
+  - **"Log what happened" composer:**
+    - Type chips.
+    - Context: account or sales initiative, with a picker.
+    - A "what happened" field and Log, which adds the activity to the timeline.
+    - The CRMpulse note about logging from the record.
+  - **Four tiles:**
+    - This week.
+    - Last 30 days.
+    - Accounts with no interaction in 30 days: amber when there are any.
+    - Follow-ups created, counted from tasks with a source activity.
+  - Type chips with counts.
+  - **Filters:** search, purpose, and period (last 60 days by default, this week, this month, this quarter, any time). More filters holds owner and context.
+  - **Timeline:** grouped this week / last week / by month. Each entry shows:
+    - Date, weekday and time, plus the type icon.
+    - Subject and purpose tag, then the ID and an edit button.
+    - The account, the initiative link, "by" and the follow-up task count.
+    - The note.
+- **`ACTIVITIES`** in `crm-data.js`: 48 activities, about 41 in the last 60 days, with the CRMpulse type and purpose lists.
+  - Every source activity that `TASKS` points to exists, with the same account and initiative.
+  - Lotus – ERP Upgrade keeps its two CRMpulse activities.
+  - The record page's Activities tab now reads from this list.
+  - Accounts' "Last interaction" is now the latest activity for that account, so the two pages agree. No account is quiet for more than 60 days now, so the "No interaction for N days" chip doesn't show.
+- **`targets.html`: Sales targets & allocation** (CRM V1 §10). It follows the CRMpulse `/targets` layout:
+  - **Filters:** fiscal year (FY26-27; FY27-28 is planned and not started yet) and search.
+  - **Dimension tabs:** geography, region, salesperson, SBU, practice / service line, offering, technology, vertical.
+  - **Table:** Q1–Q4 targets, each with closed won and the % of that quarter's target. The current quarter is shaded, and future quarters show "Not started". Then the annual target, achieved and %. % is green at 90% and above, amber at 50% and above, red below 50%. The table has a pager.
+  - **Edit per row:** a dialog with the four quarterly targets in $K and a live annual total. Changes are kept for the session.
+  - Each dimension is planned on its own, and targets are never added across dimensions.
+- **Target data** in `crm-data.js`:
+  - `TARGET_DIMS` and `targetRows(dim, fy)`.
+  - `sellOf(o)`: the same SBU, practice, technology, offering, vertical and region rules as the record page.
+  - **Where the numbers come from:**
+    - Geography and salesperson use the existing `GEO_TARGET` and `PERSON_TARGET`, so they match Sales performance.
+    - Region splits its geography's target.
+    - The other dimensions split `COMPANY_TARGET` by FY26-27 won + open opportunity value, rounded to $50K.
+    - Quarterly target = annual ÷ 4.
+    - FY27-28 = FY26-27 + 15%.
+- **Shared data** in `crm-data.js`:
+  - `ACCOUNTS`: 19 accounts, one per company in the initiatives. Derived from the initiatives: owner, lifecycle, open pipeline, customer value, recent wins, last interaction.
+  - `CONTACTS`: 63 contacts, generated with the same name generator as the record page's Contacts tab, so a person keeps the same name. Three decision makers are inactive.
+  - Helpers: `ROLES`, `hasDM`.
+- `initiative-new.html` reads `?acc=` to preselect the account.
+- **Sales-owner photos** in `assets/people/`.
+  - **From the manager's prototype set:** Gaurav, Omar Haddad, Ahmed Al-Mansoori, Karthik Menon and Vikram Iyer. Prototype photos were renamed to these fictional people.
+  - **AI-generated portraits:** Daniel Tan, Mei Lin Wong, Priya Sharma and Ananya Reddy (Gemini image model, 256px webp).
+  - `CRM.avatar(name)` shows the photo when there is one (`.av.ph`), and initials otherwise (contacts, cross-functional staff). Owner avatars on every page pick this up.
+- **Contact portraits** in `assets/people/contacts/CON-….webp`. They are AI-generated, one per contact ID, because the demo reuses some names across accounts. `CRM.avatar(name, contactId)` uses one only when the ID is in `CONTACT_PHOTOS` (`crm-data.js`), so missing files are never requested. 26 of 63 are done; the image quota ran out, and the rest show initials until they are generated. They are used on the Contacts page and the record page's Contacts tab.
+- **Contacts, account card header:** even 12px top and bottom, and a 48px minimum height. `.grp-card .grp-h` overrides the dashboard's `.grp-h:first-child { padding-top: 0 }`.
+
+### Changed
+- **Pipeline Target & forecast row:**
+  - At 1440, the Q3 forecast bar now sits on the same baseline as the quarter bars in "Bookings vs target". Above 1360px the forecast legend's top margin is 32px, set in `pipeline.html`.
+  - The Q3 progress ring is centred vertically between the heading and the minis (`.ring-card .ring { margin: auto }`). This also applies on Sales performance.
+- **Timeline** (Activities page and the record page's Activities tab):
+  - **Period blocks:** this week / last week / by month. Each block has a 16px / 600 heading with a count, and 28px between blocks (no rule). The record page used to show one "PAST" label.
+  - **Spacing:** 16px between the type tabs and the first heading.
+  - **Activities:** the "Showing N of N" footer was removed. CRMpulse loads the feed in pages; here every match shows at once, so the two numbers were always the same.
+  - **Connector line:** inside a block it now runs from dot centre to dot centre (2px), so it no longer breaks between entries. It stops at the end of a block.
+  - **Fewer line breaks:** the date column is 96px, left-aligned and doesn't wrap. It shows "31 Oct Sat" (the weekday in grey), then the time on the line below.
+  - **Phones (Activities):** the date sits on one line above the card. The card header puts title + edit on the first line, then purpose + ID.
+- **Type sizes follow the design-system scale on every page** (`--text-*`). A scan of all 11 page states now finds no size off the scale, and each role has one size:
+  - Page titles 34px.
+  - Page subtitles, table cells and body text 14px.
+  - Table headers 12px.
+  - Card titles 15px / 600. The Contacts detail name was 16px.
+  - Scope-tile figures 28px / 400. Tasks and Activities tiles were 24px / 500.
+  - Tile labels 12px.
+  - Form labels 14px / 500.
+  - `crm.css` now sets `small { font-size: var(--text-xs) }`, so a bare `<small>` no longer renders at the browser's 83%. It was 11.67px under Sales performance's loss reasons.
+  - The archived Pipeline's inline 14px is now `var(--text-sm)`.
+- **One tab style, used one way.** Tabs are the `.tabs .tab` pills (midnight when selected, count in `.tab-n`). They sit at the top of the card whose content they filter, as on Pipeline's "Deals to act on".
+  - Now used for: Activities type filter (it moved into the timeline card), the record page's Activities tab, and Sales targets dimensions (custom spacing dropped).
+  - `body.v2 .tabs` wraps when there are many.
+  - The composer's type chips on Activities stay chips: they pick a value, they don't filter.
+- **Card spacing unified at `--pad-card`** (24px, 16px on phones):
+  - Activities summary tiles: were 16/18px.
+  - Tasks view tiles and quick add: were 14/16px.
+  - Activities timeline card: no longer has an 8px top.
+  - Row lists that run edge to edge (Tasks groups, Contacts account cards) inset their rows by `--pad-card` (were 20px).
+  - Tiles inside a card (Accounts, Sales initiatives lifecycle) use 16px, so with the card's 8px they line up at 24px.
+  - A table that opens its card (Tasks, Accounts, Contacts list) pulls up by the header cell's 10px top padding (`.card > .tbl-wrap:first-child`). Its header labels now sit 24px from the card top, the same as from the left.
+- **Activities:** "Log what happened" now sits on its own line above the type chips.
+- **Buttons are now three kinds, plus links.** One block at the end of `theme-v2.css` defines them, and the design-system page says the same.
+  - **Primary** (`.btn.primary`): midnight fill, white text.
+  - **Secondary** (`.btn`): white, 1px `--line-2` border, ink text, and a darker border on hover. It looks the same on the page canvas, white cards, tinted cards, dialogs and the sticky bars. Only on the canvas does it carry `--shadow-card`. This replaces four variants: translucent white with shadow on the canvas, soft blue on white cards, white glass on tinted cards, soft blue in dialogs.
+  - **Ghost** (`.btn.ghost`): no fill or border, `--t2` text, soft fill on hover. `.btn.quiet` is the red ghost in dialogs.
+  - **Disabled:** one rule for all buttons. The page-level copies in `initiative.html` and `initiative-new.html` were removed.
+  - **Link** (`.link`, plus content links: record meta, account name, contact panel initiatives, task "related to"): deep blue, weight 500, underlined on hover.
+- **Sidebar:** Activities, Tasks, Accounts, Contacts and Sales targets are live links.
+- **Pager:** the 2px `margin-top` was removed (`crm.css`, all pages).
+- Cache-busters: `crm.css` is now `?v=20261119c`, `theme-v2.css` is `?v=20261119d`, `crm-data.js` is `?v=20261119f`, and `crm.js` is `?v=20261119h`.
+
+---
+
 ## 2026-11-18 (4) · `6190f7d` · units and page labels (Candace)
 
 ### Changed
@@ -51,7 +192,7 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-18 (2)
+## 2026-11-18 · `a96d55e`
 
 ### Changed
 - **Q3 forecast bar (Pipeline):** the unfilled part up to the target uses a lighter hatch. It is the new `--grad-hatch-soft` token (`#e8eff9` / `#d9e4f4`), so it no longer looks like the solid "Pipeline" segment beside it. The pipeline mix keeps `--grad-hatch`.

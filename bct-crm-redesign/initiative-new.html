@@ -6,9 +6,9 @@
 <title>New sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
-<link rel="stylesheet" href="assets/crm.css?v=20261118h">
+<link rel="stylesheet" href="assets/crm.css?v=20261119c">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261118i">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
 <link rel="stylesheet" href="assets/responsive.css?v=20261118g">
 <style>
 /* ---------- Page: new sales initiative ----------
@@ -108,8 +108,6 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .ed-bar b { font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
 .ed-bar span { font-size: var(--text-sm); color: var(--t3); }
 .ed-bar .sp { flex: 1; }
-body.v2 .btn:disabled, body.v2 .btn:disabled:hover { color: var(--t3); background: var(--field); border-color: var(--line); box-shadow: none; cursor: not-allowed; }
-body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(--on-dark); background: var(--primary-disabled); border-color: var(--primary-disabled); }
 </style>
 </head>
 <body class="v2">
@@ -118,8 +116,8 @@ body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261118f"></script>
-<script src="assets/crm-data.js?v=20261118a"></script>
+<script src="assets/crm.js?v=20261119h"></script>
+<script src="assets/crm-data.js?v=20261119f"></script>
 <script>
 const { money, toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -356,6 +354,8 @@ main.addEventListener('change', (e) => {
 
 CRM.renderShell('initiatives');
 { const t = autoTeam(); if (t) S.v.geo = TEAMS[t].geo; }
+// ?acc=… (from the Accounts page's + action) preselects the account
+{ const acc = new URLSearchParams(location.search).get('acc'); if (acc && OPT.acc().includes(acc)) { S.v.acc = acc; autoName(); } }
 render();
 
 // Leaving with something entered asks first: Cancel, the back link, the sidebar (Candace, 2026-11-18).

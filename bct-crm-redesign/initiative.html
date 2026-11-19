@@ -6,9 +6,9 @@
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
-<link rel="stylesheet" href="assets/crm.css?v=20261118h">
+<link rel="stylesheet" href="assets/crm.css?v=20261119c">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261118i">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
 <link rel="stylesheet" href="assets/responsive.css?v=20261118g">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
@@ -35,7 +35,6 @@
 .rec-meta a { color: var(--deep); font-weight: 500; text-decoration: none; }
 .rec-meta a:hover { text-decoration: underline; }
 .rec-acts { display: flex; gap: 8px; flex: none; padding-top: 4px; }
-.btn[aria-disabled="true"] { color: var(--t3); background: var(--field); cursor: not-allowed; }
 .btn.icon-only { width: 36px; padding: 0; justify-content: center; }
 
 .st { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: 600; white-space: nowrap; }
@@ -121,13 +120,18 @@
 .chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--t2); cursor: pointer; }
 .chip.on { background: var(--midnight); border-color: var(--midnight); color: var(--on-dark); }
 .chip small { font-size: var(--text-2xs); opacity: .75; }
-.tl-g { margin: 4px 0 16px; padding-left: 72px; font-size: var(--text-2xs); font-weight: 600; letter-spacing: .06em; color: var(--t3); }
-.tl { display: grid; grid-template-columns: 64px 18px minmax(0, 1fr); gap: 12px; padding-bottom: 18px; }
-.tl-d { text-align: right; font-size: var(--text-xs); color: var(--t3); line-height: 1.4; }
+/* Period blocks, as on the Activities page: a clear heading, a rule between blocks, the line runs dot to dot inside a block */
+.tlg + .tlg { margin-top: 28px; }
+.tl-g { display: flex; align-items: baseline; gap: 8px; margin: 0 0 14px; font-size: var(--text-lg); font-weight: 600; color: var(--ink); }
+.tl-g small { font-size: var(--text-xs); font-weight: 500; color: var(--t3); }
+.tl { display: grid; grid-template-columns: 96px 18px minmax(0, 1fr); gap: 14px; padding-bottom: 18px; }
+.tl:last-child { padding-bottom: 0; }
+.tl-d { text-align: left; font-size: var(--text-xs); color: var(--t3); line-height: 1.4; white-space: nowrap; }
 .tl-d b { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--t1); }
+.tl-d .wd { font-weight: 400; color: var(--t3); }
 .tl-dot { position: relative; display: flex; justify-content: center; }
-.tl-dot::before { content: ""; width: 10px; height: 10px; margin-top: 4px; border-radius: var(--radius-full); background: var(--deep); box-shadow: 0 0 0 3px var(--info-bg); }
-.tl:not(:last-child) .tl-dot::after { content: ""; position: absolute; top: 18px; bottom: -18px; width: 1px; background: var(--line-2); }
+.tl-dot::before { content: ""; position: relative; z-index: 1; width: 10px; height: 10px; margin-top: 5px; border-radius: var(--radius-full); background: var(--deep); box-shadow: 0 0 0 3px var(--info-bg); }
+.tl:not(:last-child) .tl-dot::after { content: ""; position: absolute; top: 10px; bottom: -28px; width: 2px; border-radius: 1px; background: var(--line-2); } /* dot centre to the next dot centre (5px + 5px half dot; 18px row gap) */
 .tl-b b { font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
 .tl-b p { margin: 4px 0 0; font-size: var(--text-sm); color: var(--t2); }
 .tl-tags { display: flex; gap: 6px; margin-top: 6px; }
@@ -251,10 +255,6 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .ed-bar b { font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
 .ed-bar span { font-size: var(--text-sm); color: var(--t3); }
 .ed-bar .sp { flex: 1; }
-.btn:disabled { color: var(--t3); background: var(--field); border-color: var(--line); cursor: not-allowed; }
-.btn.primary:disabled { color: var(--on-dark); background: var(--primary-disabled); border-color: var(--primary-disabled); }
-body.v2 .btn:disabled, body.v2 .btn:disabled:hover { color: var(--t3); background: var(--field); border-color: var(--line); box-shadow: none; cursor: not-allowed; }
-body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(--on-dark); background: var(--primary-disabled); border-color: var(--primary-disabled); }
 
 /* Stage steps: numbered dots, labels under them, one progress bar (replaces the chevron stepper) */
 .steps2 { padding: 20px 24px 8px; }
@@ -348,8 +348,8 @@ body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261118f"></script>
-<script src="assets/crm-data.js?v=20261118a"></script>
+<script src="assets/crm.js?v=20261119h"></script>
+<script src="assets/crm-data.js?v=20261119f"></script>
 <script>
 /* Data for one record. Everything shown comes from the shared demo data (assets/crm-data.js); details the list doesn't
    carry (line items, BANT, contacts, activities, stage path) are derived here so every record opens, and the Lotus
@@ -455,12 +455,8 @@ function details(o) {
     if (curIx !== startIx || o.kind !== 'open') path.push([curName, iso(curStart)]);
   }
   // Activities (fictional, oldest last)
-  const acts = lotus
-    ? [{ d: '2026-11-10T17:24', t: 'Messages with Lotus Retail India – relationship building', type: 'Messaging', purpose: 'Relationship building', who: [] },
-       { d: '2026-07-11T16:00', t: 'Follow-up – Lotus Retail India', type: 'Event / conference', note: 'Discussed scope, timelines and next steps.', who: ['Arjun Patel'] }]
-    : [{ d: iso(addDays(path[path.length - 1][1], 3)) + 'T11:30', t: `${o.kind === 'open' ? 'Call' : 'Meeting'} with ${o.acc}`, type: o.kind === 'open' ? 'Call' : 'Meeting', purpose: 'Follow-up', note: o.next ? `Agreed next step: ${o.next.toLowerCase()}.` : 'No next step agreed yet.', who: [contacts[0].n] },
-       { d: iso(addDays(created, 4)) + 'T15:00', t: `Discovery meeting – ${o.acc}`, type: 'Meeting', purpose: 'Discovery', note: `Walked through the ${sell.off.toLowerCase()} need.`, who: [contacts[0].n] }]
-      .filter(a => new Date(a.d) <= TODAY);
+  // Activities come from the shared list (assets/crm-data.js), the same ones the Activities page shows
+  const acts = ACTIVITIES.filter(a => a.si === o.id).map(a => ({ d: a.d, t: a.t, type: a.type, purpose: a.purpose, note: a.note, who: a.who }));
   return { lotus, created, existing, sell, geo, region: lotus ? 'India North' : pick(REGION[geo], o.acc), items, total, fmtL, bant, contacts, path, acts,
     leadType: lotus ? 'Existing account new lead' : existing ? 'Existing account new lead' : 'New account new lead',
     source: lotus ? 'Event / conference' : pick(['Event / conference', 'Referral', 'Website', 'Partner', 'Outbound'], o.id),
@@ -622,25 +618,33 @@ function itemsTab() {
 function contactsTab() {
   const n = (c) => D.acts.filter(a => a.who.includes(c.n));
   return `<section class="card"><div class="card-h"><div><h2>Buying committee</h2><p>Who decides and who else is involved, by their role in this initiative</p></div><div class="r"><button class="btn" data-act="toast" data-v="Would open contacts and roles">${SVG.edit}Edit contacts &amp; roles</button></div></div>
-    ${D.contacts.map(c => { const a = n(c); return `<div class="ct">${CRM.avatar(c.n)}
+    ${D.contacts.map(c => { const a = n(c); return `<div class="ct">${CRM.avatar(c.n, (CONTACTS.find(x => x.acc === o.acc && x.n === c.n) || {}).id)}
       <div><b>${esc(c.n)}</b><span class="role ${c.role === 'Decision maker' ? 'dm' : ''}">${c.role}</span><small>${esc(c.t)}</small><small>${a.length ? `Last interaction ${dd(a[0].d)} · ${a.length} interaction${a.length === 1 ? '' : 's'}` : 'No interactions yet'}</small></div>
       <div class="ct-acts"><button class="btn icon-only" aria-disabled="true" aria-label="Call" data-tip="No phone number recorded for this contact.">${SVG.phone}</button><button class="btn" data-act="tab" data-v="activities">Log activity</button></div></div>`; }).join('')}
     <p class="foot-note">Interactions count activities on this initiative that name the contact. Contacts come from ${esc(o.acc)} · <a href="#" data-act="toast" data-v="Would open all account contacts">All account contacts</a></p></section>`;
 }
 
+// Same period blocks as the Activities page: this week, last week, then by month (newest first)
+function tlGroups(list) {
+  const ws = new Date(TODAY.getTime() - ((TODAY.getDay() + 6) % 7) * DAY), g = [];
+  list.slice().sort((x, y) => y.d.localeCompare(x.d)).forEach(a => { const d = new Date(a.d.slice(0, 10));
+    const k = d >= ws ? 'This week' : d >= new Date(ws.getTime() - 7 * DAY) ? 'Last week' : d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    if (!g.length || g[g.length - 1][0] !== k) g.push([k, []]); g[g.length - 1][1].push(a); });
+  return g;
+}
 function activitiesTab() {
   const types = ['All', ...new Set(D.acts.map(a => a.type))];
   const rows = D.acts.filter(a => T.actType === 'All' || a.type === T.actType);
   return `<section class="card"><div class="card-h"><div><h2>Activity timeline</h2><p>Calls, emails, meetings and notes on this initiative</p></div><div class="r"><button class="btn primary" data-act="toast" data-v="Would open log activity">${SVG.plus}Log activity</button></div></div>
-    <div class="chips">${types.map(t => `<button class="chip ${T.actType === t ? 'on' : ''}" data-act="atype" data-v="${esc(t)}">${t}<small>${t === 'All' ? D.acts.length : D.acts.filter(a => a.type === t).length}</small></button>`).join('')}</div>
-    ${rows.length ? `<p class="tl-g">PAST</p>${rows.map(a => { const d = new Date(a.d); return `<div class="tl"><div class="tl-d"><b>${CRM.date(d, false)}</b>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div><div class="tl-dot"></div>
-      <div class="tl-b"><b>${esc(a.t)}</b>${a.note ? `<p>${esc(a.note)}</p>` : ''}<div class="tl-tags"><span>${a.type}</span>${a.purpose ? `<span>${a.purpose}</span>` : ''}</div></div></div>`; }).join('')}` : '<div class="empty"><b>No activities</b>Nothing of this type yet.</div>'}
+    <div class="tabs" role="tablist" aria-label="Filter by type">${types.map(t => `<button class="tab ${T.actType === t ? 'on' : ''}" role="tab" aria-selected="${T.actType === t}" data-act="atype" data-v="${esc(t)}">${t}<span class="tab-n">${t === 'All' ? D.acts.length : D.acts.filter(a => a.type === t).length}</span></button>`).join('')}</div>
+    ${rows.length ? tlGroups(rows).map(([k, l]) => `<section class="tlg" aria-label="${k}"><h3 class="tl-g">${k}<small>${l.length}</small></h3>${l.map(a => { const d = new Date(a.d); return `<div class="tl"><div class="tl-d"><b>${CRM.date(d, false)} <span class="wd">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</span></b>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div><div class="tl-dot"></div>
+      <div class="tl-b"><b>${esc(a.t)}</b>${a.note ? `<p>${esc(a.note)}</p>` : ''}<div class="tl-tags"><span>${a.type}</span>${a.purpose ? `<span>${a.purpose}</span>` : ''}</div></div></div>`; }).join('')}</section>`).join('') : '<div class="empty"><b>No activities</b>Nothing of this type yet.</div>'}
   </section>`;
 }
 
 function tasksTab() {
   const open = T.tasks.filter(t => !t.done).length;
-  return `<section class="card"><div class="card-h"><div><h2>Tasks</h2><p>${open} open · tasks here also appear in each assignee's Tasks list</p></div></div>
+  return `<section class="card"><div class="card-h"><div><h2>Tasks</h2><p>${open} open · tasks here also appear in each assignee's <a class="link" href="tasks.html">Tasks</a> list</p></div></div>
     <form class="tk-form" id="tk-form" novalidate>
       <input class="in" id="tk-t" placeholder="New task" aria-label="Task title">
       <input class="in" id="tk-d" type="date" aria-label="Due date">
@@ -648,7 +652,7 @@ function tasksTab() {
       <button class="btn primary" type="submit">Add</button>
       <div class="tk-err" id="tk-err" hidden></div>
     </form>
-    ${T.tasks.length ? T.tasks.map((t, i) => `<label class="tk ${t.done ? 'done' : ''}"><input type="checkbox" data-act="tk" data-v="${i}" ${t.done ? 'checked' : ''}><div><b>${esc(t.t)}</b><br><small>${esc(t.a)}</small></div><small class="${!t.done && new Date(t.d) < TODAY ? 'hot' : ''}">Due ${dd(t.d)}</small></label>`).join('')
+    ${T.tasks.length ? T.tasks.map((t, i) => `<label class="tk ${t.done ? 'done' : ''}"><input type="checkbox" data-act="tk" data-v="${i}" ${t.done ? 'checked' : ''}><div><b>${esc(t.t)}</b><br><small>${esc(t.a)}</small></div><small class="${!t.done && t.d && new Date(t.d) < TODAY ? 'hot' : ''}">${t.d ? 'Due ' + dd(t.d) : 'No due date'}</small></label>`).join('')
       : '<div class="empty"><b>No tasks yet</b>Add one above.</div>'}
   </section>`;
 }
@@ -868,7 +872,9 @@ window.addEventListener('popstate', () => {
   // browser back out of edit mode with unsaved changes: stay in edit mode and ask
   if (!toEdit && editDirty()) { history.pushState(null, '', `?id=${encodeURIComponent(o.id)}&mode=edit`); askUnsaved(exitEdit); return; }
   T.edit = toEdit; if (T.edit && !E.v) editStart(); render(); });
-if (o) { D = details(o); document.title = `${o.name} · BCT CRM`; }
+if (o) { D = details(o); document.title = `${o.name} · BCT CRM`;
+  // tasks come from the shared task list (assets/crm-data.js), the same rows the Tasks page shows; cancelled ones stay off this tab
+  T.tasks = TASKS.filter(t => t.si === o.id && t.status !== 'cxl').map(t => ({ t: t.title, d: t.due, a: t.to, done: t.status === 'done' })); }
 CRM.renderShell('initiatives');
 if (o && T.edit) editStart();
 render();

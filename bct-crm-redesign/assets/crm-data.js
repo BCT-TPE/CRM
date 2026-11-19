@@ -134,6 +134,111 @@ const INITS = [
   ...CLOSED.map(o => ({ ...o, kind: o.result, status: 'Opportunity', sub: o.result === 'won' ? 'Closed won' : 'Closed lost', code: o.result === 'won' ? 'L0' : 'Lost', prob: o.result === 'won' ? 100 : 0, w: o.result === 'won' ? o.value : 0, close: o.closed, days: null, next: '', follow: null }))
 ];
 INITS.forEach(o => { o.cur = accCurrency(o.acc, o.team); o.step = ALL_STEPS.indexOf(o.sub); });
+
+// ---- Tasks (CRM V1 §7): follow-ups for anyone, linked to an account and usually a sales initiative ----
+// Cross-functional owners (§7.5): presales, delivery, finance and legal sit outside the sales teams.
+const FUNC = { 'John Mathew': 'Presales', 'Ravi Shankar': 'Delivery', 'Neha Gupta': 'Finance', 'Lakshmi Pillai': 'Legal', 'Suresh Menon': 'Sales head' };
+const funcOf = (p) => FUNC[p] || (PERSON_TEAM[p] ? 'Sales' : 'Sales');
+// [id, title, initiative, assigned to, assigned by, status, due (days from TODAY; null = no date), source activity, completed (days from TODAY)]
+// status: ns = not started, ip = in progress, done = completed, cxl = cancelled
+const TASK_ROWS = [
+  ['0010', 'Credit check', 'SI-2026-0029', 'Neha Gupta', 'Suresh Menon', 'ns', -13],
+  ['0019', 'Send meeting minutes', 'SI-2026-0014', 'Priya Sharma', 'Priya Sharma', 'ns', -13, 'ACT-2026-0037'],
+  ['0028', 'Update BoQ', 'SI-2026-0021', 'Daniel Tan', 'Suresh Menon', 'ns', -13],
+  ['0002', 'Solution architecture review', 'SI-2026-0018', 'John Mathew', 'Suresh Menon', 'ip', -12],
+  ['0020', 'Arrange reference call', 'SI-2026-0038', 'Ahmed Al-Mansoori', 'Suresh Menon', 'ip', -12],
+  ['0012', 'Send meeting minutes', 'SI-2026-0024', 'Vikram Iyer', 'Suresh Menon', 'ip', -11, 'ACT-2026-0021'],
+  ['0004', 'Contract redlines', 'SI-2026-0025', 'Lakshmi Pillai', 'Suresh Menon', 'ns', -10],
+  ['0022', 'Prepare commercial proposal', 'SI-2026-0014', 'Ravi Shankar', 'Suresh Menon', 'ns', -10],
+  ['0014', 'Update BoQ', 'SI-2026-0019', 'Daniel Tan', 'Suresh Menon', 'ip', -9],
+  ['0006', 'Arrange reference call', 'SI-2026-0011', 'Omar Haddad', 'Suresh Menon', 'ip', -8],
+  ['0024', 'Credit check', 'SI-2026-0030', 'Neha Gupta', 'Suresh Menon', 'ip', -8],
+  ['0007', 'Update BoQ', 'SI-2026-0021', 'Daniel Tan', 'Daniel Tan', 'ns', -7, 'ACT-2026-0013'],
+  ['0016', 'Solution architecture review', 'SI-2026-0016', 'John Mathew', 'Suresh Menon', 'ns', -7],
+  ['0025', 'Contract redlines', 'SI-2026-0025', 'Lakshmi Pillai', 'Ahmed Al-Mansoori', 'ns', -7, 'ACT-2026-0049'],
+  ['0008', 'Prepare commercial proposal', 'SI-2026-0032', 'Ravi Shankar', 'Suresh Menon', 'ip', -6],
+  ['0026', 'Send meeting minutes', 'SI-2026-0027', 'Ananya Reddy', 'Suresh Menon', 'ip', -6],
+  ['0018', 'Contract redlines', 'SI-2026-0022', 'Lakshmi Pillai', 'Suresh Menon', 'ip', -5],
+  ['0031', 'Confirm the budget owner', 'SI-2026-0043', ME, ME, 'ns', -3],
+  ['0032', 'Send capability deck', 'SI-2026-0041', ME, ME, 'ip', 1, 'ACT-2026-0052'],
+  ['0033', 'Intro call with the IT head', 'SI-2026-0040', ME, 'Suresh Menon', 'ns', 5],
+  ['0034', 'Draft data governance scope', 'SI-2026-0043', 'John Mathew', ME, 'ns', 2],
+  ['0035', 'Check delivery capacity for Q1', 'SI-2026-0040', 'Ravi Shankar', ME, 'ns', 9],
+  ['0036', 'Share migration plan', 'SI-2026-0033', 'Daniel Tan', 'Daniel Tan', 'ns', 0, 'ACT-2026-0044'],
+  ['0037', 'Negotiate payment terms', 'SI-2026-0025', 'Ahmed Al-Mansoori', 'Ahmed Al-Mansoori', 'ip', 2],
+  ['0038', 'Get PO signed', 'SI-2026-0027', 'Ananya Reddy', 'Suresh Menon', 'ns', 3],
+  ['0039', 'Legal review of the MSA', 'SI-2026-0024', 'Lakshmi Pillai', 'Vikram Iyer', 'ns', 6],
+  ['0040', 'Finalise proposal pricing', 'SI-2026-0016', 'Neha Gupta', 'Ahmed Al-Mansoori', 'ns', 8],
+  ['0041', 'Plan the migration workshop', 'SI-2026-0029', 'John Mathew', 'Karthik Menon', 'ns', null],
+  ['0042', 'Collect reference letters', 'SI-2026-0022', 'Ahmed Al-Mansoori', 'Ahmed Al-Mansoori', 'ns', null],
+  ['0005', 'Send revised commercial terms', 'SI-2026-0024', 'Vikram Iyer', 'Vikram Iyer', 'done', -6, 'ACT-2026-0021', -5],
+  ['0009', 'Solution demo for security team', 'SI-2026-0032', 'John Mathew', 'Ananya Reddy', 'done', -10, null, -11],
+  ['0011', 'Credit check', 'SI-2026-0028', 'Neha Gupta', 'Suresh Menon', 'done', -15, null, -14],
+  ['0015', 'Scope workshop with CIO', 'SI-2026-0019', 'Mei Lin Wong', 'Mei Lin Wong', 'done', -20, 'ACT-2026-0005', -19],
+  ['0017', 'Share capability deck', 'SI-2026-0040', ME, ME, 'done', -9, null, -9],
+  ['0021', 'Contract review with legal', 'SI-2026-0021', 'Lakshmi Pillai', 'Daniel Tan', 'done', -4, null, -3],
+  ['0003', 'Prepare demo environment', 'SI-2026-0011', 'Ravi Shankar', 'Omar Haddad', 'cxl', -18],
+  ['0013', 'Arrange reference call', 'SI-2026-0029', 'Ahmed Al-Mansoori', 'Ananya Reddy', 'cxl', -10, 'ACT-2026-0025']
+];
+const TASK_STATUS = { ns: 'Not started', ip: 'In progress', done: 'Completed', cxl: 'Cancelled' };
+const TASKS = TASK_ROWS.map(([n, title, si, to, by, st, due, act, doneIn]) => {
+  const o = INITS.find(x => x.id === si) || {};
+  const d = (k) => k == null ? null : new Date(TODAY.getTime() + k * 864e5).toISOString().slice(0, 10);
+  return { id: 'TSK-2026-' + n, title, si: o.id || null, siName: o.name || '', acc: o.acc || '', to, by, status: st, due: d(due), act: act || null, done: d(doneIn) };
+});
+const taskOpen = (t) => t.status === 'ns' || t.status === 'ip';
+const taskLate = (t) => taskOpen(t) && t.due && new Date(t.due) < TODAY; // §7.7: due date passed, not completed or cancelled
+
+// ---- Accounts and contacts (CRM V1 customers): one account per company in INITS; contacts use the same
+// generator as the record page's Contacts tab (initiative.html), so a person has the same name and role on both pages.
+const _hash = (x) => { let h = 0; for (const c of x) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+const _pick = (arr, x) => arr[_hash(x) % arr.length];
+const ACC_VERT = [[/Retail|Lotus|Al Noor/, 'Retail'], [/Health|Sundaram/, 'Healthcare'], [/Bank|Finance/, 'Banking'], [/Kaveri|Pharma/, 'Pharma'], [/Steel|Manufactur|Industrial/, 'Manufacturing'], [/Energy|Petro/, 'Energy'], [/Logistics/, 'Logistics'], [/Facilit/, 'Facilities']];
+const HQ = { India: ['Mumbai', 'Bengaluru', 'Chennai', 'New Delhi'], 'Middle East': ['Dubai', 'Abu Dhabi', 'Riyadh', 'Muscat'], APAC: ['Singapore', 'Kuala Lumpur', 'Jakarta'] };
+const STRATEGIC = ['ABC Bank', 'Desert Industrial Holdings', 'Lotus Retail India', 'Singapore Metro Bank'];
+const ACCOUNTS = [...new Set(INITS.map(o => o.acc))].sort().map((name, i) => {
+  const its = INITS.filter(o => o.acc === name), top = its.slice().sort((a, b) => b.value - a.value)[0];
+  const geo = TEAMS[top.team].geo, won = its.filter(o => o.kind === 'won');
+  const lastWon = won.map(o => o.close).sort().pop();
+  const quiet = name === 'Gulf National Bank' ? 74 : 3 + _hash(name + 'i') % 58; // days since the last activity
+  return {
+    id: 'ACC-2026-' + String(i + 1).padStart(4, '0'), name, geo, hq: _pick(HQ[geo], name),
+    type: /Bank|Finance|Retail|Pte|Ltd|Pharma|Logistics|Facilities/.test(name) && !/Gulf|Oman|Deccan/.test(name) ? 'Private' : /Oman|Gulf|Deccan/.test(name) ? 'Government' : 'PSU',
+    vertical: (ACC_VERT.find(([re]) => re.test(name)) || [0, 'Enterprise'])[1],
+    owner: top.owner, team: top.team, strategic: STRATEGIC.includes(name),
+    lifecycle: won.length ? 'Customer' : 'Prospect',
+    pipeline: its.filter(o => o.kind === 'open' && o.status === 'Opportunity').reduce((t, o) => t + o.value, 0),
+    openAny: its.some(o => o.kind === 'open'),
+    value: won.reduce((t, o) => t + o.value, 0),
+    last: quiet, lastDate: new Date(TODAY.getTime() - quiet * 864e5).toISOString().slice(0, 10),
+    draftOrder: !!(lastWon && (TODAY - new Date(lastWon)) / 864e5 <= 45), // recently won: the order is still a draft
+    inits: its.map(o => o.id)
+  };
+});
+ACCOUNTS.forEach(a => { a.attn = [a.draftOrder ? 'Won deal with a draft order · confirm the PO' : '', a.last > 60 ? `No interaction for ${a.last} days` : ''].filter(Boolean); });
+const ROLES = ['Decision maker', 'Commercial contact', 'Technical evaluator', 'Influencer'];
+const C_FIRST = ['Arjun', 'Meera', 'Rahul', 'Sara', 'Khalid', 'Lina', 'Wei Ling', 'Farah', 'Nikhil', 'Huda'], C_LAST = ['Patel', 'Nair', 'Kapoor', 'Haddad', 'Rahman', 'Chen', 'Salem', 'Menon', 'Al-Farsi', 'Lim'];
+const CONTACTS = [];
+ACCOUNTS.forEach(a => {
+  const nm = (k) => `${_pick(C_FIRST, a.name + k)} ${_pick(C_LAST, k + a.name)}`;
+  const dom = a.name.replace(/^Al /, '').split(' ')[0].toLowerCase() + '.example';
+  const its = INITS.filter(o => o.acc === a.name);
+  const ix = Math.max(...its.map(o => o.kind === 'open' ? (o.status === 'Prospect' ? 0 : o.status === 'Lead' ? 1 : { L3: 2, L2: 3, L1: 4 }[o.code]) : 4));
+  const add = (n, title, dept, role, extra = {}) => { if (CONTACTS.some(c => c.acc === a.name && c.n === n)) return;
+    CONTACTS.push({ id: 'CON-2026-' + String(CONTACTS.length + 1).padStart(4, '0'), n, title, dept, role, acc: a.name, accId: a.id,
+      email: n.toLowerCase().replace(/[^a-z]+/g, '.') + '@' + dom, mobile: _hash(n + 'm') % 3 ? `+${a.geo === 'India' ? 91 : a.geo === 'APAC' ? 65 : 971} ${5 + _hash(n) % 4}${String(_hash(n + 'p')).slice(0, 3)} ${String(_hash(n + 'q')).slice(0, 4)}` : '', office: _hash(n + 'o') % 2 ? '' : 'Ext. ' + (2000 + _hash(n) % 800), status: 'Active', ...extra }); };
+  if (a.name === 'Lotus Retail India') add('Arjun Patel', 'Head of data', 'IT', 'Decision maker');
+  else if (ix === 0) add(nm('a'), _pick(['IT Manager', 'Head of operations'], a.name), _pick(['IT', 'Operations'], a.name), 'Influencer');
+  else add(nm('a'), _pick(['CIO', 'CTO', 'Head of IT', 'CFO'], a.name), 'IT', 'Decision maker');
+  if (ix >= 3) add(nm('b'), _pick(['Procurement lead', 'Finance controller'], a.name), _pick(['Procurement', 'Finance'], a.name), 'Influencer');
+  add(nm('c'), _pick(['Head of infrastructure', 'Business relationship manager', 'Head of retail tech', 'VP operations'], a.name), 'Business', 'Commercial contact');
+  if (_hash(a.name + 'd') % 2) add(nm('d'), _pick(['Head of security', 'Enterprise architect', 'IT manager'], a.name), 'IT', 'Technical evaluator');
+});
+// Decision makers who have left: their account now needs a new one
+['Gulf National Bank', 'Oman Energy Corporation', 'Kaveri Pharma'].forEach(acc => { const c = CONTACTS.find(x => x.acc === acc && x.role === 'Decision maker'); if (c) c.status = 'Inactive'; });
+// Contacts with a portrait in assets/people/contacts (AI-generated; the rest show initials until they are generated)
+const CONTACT_PHOTOS = new Set(['CON-2026-0001', 'CON-2026-0002', 'CON-2026-0003', 'CON-2026-0004', 'CON-2026-0005', 'CON-2026-0006', 'CON-2026-0007', 'CON-2026-0008', 'CON-2026-0009', 'CON-2026-0010', 'CON-2026-0011', 'CON-2026-0012', 'CON-2026-0013', 'CON-2026-0014', 'CON-2026-0015', 'CON-2026-0016', 'CON-2026-0017', 'CON-2026-0018', 'CON-2026-0019', 'CON-2026-0021', 'CON-2026-0022', 'CON-2026-0023', 'CON-2026-0024', 'CON-2026-0026', 'CON-2026-0028', 'CON-2026-0039']);
+const hasDM = (acc) => CONTACTS.some(c => c.acc === acc && c.role === 'Decision maker' && c.status === 'Active');
 function ageBucket(d) { return d <= 30 ? 0 : d <= 60 ? 1 : d <= 90 ? 2 : 3; }
 const AGE_NAMES = ['0–30 days', '31–60 days', '61–90 days', 'Over 90 days'];
 function attention(o) {
@@ -148,3 +253,82 @@ function attention(o) {
 const fmtDate = (d) => CRM.date(d); // "18 Nov 2026", shared with the date picker (crm.js)
 const pct = (a, b) => b ? Math.round(a / b * 100) : null;
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+
+// ---- Sales targets by dimension (CRM V1 §10): each dimension is planned on its own; targets are never added
+// across dimensions. Geography and salesperson use the targets the dashboards already use (GEO_TARGET,
+// PERSON_TARGET); the other dimensions split the company target by each value's share of FY26-27 won + open
+// opportunity value, rounded to $50K. Quarterly target = annual ÷ 4, as on Sales performance.
+const SALES_REGION = { India: ['India North', 'India West', 'India South'], 'Middle East': ['UAE', 'KSA', 'Oman'], APAC: ['Singapore', 'Malaysia', 'Indonesia'] };
+function sellOf(o) { // same rules as the record page (initiative.html selling())
+  const off = o.name.split(' – ').slice(1).join(' – ') || o.name, m = (re) => re.test(off);
+  const sbu = m(/ERP|SAP|Application|POS|Portal|App/) ? 'Enterprise applications' : m(/Cloud|Infrastructure|Network|Recovery|Service Desk/) ? 'Cloud & infrastructure' : m(/Identity|Security|Fraud/) ? 'Cybersecurity' : 'Data & AI';
+  const practice = { 'Enterprise applications': 'Application services', 'Cloud & infrastructure': 'Cloud services', 'Cybersecurity': 'Security services', 'Data & AI': 'Data services' }[sbu];
+  const tech = m(/ERP|SAP/) ? 'SAP' : m(/Cloud|Recovery/) ? 'AWS' : m(/Identity/) ? 'Okta' : m(/GenAI/) ? 'Azure OpenAI' : m(/Data|Analytics|Warehouse|Lake/) ? 'Databricks' : m(/Infrastructure|Network/) ? 'VMware' : m(/Support|Service Desk/) ? 'ServiceNow' : 'Other';
+  const geo = TEAMS[o.team].geo;
+  return { geography: geo, region: o.acc === 'Lotus Retail India' ? 'India North' : _pick(SALES_REGION[geo], o.acc), salesperson: o.owner,
+    sbu, practice, offering: off, technology: tech, vertical: (ACC_VERT.find(([re]) => re.test(o.acc)) || [0, 'Enterprise'])[1] };
+}
+const TARGET_DIMS = [['geography', 'Geography'], ['region', 'Region'], ['salesperson', 'Salesperson'], ['sbu', 'SBU'], ['practice', 'Practice / service line'], ['offering', 'Offering'], ['technology', 'Technology'], ['vertical', 'Vertical']];
+function targetRows(dim, fy = '2627') {
+  const won = INITS.filter(o => o.kind === 'won' && o.fy === fy), open = INITS.filter(o => o.kind === 'open' && o.status === 'Opportunity');
+  const vals = [...new Set([...won, ...open].map(o => sellOf(o)[dim]))];
+  if (dim === 'geography') vals.splice(0, vals.length, ...Object.keys(GEO_TARGET));
+  if (dim === 'salesperson') Object.keys(PERSON_TARGET).forEach(p => { if (!vals.includes(p)) vals.push(p); });
+  const weight = (v) => [...won, ...open].filter(o => sellOf(o)[dim] === v).reduce((t, o) => t + o.value, 0);
+  const total = vals.reduce((t, v) => t + weight(v), 0) || 1;
+  const r50 = (x) => Math.max(0.2e6, Math.round(x / 0.05e6) * 0.05e6);
+  return vals.map(v => {
+    let annual = dim === 'geography' ? GEO_TARGET[v] : dim === 'salesperson' ? (PERSON_TARGET[v] ?? null)
+      : dim === 'region' ? r50(GEO_TARGET[SALES_REGION_GEO[v]] * weight(v) / ([...won, ...open].filter(o => sellOf(o).geography === SALES_REGION_GEO[v]).reduce((t, o) => t + o.value, 0) || 1))
+      : r50(COMPANY_TARGET * weight(v) / total);
+    if (fy !== '2627' && annual) annual = Math.round(annual * 1.15 / 0.05e6) * 0.05e6; // next FY plan: +15%
+    const ach = [1, 2, 3, 4].map(q => won.filter(o => o.q === q && sellOf(o)[dim] === v).reduce((t, o) => t + o.value, 0));
+    return { name: v, annual, q: annual == null ? [null, null, null, null] : [0, 1, 2, 3].map(() => annual / 4), ach };
+  }).sort((a, b) => (b.annual || 0) - (a.annual || 0) || a.name.localeCompare(b.name));
+}
+const SALES_REGION_GEO = Object.fromEntries(Object.entries(SALES_REGION).flatMap(([g, rs]) => rs.map(r => [r, g])));
+
+
+// ---- Activities (CRM V1 §6): every call, meeting, visit and email, logged against an account or a sales initiative.
+// Types and purposes are the configured lists from CRMpulse (sentence case). Activities that tasks point to
+// (TASKS[].act) exist with the same account and initiative; the rest are spread over the last ~90 days.
+const ACT_TYPES = ['Customer / prospect visit', 'Phone call', 'Virtual meeting', 'Email', 'Messaging', 'Internal meeting', 'Event / conference', 'Other'];
+const ACT_PURPOSES = ['Introduction', 'Discovery / requirements', 'Solution presentation', 'Proposal discussion', 'Negotiation', 'Relationship building', 'Follow-up', 'Internal review'];
+const ACT_SUBJECT = { 'Customer / prospect visit': 'Visit with', 'Phone call': 'Call with', 'Virtual meeting': 'Online meeting with', 'Email': 'Email with', 'Messaging': 'Messages with', 'Internal meeting': 'Internal meeting about', 'Event / conference': 'Met at an event:', 'Other': 'Note on' };
+const ACTIVITIES = (() => {
+  const out = [], used = new Set();
+  const at = (days, hour) => { const d = new Date(TODAY.getTime() - days * 864e5); return `${d.toISOString().slice(0, 10)}T${String(hour).padStart(2, '0')}:00`; }; // local wall-clock time
+  const contactAt = (acc, k) => { const cs = CONTACTS.filter(c => c.acc === acc && c.status === 'Active'); return cs.length ? cs[_hash(acc + k) % cs.length].n : null; };
+  const add = (id, o, acc, days, hour, k, note) => {
+    if (used.has(id)) return; used.add(id);
+    const type = ACT_TYPES[_hash(id + k) % 7], purpose = ACT_PURPOSES[_hash(k + id) % 8], who = contactAt(acc, k);
+    const owner = o ? o.owner : (ACCOUNTS.find(a => a.name === acc) || {}).owner;
+    out.push({ id, d: at(days, hour), type, purpose, acc, si: o ? o.id : null, siName: o ? o.name : '', owner, who: who ? [who] : [],
+      t: `${ACT_SUBJECT[type]} ${who || acc}`, note: note || 'Discussed scope, timelines and next steps.' });
+  };
+  // the ones tasks were created from
+  TASKS.filter(t => t.act).forEach(t => { const o = INITS.find(x => x.id === t.si);
+    const before = t.due ? Math.max(1, Math.round((TODAY - new Date(t.due)) / 864e5) + 3) : 5;
+    add(t.act, o, t.acc, Math.max(1, before), 10 + _hash(t.act) % 6, 'task'); });
+  // Lotus – ERP Upgrade keeps the two activities CRMpulse shows on its record
+  const lotus = INITS.find(o => o.id === 'SI-2026-0024');
+  const l1 = out.find(a => a.id === 'ACT-2026-0021'); if (l1) Object.assign(l1, { d: '2026-11-10T17:24', type: 'Messaging', purpose: 'Relationship building', who: [], t: 'Messages with Lotus Retail India – relationship building', note: '' });
+  out.push({ id: 'ACT-2026-0014', d: '2026-07-11T16:00', type: 'Event / conference', purpose: 'Follow-up', acc: lotus.acc, si: lotus.id, siName: lotus.name, owner: lotus.owner, who: ['Arjun Patel'], t: 'Follow-up – Lotus Retail India', note: 'Discussed scope, timelines and next steps.' }); used.add('ACT-2026-0014');
+  // the rest: open initiatives and some account-only touches
+  let n = 1;
+  const next = () => { while (used.has('ACT-2026-' + String(n).padStart(4, '0'))) n++; return 'ACT-2026-' + String(n++).padStart(4, '0'); };
+  INITS.filter(o => o.kind === 'open').forEach((o, i) => {
+    add(next(), o, o.acc, 1 + _hash(o.id) % 40, 9 + _hash(o.id + 'h') % 8, 'a');
+    if (i % 2 === 0) add(next(), o, o.acc, 35 + _hash(o.id + 'b') % 50, 9 + _hash(o.id + 'g') % 8, 'b');
+  });
+  ACCOUNTS.filter((a, i) => i % 3 === 0).forEach(a => add(next(), null, a.name, Math.min(a.last, 88), 11 + _hash(a.name) % 5, 'acc'));
+  return out.sort((a, b) => b.d.localeCompare(a.d));
+})();
+const actTasks = (id) => TASKS.filter(t => t.act === id).length;
+// Last interaction on Accounts = the latest activity for that account, so Accounts and Activities agree
+ACCOUNTS.forEach(a => {
+  const last = ACTIVITIES.filter(x => x.acc === a.name).map(x => x.d.slice(0, 10)).sort().pop();
+  if (last) { a.lastDate = last; a.last = Math.round((TODAY - new Date(last)) / 864e5); }
+  a.attn = [a.draftOrder ? 'Won deal with a draft order · confirm the PO' : '', a.last > 60 ? `No interaction for ${a.last} days` : ''].filter(Boolean);
+});

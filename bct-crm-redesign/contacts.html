@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contacts · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="assets/crm.css?v=20261119c">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
+<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<style>
+/* ---------- Page: Contacts ----------
+   Same IA as CRMpulse /contacts: search / role / status filters, By account or List view, a warning for accounts
+   without an active decision maker, and a detail panel for the selected contact. Visual language = Sales initiatives. */
+.dm-warn { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 12px 16px; border: 1px solid var(--warn-soft); border-radius: var(--radius-lg); background: var(--warn-bg); font-size: var(--text-sm); color: var(--warn-text); }
+.dm-warn b { font-weight: 600; }
+.dm-warn .sp { flex: 1; }
+.dm-warn .btn { height: 32px; }
+.ct-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+.ct-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* By account: one card per account */
+.grp-card { padding: 0; overflow: hidden; }
+.grp-card .grp-h { display: flex; align-items: center; gap: 8px; min-height: 48px; margin: 0; padding: 12px var(--pad-card); } /* even top and bottom; same 20px inset as the rows */
+.grp-h b, .grp-h small { line-height: 1.2; }
+.grp-h b { font-size: var(--text-md); font-weight: 600; color: var(--ink); }
+.grp-h small { font-size: var(--text-xs); color: var(--t3); }
+.grp-h .sp { flex: 1; }
+.ok-tag, .need-tag { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; }
+.ok-tag { background: var(--ok-bg); color: var(--ok-text); }
+.need-tag { background: var(--warn-bg); color: var(--warn-text); }
+.ok-tag svg, .need-tag svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.cr { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .9fr) minmax(0, 1.3fr) auto; gap: 16px; align-items: center; width: 100%; min-height: 64px; padding: 10px var(--pad-card); border: 0; border-top: 1px solid var(--line); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.cr:hover { background: var(--surface-faint); }
+.cr.on { background: var(--hover); } /* selected: soft fill only, like the other selected rows */
+.cr > .chip { justify-self: end; }
+.cr .ell, .grp-card .ell { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cr .t-main { font-weight: 500; color: var(--ink); }
+.cr .t-sub { font-size: var(--text-xs); color: var(--t3); margin-top: 2px; }
+.chip { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
+.chip.role { background: var(--hover); color: var(--t2); }
+.chip.role.dm { background: var(--info-bg); color: var(--deep); }
+.chip.Active { background: var(--ok-bg); color: var(--ok-text); }
+.chip.Inactive { background: var(--field); color: var(--t3); }
+.mail { font-size: var(--text-sm); color: var(--t2); }
+
+/* List view */
+.tbl.ct { table-layout: fixed; }
+.tbl.ct col.c-n { width: 28%; } .tbl.ct col.c-a { width: 22%; } .tbl.ct col.c-r { width: 16%; } .tbl.ct col.c-e { width: 24%; } .tbl.ct col.c-s { width: 10%; }
+.tbl.ct td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
+.tbl.ct tr.on td { background: var(--hover); }
+
+/* Detail panel */
+.cp { position: sticky; top: 72px; } /* below the stuck filter bar */
+.cp-h { display: flex; gap: 14px; align-items: flex-start; }
+.cp-h .av { width: 48px; height: 48px; font-size: var(--text-md); flex: none; }
+.cp-h h2 { margin: 0; font-size: var(--text-md); font-weight: 600; color: var(--ink); } /* card title */
+.cp-h p { margin: 2px 0 0; font-size: var(--text-xs); color: var(--t3); }
+.cp-h .btn { margin-left: auto; }
+.cp-h .btn.icon-only { width: 36px; height: 36px; padding: 0; justify-content: center; flex: none; }
+.cp-h svg, .cp-acts svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cp-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 14px 0; }
+.cp-tags small { font-size: var(--text-xs); color: var(--t3); font-variant-numeric: tabular-nums; }
+.cp-acts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 18px; }
+.cp-acts .btn { justify-content: center; gap: 6px; height: 36px; padding: 0 6px; white-space: nowrap; }
+.cp-acts .btn svg, .cp-h .btn svg { flex: none; }
+.cp-f { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+.cp-f div.full { grid-column: 1 / -1; }
+.cp-f small { display: block; font-size: var(--text-xs); color: var(--t3); }
+.cp-f b { display: block; margin-top: 2px; font-size: var(--text-sm); font-weight: 500; color: var(--ink); overflow-wrap: anywhere; }
+.cp-f b.none { color: var(--t3); font-weight: 400; }
+.cp-note { margin: 16px 0 0; padding: 10px 12px; border-radius: var(--radius-md); background: var(--warn-bg); font-size: var(--text-xs); color: var(--warn-text); }
+.cp-sec { margin: 18px 0 8px; padding-top: 14px; border-top: 1px solid var(--line); font-size: var(--text-xs); font-weight: 600; color: var(--t2); }
+.cp-in { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: var(--text-sm); }
+.cp-in a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); text-decoration: none; }
+.cp-in a:hover { color: var(--deep); text-decoration: underline; }
+.st { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; flex: none; }
+.st.Prospect { background: var(--cyan-50); color: var(--cyan-text); } .st.Lead { background: var(--ice); color: var(--cyan-text); } .st.Opportunity { background: var(--info-bg); color: var(--deep); }
+.st.won { background: var(--ok-bg); color: var(--ok-text); } .st.lost { background: var(--danger-bg); color: var(--danger); }
+
+@media (max-width: 1100px) {
+  .ct-grid { grid-template-columns: 1fr; }
+  .cp { position: static; }
+}
+@media (max-width: 768px) {
+  .cr { grid-template-columns: minmax(0, 1fr) auto; }
+  .cr .mail, .cr .rl { display: none; }
+  .tbl.ct { min-width: 760px; }
+  .dm-warn { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+    <header class="v2-head">
+      <div class="v2-hello">
+        <div class="v2-top"><span class="v2-eyebrow">Contacts</span></div>
+        <h1>Contacts</h1>
+        <p>People at customer and prospect accounts. Each contact belongs to exactly one account.</p>
+      </div>
+      <div class="acts" style="display:flex;gap:8px">
+        <button class="btn primary" id="new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New contact</button>
+      </div>
+    </header>
+
+    <div class="filters" id="filters" role="toolbar" aria-label="Filters">
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="f-search" type="search" placeholder="Name, email, title or account" aria-label="Search contacts"></label>
+      <label class="select"><span class="lbl">Role</span><select id="f-role" aria-label="Role"></select></label>
+      <label class="select"><span class="lbl">Status</span><select id="f-status" aria-label="Status"></select></label>
+      <button class="btn ghost" id="reset" hidden>Reset</button>
+      <span class="sp"></span>
+      <div class="seg" id="f-view" role="radiogroup" aria-label="View">
+        <button data-v="acc" class="on" role="radio" aria-checked="true">By account</button>
+        <button data-v="list" role="radio" aria-checked="false">List</button>
+      </div>
+    </div>
+
+    <div id="page"></div>
+  </main>
+</div>
+
+<script src="assets/crm.js?v=20261119h"></script>
+<script src="assets/crm-data.js?v=20261119f"></script>
+<script>
+/* Contacts — people at the accounts. A decision maker is an active contact in the decision-maker role;
+   accounts without one are flagged (they can't move an opportunity's authority question forward). */
+const { toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const IC = {
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
+  mail: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></svg>',
+  phone: '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/></svg>',
+  meet: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>'
+};
+const PER_PAGE = 20;
+const S = { q: '', role: '', status: '', view: 'acc', noDM: false, sel: CONTACTS[0].id, page: 1, sort: 'name' };
+const noDMAccounts = ACCOUNTS.filter(a => !hasDM(a.name)).map(a => a.name);
+const anyFilter = () => S.q || S.role || S.status || S.noDM;
+// a title that normally sits in IT, recorded under another department
+const IT_TITLE = /infrastructure|security|architect|IT manager|tech/i;
+const deptNote = (c) => IT_TITLE.test(c.title) && c.dept !== 'IT' ? `The title ${c.title} usually sits in IT, not ${c.dept}. Check the department.` : '';
+
+function rows() {
+  const q = S.q.trim().toLowerCase();
+  return CONTACTS.filter(c => (!S.role || c.role === S.role) && (!S.status || c.status === S.status) && (!S.noDM || noDMAccounts.includes(c.acc))
+    && (!q || [c.n, c.email, c.title, c.acc].some(v => v.toLowerCase().includes(q))))
+    .sort((a, b) => a.acc.localeCompare(b.acc) || ROLES.indexOf(a.role) - ROLES.indexOf(b.role) || a.n.localeCompare(b.n));
+}
+const ell = (html, cls = '') => `<div class="ell ${cls}">${html}</div>`;
+const roleChip = (c) => `<span class="chip role ${c.role === 'Decision maker' ? 'dm' : ''}">${c.role}</span>`;
+function banner() {
+  const n = noDMAccounts.length; if (!n) return '';
+  return `<div class="dm-warn" role="status"><span><b>${n} accounts have no active decision maker</b> (no active contact in the decision-maker role).</span><span class="sp"></span>
+    <button class="btn" data-act="nodm" aria-pressed="${S.noDM}">${S.noDM ? 'Show all accounts' : 'Show only these'}</button></div>`;
+}
+function byAccount(list) {
+  const accs = [...new Set(list.map(c => c.acc))];
+  return accs.map(acc => {
+    const cs = list.filter(c => c.acc === acc), all = CONTACTS.filter(c => c.acc === acc).length;
+    return `<section class="card grp-card" aria-label="${esc(acc)}">
+      <div class="grp-h"><b>${esc(acc)}</b><small>${cs.length === all ? `${all} contact${all === 1 ? '' : 's'}` : `${cs.length} of ${all} on this page`}</small><span class="sp"></span>
+        ${hasDM(acc) ? `<span class="ok-tag">${IC.check}Decision maker</span>` : `<span class="need-tag">${IC.plus}Needs a decision maker</span>`}</div>
+      ${cs.map(c => `<button class="cr ${S.sel === c.id ? 'on' : ''}" data-act="sel" data-v="${c.id}" aria-pressed="${S.sel === c.id}">
+        <div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t">${ell(esc(c.n), 't-main')}${ell(`${esc(c.title)} · ${c.dept}`, 't-sub')}</div></div>
+        <span class="rl">${roleChip(c)}</span>${ell(esc(c.email), 'mail')}<span class="chip ${c.status}">${c.status}</span></button>`).join('')}
+    </section>`;
+  }).join('');
+}
+function listView(list) {
+  const sorted = list;
+  const th = (k, l) => `<th aria-sort="${S.sort === k ? 'ascending' : 'none'}"><button class="th-sort ${S.sort === k ? 'on' : ''}" data-act="sort" data-v="${k}">${l}<span class="arr" aria-hidden="true">↑</span></button></th>`;
+  return `<section class="card"><div class="tbl-wrap"><table class="tbl ct">
+    <colgroup><col class="c-n"><col class="c-a"><col class="c-r"><col class="c-e"><col class="c-s"></colgroup>
+    <thead><tr>${th('name', 'Contact')}${th('acc', 'Account')}<th>Role</th><th>Email</th><th>Status</th></tr></thead>
+    <tbody>${sorted.map(c => `<tr class="${S.sel === c.id ? 'on' : ''}" data-act="sel" data-v="${c.id}" tabindex="0">
+      <td><div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t">${ell(esc(c.n), 't-main')}${ell(`${esc(c.title)} · ${c.dept}`, 't-sub')}</div></div></td>
+      <td>${ell(esc(c.acc))}${ell(c.accId, 't-sub')}</td><td>${roleChip(c)}</td><td>${ell(esc(c.email), 'mail')}</td><td><span class="chip ${c.status}">${c.status}</span></td></tr>`).join('')}</tbody>
+  </table></div></section>`;
+}
+function panel() {
+  const c = CONTACTS.find(x => x.id === S.sel); if (!c) return '';
+  const its = INITS.filter(o => o.acc === c.acc), note = deptNote(c);
+  const pill = (o) => o.kind === 'open' ? `<span class="st ${o.status}">${o.status}</span>` : `<span class="st ${o.kind}">${o.kind === 'won' ? 'Closed won' : 'Closed lost'}</span>`;
+  const f = (k, v, full) => `<div class="${full ? 'full' : ''}"><small>${k}</small><b class="${v ? '' : 'none'}">${v ? esc(v) : 'Not recorded'}</b></div>`;
+  return `<section class="card cp" aria-label="Contact details">
+    <div class="cp-h">${CRM.avatar(c.n, c.id)}<div><h2>${esc(c.n)}</h2><p>${esc(c.title)} · ${esc(c.acc)}</p></div><button class="btn icon-only" data-act="edit" aria-label="Edit ${esc(c.n)}" data-tip="Edit contact">${IC.edit}</button></div>
+    <div class="cp-tags">${roleChip(c)}<span class="chip ${c.status}">${c.status}</span><small>${c.id}</small></div>
+    <div class="cp-acts"><button class="btn" data-act="email">${IC.mail}Email</button><button class="btn" data-act="call" aria-label="Log a call">${IC.phone}Call</button><button class="btn" data-act="meet" aria-label="Log a meeting">${IC.meet}Meeting</button></div>
+    <div class="cp-f">${f('Business email', c.email, true)}${f('Mobile', c.mobile)}${f('Office phone', c.office)}${f('Department', c.dept)}${f('Account role', c.role)}</div>
+    ${note ? `<p class="cp-note">${esc(note)}</p>` : ''}
+    <div class="cp-sec">Initiatives at this account</div>
+    ${its.length ? its.map(o => `<div class="cp-in"><a href="initiative.html?id=${encodeURIComponent(o.id)}#contacts">${esc(o.name)}</a>${pill(o)}</div>`).join('') : '<p class="muted" style="margin:0;font-size:var(--text-sm)">No initiatives yet</p>'}
+  </section>`;
+}
+function render() {
+  const list = rows();
+  if (list.length && !list.some(c => c.id === S.sel)) S.sel = list[0].id;
+  const pages = Math.max(1, Math.ceil(list.length / PER_PAGE)); S.page = Math.min(S.page, pages);
+  const ordered = S.view === 'acc' ? list : list.slice().sort(S.sort === 'acc' ? (a, b) => a.acc.localeCompare(b.acc) || a.n.localeCompare(b.n) : (a, b) => a.n.localeCompare(b.n));
+  const shown = ordered.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
+  const pager = pages > 1 ? `<div class="pager" style="border-top:0"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, list.length)} of ${list.length} contacts</span><span class="sp"></span>
+    <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
+    ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}
+    <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>` : '';
+  $('#page').innerHTML = banner() + (list.length
+    ? `<div class="ct-grid"><div class="ct-main">${S.view === 'acc' ? byAccount(shown) : listView(shown)}${pager}</div>${panel()}</div>`
+    : `<section class="card"><div class="empty" style="padding:48px 12px"><b>No contacts here</b>Nothing matches these filters.<br><button class="link" data-act="reset">Clear filters</button></div></section>`);
+  $('#reset').hidden = !anyFilter();
+}
+
+const page = $('#page');
+page.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act, c = CONTACTS.find(x => x.id === S.sel);
+  if (act === 'sel') { S.sel = a.dataset.v; render(); if (innerWidth <= 1100) $('.cp')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  else if (act === 'nodm') { S.noDM = !S.noDM; S.page = 1; render(); }
+  else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
+  else if (act === 'page') { S.page = +a.dataset.v; render(); scrollTo({ top: 0, behavior: 'smooth' }); }
+  else if (act === 'email') toast(`Would open a new email to ${c.email}`);
+  else if (act === 'call') toast(`Would log a call with ${c.n}`);
+  else if (act === 'meet') toast(`Would log a meeting with ${c.n}`);
+  else if (act === 'edit') toast('Would open the contact editor');
+  else if (act === 'reset') resetAll();
+});
+page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-act]')) e.target.click(); });
+function fill(sel, opts) { sel.innerHTML = opts.map(([k, l]) => `<option value="${esc(k)}">${esc(l)}</option>`).join(''); }
+fill($('#f-role'), [['', 'All'], ...ROLES.map(r => [r, r])]);
+fill($('#f-status'), [['', 'All'], ['Active', 'Active'], ['Inactive', 'Inactive']]);
+$('#f-search').addEventListener('input', (e) => { S.q = e.target.value; S.page = 1; render(); });
+$('#f-role').addEventListener('change', (e) => { S.role = e.target.value; S.page = 1; render(); });
+$('#f-status').addEventListener('change', (e) => { S.status = e.target.value; S.page = 1; render(); });
+$('#f-view').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.view = b.dataset.v;
+  $('#f-view').querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', String(x === b)); }); S.page = 1; render(); });
+function resetAll() { S.q = S.role = S.status = ''; S.noDM = false; $('#f-search').value = ''; $('#f-role').value = ''; $('#f-status').value = ''; S.page = 1; render(); }
+$('#reset').addEventListener('click', resetAll);
+$('#new').addEventListener('click', () => toast('Would open the new contact form'));
+
+CRM.renderShell('contacts');
+CRM.watchSticky($('#filters'));
+render();
+</script>
+</body>
+</html>
