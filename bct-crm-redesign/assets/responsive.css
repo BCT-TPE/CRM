@@ -14,6 +14,7 @@
 
 /* Top bar for the drawer (built by crm.js, shown ≤768 only) */
 .m-bar { display: none; }
+.tbl-sort { display: none; } /* phone-only Sort for tables (crm.js prepTables) */
 .m-scrim { display: none; }
 
 @media (max-width: 1360px) {
@@ -48,8 +49,15 @@
   .main .ed-bar { margin: var(--space-4) calc(-1 * var(--pad-page)) calc(-1 * var(--pad-page)); padding-left: var(--pad-page); padding-right: var(--pad-page); }
   .tbl th:first-child, .tbl td:first-child { position: sticky; left: 0; z-index: 1; background: var(--surface); }
   .tbl th:first-child { z-index: 2; }
+  body.v2 .tbl th:first-child { background: var(--surface); } /* theme-v2 makes headers transparent: the pinned one must cover what scrolls under it */
   body.v2 .tbl tbody tr:hover td:first-child { background: var(--hover); }
   .tbl-wrap { -webkit-overflow-scrolling: touch; }
+  /* header KPIs share the width evenly (the desktop min-widths that stop jitter no longer fit) */
+  .v2-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); width: 100%; }
+  .v2-kpis .v2-kpi:nth-child(n) { min-width: 0; } /* :nth-child(n) outweighs the per-KPI desktop min-widths in theme-v2.css */
+  .v2-kl, .v2-ks { white-space: normal; }
+  /* list toolbar (summary, attention, sort, view switch) wraps instead of pushing the switch off screen */
+  .main .lt-bar { flex-wrap: wrap; row-gap: var(--space-2); }
 }
 
 @media (max-width: 768px) {
@@ -68,10 +76,39 @@
   .m-bar .brand { padding: 0; flex: none; }
   .m-bar .sp { flex: 1; }
   .m-bar .avatar-img { width: 28px; height: 28px; border-radius: var(--radius-sm); }
-  .v2-head { padding-top: var(--space-6); }
+  .v2-head { padding-top: var(--space-6); margin-bottom: var(--space-1); } /* 4px + the filter bar's 8px top padding = 12px to the search */
+  .v2-head:has(> .acts) { row-gap: var(--space-3); } /* Sales pages: subtitle → action buttons 12px, same as buttons → search */
   .grid > [class*="s"] { grid-column: span 12; }
-  .filters { position: relative; } /* not sticky on small screens; keeps its layer so menus open above the cards */
-  .main .lt-bar { flex-wrap: wrap; }
+  /* Filter bar: sticky under the 56px top bar, at most two rows (crm.js compactFilters):
+     row 1 = search + More filters (+ Export), row 2 = the other filters, scrolling sideways. No search = one row. */
+  .filters.compact { top: 56px; flex-wrap: wrap; row-gap: var(--space-2); padding-top: var(--space-2); padding-bottom: var(--space-2); }
+  body.v2 .filters.compact { gap: var(--space-2); }
+  .filters.compact .sp { display: none; }
+  .main .filters.compact .search { flex: 1 1 0; min-width: 0; width: auto; }
+  .filters.compact .f-scroll { display: flex; align-items: center; gap: var(--space-2); min-width: 0; overflow-x: auto; scrollbar-width: none;
+    margin: -4px calc(-1 * var(--pad-page)); padding: 4px var(--pad-page); } /* bleeds to the screen edge; 4px keeps the pill shadows */
+  .filters.compact .f-scroll::-webkit-scrollbar { display: none; }
+  .filters.compact .f-scroll > * { flex: none; }
+  .filters.compact.two .f-scroll { flex: 1 1 calc(100% + 2 * var(--pad-page)); order: 3; } /* + the edge bleed, so it always takes row 2 */
+  /* fade at the right edge says the row scrolls */
+  .filters.compact .f-scroll { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+  .filters.compact.one .f-scroll { flex: 1 1 0; margin-right: 0; padding-right: var(--space-1); }
+  /* More filters and Export become 40px icon buttons; the label stays for screen readers */
+  .filters.compact #more-btn, .filters.compact #export { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
+  .filters.compact #more-btn .count-badge { position: absolute; top: -4px; right: -4px; font-size: var(--text-2xs); }
+  /* flat controls: the sideways row clips anything outside it, so the pills' soft drop shadow ended in a hard line.
+     Same treatment as controls inside a card: no shadow, a hairline border. */
+  body.v2 .main .filters.compact :is(.search, .select, .seg, .ftog, .btn:not(.primary)) { box-shadow: none; border: 1px solid var(--line-2); background: var(--surface); }
+  body.v2 .main .filters.compact :is(.search:focus-within, .select.set, .select.open, .ftog[aria-pressed="true"]) { border-color: var(--deep); }
+  .main .lt-bar { flex-wrap: wrap; column-gap: var(--space-2); }
+  /* need attention + Sort share one row: Sort takes what is left, a long option ends in … */
+  .main .lt-bar .sp { display: none; }
+  .main .lt-bar .sum { flex-basis: 100%; }
+  .main .lt-bar #w-sort { flex: 1 1 calc(100% - 144px); min-width: 0; } /* fills the row after the ~128px attention chip, so the view switch starts the next row */
+  .main .lt-bar #w-sort .sel-btn { flex: 1; min-width: 0; max-width: none; padding-right: 26px; }
+  body.v2 .main .lt-bar #w-sort .lbl { padding-left: 12px; }
+  .main .lt-bar #w-sort .lbl + .sel-btn { padding-left: 4px; }
+  .main .lt-bar .tog { padding: 0 10px; gap: 5px; } /* with the tighter Sort, "Recently updated" fits on a 390px phone */
   .drill { width: min(480px, 100vw); }
   .toast { top: calc(56px + var(--space-3)); } /* under the top bar */
   .main .fnc-row { grid-template-columns: repeat(6, minmax(112px, 1fr)); overflow-x: auto; padding-bottom: var(--space-1); }
@@ -94,22 +131,55 @@
   .zone-t { white-space: nowrap; }
   .zone-s { flex-basis: 100%; padding-left: 18px; }
   /* table tabs never wrap inside a pill; the row scrolls instead */
-  .tabs { overflow-x: auto; scrollbar-width: none; }
+  .tabs, body.v2 .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } /* one row, scrolls sideways; fade = more to the right */
+  .tabs::-webkit-scrollbar { display: none; }
   .tab { flex: none; white-space: nowrap; }
+  /* One height for everything you tap (40px, the form-field height): buttons, selects, search, segmented switches,
+     tabs and chips, pager and icon buttons. Tiles, chart columns and table cards are tap areas sized by their content. */
+  body.v2 :is(.main, .m-bar) :is(.btn, .select, .search, .seg, .tab, .tchip, .tog, .ftog, .icon-btn, .pager button) { height: 40px; min-height: 40px; }
+  body.v2 :is(.main, .m-bar) :is(.btn.icon-only, .icon-btn, .pager button) { width: 40px; min-width: 40px; padding: 0; justify-content: center; }
+  body.v2 .main .seg button { height: 32px; }
+  /* Tables → card list (crm.js prepTables adds data-label / data-wide and the Sort select) */
+  .main .tbl-sort { display: inline-flex; margin-bottom: var(--space-3); }
+  body.v2 .main .tbl-sort { border-color: var(--line-2); box-shadow: none; }
+  .main .tbl-wrap { overflow: visible; margin: 0; }
+  .main .tbl, .main .tbl tbody { display: block; width: 100%; min-width: 0 !important; } /* beats the per-table min-widths (some in page styles) */
+  .main .tbl colgroup, .main .tbl thead { display: none; }
+  .main .tbl tbody { display: flex; flex-direction: column; gap: var(--space-3); }
+  .main .tbl tbody tr { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3) var(--space-4);
+    padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+  body.v2 .main .tbl tbody tr:hover { background: var(--hover); }
+  .main .tbl tbody td, body.v2 .main .tbl tbody td { display: block; position: static; height: auto; min-width: 0; padding: 0; border: 0; background: none; text-align: left; white-space: normal; }
+  body.v2 .main .tbl tbody tr:hover td, body.v2 .main .tbl tbody tr:hover td:first-child { background: none; }
+  .main .tbl tbody td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; font-size: var(--text-2xs); font-weight: 400; color: var(--t3); }
+  body.v2 .main .tbl tbody td:first-child { grid-column: 1 / -1; }
+  body.v2 .main .tbl tbody tr:has(> td[data-act2]:not(:empty)) > td:first-child { padding-right: 44px; } /* room for the edit button in the corner */
+  .main .tbl tbody td:first-child::before { display: none; }
+  .main .tbl tbody td[data-wide] { grid-column: 1 / -1; }
+  .main .tbl tbody td.r > * { justify-content: flex-start; text-align: left; }
+  /* unlabelled cells hold row actions: top-right corner of the card */
+  body.v2 .main .tbl tbody td[data-act2] { position: absolute; top: var(--space-3); right: var(--space-3); width: auto; }
+  body.v2 .main .tbl tbody td[data-act2]:empty { display: none; }
+  .main td[data-act2] .btn.icon-only { justify-content: center; }
+  .main .tbl tbody td:first-child .t-sub { white-space: normal; overflow: visible; } /* card has room: show the full ID · initiative line instead of cutting it */
+  .main .tbl-wrap + .pager { margin-top: var(--space-4); } /* the last card no longer sits on the pager's rule */
+  /* Days in stage: same dot size and spacing as the dot map (pipeline.html syncAgeDots sets --dot-d / --dot-p) */
+  .v2-age .ad-g { gap: 0; width: calc(var(--dot-p, 6px) * 10); max-width: 100%; }
+  .v2-age .ad-g i { border-radius: 0; -webkit-mask-image: radial-gradient(circle closest-side, #000 calc(var(--dot-d, 4px) / 2 - .25px), transparent calc(var(--dot-d, 4px) / 2 + .25px));
+    mask-image: radial-gradient(circle closest-side, #000 calc(var(--dot-d, 4px) / 2 - .25px), transparent calc(var(--dot-d, 4px) / 2 + .25px)); }
+  .v2-age .ad-row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* header KPIs 2×2 (four across ran off the screen between 481 and 768) */
+  .v2-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); width: 100%; }
 }
 
 @media (max-width: 480px) {
   :root { --pad-page: 16px; --pad-card: 16px; }
   .card { padding: var(--pad-card); }
-  .tbl-wrap { margin: 0 calc(-1 * var(--pad-card)); }
-  .tbl th:first-child, .tbl td:first-child { padding-left: var(--pad-card); }
   .tabs, body.v2 .tabs { margin-left: calc(-1 * var(--pad-card)); margin-right: calc(-1 * var(--pad-card)); padding-left: var(--pad-card); padding-right: var(--pad-card); overflow-x: auto; }
   .v2-hello h1 { font-size: var(--text-3xl); }
-  .v2-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); width: 100%; }
-  .v2-kpis .v2-kpi { min-width: 0; }
   .v2-kv { font-size: var(--text-3xl); }
   .v2-kv sup { font-size: var(--text-sm); }
-  .v2-ks { white-space: normal; }
   .main .search { flex: 1 1 100%; width: auto; }
   .card-h { flex-wrap: wrap; }
   .card-h .r { margin-left: 0; }
@@ -131,4 +201,7 @@
   .main .life-open .life-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .main .fn-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pager { flex-wrap: wrap; }
+}
+@media (max-width: 400px) {
+  .v2-kv { font-size: var(--text-2xl); } /* $471.3K fits half of a 360px screen */
 }

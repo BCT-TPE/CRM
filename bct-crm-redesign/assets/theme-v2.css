@@ -57,7 +57,7 @@ body.v2 .filters::after { background: var(--line-2); }
 
 body.v2 .select { border-radius: var(--radius-pill); border-color: var(--surface); background: var(--glass); box-shadow: var(--shadow-card); }
 body.v2 .select:hover { background: var(--surface); }
-body.v2 .card .select { box-shadow: none; } /* inside a card, controls stay flat; the card carries the shadow */
+body.v2 .card .select { box-shadow: none; border-color: var(--line-2); } /* inside a card, controls stay flat; the card carries the shadow */
 body.v2 .select .lbl { padding-left: 14px; }
 body.v2 .select.set, body.v2 .select.open { border-color: var(--deep); background: var(--surface); }
 

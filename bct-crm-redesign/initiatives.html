@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales initiatives · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
 <link rel="stylesheet" href="assets/crm.css?v=20261119c">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261120w">
 <style>
 /* ---------- Page: Sales initiatives (list page) ---------- */
 /* Lifecycle strip: status tiles filter the list (list-page behaviour, as in the old CRM) */
@@ -50,6 +50,9 @@
 .stg2 { display: flex; align-items: center; gap: 7px; min-width: 0; }
 /* 13-step progress: 3 prospect · 3 lead · 7 opportunity sub-stages */
 .prog { display: flex; gap: 2px; width: max-content; margin-top: 0; padding: 6px 0 2px; cursor: help; } /* taller hit area for the tooltip */
+.stg-r { display: flex; align-items: center; gap: 8px; margin-top: 2px; } /* progress + days on one line keeps the row at the 64px table height */
+.stg-r .t-sub { margin: 0; white-space: nowrap; }
+.stg-r .prog { padding: 6px 0; }
 .prog i { width: 8px; height: 4px; border-radius: var(--radius-2xs); background: var(--chart-track); }
 .prog i.f { background: var(--chart-step); }
 .prog i.c { background: var(--ink); }
@@ -58,7 +61,18 @@
 /* Table */
 .tbl.si { table-layout: fixed; }
 .tbl.si col.c-name { width: 21%; } .tbl.si col.c-stage { width: 25%; } .tbl.si col.c-own { width: 14%; } .tbl.si col.c-val { width: 10%; }
-.tbl.si col.c-prob { width: 6%; } .tbl.si col.c-close { width: 9%; } .tbl.si col.c-next { width: 15%; }
+.tbl.si col.c-prob { width: 6%; } .tbl.si col.c-close { width: 9%; } .tbl.si col.c-next { width: 15%; } .tbl.si col.c-act { width: 52px; }
+.qa-acts { display: flex; justify-content: flex-end; }
+.qa-acts .btn.icon-only { width: 32px; height: 32px; padding: 0; justify-content: center; }
+.qa-acts svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* More filters: CRMpulse's 13 fields as selects, two columns */
+#more-pop { width: 520px; }
+#more-pop .mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+#more-pop .mgrid .grp + .grp { margin-top: 0; }
+body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; border-radius: var(--radius-control); border-color: var(--line-2); box-shadow: none; }
+#more-pop .fsel .sel-btn { max-width: none; width: 100%; font-weight: 400; }
+.lt-bar label.select { height: 36px; }
+@media (max-width: 768px) { #more-pop { width: calc(100vw - 32px); } #more-pop .mgrid { grid-template-columns: 1fr; } }
 .tbl.si td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
 .next-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .next-none { color: var(--danger); }
@@ -133,7 +147,7 @@
       <div class="v2-hello">
         <div class="v2-top"><span class="v2-eyebrow">Sales initiatives</span></div>
         <h1>Sales initiatives</h1>
-        <p>Prospects, leads and opportunities as one record, from first interest to closure · USD</p>
+        <p>Prospects, leads and opportunities in one record, first interest to closure · USD</p>
       </div>
       <div class="acts" style="display:flex;gap:8px">
         <button class="btn" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export to Excel</button>
@@ -152,8 +166,7 @@
       <div style="position:relative">
         <button class="btn" id="more-btn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>More filters<span class="count-badge" id="more-n" hidden></span></button>
         <div class="pop" id="more-pop" role="dialog" aria-label="More filters" hidden style="top:44px;right:0">
-          <div class="grp"><h4>Owner</h4><div id="m-owner"></div></div>
-          <div class="grp"><h4>Geography</h4><div id="m-geo"></div></div>
+          <div class="mgrid" id="m-grid"></div>
           <div class="pop-foot"><button class="link" id="more-clear">Clear</button><button class="btn primary" id="more-done" style="height:32px">Done</button></div>
         </div>
       </div>
@@ -165,13 +178,26 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261119h"></script>
-<script src="assets/crm-data.js?v=20261119f"></script>
+<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 /* Sales initiatives — the list behind every number on the dashboards (requirement 5.12: list, kanban and funnel views). */
 const { money, moneyBig, icon, toast } = CRM;
 const chev = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
-const S = { q: '', mine: 'all', team: '', close: '', owners: [], geo: [], status: 'open', attn: false, view: 'list', sort: 'value', page: 1, stage: '', band: '' };
+const MORE0 = () => ({ sub: '', funnel: '', state: '', owner: '', geo: '', region: '', leadType: '', source: '', category: '', sbu: '', practice: '', tech: '', vertical: '' });
+const S = { q: '', mine: 'all', team: '', close: '', m: MORE0(), status: 'open', attn: false, view: 'list', sort: 'updated', page: 1, stage: '', band: '' };
+// CRMpulse State filter (lib/api/initiatives STATES); no demo record is on hold or discontinued
+const STATES = [['open', 'Open', o => o.kind === 'open'], ['active', 'Open (not on hold)', o => o.kind === 'open'], ['on_hold', 'On hold', () => false],
+  ['won', 'Closed won', o => o.kind === 'won'], ['lost', 'Closed lost', o => o.kind === 'lost'], ['closed', 'Closed (won or lost)', o => o.kind !== 'open'], ['disposed', 'Discontinued', () => false]];
+const META = Object.fromEntries(INITS.map(o => [o.id, { ...recMeta(o), sell: sellOf(o) }]));
+const moreN = () => Object.values(S.m).filter(Boolean).length;
+function moreMatch(o) {
+  const m = S.m, x = META[o.id], sl = x.sell;
+  return (!m.sub || o.sub === m.sub) && (!m.funnel || o.code === m.funnel) && (!m.state || STATES.find(t => t[0] === m.state)[2](o))
+    && (!m.owner || o.owner === m.owner) && (!m.geo || sl.geography === m.geo) && (!m.region || sl.region === m.region)
+    && (!m.leadType || x.leadType === m.leadType) && (!m.source || x.source === m.source) && (!m.category || x.category === m.category)
+    && (!m.sbu || sl.sbu === m.sbu) && (!m.practice || sl.practice === m.practice) && (!m.tech || sl.technology === m.tech) && (!m.vertical || sl.vertical === m.vertical);
+}
 const PER_PAGE = 10;
 const STATUS = [
   ['open', 'All open', 'dot-all', o => o.kind === 'open'],
@@ -184,15 +210,7 @@ const STATUS = [
 ];
 const NOUN = { open: 'open initiatives', Prospect: 'prospects', Lead: 'leads', Opportunity: 'open opportunities', won: 'closed won', lost: 'closed lost', all: 'initiatives' };
 const fu = (d) => CRM.date(d, false); // "18 Nov"
-function needs(o) {
-  if (o.kind !== 'open') return [];
-  const r = [];
-  if (!o.next) r.push('No next step');
-  if (o.follow && new Date(o.follow) < TODAY) r.push('Follow-up overdue');
-  if (o.close && new Date(o.close) < TODAY) r.push('Close date passed');
-  if (o.days > 30) r.push(`${o.days} days in stage`);
-  return r;
-}
+const needs = (o) => attention(o); // same rule as CRMpulse and the Pipeline dashboard (assets/crm-data.js)
 function closeMatch(o) {
   if (!S.close) return true;
   if (S.close === 'none') return !o.close;
@@ -206,8 +224,7 @@ function base() { // every filter except the status tiles, attention and stage c
   return INITS.filter(o =>
     (S.mine === 'all' || o.owner === ME) &&
     (!S.team || o.team === S.team) &&
-    (!S.owners.length || S.owners.includes(o.owner)) &&
-    (!S.geo.length || S.geo.includes(TEAMS[o.team].geo)) &&
+    moreMatch(o) &&
     closeMatch(o) &&
     (!qs || [o.id, o.name, o.acc, o.owner].some(v => v.toLowerCase().includes(qs))));
 }
@@ -227,11 +244,12 @@ function render() {
   const b = base();
   page.innerHTML = `
     <div class="grid">
-      ${zoneHead(1, 'Lifecycle', 'Prospect → lead → opportunity → closed · select a status to filter the list')}
+      ${zoneHead(1, 'Lifecycle', 'Prospect → lead → opportunity → closed · select a status to filter')}
       ${lifeStrip(b)}
       ${zoneHead(2, 'Initiatives', S.view === 'list' ? 'One row per initiative · select a row to open it' : S.view === 'kanban' ? 'Grouped by main status and funnel code' : 'How far initiatives get · the status tiles above do not apply here')}
       ${listCard(b)}
     </div>`;
+  CRM.enhanceSelects(page);
   if (!render.done) { page.querySelectorAll('.card, .zone').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
 }
 
@@ -246,7 +264,7 @@ function lifeStrip(b) {
   const [, closedV] = sum(o => o.kind !== 'open'), closedN = sum(o => o.kind !== 'open')[0];
   return `
     <section class="card s7 life-g life-open tint" aria-label="Open initiatives">
-      <div class="life-h">Open<span>in progress, from first interest to opportunity</span></div>
+      <div class="life-h">Open<span>first interest to opportunity</span></div>
       <div class="life-cells">${tile(open, 'All open')}${tile(pro)}${tile(lead)}${tile(opp, 'Opportunities')}</div>
     </section>
     <section class="card s3 life-g life-closed" aria-label="Closed initiatives">
@@ -271,9 +289,10 @@ function listCard(b) {
       <span class="sum"><b>${rows.length}</b> ${NOUN[S.status]} · <b>${money(g)}</b> total value · <b>${money(w)}</b> weighted</span>
       <span class="chip-row">
         ${S.stage ? `<span class="filter-chip">Stage: ${esc(S.stage)}<button data-act="unstage" aria-label="Clear stage filter"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>` : ''}
-        ${attnN || S.attn ? `<button class="tog ${S.attn ? 'on' : ''}" data-act="attn" aria-pressed="${S.attn}" data-tip-h="Needs attention" data-tip="No next step, follow-up overdue, close date passed, or more than 30 days in the stage."><b>${attnN}</b> need attention</button>` : ''}
+        ${attnN || S.attn ? `<button class="tog ${S.attn ? 'on' : ''}" data-act="attn" aria-pressed="${S.attn}" data-tip-h="Needs attention" data-tip="No next step, close date passed, over 30 days in stage, or open over 90 days."><b>${attnN}</b> need attention</button>` : ''}
       </span>
       <span class="sp"></span>
+      ${S.view === 'list' ? `<label class="select" id="w-sort"><span class="lbl">Sort</span><select id="f-sort" aria-label="Sort">${['updated', 'value', 'close', 'stage', 'since', 'name', ...(['prob', 'next'].includes(S.sort) ? [S.sort] : [])].map(k => `<option value="${k}" ${S.sort === k ? 'selected' : ''}>${SORTS[k].label || { prob: 'Probability', next: 'Next follow-up' }[k]}</option>`).join('')}</select></label>` : ''}
       <div class="seg" role="radiogroup" aria-label="View">
         ${[['list', 'List'], ['kanban', 'Kanban'], ['funnel', 'Funnel']].map(([k, n]) => `<button data-act="view" data-v="${k}" class="${S.view === k ? 'on' : ''}" role="radio" aria-checked="${S.view === k}">${n}</button>`).join('')}
       </div>
@@ -283,11 +302,13 @@ function listCard(b) {
 }
 
 const SORTS = {
-  name: { fn: (a, b) => a.name.localeCompare(b.name), dir: 'asc' },
-  stage: { fn: (a, b) => (b.step ?? 99) - (a.step ?? 99), dir: 'desc' },
-  value: { fn: (a, b) => b.value - a.value, dir: 'desc' },
+  updated: { fn: (a, b) => META[b.id].updated.localeCompare(META[a.id].updated), dir: 'desc', label: 'Recently updated' },
+  since: { fn: (a, b) => (b.kind === 'open' ? b.days : -1) - (a.kind === 'open' ? a.days : -1), dir: 'desc', label: 'Longest in stage' },
+  name: { fn: (a, b) => a.name.localeCompare(b.name), dir: 'asc', label: 'Name' },
+  stage: { fn: (a, b) => (b.step ?? 99) - (a.step ?? 99), dir: 'desc', label: 'Stage' },
+  value: { fn: (a, b) => b.value - a.value, dir: 'desc', label: 'Value (high → low)' },
   prob: { fn: (a, b) => b.prob - a.prob, dir: 'desc' },
-  close: { fn: (a, b) => (a.close || '9999').localeCompare(b.close || '9999'), dir: 'asc' },
+  close: { fn: (a, b) => (a.close || '9999').localeCompare(b.close || '9999'), dir: 'asc', label: 'Expected close (soonest)' },
   next: { fn: (a, b) => (a.follow || '9999').localeCompare(b.follow || '9999'), dir: 'asc' }
 };
 function th(key, label, cls = '', tip = '') {
@@ -308,6 +329,7 @@ function prog(o) {
     + `<div class='row'><span>One dash per sub-stage · dark = now</span></div>`;
   return `<div class="prog" tabindex="0" aria-label="Lifecycle step ${o.step + 1} of ${n}: ${esc(o.sub)}" data-tip-html="${tip}">${ALL_STEPS.map((_, i) => `<i class="${i < o.step ? 'f' : i === o.step ? 'c' : ''} ${i === 3 || i === 6 ? 'sep' : ''}"></i>`).join('')}</div>`;
 }
+const IC_EDIT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>';
 function stagePill(o) { return o.kind === 'open' ? `<span class="st ${o.status}">${o.status}</span>` : `<span class="st ${o.kind}">${o.kind === 'won' ? 'Won' : 'Lost'}</span>`; }
 function listView(rows) {
   if (!rows.length) return emptyMsg();
@@ -317,19 +339,20 @@ function listView(rows) {
   const shown = rows.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
   return `
     <div class="tbl-wrap"><table class="tbl si">
-      <colgroup><col class="c-name"><col class="c-stage"><col class="c-own"><col class="c-val"><col class="c-prob"><col class="c-close"><col class="c-next"></colgroup>
-      <thead><tr>${th('name', 'Initiative')}${th('stage', 'Stage', '', 'Main status and sub-stage. The bar shows the 13 configured steps: 3 prospect, 3 lead, 7 opportunity.')}${th('', 'Owner / team')}${th('value', 'Value', 'r')}${th('prob', 'Prob.', 'r')}${th('close', 'Close')}${th('next', 'Next step')}</tr></thead>
+      <colgroup><col class="c-name"><col class="c-stage"><col class="c-own"><col class="c-val"><col class="c-prob"><col class="c-close"><col class="c-next"><col class="c-act"></colgroup>
+      <thead><tr>${th('name', 'Initiative')}${th('stage', 'Stage', '', 'Main status and sub-stage. Bar = 13 steps: 3 prospect, 3 lead, 7 opportunity.')}${th('', 'Owner / team')}${th('value', 'Value', 'r')}${th('prob', 'Prob.', 'r')}${th('close', 'Close')}${th('next', 'Next step')}<th aria-label="Actions"></th></tr></thead>
       <tbody>${shown.map(o => {
         const local = localAmount(o.value, o.cur), late = o.follow && new Date(o.follow) < TODAY, passed = o.kind === 'open' && o.close && new Date(o.close) < TODAY;
         return `<tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
           <td>${ell(o.name, 't-main')}${ell(`${o.id} · ${o.acc}`, 't-sub')}</td>
           <td><div class="stg2">${stagePill(o)}${o.kind === 'open' ? `<span class="ell">${o.sub}</span>${o.code ? `<span class="code">${o.code}</span>` : ''}` : `<span class="muted">${o.kind === 'won' ? 'Closed won · L0' : 'Closed lost'}</span>`}</div>
-            ${o.kind === 'open' ? `${prog(o)}<div class="t-sub ${o.days > 30 ? 'hot' : ''}" style="margin-top:4px">${o.days} days in stage</div>` : `<div class="t-sub">${o.kind === 'lost' ? esc(o.reason) : 'Booked'}</div>`}</td>
+            ${o.kind === 'open' ? `<div class="stg-r">${prog(o)}<span class="t-sub ${o.days > 30 ? 'hot' : ''}">${o.days} days in stage</span></div>` : `<div class="t-sub">${o.kind === 'lost' ? esc(o.reason) : 'Booked'}</div>`}</td>
           <td><div class="own">${CRM.avatar(o.owner)}<div class="own-t">${ell(o.owner)}${ell(o.team, 't-sub')}</div></div></td>
           <td class="r num"><div class="t-val">${money(o.value)}</div>${local ? `<div class="t-sub">${local}</div>` : ''}</td>
           <td class="r num">${o.prob}%</td>
           <td class="num">${o.close ? `<span class="${passed ? 'hot' : ''}">${fmtDate(o.close)}</span>` : '<span class="muted">Not set</span>'}</td>
           <td>${o.kind !== 'open' ? '<span class="muted">—</span>' : o.next ? `<div class="next-t">${esc(o.next)}</div>${o.follow ? `<div class="fu ${late ? 'late' : ''}">${late ? 'Overdue' : 'Follow-up'} ${fu(o.follow)}</div>` : ''}` : '<span class="next-none">No next step</span>'}</td>
+          <td><div class="qa-acts">${o.kind === 'open' ? `<button class="btn icon-only" data-act="edit" data-id="${o.id}" aria-label="Edit ${esc(o.name)}" data-tip="Edit">${IC_EDIT}</button>` : `<button class="btn icon-only" aria-disabled="true" aria-label="Edit ${esc(o.name)}" data-tip="Closed initiatives can't be edited">${IC_EDIT}</button>`}</div></td>
         </tr>`;
       }).join('')}</tbody>
     </table></div>
@@ -403,7 +426,7 @@ function funnelView(b) {
     <div class="fn-wrap">
       <div>
           <h3 class="fn-h">Lifecycle funnel</h3>
-          <p class="fn-p">How many initiatives reached each stage · solid = reached, faint = lost since the stage before · select a stage to list what's in it now</p>
+          <p class="fn-p">Initiatives reaching each stage · solid = reached, faint = lost since the previous stage · select a stage to list what's in it</p>
       </div>
       <div class="fn-kpis">
         ${fk('Win rate', won.length + lost.length ? pct(won.length, won.length + lost.length) + '%' : '—', `${won.length} won · ${lost.length} lost`)}
@@ -411,7 +434,7 @@ function funnelView(b) {
         ${fk('Open pipeline', money(ov), `${open.length} open initiatives`)}
         ${fk('<span class="def" tabindex="0" data-tip="Σ value × probability.">Weighted</span>', money(ow), 'Value × probability')}
         ${fk('Avg days in stage', avgDays == null ? '—' : `${avgDays} days`, 'Open initiatives')}
-        ${fk('<span class="def" tabindex="0" data-tip="No next step, follow-up overdue, close date passed, or more than 30 days in the stage.">Need attention</span>', attn, 'Open initiatives', attn ? 'warn' : '')}
+        ${fk('<span class="def" tabindex="0" data-tip="No next step, close date passed, over 30 days in stage, or open over 90 days.">Need attention</span>', attn, 'Open initiatives', attn ? 'warn' : '')}
       </div>
       <div>
         ${bands}
@@ -437,7 +460,7 @@ function funnelView(b) {
 }
 
 function emptyMsg() {
-  const any = S.q || S.mine !== 'all' || S.team || S.close || S.owners.length || S.geo.length || S.attn || S.stage;
+  const any = S.q || S.mine !== 'all' || S.team || S.close || moreN() || S.attn || S.stage;
   return `<div class="empty"><b>No initiatives match</b>${S.mine === 'me' ? 'You have nothing in this status. ' : ''}${any ? '<button class="link" data-act="reset">Clear filters</button>' : ''}</div>`;
 }
 
@@ -445,23 +468,41 @@ function emptyMsg() {
 const $ = (s) => document.querySelector(s);
 function syncControls() {
   document.querySelectorAll('#f-mine button').forEach(b => { const on = b.dataset.v === S.mine; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
-  const teams = Object.keys(TEAMS).filter(t => !S.geo.length || S.geo.includes(TEAMS[t].geo));
+  const teams = Object.keys(TEAMS).filter(t => !S.m.geo || TEAMS[t].geo === S.m.geo);
   $('#f-team').innerHTML = `<option value="">All teams</option>` + teams.map(t => `<option ${S.team === t ? 'selected' : ''}>${esc(t)}</option>`).join('');
   const closeOpts = [['', 'Any date'], ['2627', 'FY26-27'], ['2627-3', 'Q3 FY26-27 (now)'], ['2627-4', 'Q4 FY26-27'], ['2728', 'FY27-28'], ['none', 'Not set']];
   $('#f-close').innerHTML = closeOpts.map(([v, n]) => `<option value="${v}" ${S.close === v ? 'selected' : ''}>${n}</option>`).join('');
   $('#w-team').classList.toggle('set', !!S.team);
   $('#w-close').classList.toggle('set', !!S.close);
-  const more = S.owners.length + S.geo.length;
+  const more = moreN();
   $('#more-n').hidden = !more; $('#more-n').textContent = more;
   $('#reset').hidden = !(S.q || S.mine !== 'all' || S.team || S.close || more || S.attn || S.stage || S.status !== 'open');
 }
 function buildMore() {
+  const uniq = (f) => [...new Set(INITS.map(f))].filter(Boolean).sort();
   const people = [...new Set(Object.values(TEAMS).flatMap(t => t.people))].sort();
-  $('#m-owner').innerHTML = people.map(p => `<label class="check"><input type="checkbox" data-m="owners" value="${esc(p)}" ${S.owners.includes(p) ? 'checked' : ''}>${esc(p)}${p === ME ? ' (you)' : ''}</label>`).join('');
-  $('#m-geo').innerHTML = Object.keys(GEO_TARGET).map(g => `<label class="check"><input type="checkbox" data-m="geo" value="${g}" ${S.geo.includes(g) ? 'checked' : ''}>${g}</label>`).join('');
+  const subs = [...PRE_STAGES.Prospect.map(x => ['Prospect', x]), ...PRE_STAGES.Lead.map(x => ['Lead', x]), ...STAGES.map(x => ['Opportunity', x.name])];
+  const regions = Object.entries(SALES_REGION).filter(([g]) => !S.m.geo || g === S.m.geo).flatMap(([, r]) => r);
+  const F = [
+    ['sub', 'Sub-stage', subs.map(([g, x]) => [x, `${g} · ${x}`])],
+    ['funnel', 'Funnel code', ['L3', 'L2', 'L1', 'L0', 'L0-X', 'Lost'].map(x => [x, x])],
+    ['state', 'State', STATES.map(([k, l]) => [k, l])],
+    ['owner', 'Owner', people.map(p => [p, p === ME ? `${p} (you)` : p])],
+    ['geo', 'Geography', Object.keys(SALES_REGION).map(g => [g, g])],
+    ['region', 'Region', regions.map(r => [r, r])],
+    ['leadType', 'Lead type', ['New account new lead', 'Existing account new lead'].map(x => [x, x])],
+    ['source', 'Lead source', ['Event / conference', 'Referral', 'Website', 'Partner', 'Outbound'].map(x => [x, x])],
+    ['category', 'Business category', ['New customer – new business', 'Existing customer – new business'].map(x => [x, x])],
+    ['sbu', 'SBU', uniq(o => META[o.id].sell.sbu).map(x => [x, x])],
+    ['practice', 'Practice / service line', uniq(o => META[o.id].sell.practice).map(x => [x, x])],
+    ['tech', 'Technology', uniq(o => META[o.id].sell.technology).map(x => [x, x === 'Other' ? 'Not set' : x])],
+    ['vertical', 'Vertical', uniq(o => META[o.id].sell.vertical).map(x => [x, x])]
+  ];
+  $('#m-grid').innerHTML = F.map(([k, l, opts]) => `<div class="grp"><h4>${l}</h4><label class="select fsel"><select data-m="${k}" aria-label="${l}"><option value="">All</option>${opts.map(([v, n]) => `<option value="${esc(v)}" ${S.m[k] === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label></div>`).join('');
+  CRM.enhanceSelects?.($('#m-grid'));
 }
 function setMore(open) { $('#more-pop').hidden = !open; $('#more-btn').setAttribute('aria-expanded', open); if (open) buildMore(); }
-function resetAll() { const v = S.view; Object.assign(S, { q: '', mine: 'all', team: '', close: '', owners: [], geo: [], status: 'open', attn: false, page: 1, stage: '' }); S.view = v; $('#f-search').value = ''; render(); }
+function resetAll() { const v = S.view; Object.assign(S, { q: '', mine: 'all', team: '', close: '', m: MORE0(), status: 'open', attn: false, page: 1, stage: '' }); S.view = v; $('#f-search').value = ''; render(); }
 
 let searchT;
 $('#f-search').addEventListener('input', (e) => { clearTimeout(searchT); searchT = setTimeout(() => { S.q = e.target.value; S.page = 1; render(); }, 150); });
@@ -472,16 +513,19 @@ $('#reset').addEventListener('click', resetAll);
 $('#more-btn').addEventListener('click', (e) => { e.stopPropagation(); setMore($('#more-pop').hidden); });
 $('#more-pop').addEventListener('click', (e) => e.stopPropagation());
 $('#more-pop').addEventListener('change', (e) => {
-  const i = e.target, arr = S[i.dataset.m], k = arr.indexOf(i.value);
-  if (i.checked && k < 0) arr.push(i.value); if (!i.checked && k >= 0) arr.splice(k, 1);
+  const k = e.target.dataset.m; if (!k) return;
+  S.m[k] = e.target.value;
+  if (k === 'geo') { S.m.region = ''; if (S.team && TEAMS[S.team].geo !== S.m.geo && S.m.geo) S.team = ''; buildMore(); }
   S.page = 1; render();
 });
-$('#more-clear').addEventListener('click', () => { S.owners = []; S.geo = []; buildMore(); render(); });
+$('#more-clear').addEventListener('click', () => { S.m = MORE0(); buildMore(); render(); });
 $('#more-done').addEventListener('click', () => setMore(false));
 document.addEventListener('click', () => setMore(false));
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMore(false); });
 
+page.addEventListener('change', (e) => { if (e.target.id === 'f-sort') { S.sort = e.target.value; S.page = 1; render(); } });
 page.addEventListener('click', (e) => {
+  if (e.target.closest('[aria-disabled="true"], #w-sort')) return;
   const a = e.target.closest('[data-act]'); if (!a) return;
   const act = a.dataset.act;
   if (act === 'status') { S.status = a.dataset.v; S.page = 1; S.stage = ''; render(); }
@@ -492,6 +536,7 @@ page.addEventListener('click', (e) => {
   else if (act === 'unstage') { S.stage = ''; S.page = 1; render(); }
   else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
   else if (act === 'page') { S.page = +a.dataset.v; render(); }
+  else if (act === 'edit') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}&mode=edit`;
   else if (act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
   else if (act === 'reset') resetAll();
 });

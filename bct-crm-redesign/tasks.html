@@ -5,18 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tasks · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
 <link rel="stylesheet" href="assets/crm.css?v=20261119c">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261120w">
 <style>
 /* ---------- Page: Tasks (CRM V1 §7) ----------
    Mirrors CRMpulse /tasks (tasks-view, task-board): five view tiles, search / assignee / "show completed and
    cancelled", then one table (sortable, paged), open tasks first. Visual language = the other pages. */
 /* Scope tiles: the same tinted card of tiles as Accounts and Sales initiatives (selected tile = white) */
 .sc-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 8px; }
-.tt { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 16px; border: 0; border-radius: var(--radius-lg); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+/* label / count / note on shared rows (subgrid), so tiles side by side line up */
+.sc-tiles { grid-auto-rows: auto; }
+.tt { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 4px; align-content: start; min-width: 0; padding: 16px; border: 0; border-radius: var(--radius-lg); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .tt:hover { background: var(--hover); }
 .tt.on { background: var(--surface); box-shadow: var(--shadow-soft); }
 .tt-k { font-size: var(--text-xs); color: var(--t3); white-space: nowrap; }
@@ -78,8 +80,9 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
 @media (max-width: 480px) { .tf-2 { grid-template-columns: 1fr; } .tf-seg { flex-wrap: wrap; } }
 @media (max-width: 1180px) { .sc-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 768px) {
-  .sc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tt-s { white-space: normal; }
-  .tbl.tk { min-width: 820px; }
+  .sc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tbl.tk { min-width: 720px; }
+  .tbl.tk col.c-t { width: 30%; } /* pinned column stays ~216px, as on the other tables */
 }
 </style>
 </head>
@@ -112,8 +115,8 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261119h"></script>
-<script src="assets/crm-data.js?v=20261119f"></script>
+<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 const { toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -143,8 +146,8 @@ const S = { view: 'mine', closed: !myOpen, note: myOpen ? '' : "You have no open
 function tiles() {
   const open = TASKS.filter(taskOpen), mine = open.filter(t => t.to === ME), late = open.filter(taskLate);
   const done30 = TASKS.filter(t => t.status === 'done' && t.done && (TODAY - new Date(t.done)) / DAY <= 30).length;
-  const sub = { mine: mine.length ? (mine.filter(taskLate).length ? `${mine.filter(taskLate).length} overdue` : 'None overdue') : 'Nothing assigned to you', given: 'Open tasks you gave others',
-    team_overdue: late.length ? `Visible to you · oldest ${Math.max(...late.map(t => -daysUntil(t.due)))} days` : 'Nothing overdue', week: 'Today to Sunday', all: `${done30} completed in 30 days` };
+  const sub = { mine: mine.length ? (mine.filter(taskLate).length ? `${mine.filter(taskLate).length} overdue` : 'None overdue') : 'None assigned', given: 'Given to others',
+    team_overdue: late.length ? `Oldest ${Math.max(...late.map(t => -daysUntil(t.due)))} days` : 'Nothing overdue', week: 'Today to Sunday', all: `${done30} done in 30 days` }; // short enough for one line on a phone tile
   return `<section class="card tint sc-tiles" role="tablist" aria-label="Task views">${VIEWS.map(([k, l, fn]) => { const n = open.filter(fn).length, alert = k === 'team_overdue' && n > 0;
     return `<button role="tab" aria-selected="${S.view === k}" class="tt ${S.view === k ? 'on' : ''}" data-act="view" data-v="${k}"><span class="tt-k">${l}</span><span class="tt-n ${alert ? 'hot' : ''}">${n}</span><span class="tt-s">${sub[k]}</span></button>`; }).join('')}</section>
     ${S.note ? `<p class="tk-note">${S.note}</p>` : ''}`;

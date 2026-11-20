@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
 <link rel="stylesheet" href="assets/crm.css?v=20261119c">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261120w">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
    Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
@@ -348,8 +348,8 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261119h"></script>
-<script src="assets/crm-data.js?v=20261119f"></script>
+<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 /* Data for one record. Everything shown comes from the shared demo data (assets/crm-data.js); details the list doesn't
    carry (line items, BANT, contacts, activities, stage path) are derived here so every record opens, and the Lotus
@@ -457,7 +457,7 @@ function details(o) {
   // Activities (fictional, oldest last)
   // Activities come from the shared list (assets/crm-data.js), the same ones the Activities page shows
   const acts = ACTIVITIES.filter(a => a.si === o.id).map(a => ({ d: a.d, t: a.t, type: a.type, purpose: a.purpose, note: a.note, who: a.who }));
-  return { lotus, created, existing, sell, geo, region: lotus ? 'India North' : pick(REGION[geo], o.acc), items, total, fmtL, bant, contacts, path, acts,
+  return { lotus, created, existing, sell, geo, region: o.acc === 'Lotus Retail India' ? 'India North' : pick(REGION[geo], o.acc), items, total, fmtL, bant, contacts, path, acts,
     leadType: lotus ? 'Existing account new lead' : existing ? 'Existing account new lead' : 'New account new lead',
     source: lotus ? 'Event / conference' : pick(['Event / conference', 'Referral', 'Website', 'Partner', 'Outbound'], o.id),
     category: lotus ? 'New customer – new business' : existing ? 'Existing customer – new business' : 'New customer – new business',
@@ -532,8 +532,8 @@ function header() {
         ${closed ? '' : `<button class="btn primary" data-act="toast" data-v="Would open change stage">${SVG.swap}Change stage</button>`}
         <button class="btn icon-only" aria-label="More actions" aria-haspopup="menu" aria-expanded="${T.more}" data-act="more">${SVG.more}</button>
         <div class="pop more-pop" role="menu" ${T.more ? '' : 'hidden'}>
-          <button class="mi" role="menuitem" ${won ? 'data-act="toast" data-v="Would create a customer order from this initiative"' : 'aria-disabled="true"'}>Create customer order<small>${won ? 'From this closed-won initiative' : 'Available once the initiative is closed won'}</small></button>
-          <button class="mi" role="menuitem" ${closed ? 'data-act="toast" data-v="Would start a follow-on initiative"' : 'aria-disabled="true"'}>Follow-on initiative<small>${closed ? 'Start the next initiative for this account' : 'Available once the initiative is closed'}</small></button>
+          <button class="mi" role="menuitem" ${won ? 'data-act="toast" data-v="Would create a customer order from this initiative"' : 'aria-disabled="true"'}>Create customer order<small>${won ? 'From this closed-won initiative' : 'Available after closed won'}</small></button>
+          <button class="mi" role="menuitem" ${closed ? 'data-act="toast" data-v="Would start a follow-on initiative"' : 'aria-disabled="true"'}>Follow-on initiative<small>${closed ? 'Start the next initiative for this account' : 'Available after closing'}</small></button>
           <hr>
           <button class="mi" role="menuitem" data-act="toast" data-v="Would duplicate this initiative">Duplicate</button>
           <button class="mi" role="menuitem" data-act="toast" data-v="Would put this initiative on hold">Put on hold</button>
@@ -542,7 +542,7 @@ function header() {
       </div>`}
     </header>
     <section class="card sum-card ${ed ? 'editing' : ''}" aria-label="Summary">
-      <div class="steps2" style="--n:${n}" aria-label="${st.label} stages" ${ed ? 'data-tip="Stage changes are logged in stage history, so they\'re made with change stage rather than here."' : ''}>
+      <div class="steps2" style="--n:${n}" aria-label="${st.label} stages" ${ed ? 'data-tip="Use Change stage so the change is logged in stage history."' : ''}>
         <ol>${steps}</ol>
         <div class="sp-bar ${o.kind === 'lost' ? 'lost' : ''}"><i style="width:${fill.toFixed(1)}%"></i></div>
       </div>
@@ -592,7 +592,7 @@ function overview() {
       ${F('desc', esc(v.desc), txa('desc', 'Anything the team should know'), { full: true, multi: true })}
       ${closed ? F('outcome', o.kind === 'won' ? `Closed won on ${dd(o.close)} · booked ${money(o.value)}` : `Closed lost on ${dd(o.close)} · ${esc(o.reason)}`, 'lock', { label: 'Outcome', full: true }) : ''}
     </div></section>
-    <section class="card"><div class="card-h"><div><h2>Qualification (BANT)</h2><p>Optional · unknown is fine, fill it in as you learn more</p></div><div class="r"><span class="pill ${rec === 4 ? 'ok' : ''}" id="bant-n">${rec} of 4 recorded</span></div></div><div class="fg c3">
+    <section class="card"><div class="card-h"><div><h2>Qualification (BANT)</h2><p>Optional · fill in as you learn more</p></div><div class="r"><span class="pill ${rec === 4 ? 'ok' : ''}" id="bant-n">${rec} of 4 recorded</span></div></div><div class="fg c3">
       ${F('need', esc(v.need), txa('need', 'What problem does the client want solved?'), { full: true, multi: true, req: isOpp, empty: 'Not recorded', help: isOpp ? 'Needed for an opportunity.' : 'Needed before converting to an opportunity.' })}
       ${F('budget', esc(v.budget), inp('budget'), { empty: 'Not recorded' })}
       ${F('authority', esc(v.authority), inp('authority', 'text', 'e.g. CIO'), { empty: 'Not recorded' })}
@@ -716,7 +716,7 @@ function rail() {
   return `${ns}
     <section class="card"><h3>Account &amp; team</h3><div class="fg g1">
       ${account}
-      ${F('owner', `<div class="mem">${CRM.avatar(v.owner)}<div><b>${esc(v.owner)}</b><small>Sales owner</small></div></div>`, sel('owner'), { req: true, help: 'Selling is never restricted by team, geography or classification.' })}
+      ${F('owner', `<div class="mem">${CRM.avatar(v.owner)}<div><b>${esc(v.owner)}</b><small>Sales owner</small></div></div>`, sel('owner'), { req: true, help: 'Not restricted by team, geography or classification.' })}
       ${F('team', esc(v.team), sel('team'), { help: 'Automatic when the owner is in one team.' })}
       <div class="fg">${F('geo', esc(v.geo), sel('geo'))}${F('region', esc(v.region), sel('region'))}</div>
       <div class="fld"><span class="lab">Contributors <span class="muted" style="font-weight:400;font-size: var(--text-xs)">· no booking credit</span></span><div class="contrib"><button class="btn" data-act="toast" data-v="Would open add contributor">${SVG.plus}Add contributor</button></div></div>

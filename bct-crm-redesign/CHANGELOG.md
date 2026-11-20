@@ -7,7 +7,60 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-19
+## 2026-11-20
+
+Scope of this round: the five Dashboards + Sales pages (Pipeline & forecast, Sales performance, Sales initiatives, Activities, Tasks). Accounts, Contacts and Sales targets stay in the repo but are out of the nav again.
+
+### Data and logic (aligned with CRMpulse)
+- **Needs attention = CRMpulse `attention_flags`** (`assets/crm-data.js` `attention()`): no next step, expected close passed, more than 30 days in the stage, open more than 90 days. Dropped the extra "no close date" rule; Sales initiatives now uses the same function instead of its own (which counted overdue follow-ups). Tooltips updated to match.
+- **Shared record facts** in `crm-data.js`: `createdOf()`, `openDays()` and `recMeta()` (lead type, lead source, business category, last stage change). The list and the record page now derive these the same way; all 42 records were checked against `initiative.html`.
+- **Duplicate ID fixed:** the demo closed deal "Desert – Asset Monitoring AMC" was `SI-2026-0038`, the same ID as Al Noor – Disaster Recovery on Cloud. It is now `SI-2026-0044`.
+- **Region:** every Lotus Retail India initiative sells into India North on the record page too (was India West on three of them, while `sellOf()` and Sales targets used India North).
+
+### Sales initiatives
+- **More filters = CRMpulse's 13 fields**, as selects in two columns: Sub-stage, Funnel code, State (7 options; no demo record is on hold or discontinued), Owner, Geography, Region (follows Geography), Lead type, Lead source, Business category, SBU, Practice / service line, Technology, Vertical.
+- **Sort select** with CRMpulse's six options (Recently updated, Value, Expected close, Stage, Longest in stage, Name), default Recently updated. Column-header sorting still works and stays in sync.
+- **Row edit button** (pencil) opens `initiative.html?id=…&mode=edit`; disabled with a reason on closed records.
+- Stage cell: lifecycle bar and "N days in stage" on one line, so rows are 64px like every other table.
+
+### Activities
+- Period filter gains **Custom range…** with From / To date pickers (inclusive, either end optional).
+- Mine / My teams / Everyone moved from the page header into the filter bar, and the filter bar sits right under the header, as on the other pages.
+- Timeline icons are **coloured by activity type**, one hue each (visit, call, virtual meeting, email, messaging, internal meeting, event, other). Matching follows CRMpulse `activityTypeStyle()`. New tokens `--act-*` in `design-system/tokens.css`.
+- Summary tiles share row heights (subgrid), so a wrapped label never pushes one figure down. Third tile renamed "Accounts idle 30+ days".
+
+### Tasks
+- Scope-tile notes shortened to fit one line ("Given to others", "Oldest N days", "N done in 30 days", "None assigned"); tiles share row heights (subgrid).
+
+### Sales performance
+- Bookings-by-quarter chart: plot / baseline / labels are shared rows (subgrid), so all four baselines line up when labels wrap.
+- Table rows 64px (were 60–66px).
+
+### Shell and shared
+- Sidebar: Accounts, Contacts and Sales targets are greyed out again with "Not part of this redesign round". The collapsed / expanded state now also syncs live across open tabs (`storage` event).
+- Selects inside cards get a hairline border (they were white on white).
+- Copy tightened site-wide (subtitles, card notes, tooltips, form help) without changing meaning.
+- Contacts detail panel (kept, out of nav): last 3 interactions, sub-stage on open initiatives (max 5), inactive decision-maker note, Call / Meeting disabled for inactive contacts.
+
+### Responsive (≤1100 / ≤768)
+- **Header KPIs:** four equal columns ≤1100, 2×2 ≤768 (the desktop min-widths overflowed between 769 and 1100); labels may wrap.
+- **Filter bar on phones** (`crm.js` `compactFilters`): sticky under the 56px top bar, at most two rows: search + More filters (+ Export) on row 1, the rest in a sideways-scrolling row with a fade. Pages without search get one row. Controls are flat (no shadow: the scroll row clipped it into a hard line). Menus and date pickers opened from the scroll row are moved to `<body>` while open (`pinPop`), so the row's mask / the bar's blur can't clip them.
+- **Sticky detection** (`watchSticky`) is scroll-based and works for any sticky `top`, not only 0.
+- **Tables on phones become card lists** (`crm.js` `prepTables` + `responsive.css`): every cell gets its column name as `data-label`; Stage, Next step, Owner and Assigned to take the full width; row actions sit in the top-right corner; a Sort select replaces the hidden header row (not added where the card already has one).
+- Pinned first column (769–1100): header now has a solid background (theme-v2 made it transparent, so scrolled headers showed through).
+- Tabs are one sideways-scrolling row on phones.
+- Sales initiatives list bar on phones: summary on its own row, then need attention + Sort side by side, then the view switch.
+- Pipeline "Days in stage": on phones the dots take the dot map's exact size and spacing (`syncAgeDots`, measured from the map).
+- **Every tap target is 40px high on phones** (buttons, selects, search, segmented switches, tabs, chips, pager and icon buttons; was 30–40px).
+- Header to filter bar is 12px on phones; on the Sales pages subtitle → action buttons is 12px too.
+- Activities composer Log button label centred when full width.
+
+### Cache-busters
+- `tokens.css` 20261120c, `crm.css` 20261119c, `crm.js` 20261120h, `crm-data.js` 20261120b, `dashboard.css` 20261120a, `theme-v2.css` 20261120a, `responsive.css` 20261120w.
+
+---
+
+## 2026-11-19 · `c00bb2d`
 
 ### Added
 - **`accounts.html`: Accounts page.** It follows the CRMpulse `/accounts` layout:

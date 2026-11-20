@@ -134,7 +134,7 @@
 .tbl.opp col.c-val { width: 8.5%; } .tbl.opp col.c-prob { width: 6%; } .tbl.opp col.c-w { width: 8.5%; }
 .tbl.opp col.c-close { width: 9%; } .tbl.opp col.c-days { width: 11.5%; }
 .tbl.opp.with-why col.c-opp { width: 19%; } .tbl.opp.with-why col.c-why { width: 15%; } .tbl.opp.with-why col.c-own { width: 13%; } .tbl.opp.with-why col.c-stg { width: 15%; } .tbl.opp.with-why col.c-prob { width: 5%; } .tbl.opp.with-why col.c-days { width: 7.5%; }
-.tbl.opp td { height: 60px; padding-top: 9px; padding-bottom: 9px; }
+.tbl.opp td { height: 64px; padding-top: 10px; padding-bottom: 10px; } /* 64px rows, same as every table */
 .tbl .ell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .tbl .t-val { font-weight: 600; color: var(--ink); font-size: var(--text-sm); }
 .stg { display: flex; align-items: center; gap: 7px; min-width: 0; }

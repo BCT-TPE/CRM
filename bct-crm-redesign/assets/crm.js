@@ -36,7 +36,7 @@
     ['Plan & report', [['targets', 'Sales targets', 'flag', 1], ['reports', 'Reports', 'report', 1]]],
     ['Setup', [['structure', 'Sales structure', 'tree', 1]]]
   ];
-  const BUILT = { pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html', accounts: 'accounts.html', contacts: 'contacts.html', targets: 'targets.html' };
+  const BUILT = { pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html' }; // this round = Dashboards + Sales; accounts / contacts / targets pages exist but stay out of the nav
 
   function renderShell(active) {
     const side = document.getElementById('side');
@@ -99,6 +99,8 @@
       if (!drawer.matches) setNav(false);
     };
     rail.addEventListener('change', apply); drawer.addEventListener('change', apply); apply();
+    // other open tabs of the CRM follow a collapse / expand made here
+    addEventListener('storage', (e) => { if (e.key === 'crm-side') apply(); });
   }
   // Account menu: same content, layout and position as the BCT AI CRM prototype's profile menu.
   // Lucide icons, exactly as the prototype draws them (stroke 2, round caps).
@@ -277,9 +279,48 @@
     // page name, shown at the start of the stuck bar when the sidebar is collapsed (CSS: .filters::before)
     const cur = document.querySelector('.nav-item[aria-current="page"]');
     el.dataset.page = cur ? cur.dataset.name : document.title.split(' · ')[0];
-    const s = document.createElement('div'); s.style.height = '1px'; el.before(s);
-    new IntersectionObserver(([en]) => el.classList.toggle('stuck', !en.isIntersecting)).observe(s);
+    // stuck = sitting at its sticky top (0 on desktop, under the 56px top bar on phones)
+    const check = () => { const t = parseFloat(getComputedStyle(el).top) || 0; el.classList.toggle('stuck', scrollY > 0 && el.getBoundingClientRect().top <= t + 0.5); };
+    addEventListener('scroll', check, { passive: true }); addEventListener('resize', check); check();
+    compactFilters(el);
   }
+
+  // Phone filter bar (≤768): sticky and at most two rows. Row 1 = search + More filters (and Export);
+  // everything else goes in a row that scrolls sideways. Pages without a search get one row.
+  // Nodes are moved, not copied, so page code keeps its ids and listeners; wider windows get the original order back.
+  const phone = matchMedia('(max-width: 768px)');
+  function compactFilters(f) {
+    const apply = () => {
+      if (phone.matches && !f._orig) {
+        f._orig = [...f.children];
+        const search = f._orig.find(c => c.matches('.search'));
+        const more = f._orig.find(c => c.id === 'more-btn' || c.querySelector('#more-btn'));
+        const exp = f._orig.find(c => c.id === 'export');
+        const row = document.createElement('div'); row.className = 'f-scroll';
+        f._orig.forEach(c => { if (c !== search && c !== more && c !== exp && !c.matches('.sp')) row.appendChild(c); });
+        row.addEventListener('scroll', () => { closeSel(); closeDate(); }, { passive: true });
+        f.classList.add('compact', search ? 'two' : 'one');
+        if (search) f.append(...[search, more, exp].filter(Boolean), row); else f.append(row, ...[more, exp].filter(Boolean));
+        f._row = row;
+      } else if (!phone.matches && f._orig) {
+        f.append(...f._orig); f._row.remove(); f.classList.remove('compact', 'two', 'one'); f._orig = f._row = null;
+      }
+    };
+    phone.addEventListener('change', apply); apply();
+  }
+  // Menus inside the sideways-scrolling filter row would be clipped by it: place them on the page instead
+  // (the row's fade mask and the stuck bar's backdrop blur would clip it, so it moves to <body> while open)
+  function pinPop(pop, anchor) {
+    if (!anchor.closest('.f-scroll')) return false;
+    if (!pop._home) { pop._home = pop.parentNode; document.body.appendChild(pop); }
+    const r = anchor.getBoundingClientRect();
+    pop.classList.remove('up'); pop.style.translate = '';
+    pop.style.minWidth = `${Math.round(r.width)}px`; // its CSS min-width is a % of the select it left
+    pop.style.position = 'fixed'; pop.style.top = `${Math.round(r.bottom + 6)}px`;
+    pop.style.left = `${Math.round(Math.max(12, Math.min(r.left, innerWidth - pop.offsetWidth - 12)))}px`;
+    return true;
+  }
+  addEventListener('scroll', () => { if (selOpen && selOpen.menu.style.position === 'fixed') closeSel(); if (dtOpen && dtOpen.pop.style.position === 'fixed') closeDate(); }, { passive: true });
 
   // body.scrolled: lets sticky bars that pages re-render (the record back bar) pick up the glass background
   const onScroll = () => document.body.classList.toggle('scrolled', scrollY > 4);
@@ -289,7 +330,8 @@
   // but is hidden and driven by a button + listbox styled like the filter popover.
   const selCheck = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   let selOpen = null;
-  function closeSel() { if (!selOpen) return; selOpen.menu.hidden = true; selOpen.btn.setAttribute('aria-expanded', 'false'); selOpen.wrap.classList.remove('open'); selOpen = null; }
+  function unpin(pop) { if (!pop._home) return; pop._home.appendChild(pop); pop._home = null; pop.style.position = pop.style.left = pop.style.top = pop.style.minWidth = ''; }
+  function closeSel() { if (!selOpen) return; selOpen.menu.hidden = true; unpin(selOpen.menu); selOpen.btn.setAttribute('aria-expanded', 'false'); selOpen.wrap.classList.remove('open'); selOpen = null; }
   function enhanceSelect(sel) {
     if (sel._enh) return; sel._enh = true;
     const wrap = sel.closest('.select'); if (!wrap) return;
@@ -311,6 +353,7 @@
       const bars = [...document.querySelectorAll('.ed-bar')].map(b => b.getBoundingClientRect().top).filter(t => t > 0);
       const floor = Math.min(innerHeight, ...bars) - 8, r = wrap.getBoundingClientRect(), mh = menu.offsetHeight;
       if (r.bottom + 6 + mh > floor && r.top - 6 - mh > 8) menu.classList.add('up');
+      pinPop(menu, wrap);
       (menu.querySelector('.on') || menu.firstElementChild)?.focus(); };
     btn.addEventListener('click', (e) => { e.preventDefault(); if (selOpen && selOpen.menu === menu) closeSel(); else open(); });
     btn.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(); } });
@@ -327,7 +370,7 @@
       else if (e.key === 'Escape' || e.key === 'Tab') { closeSel(); if (e.key === 'Escape') btn.focus(); }
     });
   }
-  document.addEventListener('click', (e) => { if (selOpen && !selOpen.wrap.contains(e.target)) closeSel(); });
+  document.addEventListener('click', (e) => { if (selOpen && !selOpen.wrap.contains(e.target) && !selOpen.menu.contains(e.target)) closeSel(); });
   // Filter popovers (More filters) are placed by each page next to their button. When the filter row wraps
   // on smaller windows, keep an open one inside the window (2026-11-17).
   function keepPopsInView() {
@@ -370,7 +413,7 @@
   };
   const svg = (p, c = '') => `<svg viewBox="0 0 24 24" aria-hidden="true" ${c ? `class="${c}"` : ''}>${p}</svg>`;
   let dtOpen = null;
-  function closeDate(focus) { if (!dtOpen) return; const o = dtOpen; dtOpen = null; o.pop.hidden = true; o.wrap.classList.remove('open'); o.btn.setAttribute('aria-expanded', 'false'); if (focus) o.btn.focus(); }
+  function closeDate(focus) { if (!dtOpen) return; const o = dtOpen; dtOpen = null; o.pop.hidden = true; unpin(o.pop); o.wrap.classList.remove('open'); o.btn.setAttribute('aria-expanded', 'false'); if (focus) o.btn.focus(); }
   function quarterEnd(d, ahead) { const qm = d.getMonth() - (d.getMonth() % 3) + 3 * ahead; return new Date(d.getFullYear(), qm + 3, 0); }
   function shortcuts(inp) {
     const t = today(), add = (n) => new Date(t.getFullYear(), t.getMonth(), t.getDate() + n);
@@ -429,6 +472,7 @@
       if (r.bottom + 6 + ph > floor && r.top - 6 - ph > 8) pop.classList.add('up');
       const pr = pop.getBoundingClientRect(), pad = 12;
       if (pr.right > innerWidth - pad) pop.style.translate = `${Math.round(Math.max(pad - pr.left, innerWidth - pad - pr.right))}px 0`;
+      if (pinPop(pop, wrap)) { pop.querySelector(`.dt-grid [data-d="${focusD}"]`)?.focus(); return; }
       if (pr.bottom > floor && !pop.classList.contains('up')) scrollBy({ top: pr.bottom - floor + pad, behavior: 'instant' }); // phone: bring the whole calendar into view
       pop.querySelector(`.dt-grid [data-d="${focusD}"]`)?.focus();
     };
@@ -449,11 +493,40 @@
       else if (e.key === 'PageUp' || e.key === 'PageDown') { e.preventDefault(); show(isoDate(new Date(d.getFullYear(), d.getMonth() + (e.key === 'PageUp' ? -1 : 1), Math.min(d.getDate(), 28))), true); }
     });
   }
-  document.addEventListener('click', (e) => { if (dtOpen && !dtOpen.wrap.contains(e.target)) closeDate(); });
+  document.addEventListener('click', (e) => { if (dtOpen && !dtOpen.wrap.contains(e.target) && !dtOpen.pop.contains(e.target)) closeDate(); });
   function enhanceDates(root) { (root || document).querySelectorAll('input[type="date"]').forEach(enhanceDate); }
   // pages call this after each render; it also turns date inputs into the date picker
   function enhanceSelects(root) { (root || document).querySelectorAll('.select select').forEach(enhanceSelect); enhanceDates(root); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => enhanceSelects()); else setTimeout(enhanceSelects);
+
+  // Tables on phones (≤768, responsive.css) become a list of cards. Each cell gets its column name as data-label,
+  // long columns (stage, next step) take the full card width, and tables sorted by their column headers get a
+  // Sort select, since the header row is hidden there. Runs after every re-render (pages rebuild tables with innerHTML).
+  const WIDE = /^(stage|next step|owner|assigned to)/i;
+  function prepTables() {
+    document.querySelectorAll('table.tbl').forEach((t) => {
+      if (t._prep) return; t._prep = true;
+      const ths = [...t.querySelectorAll('thead th')];
+      const names = ths.map((th) => {
+        const b = th.querySelector('.th-sort');
+        const txt = b ? [...b.childNodes].filter(n => !(n.classList && n.classList.contains('arr'))).map(n => n.textContent).join('') : th.textContent;
+        return txt.replace(/\s+/g, ' ').trim();
+      });
+      t.querySelectorAll('tbody tr').forEach((tr) => [...tr.children].forEach((td, i) => {
+        if (names[i]) { td.dataset.label = names[i]; if (WIDE.test(names[i])) td.dataset.wide = ''; } else td.dataset.act2 = '';
+      }));
+      const sorts = ths.map(th => th.querySelector('.th-sort')).filter(Boolean);
+      const card = t.closest('.card'), wrap = t.closest('.tbl-wrap') || t;
+      if (!sorts.length || (card && card.querySelector('#f-sort')) || wrap.previousElementSibling?.classList.contains('tbl-sort')) return;
+      const on = sorts.find(b => b.classList.contains('on'));
+      const lab = document.createElement('label'); lab.className = 'select tbl-sort';
+      lab.innerHTML = `<span class="lbl">Sort</span><select aria-label="Sort">${sorts.map(b => `<option value="${b.dataset.v}" ${b === on ? 'selected' : ''}>${names[ths.indexOf(b.closest('th'))]}</option>`).join('')}</select>`;
+      wrap.before(lab);
+      lab.querySelector('select').addEventListener('change', (e) => { e.stopPropagation(); sorts.find(b => b.dataset.v === e.target.value)?.click(); });
+      enhanceSelect(lab.querySelector('select'));
+    });
+  }
+  new MutationObserver(prepTables).observe(document.documentElement, { childList: true, subtree: true });
 
   // Owner avatar: initials on a blue-family tint, fixed per person (styles .av / .av-a…e in theme-v2.css)
   // Photo when the person has one in assets/people (sales owners), initials otherwise (contacts, cross-functional staff).

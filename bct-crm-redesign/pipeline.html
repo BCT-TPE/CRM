@@ -6,11 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pipeline & forecast · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
 <link rel="stylesheet" href="assets/crm.css?v=20261119c">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261120w">
 <style>
 /* Q3 forecast bar sits on the same baseline as the quarter bars in "Bookings vs target" beside it (1440 desktop) */
 @media (min-width: 1361px) { body.v2 .fc .sum-legend { margin-top: 32px; } }
@@ -26,7 +26,7 @@
       <div class="v2-hello">
         <div class="v2-top"><span class="v2-eyebrow">Pipeline &amp; forecast</span><span class="updated"><i></i>Updated 10:11</span></div>
         <h1 id="hello">Good morning, Gaurav</h1>
-        <p id="page-meta">Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · Q3 in progress, week 7 of 14</p>
+        <p id="page-meta">Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · Q3 · week 7 of 14</p>
       </div>
       <div class="v2-kpis kpis-pipe" id="hero-kpis" aria-label="Open pipeline KPIs"></div>
     </header>
@@ -67,8 +67,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261119h"></script>
-<script src="assets/crm-data.js?v=20261119f"></script>
+<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm-data.js?v=20261120b"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
 /* Data lives in assets/crm-data.js (shared with Sales performance). */
@@ -122,7 +122,7 @@ function render() {
   { const h = $('#hero-kpis'); h.classList.toggle('is-empty', [...h.querySelectorAll('.v2-kv')].every(v => { const c = v.cloneNode(true); c.querySelectorAll('.v2-badge').forEach(b => b.remove()); return /^(\$0|0|N\/A)$/.test(c.textContent.trim()); })); } // empty: slots collapse
   page.innerHTML = `
     <div class="grid">
-      ${zoneHead(1, 'Target &amp; forecast', `${qLabel} · bookings, targets and deals closing in the quarter`)}
+      ${zoneHead(1, 'Target &amp; forecast', `${qLabel} · bookings, target and deals closing`)}
       ${forecastHero(h)}
       ${ringCard(h)}
       ${quarterCard(base).replace('class="card s6"', 'class="card s5"')}
@@ -134,7 +134,24 @@ function render() {
     </div>`;
   if (!render.done) { document.querySelectorAll('.card, .zone, .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
   renderDrill(list, base);
+  syncAgeDots();
 }
+// Days in stage dots take the dot map's size and spacing (≤768, responsive.css), so both charts on the card column read
+// as one dot language. Measured from the map as drawn; four columns, or two when four columns of that size don't fit.
+function syncAgeDots() {
+  const card = page.querySelector('.v2-age'), svg = page.querySelector('.geo-map svg'), M = window.REGION_MAP;
+  if (!card || !svg || !M) return;
+  const k = (svg.clientWidth || svg.getBoundingClientRect().width) / M.w; if (!k) return; // layout width: the entry animation scales the card
+  const ys = [...new Set(M.dots.me.map(([, y]) => y))].sort((a, b) => a - b); // dot rows sit on one grid
+  const pitch = Math.min(...ys.slice(1).map((y, i) => y - ys[i])) * k;
+  card.style.setProperty('--dot-d', `${(2 * M.r * k).toFixed(2)}px`);
+  card.style.setProperty('--dot-p', `${pitch.toFixed(2)}px`);
+  const rowEl = card.querySelector('.ad-row'); if (!rowEl) return;
+  rowEl.classList.remove('two');
+  const ad = rowEl.querySelector('.ad'), pad = ad ? parseFloat(getComputedStyle(ad).paddingLeft) * 2 : 0;
+  if (ad && pitch * 10 > ad.clientWidth - pad + 0.5) rowEl.classList.add('two');
+}
+addEventListener('resize', () => { clearTimeout(syncAgeDots.t); syncAgeDots.t = setTimeout(syncAgeDots, 100); });
 
 /* Layout: three zones, each says what it covers. All rows use the same 6 | 6 split so card edges line up.
    1 Target & forecast (selected quarter, uses bookings + targets) · 2 Pipeline now (all open deals) · 3 Deals to act on (table). */
@@ -187,7 +204,7 @@ function forecastCard(h) {
     <div class="minis">
       ${mini('<span class="def" tabindex="0" data-tip-h="Weighted forecast" data-tip="Σ value × probability for open deals closing in this quarter.">Weighted forecast</span>', money(h.weighted))}
       ${mini(gap != null && gap >= 0 ? 'Ahead of target' : 'Gap to target', gap == null ? 'N/A' : money(Math.abs(gap)), gap == null ? '' : gap < 0 ? 'neg' : 'pos')}
-      ${mini('<span class="def" tabindex="0" data-tip-h="Pipeline coverage" data-tip="Open pipeline closing this quarter ÷ target still to win. Below 1× means even winning every open deal would not reach target.">Coverage</span>', past ? '—' : coverage == null ? (h.target == null ? 'N/A' : 'Met') : coverage.toFixed(1) + '×')}
+      ${mini('<span class="def" tabindex="0" data-tip-h="Pipeline coverage" data-tip="Open pipeline closing this quarter ÷ target still to win. Below 1×, winning every open deal still misses target.">Coverage</span>', past ? '—' : coverage == null ? (h.target == null ? 'N/A' : 'Met') : coverage.toFixed(1) + '×')}
       ${mini('Open deals in quarter', h.n)}
     </div>
   </section>`;
@@ -203,10 +220,10 @@ function kpiCards(list) {
   return `
   <section class="card s12 kpi-strip" aria-label="Open pipeline KPIs">
     ${cell('Open pipeline', moneyBig(gross), `<b>${list.length}</b> open opportunities`)}
-    ${cell('<span class="def" tabindex="0" data-tip-h="Weighted pipeline" data-tip="Σ value × probability. Probability comes from the stage default unless the owner overrode it.">Weighted</span>', moneyBig(wt), gross ? `<b>${pct(wt, gross)}%</b> of gross` : 'No open deals')}
+    ${cell('<span class="def" tabindex="0" data-tip-h="Weighted pipeline" data-tip="Σ value × probability (stage default unless the owner overrode it).">Weighted</span>', moneyBig(wt), gross ? `<b>${pct(wt, gross)}%</b> of gross` : 'No open deals')}
     ${cell('Avg deal size', avg == null ? 'N/A' : moneyBig(avg), largest == null ? '—' : `Largest <b>${money(largest)}</b>`)}
     <button class="ks click ${on90 ? 'on' : ''} ${old.length ? 'alert' : ''}" data-act="drill" data-type="age" data-v="3" aria-pressed="${!!on90}">
-      <span class="kpi-k"><span class="def" data-tip="Opportunities that have stayed in their current stage for more than 90 days.">Over 90 days in stage</span>${chev}</span><span class="mid">${old.length}</span><span class="kpi-s"><b>${money(old.reduce((s, o) => s + o.value, 0))}</b> · ${oldPast} past close</span>
+      <span class="kpi-k"><span class="def" data-tip="Opportunities in their current stage for over 90 days.">Over 90 days in stage</span>${chev}</span><span class="mid">${old.length}</span><span class="kpi-s"><b>${money(old.reduce((s, o) => s + o.value, 0))}</b> · ${oldPast} past close</span>
     </button>
   </section>`;
 }
@@ -372,7 +389,7 @@ function stageCard(list) {
   const W = list.reduce((s, o) => s + o.w, 0);
   return `
   <section class="card s6" aria-labelledby="st-h">
-    <div class="card-h"><div><h2 id="st-h">Pipeline by stage</h2><p>Select a stage to see its deals</p></div>
+    <div class="card-h"><div><h2 id="st-h">Pipeline by stage</h2><p>Select a stage for its deals</p></div>
       <div class="r legend nest-lg"><span><i class="lg-gross"></i>Gross</span><span><i class="lg-wtd"></i>Weighted</span></div></div>
     ${list.length ? `${rowsHead('Stage')}<div class="rows">${groups}</div>
     <div class="rows-foot"><span><b>${list.length}</b> open opportunities</span><span><b>${money(tot)}</b> gross · <b>${money(W)}</b> weighted</span></div>` : emptyMsg()}
@@ -400,7 +417,7 @@ function breakdownCard(list) {
   const note = b[3].n ? `<b>${pct(b[3].g, tot)}%</b> of open value has sat in its stage for more than 90 days.` : 'Nothing has sat in its stage for more than 90 days.';
   return `
   <section class="card s6 bd-card" aria-labelledby="bd-h">
-    <div class="card-h"><div><h2 id="bd-h">Where the pipeline sits</h2><p>By sales team and by days in the current stage · select a row to see its deals</p></div></div>
+    <div class="card-h"><div><h2 id="bd-h">Where the pipeline sits</h2><p>By sales team and days in stage · select a row for its deals</p></div></div>
     ${list.length ? `${rowsHead('Sales team')}<div class="rows">${teamRows}</div>
       <div class="bd-gap"></div>${rowsHead('Days in current stage')}<div class="rows">${ageRows}</div>
       <div class="rows-foot"><span>${note}</span></div>` : emptyMsg()}
@@ -433,14 +450,14 @@ function quarterCard(base) {
     </button>`;
   }).join('');
   const notes = [];
-  if (noDate.length) notes.push(`${noDate.length} open opportunit${noDate.length === 1 ? 'y' : 'ies'} (${money(noDate.reduce((s, o) => s + o.value, 0))}) ${noDate.length === 1 ? 'has' : 'have'} no expected close date`);
-  if (later.length) notes.push(`${later.length} (${money(later.reduce((s, o) => s + o.value, 0))}) close after FY26-27`);
+  if (noDate.length) notes.push(`${noDate.length} open (${money(noDate.reduce((s, o) => s + o.value, 0))}) with no close date`);
+  if (later.length) notes.push(`${later.length} (${money(later.reduce((s, o) => s + o.value, 0))}) closing after FY26-27`);
   return `
   <section class="card s6" aria-labelledby="q-h">
-    <div class="card-h"><div><h2 id="q-h">Bookings vs target by quarter</h2><p>Closed won plus open pipeline by forecast category · select a quarter to see its deals</p></div></div>
+    <div class="card-h"><div><h2 id="q-h">Bookings vs target by quarter</h2><p>Closed won + open pipeline by forecast category · select a quarter for its deals</p></div></div>
     <div class="legend" style="margin-bottom:12px"><span><i class="c-won"></i>Closed won</span><span><i class="c-commit"></i>Commit</span><span><i class="c-best"></i>Best case</span><span><i class="c-pipe"></i>Pipeline</span><span><i class="line"></i>Target</span></div>
     <div class="qchart">${cols}</div>
-    ${notes.length ? `<p class="qnote">${notes.join(' · ')}, so ${noDate.length + later.length === 1 ? 'it is' : 'they are'} not in any quarter above.</p>` : ''}
+    ${notes.length ? `<p class="qnote">Not in any quarter above: ${notes.join(' · ')}.</p>` : ''}
   </section>`;
 }
 
@@ -554,7 +571,7 @@ function tableCard(all) {
   return `
   <section class="card s12" id="opp-table" aria-labelledby="tb-h">
     <div class="card-h"><div><h2 id="tb-h">Open opportunities</h2>
-      <p>${money(g)} gross · ${money(w)} weighted${outside ? ` · includes ${outside} closing after FY26-27 or without a close date` : ''} · select a row to open the record</p></div>
+      <p>${money(g)} gross · ${money(w)} weighted${outside ? ` · incl. ${outside} after FY26-27 or undated` : ''} · select a row to open it</p></div>
       <div class="r"><button class="link" data-act="si">Open in sales initiatives ${icon('arrow')}</button></div></div>
     <div class="tabs" role="tablist" aria-label="Which deals">
       ${TABS.map(([k, n, f]) => { const c = all.filter(f).length; return `<button role="tab" aria-selected="${S.tab === k}" class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-v="${k}">${n}<span class="tab-n ${k !== 'all' && c ? 'hot' : ''}">${c}</span></button>`; }).join('')}
@@ -607,11 +624,11 @@ function heroKpis(list) {
   const on90 = S.drill && S.drill.type === 'age' && S.drill.v === 3;
   const k = (label, val, badge, sub, extra = '') => `<div class="v2-kpi ${extra}"><div class="v2-kv">${val}${badge ? `<span class="v2-badge">${badge}</span>` : ''}</div><div class="v2-kl">${label}</div><div class="v2-ks">${sub}</div></div>`;
   return k('Open pipeline', moneyBig(gross), `${list.length} deals`, 'Gross value of open opportunities')
-    + k('<span class="def" tabindex="0" data-tip-h="Weighted pipeline" data-tip="Σ value × probability. Probability comes from the stage default unless the owner overrode it.">Weighted</span>', moneyBig(wt), gross ? `${pct(wt, gross)}%` : '', 'of gross')
+    + k('<span class="def" tabindex="0" data-tip-h="Weighted pipeline" data-tip="Σ value × probability (stage default unless the owner overrode it).">Weighted</span>', moneyBig(wt), gross ? `${pct(wt, gross)}%` : '', 'of gross')
     + k('Avg deal size', avg == null ? 'N/A' : moneyBig(avg), '', largest == null ? '—' : `Largest <b>${money(largest)}</b>`)
     + `<button class="v2-kpi click ${on90 ? 'on' : ''} ${old.length ? 'alert' : ''}" data-act="drill" data-type="age" data-v="3" aria-pressed="${!!on90}">
         <div class="v2-kv">${old.length}<span class="v2-badge ${old.length ? 'hot' : ''}">${money(old.reduce((s, o) => s + o.value, 0))}</span></div>
-        <div class="v2-kl"><span class="def" data-tip="Opportunities that have stayed in their current stage for more than 90 days.">Over 90 days in stage</span></div>
+        <div class="v2-kl"><span class="def" data-tip="Opportunities in their current stage for over 90 days.">Over 90 days in stage</span></div>
         <div class="v2-ks">${oldPast} past close</div></button>`;
 }
 
@@ -675,7 +692,7 @@ function ringCard(h) {
       ${mini('<span class="def" tabindex="0" data-tip-h="Weighted forecast" data-tip="Σ value × probability for open deals closing in this quarter.">Weighted forecast</span>', money(h.weighted))}
       ${mini(gap != null && gap >= 0 ? 'Ahead of target' : 'Gap to target', gap == null ? 'N/A' : money(Math.abs(gap)), gap == null ? '' : gap < 0 ? 'neg' : 'pos')}
       ${mini('Open deals in quarter', h.n)}
-      ${mini('<span class="def" tabindex="0" data-tip-h="Pipeline coverage" data-tip="Open pipeline closing this quarter ÷ target still to win. Below 1× means even winning every open deal would not reach target.">Coverage</span>', past ? '—' : coverage == null ? (h.target == null ? 'N/A' : 'Met') : coverage.toFixed(1) + '×')}
+      ${mini('<span class="def" tabindex="0" data-tip-h="Pipeline coverage" data-tip="Open pipeline closing this quarter ÷ target still to win. Below 1×, winning every open deal still misses target.">Coverage</span>', past ? '—' : coverage == null ? (h.target == null ? 'N/A' : 'Met') : coverage.toFixed(1) + '×')}
     </div>
   </section>`;
 }
@@ -699,7 +716,7 @@ function mixPills(list) {
     </button>`).join('');
   return `
   <section class="card mix v2-mix" aria-labelledby="mix-h">
-    <div class="card-h"><div><h2 id="mix-h">Pipeline mix</h2><p>Share of open value by forecast category · select one to see its deals</p></div></div>
+    <div class="card-h"><div><h2 id="mix-h">Pipeline mix</h2><p>Share of open value by forecast category · select one for its deals</p></div></div>
     ${tot ? `<div class="mp-row">${pills}</div><div class="mix-cols">${cols}</div>
     <p class="so-what"><b>${pct(top.g, tot)}%</b> of open value is ${top.code === 'L3' ? 'still early stage (L3)' : top.code === 'L2' ? 'at proposal stage (L2)' : 'in negotiation or contract (L1)'}.</p>` : emptyMsg()}
   </section>`;
@@ -726,7 +743,7 @@ function ageDots(list) {
   }).join('');
   return `
   <section class="card v2-age" aria-labelledby="ag-h">
-    <div class="card-h"><div><h2 id="ag-h">Days in stage</h2><p>Open value by time in the current stage · select a column to see its deals</p></div>
+    <div class="card-h"><div><h2 id="ag-h">Days in stage</h2><p>Open value by days in stage · select a column for its deals</p></div>
       <div class="r legend"><span><i class="ad-key"></i>1 dot = ${money(unit)}</span></div></div>
     ${list.length ? `<div class="ad-row">${cols}</div><p class="so-what"><b>${pct(b[3].g, tot)}%</b> has sat over 90 days.</p>` : emptyMsg()}
   </section>`;
@@ -749,7 +766,7 @@ function syncControls() {
   $('#more-n').hidden = !more; $('#more-n').textContent = more;
   $('#reset').hidden = !(S.q || S.team || S.owner || more || S.drill || S.fy !== '2627');
   const q = S.q || CUR_Q;
-  $('#page-meta').textContent = `Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · ${S.q ? `Closing in Q${S.q}` : 'All close dates'} · Q3 in progress, week 7 of 14`;
+  $('#page-meta').textContent = `Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · ${S.q ? `Closing in Q${S.q}` : 'All close dates'} · Q3 · week 7 of 14`;
 }
 function buildMore() {
   $('#m-geo').innerHTML = Object.keys(GEO_TARGET).map(g => `<label class="check"><input type="checkbox" value="${g}" ${S.geo.includes(g) ? 'checked' : ''} data-m="geo">${g}</label>`).join('');

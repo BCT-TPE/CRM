@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>New sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
 <link rel="stylesheet" href="assets/crm.css?v=20261119c">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261120w">
 <style>
 /* ---------- Page: new sales initiative ----------
    Same fields and order as CRMpulse /initiatives/new (status & sub-stage, account & ownership, value & forecast,
@@ -116,8 +116,8 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261119h"></script>
-<script src="assets/crm-data.js?v=20261119f"></script>
+<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 const { money, toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -221,14 +221,14 @@ function sStatus() {
 function sAccount() {
   return `<section class="card">${secH(2, 'Account &amp; ownership')}<div class="fg">
     ${fld('acc', sel('acc'), { req: true, help: 'Only approved accounts can be selected.' })}
-    ${fld('owner', sel('owner'), { req: true, help: 'Selling is never restricted by team, geography or classification.' })}
+    ${fld('owner', sel('owner'), { req: true, help: 'Not restricted by team, geography or classification.' })}
     ${fld('offering', sel('offering'), { help: 'Used for the name and the offering classification.' })}
-    ${fld('name', inp('name', 'text', 'Account – Offering'), { req: true, help: 'Filled in from the account and offering. You can edit it.' })}
+    ${fld('name', inp('name', 'text', 'Account – Offering'), { req: true, help: 'Filled from the account and offering; editable.' })}
   </div></section>`;
 }
 function sValue() {
   const u = usd(), q = S.v.close ? fyq(S.v.close) : null;
-  return `<section class="card">${secH(3, 'Value &amp; forecast', 'A provisional value is fine until line items are added.')}<div class="fg">
+  return `<section class="card">${secH(3, 'Value &amp; forecast', 'Provisional until line items are added.')}<div class="fg">
     ${fld('value', `<div class="money">${sel('cur')}<input class="in" type="number" min="0" data-f="value" value="${esc2(S.v.value)}" placeholder="0" aria-label="Estimated value"></div>`,
       { req: isOpp(), help: S.v.cur !== 'USD' && u ? `Reported in USD · ${money(u)}` : 'Reported in USD.' })}
     ${fld('close', inp('close', 'date'), { help: q ? `Forecast in Q${q.q} FY${q.fy.slice(0, 2)}-${q.fy.slice(2)}.` : isOpp() ? 'Needed for the quarterly forecast.' : 'Optional until it becomes an opportunity.' })}
@@ -244,7 +244,7 @@ function sNext() {
   </div></section>`;
 }
 function sBant() {
-  return `<section class="card">${secH(5, 'Qualification (BANT)', 'Unknown is fine. Fill it in as you learn more.')}<div class="fg">
+  return `<section class="card">${secH(5, 'Qualification (BANT)', 'Optional. Fill in as you learn more.')}<div class="fg">
     ${fld('need', txa('need', 'What problem does the client want solved?'), { req: isOpp(), full: true, help: isOpp() ? 'Needed for an opportunity.' : 'Optional for now.' })}
     ${fld('budget', inp('budget', 'text', 'e.g. Indicative range'))}
     ${fld('authority', inp('authority', 'text', 'e.g. CIO'))}
@@ -256,7 +256,7 @@ function sBant() {
 function sClass() {
   const at = autoTeam(), vd = vertDefault();
   return `<section class="card"><button type="button" class="fold ${S.more ? 'open' : ''}" data-act="fold" aria-expanded="${S.more}">
-      ${secH(6, 'Classification, team &amp; notes', 'Vertical defaults from the account · team set automatically when the owner is in one team · lead type and source, business category, classifications, contributors, notes')}${SVG.chev}</button>
+      ${secH(6, 'Classification, team &amp; notes', 'Vertical from the account · team auto-set if the owner has one · lead type and source, category, classifications, contributors, notes')}${SVG.chev}</button>
     ${S.more ? `<div class="fold-b"><div class="fg">
       ${fld('leadType', sel('leadType'))}
       ${fld('source', sel('source'))}
@@ -289,7 +289,7 @@ function rail() {
     <section class="card">
       <h3>Needed to create ${isOpp() ? 'an opportunity' : 'a ' + S.status.toLowerCase()}<span class="pill ${ok === l.length ? 'ok' : 'warn'}">${ok}/${l.length}</span></h3>
       ${l.map(([t, d]) => `<div class="chk ${d ? 'ok' : ''}"><i>${d ? SVG.check : ''}</i><span>${t}</span></div>`).join('')}
-      <p class="rail-note">Switch the status to see what each stage needs. Attachments can be added after the initiative is created.</p>
+      <p class="rail-note">Switch status to see what each stage needs. Add attachments after creating.</p>
     </section>`;
 }
 // One action: Create. Line items are added on the record after it exists (its Line items tab), so there is no
@@ -303,7 +303,7 @@ function bar() {
 
 function render() {
   $('#main').innerHTML = `<div class="back-bar"><a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a></div>
-    <header class="nw-head"><h1>New sales initiative</h1><p>One record from first interest to closure. Start with what you know; you can add the rest as it progresses.</p></header>
+    <header class="nw-head"><h1>New sales initiative</h1><p>One record from first interest to closure. Start with what you know and add the rest later.</p></header>
     <div class="nw-grid"><div class="nw-main">${sStatus()}${sAccount()}${sValue()}${sNext()}${sBant()}${sClass()}</div><aside class="nw-rail" id="rail">${rail()}</aside></div>
     <div class="ed-bar" id="ed-bar">${bar()}</div>`;
   CRM.enhanceSelects($('#main'));

@@ -73,7 +73,7 @@ const CLOSED = [
   { id: 'SI-2026-0010', name: 'Gulf – Digital Onboarding', acc: 'Gulf National Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', result: 'won', value: 0.70e6, closed: '2026-07-19' },
   { id: 'SI-2026-0012', name: 'Emirates Logistics Hub – Fleet Tracking', acc: 'Emirates Logistics Hub', owner: 'Omar Haddad', team: 'Middle East Enterprise', result: 'won', value: 0.55e6, closed: '2026-08-24' },
   { id: 'SI-2026-0013', name: 'ABC – Fraud Analytics', acc: 'ABC Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', result: 'won', value: 0.35e6, closed: '2026-09-26' },
-  { id: 'SI-2026-0038', name: 'Desert – Asset Monitoring AMC', acc: 'Desert Industrial Holdings', owner: 'Omar Haddad', team: 'Middle East Enterprise', result: 'won', value: 0.35e6, closed: '2026-10-15' },
+  { id: 'SI-2026-0044', name: 'Desert – Asset Monitoring AMC', acc: 'Desert Industrial Holdings', owner: 'Omar Haddad', team: 'Middle East Enterprise', result: 'won', value: 0.35e6, closed: '2026-10-15' },
   // FY26-27 · lost (reached = furthest funnel code before it was lost, for the lifecycle funnel)
   { id: 'SI-2026-0006', name: 'Straits – Analytics Platform', acc: 'Straits Energy Pte Ltd', owner: 'Daniel Tan', team: 'APAC Sales', result: 'lost', value: 0.12e6, closed: '2026-06-03', reason: 'No budget' , reached: 'L3' },
   { id: 'SI-2026-0015', name: 'Pacific – Data Lake', acc: 'Pacific Health Systems', owner: 'Mei Lin Wong', team: 'APAC Sales', result: 'lost', value: 0.65e6, closed: '2026-09-18', reason: 'Lost to competitor' , reached: 'L1' },
@@ -241,14 +241,35 @@ const CONTACT_PHOTOS = new Set(['CON-2026-0001', 'CON-2026-0002', 'CON-2026-0003
 const hasDM = (acc) => CONTACTS.some(c => c.acc === acc && c.role === 'Decision maker' && c.status === 'Active');
 function ageBucket(d) { return d <= 30 ? 0 : d <= 60 ? 1 : d <= 90 ? 2 : 3; }
 const AGE_NAMES = ['0–30 days', '31–60 days', '61–90 days', 'Over 90 days'];
+// Needs attention = CRMpulse initiatives.attention_flags: no next step, expected close passed,
+// more than 30 days in the stage, open more than 90 days (open records only)
 function attention(o) {
-  const r = [];
+  if (o.kind && o.kind !== 'open') return [];
+  const r = [], open = openDays(o);
   if (!o.next) r.push('No next step');
   if (o.close && new Date(o.close) < TODAY) r.push('Close date passed');
-  if (!o.close) r.push('No close date');
-  if (o.days > 30) r.push(`${o.days} days in ${o.code}`);
-  if (o.open > 90) r.push(`Open ${o.open} days`);
+  if (o.days > 30) r.push(`${o.days} days in ${o.code || 'stage'}`);
+  if (open > 90) r.push(`Open ${open} days`);
   return r;
+}
+// Record facts shared by the Sales initiatives list (filters, sort) and the record page (initiative.html details())
+const _DAY = 864e5;
+function createdOf(o) {
+  if (o.id === 'SI-2026-0024') return new Date('2026-07-06');
+  return o.kind === 'open' || !o.kind ? new Date(TODAY.getTime() - (o.open || (o.days || 10) + 12) * _DAY) : new Date(new Date(o.close).getTime() - (80 + _hash(o.id) % 70) * _DAY);
+}
+function openDays(o) { return Math.round((TODAY - createdOf(o)) / _DAY); }
+function recMeta(o) {
+  const lotus = o.id === 'SI-2026-0024', existing = INITS.some(x => x.acc === o.acc && x.id !== o.id && x.kind === 'won');
+  const firstOfGroup = [PRE_STAGES.Prospect[0], PRE_STAGES.Lead[0], STAGES[0].name].includes(o.sub);
+  const created = createdOf(o);
+  return {
+    leadType: lotus || existing ? 'Existing account new lead' : 'New account new lead',
+    source: lotus ? 'Event / conference' : _pick(['Event / conference', 'Referral', 'Website', 'Partner', 'Outbound'], o.id),
+    category: lotus ? 'New customer – new business' : existing ? 'Existing customer – new business' : 'New customer – new business',
+    // last stage change: the date the current stage was entered (record page "Last modified")
+    updated: lotus ? '2026-10-29' : o.kind !== 'open' ? o.close : (firstOfGroup ? created : new Date(TODAY.getTime() - o.days * _DAY)).toISOString().slice(0, 10)
+  };
 }
 const fmtDate = (d) => CRM.date(d); // "18 Nov 2026", shared with the date picker (crm.js)
 const pct = (a, b) => b ? Math.round(a / b * 100) : null;

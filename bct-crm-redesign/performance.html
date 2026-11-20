@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales performance · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261118b">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
 <link rel="stylesheet" href="assets/crm.css?v=20261119c">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261118a">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261119d">
-<link rel="stylesheet" href="assets/responsive.css?v=20261118g">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261120w">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
@@ -21,6 +21,10 @@
 
 /* Quarter chart: this year (ink) beside last year (gray), dashed target per quarter */
 .pq-plot { position: relative; flex: 1; min-height: 170px; margin-top: 22px; }
+/* plot / baseline / labels are three shared rows (subgrid): a quarter whose labels wrap to more lines no longer gets a
+   taller plot, so all four baselines stay on one line on narrow screens */
+.qchart:has(.pq-plot) { grid-template-rows: 1fr auto auto; }
+.qchart:has(.pq-plot) > .qcol { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 0; }
 .pq-pair { position: absolute; left: 50%; bottom: 0; height: 100%; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 4px; }
 .pq-pair i { display: block; border-radius: var(--radius-xs) var(--radius-xs) 0 0; transition: height .45s var(--ease); }
 .pq-pair i.ly { width: 20px; background: var(--chart-gray); }
@@ -60,7 +64,7 @@
 .tbl.att { table-layout: fixed; }
 .tbl.att col.c-name { width: 24%; } .tbl.att col.c-tgt { width: 10%; } .tbl.att col.c-bkd { width: 10%; } .tbl.att col.c-bar { width: 24%; }
 .tbl.att col.c-wl { width: 10%; } .tbl.att col.c-wr { width: 8%; } .tbl.att col.c-avg { width: 10%; } .tbl.att col.c-chev { width: 4%; }
-.tbl.att td { height: 60px; }
+.tbl.att td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
 .attn-cell { display: flex; align-items: center; gap: 12px; }
 .attn-track { position: relative; flex: 1; height: 12px; border-radius: var(--radius-xs); background: var(--chart-track); }
 .attn-track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--radius-xs); background: var(--ink); }
@@ -73,7 +77,7 @@
 /* Closed deals table */
 .tbl.cl { table-layout: fixed; }
 .tbl.cl col.c-opp { width: 30%; } .tbl.cl col.c-own { width: 20%; } .tbl.cl col.c-res { width: 20%; } .tbl.cl col.c-val { width: 10%; } .tbl.cl col.c-date { width: 12%; } .tbl.cl col.c-q { width: 8%; }
-.tbl.cl td { height: 60px; }
+.tbl.cl td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
 .res { display: inline-flex; align-items: center; gap: 7px; font-size: var(--text-sm); font-weight: 500; color: var(--t1); }
 .res i { width: 8px; height: 8px; border-radius: var(--radius-full); background: var(--ink); flex: none; }
 .res.lost { color: var(--t2); font-weight: 400; }
@@ -133,8 +137,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261119h"></script>
-<script src="assets/crm-data.js?v=20261119f"></script>
+<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
    Data and rules are shared with Pipeline & forecast (assets/crm-data.js), so Q1–Q3 bookings match on both pages. */
@@ -271,7 +275,7 @@ function ringCard(P, label) {
     </div>
     <div class="minis">
       ${mini('Variance to target', sign(variance), variance == null ? '' : variance < 0 ? 'neg' : 'pos')}
-      ${mini('<span class="def" tabindex="0" data-tip="Booked minus expected by today. The dot on the ring marks expected by today.">Vs expected today</span>', done || notStarted ? '—' : sign(vsExp), vsExp == null || done || notStarted ? '' : vsExp < 0 ? 'neg' : 'pos')}
+      ${mini('<span class="def" tabindex="0" data-tip="Booked minus expected by today (the dot on the ring).">Vs expected today</span>', done || notStarted ? '—' : sign(vsExp), vsExp == null || done || notStarted ? '' : vsExp < 0 ? 'neg' : 'pos')}
       ${mini(`Needed in ${P.daysLeft} days`, needed == null ? 'N/A' : money(needed))}
       ${mini('Period elapsed', `${Math.round(P.elapsed * 100)}%`)}
     </div>
@@ -318,7 +322,7 @@ function quarterCard() {
   const tyToDate = qs.filter(x => x.q <= CUR_Q).reduce((s, x) => s + x.ty, 0), lyToDate = qs.filter(x => x.q <= CUR_Q).reduce((s, x) => s + x.ly, 0);
   return `
   <section class="card s6" aria-labelledby="q-h">
-    <div class="card-h"><div><h2 id="q-h">Bookings by quarter</h2><p>Closed won vs target and last year · select a quarter to see its deals</p></div></div>
+    <div class="card-h"><div><h2 id="q-h">Bookings by quarter</h2><p>Closed won vs target and last year · select a quarter for its deals</p></div></div>
     <div class="legend" style="margin-bottom:12px"><span><i class="c-won"></i>FY26-27</span><span><i style="background: var(--chart-under)"></i>In progress</span><span><i class="lg-ly"></i>FY25-26</span><span><i class="line"></i>Target</span></div>
     <div class="qchart">${cols}</div>
     <p class="qnote"><b>${tyToDate >= lyToDate ? '+' : '−'}${money(Math.abs(tyToDate - lyToDate))}</b> vs the same quarters last year (${money(lyToDate)}).</p>
@@ -333,7 +337,7 @@ function wonLostCard(P) {
   const avgW = nW ? P.booked / nW : 0, avgL = nL ? P.lostV / nL : 0;
   return `
   <section class="card s6 wl-card" aria-labelledby="wl-h">
-    <div class="card-h"><div><h2 id="wl-h">Won vs lost</h2><p>Closed opportunities by count and by value · select to see the deals</p></div></div>
+    <div class="card-h"><div><h2 id="wl-h">Won vs lost</h2><p>Closed deals by count and value · select one for its deals</p></div></div>
     ${n ? `<div class="wl">
       <div class="wl-row"><div class="wl-h"><span>By count</span><b>${pct(nW, n)}% won</b></div>${bar(nW, nL, `${nW} deals`, `${nL} deals`)}
         <div class="wl-k"><span><i class="c-won"></i>${nW} won</span><span><i style="background: var(--chart-gray)"></i>${nL} lost</span></div></div>
@@ -357,7 +361,7 @@ function lossCard(P) {
   }).join('');
   return `
   <section class="card s6 lr-card" aria-labelledby="lr-h">
-    <div class="card-h"><div><h2 id="lr-h">Why we lost</h2><p>Closed lost value by loss reason · select a reason to see the deals</p></div></div>
+    <div class="card-h"><div><h2 id="lr-h">Why we lost</h2><p>Lost value by reason · select a reason for its deals</p></div></div>
     ${rows.length ? `<div class="lr-list">${list}</div><p class="so-what"><b>${esc(rows[0].r)}</b> accounts for ${pct(rows[0].v, tot)}% of lost value.</p>`
       : `<div class="empty"><b>No losses</b>Nothing was closed lost in this period.</div>`}
   </section>`;
@@ -391,7 +395,7 @@ function whoCard(P) {
   const top = units.find(u => u.att != null);
   return `
   <section class="card s12" aria-labelledby="who-h">
-    <div class="card-h"><div><h2 id="who-h">Attainment</h2><p>Bookings against each ${S.who === 'teams' ? "team's" : "salesperson's"} own target · targets are not added together · select a row to see its deals</p></div>
+    <div class="card-h"><div><h2 id="who-h">Attainment</h2><p>Bookings against each ${S.who === 'teams' ? "team's" : "salesperson's"} own target (not summed) · select a row for its deals</p></div>
       <div class="r legend"><span><i class="c-won"></i>Met target</span><span><i style="background: var(--chart-under)"></i>Below target</span><span><i class="lg-tick"></i>100%</span></div></div>
     <div class="tabs" role="tablist" aria-label="Group by">
       <button role="tab" aria-selected="${S.who === 'teams'}" class="tab ${S.who === 'teams' ? 'on' : ''}" data-act="who" data-v="teams">Teams<span class="tab-n">${teams.length}</span></button>
@@ -526,7 +530,7 @@ function syncControls() {
   $('#w-owner').classList.toggle('set', !!S.owner);
   $('#more-n').hidden = !S.geo.length; $('#more-n').textContent = S.geo.length;
   $('#reset').hidden = !(S.q || S.team || S.owner || S.geo.length || S.drill || S.fy !== '2627');
-  $('#page-meta').textContent = `Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD · ${S.q ? `Q${S.q}` : 'Full year'} · Q3 in progress, week 7 of 14`;
+  $('#page-meta').textContent = `Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD · ${S.q ? `Q${S.q}` : 'Full year'} · Q3 · week 7 of 14`;
 }
 function buildMore() { $('#m-geo').innerHTML = Object.keys(GEO_TARGET).map(g => `<label class="check"><input type="checkbox" value="${g}" ${S.geo.includes(g) ? 'checked' : ''}>${g}</label>`).join(''); }
 function setMore(open) { $('#more-pop').hidden = !open; $('#more-btn').setAttribute('aria-expanded', open); if (open) buildMore(); }
