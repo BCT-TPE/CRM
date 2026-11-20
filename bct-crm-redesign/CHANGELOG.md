@@ -7,7 +7,14 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-20 (second push)
+## 2026-11-20 (docs)
+
+### Added
+- **`RWD.md`**: the responsive work of today's two pushes in one place (Traditional Chinese, for the design team): breakpoints, what overflowed and how it was fixed, the phone filter bar, tables as card lists on phones, alignment and the 40px tap height, the record-page fixes, how it was checked, and what is still open. Linked from the README.
+
+---
+
+## 2026-11-20 (second push) · `ee7007b`
 
 ### Tap targets at every width
 - The 40px height for everything you tap (buttons, selects, search, segmented switches, tabs, chips, pager and icon buttons) now applies on desktop too, not only on phones, and also inside the phone top bar, side panels (`.drill`) and popovers (`.pop`). Icon-only buttons are 40×40. The More filters "Done" button lost its inline `height: 32px` (Pipeline, Sales performance, Sales initiatives). Tiles, chart columns, table rows and cards stay content-sized.

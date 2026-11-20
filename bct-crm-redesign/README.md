@@ -19,7 +19,7 @@ Redesign of the CRM V1 classic pages, following the old CRMpulse information arc
 | Sales targets | `targets.html` | Quarterly booking targets per dimension (geography, region, salesperson, SBU, practice, offering, technology, vertical) against closed won; edit a row's targets |
 | Pipeline (archived layout) | `pipeline_archieve.html` | The first Pipeline layout, kept for reference |
 
-Every page works from 1440 down to a 390 px phone.
+Every page works from 1440 down to a 390 px phone. What changes at each width, and why, is in `RWD.md` (Traditional Chinese).
 
 Design system: `design-system/index.html` (tokens in `design-system/tokens.css`).
 
@@ -44,3 +44,4 @@ then go to `http://localhost:5174/pipeline.html`.
 - `assets/region-map.js` — dot map generated from world-atlas 110m (ISC licence)
 - `assets/fonts/` — Inter (OFL)
 - `CHANGELOG.md` — what changed in each push to `main`
+- `RWD.md` — responsive behaviour per breakpoint and the fixes behind it (Traditional Chinese)
