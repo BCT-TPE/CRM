@@ -6,10 +6,10 @@
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
-<link rel="stylesheet" href="assets/crm.css?v=20261119c">
+<link rel="stylesheet" href="assets/crm.css?v=20261120a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261120w">
+<link rel="stylesheet" href="assets/responsive.css?v=20261120y">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
    Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
@@ -72,8 +72,8 @@
 /* Body: tabs + rail */
 .rec-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; margin-top: 16px; }
 .rec-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.rec-tabs { display: flex; gap: 2px; padding: 6px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line-2); }
-.rtab { flex: 1 1 0; justify-content: center; display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 6px; white-space: nowrap; min-width: 0; border: 0; border-radius: var(--radius-control); background: none; font: inherit; font-size: var(--text-sm); color: var(--t2); cursor: pointer; }
+.rec-tabs { display: flex; gap: 0; padding: 6px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line-2); }
+.rtab { flex: 1 1 0; justify-content: center; display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; white-space: nowrap; min-width: 0; border: 0; border-radius: var(--radius-control); background: none; font: inherit; font-size: var(--text-sm); color: var(--t2); cursor: pointer; }
 .rtab:hover { background: var(--hover); color: var(--ink); }
 .rtab.on { background: var(--deep); color: var(--on-dark); font-weight: 500; }
 .rtab .tab-n { background: var(--hover); }
@@ -134,8 +134,8 @@
 .tl:not(:last-child) .tl-dot::after { content: ""; position: absolute; top: 10px; bottom: -28px; width: 2px; border-radius: 1px; background: var(--line-2); } /* dot centre to the next dot centre (5px + 5px half dot; 18px row gap) */
 .tl-b b { font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
 .tl-b p { margin: 4px 0 0; font-size: var(--text-sm); color: var(--t2); }
-.tl-tags { display: flex; gap: 6px; margin-top: 6px; }
-.tl-tags span { display: inline-flex; height: 20px; align-items: center; padding: 0 7px; border-radius: var(--radius-sm); background: var(--hover); font-size: var(--text-2xs); font-weight: 500; color: var(--t2); }
+.tl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tl-tags span { display: inline-flex; height: 20px; align-items: center; padding: 0 7px; border-radius: var(--radius-sm); background: var(--hover); font-size: var(--text-2xs); font-weight: 500; color: var(--t2); white-space: nowrap; }
 
 .li-card { padding-bottom: 0; overflow: hidden; } /* the total row closes the card */
 .li-card .tbl-wrap { margin-bottom: 0; }
@@ -273,6 +273,35 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .sp-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--radius-2xs); background: linear-gradient(90deg, var(--cyan), var(--deep)); }
 .sp-bar.lost i { background: var(--chart-gray); }
 .steps2.jr { padding: 4px 0 0; }
+.sp-now { display: none; }
+@media (max-width: 768px) {
+  /* Summary stepper: every step as a dot across the full width (no sideways scroll), the bar under them lines up again,
+     and the current step is named in one caption */
+  .main .sum-card .steps2 { overflow: visible; padding: 16px 16px 8px; }
+  .main .sum-card .steps2 ol { min-width: 0; }
+  .main .sum-card .steps2 .sp-lab { display: none; }
+  .main .sum-card .steps2 .sp-now { display: block; margin-top: 10px; text-align: center; font-size: var(--text-sm); color: var(--t2); }
+  .main .sum-card .steps2 .sp-now b { font-weight: 600; color: var(--ink); }
+  /* Stage journey: the steps and their bar scroll together, so they stay aligned */
+  .main .steps2.jr { overflow-x: auto; scrollbar-width: none; }
+  .main .steps2.jr ol { min-width: 0; }
+  .main .steps2.jr > ol, .main .steps2.jr > .sp-bar { width: max(100%, calc(var(--n) * 100px)); }
+  /* Activity timeline: date on its own line above the entry, so the entry gets the width */
+  .tl { grid-template-columns: 18px minmax(0, 1fr); column-gap: 12px; row-gap: 2px; }
+  .tl-dot { grid-column: 1; grid-row: 1 / span 2; }
+  .tl-d { grid-column: 2; grid-row: 1; display: flex; gap: 6px; align-items: baseline; }
+  .tl-d b { display: inline; }
+  .tl-b { grid-column: 2; }
+  .tl-dot::before { margin-top: 4px; }
+  /* Buying committee: actions move under the person, so name, role chip and details get the full width */
+  .ct { grid-template-columns: 40px minmax(0, 1fr); row-gap: 10px; }
+  .ct-acts { grid-column: 2; }
+  /* Line items total: a plain row under the cards (the table body is a card list here) */
+  .main .tbl tfoot, .main .tbl tfoot tr { display: block; }
+  .main .tbl tfoot tr { display: flex; justify-content: space-between; align-items: baseline; padding: var(--space-3) 0 0; }
+  .main .tbl tfoot td, body.v2 .main .tbl tfoot td { position: static; display: block; height: auto; padding: 0; border: 0; background: none; }
+  .main .tbl tfoot td small { display: block; text-align: right; }
+} /* phones only: the step names give way to one caption (responsive rules below) */
 .jr .sp-lab b { display: block; font-weight: 600; color: var(--ink); }
 .jr .sp-lab { color: var(--t3); }
 .jr .jr-d { display: table; margin: 6px auto 0; height: 20px; padding: 0 8px; border-radius: var(--radius-control); background: var(--info-bg); color: var(--deep); font-style: normal; font-size: var(--text-xs); font-weight: 600; line-height: 20px; }
@@ -545,6 +574,7 @@ function header() {
       <div class="steps2" style="--n:${n}" aria-label="${st.label} stages" ${ed ? 'data-tip="Use Change stage so the change is logged in stage history."' : ''}>
         <ol>${steps}</ol>
         <div class="sp-bar ${o.kind === 'lost' ? 'lost' : ''}"><i style="width:${fill.toFixed(1)}%"></i></div>
+        <div class="sp-now">${o.kind === 'open' ? `Step ${cur + 1} of ${n} · <b>${esc(st.list[cur])}</b>` : o.kind === 'won' ? '<b>Closed won</b>' : `<b>Closed lost</b> · after ${esc(lostAt)}`}</div>
       </div>
       <div class="facts">
         ${ed ? `<div class="f">${lockedF('Value', local || money(o.value), `${local ? money(o.value) + ' · ' : ''}${D.items.length} line item${D.items.length === 1 ? '' : 's'} · <button class="link" data-act="toast" data-v="Would open the line item editor">Edit line items</button>`, {})}</div>`
@@ -817,8 +847,15 @@ function probHelp() { const st = STAGE_BY_NAME[o.sub], w = `Weighted ${money(o.v
 function render() {
   if (!o) { $('#main').innerHTML = `<div class="back-bar"><a class="back" href="initiatives.html">${SVG.back}Sales initiatives</a></div><div class="card" style="margin-top:20px"><div class="empty" style="padding:72px 12px"><b>Initiative not found</b>No record ${esc(id)} in this demo.</div></div>`; return; }
   const body = ED() ? overview : ({ overview, items: itemsTab, contacts: contactsTab, activities: activitiesTab, tasks: tasksTab, history: historyTab, files: filesTab }[T.tab] || overview);
+  const tabsX = document.querySelector('.rec-tabs')?.scrollLeft || 0;
   $('#main').innerHTML = `${header()}<div class="rec-grid ${ED() ? 'editing' : ''}"><div class="rec-main">${tabsBar()}${body()}</div><aside class="rail">${rail()}</aside></div>${ED() ? `<div class="ed-bar ${changed().length ? 'dirty' : ''}" id="ed-bar">${editBar()}</div>` : ''}`;
   CRM.enhanceSelects($('#main')); // every select on the page (edit form, task assignee) uses the custom menu
+  const row = document.querySelector('.rec-tabs');
+  if (row) { // scroll the row itself, never the page
+    row.scrollLeft = tabsX;
+    const on = row.querySelector('.rtab.on'), pad = 8;
+    if (on) { const l = on.getBoundingClientRect().left - row.getBoundingClientRect().left + row.scrollLeft, r = l + on.offsetWidth; if (l < row.scrollLeft + pad) row.scrollLeft = l - pad; else if (r > row.scrollLeft + row.clientWidth - pad) row.scrollLeft = r - row.clientWidth + pad; }
+  }
 }
 
 $('#main').addEventListener('click', (e) => {

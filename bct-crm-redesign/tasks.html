@@ -6,10 +6,10 @@
 <title>Tasks · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
-<link rel="stylesheet" href="assets/crm.css?v=20261119c">
+<link rel="stylesheet" href="assets/crm.css?v=20261120a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261120w">
+<link rel="stylesheet" href="assets/responsive.css?v=20261120y">
 <style>
 /* ---------- Page: Tasks (CRM V1 §7) ----------
    Mirrors CRMpulse /tasks (tasks-view, task-board): five view tiles, search / assignee / "show completed and
@@ -44,7 +44,8 @@ body.v2 .ftog[aria-pressed="true"] { border-color: var(--deep); background: var(
 .tk-t input { width: 16px; height: 16px; margin: 0; accent-color: var(--deep); cursor: pointer; }
 .tk-t input:disabled { cursor: not-allowed; }
 .tk-t .open { max-width: 100%; padding: 0; border: 0; background: none; font: inherit; font-weight: 500; color: var(--ink); text-align: left; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tk-t .open:hover { color: var(--deep); text-decoration: underline; text-underline-offset: 3px; }
+.tk-t .open:hover { color: var(--deep); } /* the row already highlights on hover: no underline */
+.tbl.tk .link:hover { text-decoration: none; } /* links inside a task row: no underline either */
 tr.is-done .open, tr.is-cxl .open { color: var(--t3); text-decoration: line-through; font-weight: 400; }
 .tk-t .t-sub .link { font-size: var(--text-xs); }
 .late { color: var(--danger); } .today { color: var(--warn-text); }

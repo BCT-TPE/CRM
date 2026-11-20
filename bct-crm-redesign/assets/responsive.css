@@ -15,6 +15,13 @@
 /* Top bar for the drawer (built by crm.js, shown ≤768 only) */
 .m-bar { display: none; }
 .tbl-sort { display: none; } /* phone-only Sort for tables (crm.js prepTables) */
+
+/* One height for everything you tap, at every width (40px = the form-field height): buttons, selects, search,
+   segmented switches, tabs and chips, pager and icon buttons, in the page, the phone top bar, side panels and popovers.
+   Tiles, chart columns, table rows and cards are tap areas sized by their content. (2026-11-20) */
+body.v2 :is(.main, .m-bar, .drill, .pop) :is(.btn, .select, .search, .seg, .tab, .tchip, .tog, .ftog, .icon-btn, .pager button) { height: 40px; min-height: 40px; }
+body.v2 :is(.main, .m-bar, .drill, .pop) :is(.btn.icon-only, .icon-btn, .pager button) { width: 40px; min-width: 40px; padding: 0; justify-content: center; }
+body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
 .m-scrim { display: none; }
 
 @media (max-width: 1360px) {
@@ -135,15 +142,10 @@
     -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } /* one row, scrolls sideways; fade = more to the right */
   .tabs::-webkit-scrollbar { display: none; }
   .tab { flex: none; white-space: nowrap; }
-  /* One height for everything you tap (40px, the form-field height): buttons, selects, search, segmented switches,
-     tabs and chips, pager and icon buttons. Tiles, chart columns and table cards are tap areas sized by their content. */
-  body.v2 :is(.main, .m-bar) :is(.btn, .select, .search, .seg, .tab, .tchip, .tog, .ftog, .icon-btn, .pager button) { height: 40px; min-height: 40px; }
-  body.v2 :is(.main, .m-bar) :is(.btn.icon-only, .icon-btn, .pager button) { width: 40px; min-width: 40px; padding: 0; justify-content: center; }
-  body.v2 .main .seg button { height: 32px; }
   /* Tables → card list (crm.js prepTables adds data-label / data-wide and the Sort select) */
   .main .tbl-sort { display: inline-flex; margin-bottom: var(--space-3); }
   body.v2 .main .tbl-sort { border-color: var(--line-2); box-shadow: none; }
-  .main .tbl-wrap { overflow: visible; margin: 0; }
+  .main .tbl-wrap, .main .card > .tbl-sort:first-child + .tbl-wrap { overflow: visible; margin: 0; } /* Sort is visible here: no pull-up */
   .main .tbl, .main .tbl tbody { display: block; width: 100%; min-width: 0 !important; } /* beats the per-table min-widths (some in page styles) */
   .main .tbl colgroup, .main .tbl thead { display: none; }
   .main .tbl tbody { display: flex; flex-direction: column; gap: var(--space-3); }

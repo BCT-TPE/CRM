@@ -7,7 +7,33 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-20
+## 2026-11-20 (second push)
+
+### Tap targets at every width
+- The 40px height for everything you tap (buttons, selects, search, segmented switches, tabs, chips, pager and icon buttons) now applies on desktop too, not only on phones, and also inside the phone top bar, side panels (`.drill`) and popovers (`.pop`). Icon-only buttons are 40×40. The More filters "Done" button lost its inline `height: 32px` (Pipeline, Sales performance, Sales initiatives). Tiles, chart columns, table rows and cards stay content-sized.
+
+### Tasks
+- No underline on hover for the task title or the initiative link in a row (the row already highlights).
+- Header spacing: the phone-only Sort select that `prepTables` inserts before the table is hidden on desktop but stopped `.card > .tbl-wrap:first-child` from matching, so the thead got extra top space again. `crm.css` now also matches `.tbl-sort:first-child + .tbl-wrap`; phones (Sort visible) keep no pull-up.
+
+### Sales initiative record (`initiative.html`), phones
+- Tab row keeps its scroll position when a tab is chosen (the page re-renders), and only the row scrolls to show the chosen tab, never the page.
+- Summary stepper: every step as a dot across the width (no sideways scroll, so the bar lines up with the dots again), step names hidden, one caption under the bar ("Step 2 of 4 · Initial contact", "Closed won", "Closed lost · after …").
+- Stage journey (Stage history): steps and bar share one width (`max(100%, n × 100px)`) and scroll together; up to 3 stages fit without scrolling.
+- Activity timeline: date on its own line above the entry; type / purpose tags never break inside a chip.
+- Buying committee: Call / Log activity move under the person.
+- Line items: the Total row is a plain row under the item cards.
+- Tab row on every width: `.rec-tabs` gap 0, `.rtab` padding 0 14px.
+
+### Activities, phones
+- The edit button sits in the card's top-right corner (it wrapped onto the second line once it became 40px); the title keeps 44px clear for it.
+
+### Cache-busters
+- `crm.css` 20261120a, `responsive.css` 20261120y (others unchanged since the first push today).
+
+---
+
+## 2026-11-20 · `5205e78`
 
 Scope of this round: the five Dashboards + Sales pages (Pipeline & forecast, Sales performance, Sales initiatives, Activities, Tasks). Accounts, Contacts and Sales targets stay in the repo but are out of the nav again.
 
