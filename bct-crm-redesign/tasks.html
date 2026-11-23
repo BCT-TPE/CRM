@@ -6,10 +6,10 @@
 <title>Tasks · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261123e">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261123j">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261123d">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261123g">
+<link rel="stylesheet" href="assets/responsive.css?v=20261123k">
 <style>
 /* ---------- Page: Tasks (CRM V1 §7) ----------
    Mirrors CRMpulse /tasks (tasks-view, task-board): five view tiles, search / assignee / "show completed and
@@ -114,7 +114,7 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261123e"></script>
+<script src="assets/crm.js?v=20261123m"></script>
 <script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 const { toast } = CRM;
@@ -137,12 +137,10 @@ const VIEWS = [
   ['all', 'All open', () => true]
 ];
 const EMPTY = { mine: 'Nothing open is assigned to you.', given: "You haven't given anyone an open task.", team_overdue: 'Nothing is overdue.', week: 'Nothing is due between today and Sunday.', all: 'No open tasks match.' };
-// Default view (CRMpulse defaultView): Administrator / Sales Head / Sales Manager open on Team overdue when anything is overdue;
-// a salesperson opens on My open tasks, or on the ones they finished when none are open
-const myOpen = TASKS.filter(t => taskOpen(t) && t.to === ME).length, teamLate = TASKS.filter(taskLate).length;
-const S0 = CRM.user.assigning
-  ? (teamLate ? { view: 'team_overdue', closed: false, note: myOpen ? '' : 'Opened on Team overdue because you have no open tasks of your own.' } : { view: 'mine', closed: false, note: '' })
-  : { view: 'mine', closed: !myOpen, note: myOpen ? '' : "You have no open tasks; showing the ones you've finished." };
+// Default view: everyone, Administrator included, opens on My open tasks; with none open, on the ones they finished.
+// (Old CRMpulse opened managers on Team overdue; the design team chose My open tasks for every role, 2026-11-23.)
+const myOpen = TASKS.filter(t => taskOpen(t) && t.to === ME).length;
+const S0 = { view: 'mine', closed: !myOpen, note: myOpen ? '' : "You have no open tasks; showing the ones you've finished." };
 const S = { ...S0, q: '', to: '', sort: 'due', page: 1 };
 
 function tiles() {

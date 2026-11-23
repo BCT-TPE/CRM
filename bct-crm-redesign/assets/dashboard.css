@@ -87,7 +87,7 @@
 .grp-h { display: flex; align-items: center; gap: 8px; padding: 12px 0 6px; font-size: var(--text-xs); color: var(--t3); }
 .grp-h:first-child { padding-top: 0; }
 .grp-h .tot { margin-left: auto; font-variant-numeric: tabular-nums; }
-.row { display: grid; grid-template-columns: minmax(180px, 1.2fr) minmax(80px, 1fr) 68px 64px 14px; align-items: center; gap: 14px; padding: 7px 8px; margin: 0 -8px; border-radius: var(--radius-control); border: 0; background: transparent; text-align: left; cursor: pointer; width: calc(100% + 16px); }
+.row { display: grid; grid-template-columns: minmax(180px, 1.2fr) minmax(80px, 1fr) 68px 64px; /* no chevron column (chevrons removed) */ align-items: center; gap: 14px; padding: 7px 8px; margin: 0 -8px; border-radius: var(--radius-control); border: 0; background: transparent; text-align: left; cursor: pointer; width: calc(100% + 16px); }
 .row:hover { background: var(--hover); }
 .row.on { background: var(--info-bg); }
 .row.dim { opacity: .45; }
@@ -111,6 +111,10 @@
 .qchart { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; align-items: stretch; flex: 1; padding-top: 8px; }
 .qcol { display: flex; flex-direction: column; align-items: stretch; height: 100%; border: 0; background: transparent; padding: 6px 4px 8px; border-radius: var(--radius-lg); cursor: pointer; font: inherit; color: inherit; }
 .qcol:hover { background: var(--hover); }
+/* plot / baseline / labels are three shared rows (subgrid): a quarter whose labels wrap to more lines
+   no longer gets a shorter plot, so all four baselines stay on one line (Pipeline and Sales performance) */
+.qchart { grid-template-rows: 1fr auto auto; }
+.qchart > .qcol { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 0; }
 .qcol.on { background: var(--info-bg); }
 .qplot { position: relative; flex: 1; min-height: 170px; margin-top: 22px; }
 .qstack { position: absolute; left: 50%; bottom: 0; width: 44px; height: 100%; margin-left: -22px; display: flex; flex-direction: column-reverse; gap: 2px; }
@@ -169,6 +173,7 @@
 .mix-k .chev { margin-left: auto; }
 .mix-v { font-size: var(--text-xl); font-weight: 500; letter-spacing: -.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
 .mix-s { font-size: var(--text-xs); color: var(--t3); }
+.mix-s > span { white-space: nowrap; } /* wraps only at the ·, never inside "4 deals" */
 .lean-list { display: flex; flex-direction: column; gap: 2px; }
 .age-list { display: flex; flex-direction: column; gap: 2px; }
 .lean { display: flex; flex-direction: column; gap: 5px; width: calc(100% + 16px); margin: 0 -8px; padding: 6px 8px; border: 0; border-radius: var(--radius-control); background: none; text-align: left; font: inherit; color: inherit; }
@@ -224,7 +229,7 @@ button.ks.on { background: var(--info-bg); }
 .shade-lg { gap: 4px; align-items: center; }
 .shade-lg i { width: 12px; height: 10px; border-radius: var(--radius-xs); }
 .shade-lg span { margin: 0 4px; }
-.tm-r { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(60px, 1fr) 72px 40px 14px; align-items: center; gap: 14px; width: calc(100% + 16px); margin: 0 -8px; padding: 7px 8px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; font: inherit; color: inherit; }
+.tm-r { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(60px, 1fr) 72px 40px; /* no chevron column (chevrons removed) */ align-items: center; gap: 14px; width: calc(100% + 16px); margin: 0 -8px; padding: 7px 8px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; font: inherit; color: inherit; }
 .tm-r:last-child { border-bottom: 0; }
 .tm-r:hover, .tm-r.on { background: var(--hover); }
 .tm-n { min-width: 0; font-size: var(--text-sm); font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

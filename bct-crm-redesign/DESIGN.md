@@ -25,6 +25,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 | 可點擊元件高度 | 統一 40px（按鈕、下拉、搜尋框、頁碼、圖示按鈕 40×40）。切換鈕（seg、紀錄頁分頁）外框 40px、裡面每個選項 32px |
 | 表格列高 | 64px，一行顯示；放不下的名稱、客戶、負責人用省略號（已確認維持現狀，不換行、不左右捲） |
 | 數字卡 | 同一排等高，數字對齊；說明文字可換行，用 subgrid 讓各列對齊 |
+| 季度長條圖 | 每欄的圖、底線、標籤共用同一組列（subgrid，`.qchart` 在 `dashboard.css`）；某一季標籤換行時，四欄底線仍在同一高度 |
 | 文字 | 下拉選單的值、篩選列標籤（Assignee、Team、Fiscal year…）、More filters 裡每個選單的標題，一律 14px |
 
 ## 3. 表格與列表
@@ -33,6 +34,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - 列裡的連結、勾選框各自運作，點它們不會開啟整列。
 - 整列可用鍵盤 Tab 到、按 Enter 開啟。
 - 只有在列本身不能點時才保留編輯按鈕（目前只有 Activities 的活動卡）。
+- 可點的列不放「>」箭頭（hover 底色已表示可點），也不要替它保留空欄：內容的右緣要切齊卡片內距，跟左緣對稱。
 
 ## 4. 按鈕位置
 
@@ -48,6 +50,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
   2. ≤1480px：More filters、Export 變成 40×40 圖示按鈕（文字保留給螢幕報讀器）；
   3. 還放不下才換行，不能超出畫面。
 - 已知例外：Pipeline、Sales performance 套用篩選、出現 Reset 時，1280px 寬會換成兩行（差約 20px）。
+- More filters 彈出框：高度最多到視窗底部（留 12px），內容在框內捲動，Clear／Done 固定在框底；打開或在框內捲動都不會帶動整頁。框內的下拉選單會浮在最上層，下方空間不夠時往上展開；選完彈出框不會關閉。篩選列固定／取消固定時，已打開的彈出框會重新定位。手機（≤480px）上每頁的 More filters 都是滿版、左右各 16px 置中；更寬時對齊按鈕展開。
 
 ## 6. 側邊欄與帳號
 
@@ -55,7 +58,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - 這輪沒做的頁面顯示灰色停用，滑上去顯示「Not part of this redesign round」。
 - 示範帳號：Gaurav Shrotriya，**Administrator**（設定在 `assets/crm.js` 的 `USER`）。角色會影響預設畫面，照舊版規則：
   - Activities：Administrator、Sales Head 預設 Everyone；Sales Manager 預設 My teams；其他人預設 Mine
-  - Tasks：Administrator、Sales Head、Sales Manager 有團隊逾期時預設 Team overdue；業務預設 My open tasks
+  - Tasks：所有角色都預設 My open tasks（自己沒有未完成任務時，改顯示已完成的）。舊版經理類角色預設 Team overdue，這裡依設計決定不照做（2026-11-23）
 - Tasks 旁顯示自己未完成的任務數：藍色正圓、白字；收合側邊欄時放在圖示右上角；完成任務後即時更新。
 - 帳號選單只有：姓名、Email、Sign out（照舊版 ProfileMenu）。
 - 通知選單照舊版：標題 + Mark all read、只列未讀（沒有時顯示 You're all caught up.）、See all →。

@@ -7,7 +7,27 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-23
+## 2026-11-23 (second push)
+
+Layout fixes found while reviewing on desktop and phones. Cache-busters: `crm.css?v=20261123j`, `crm.js?v=20261123m`, `dashboard.css?v=20261123d`, `responsive.css?v=20261123k` (all pages that load them).
+
+### Changed
+- **Tasks opens on My open tasks for every role**, Administrator included (old CRMpulse opened managers on Team overdue; overridden by design decision). Activities still opens on Everyone.
+- **Phone page-header actions** (Sales initiatives: Export to Excel + New sales initiative; Tasks: New task): full width, split evenly; under 360px they stack. Once the filter bar is stuck they reappear as 40×40 icon buttons at the end of row 1 (`.f-acts`, built in `compactFilters`; each icon clicks the real button).
+- **Pipeline mix on phones (≤480px)**: two columns (Commit | Best case, then Pipeline); "$x weighted" and "n deals" never break inside, only after the "·".
+- **Activities timeline on phones**: the coloured type icon (24px) is back, before the date; no connecting line.
+- **More filters on phones (≤480px)**: every page's popover is full width with 16px gutters, centred.
+
+### Fixed
+- **Quarter charts (Pipeline, Sales performance)**: plot / baseline / labels share subgrid rows in `dashboard.css` (`.qchart`), so a quarter whose label wraps to more lines no longer drops its baseline. Performance's page-level copy of the rule was removed.
+- **Leftover chevron columns**: chevrons were removed earlier but their 14px grid column (+ gap) stayed, leaving an empty strip on the right. Removed from `.row`, `.tm-r` (By sales team), Why we lost (`.lr`) and the Attainment table (`c-chev` column and its empty cells; Avg deal gets the width).
+- **Activities More filters** opened rightwards (`left: 0`) and ran off the screen on phones; it now opens leftwards like the other pages.
+- **More filters kept in view**: an open popover is re-placed when the filter bar sticks or unsticks (the header icons move the More filters button). Its height is capped at the room left in the window: it scrolls on its own (`overscroll-behavior: contain`, the page never scrolls), Clear / Done stay pinned at its bottom, and its scrollbar is always visible (a 4px line with rounded ends). Select menus inside it are pinned to the window (`pinPop`), open upward when there is no room below, and picking a value no longer closes the popover.
+- **Phones at 342px**: "New sales initiative" overflowed half the width and widened the page by 17px, which pushed popovers off-centre.
+
+---
+
+## 2026-11-23 · `6a022ed`
 
 Review pass against the design team's prototype checklist, a sidebar/profile sync with old CRMpulse, and a WCAG AA contrast pass. Cache-busters: `tokens.css?v=20261123a`, `crm.css?v=20261123e`, `crm.js?v=20261123e`, `dashboard.css?v=20261123a`, `responsive.css?v=20261123g` (all pages that load them, including the out-of-scope ones).
 

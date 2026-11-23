@@ -279,7 +279,11 @@
     const cur = document.querySelector('.nav-item[aria-current="page"]');
     el.dataset.page = cur ? cur.dataset.name : document.title.split(' · ')[0];
     // stuck = sitting at its sticky top (0 on desktop, under the 56px top bar on phones)
-    const check = () => { const t = parseFloat(getComputedStyle(el).top) || 0; el.classList.toggle('stuck', scrollY > 0 && el.getBoundingClientRect().top <= t + 0.5); };
+    // when it sticks or unsticks on a phone, the header actions join or leave row 1 and the More filters button moves:
+    // re-place an open popover so it stays inside the window
+    const check = () => { const t = parseFloat(getComputedStyle(el).top) || 0, was = el.classList.contains('stuck');
+      const now = el.classList.toggle('stuck', scrollY > 0 && el.getBoundingClientRect().top <= t + 0.5);
+      if (now !== was) requestAnimationFrame(() => keepPopsInView('stuck')); };
     addEventListener('scroll', check, { passive: true }); addEventListener('resize', check); check();
     compactFilters(el);
   }
@@ -301,21 +305,46 @@
         f.classList.add('compact', search ? 'two' : 'one');
         if (search) f.append(...[search, more, exp].filter(Boolean), row); else f.append(row, ...[more, exp].filter(Boolean));
         f._row = row;
+        // Page-header actions (Export, New …): once the bar is stuck they come back as icon buttons at the end of row 1.
+        // Each icon clicks the real button, so page code keeps a single handler.
+        const acts = [...document.querySelectorAll('.v2-head > .acts > .btn')];
+        if (acts.length) {
+          const box = document.createElement('div'); box.className = 'f-acts';
+          acts.forEach(btn => {
+            const ic = document.createElement('button');
+            ic.type = 'button'; ic.className = 'btn icon-only' + (btn.classList.contains('primary') ? ' primary' : '');
+            ic.setAttribute('aria-label', btn.textContent.trim()); ic.innerHTML = btn.querySelector('svg')?.outerHTML || '';
+            ic.addEventListener('click', () => btn.click());
+            box.appendChild(ic);
+          });
+          row.before(box); f._acts = box;
+        }
       } else if (!phone.matches && f._orig) {
-        f.append(...f._orig); f._row.remove(); f.classList.remove('compact', 'two', 'one'); f._orig = f._row = null;
+        f.append(...f._orig); f._row.remove(); f._acts?.remove(); f.classList.remove('compact', 'two', 'one'); f._orig = f._row = f._acts = null;
       }
     };
     phone.addEventListener('change', apply); apply();
   }
   // Menus inside the sideways-scrolling filter row would be clipped by it: place them on the page instead
   // (the row's fade mask and the stuck bar's backdrop blur would clip it, so it moves to <body> while open)
+  // Same for menus inside a More filters popover, whose body scrolls on its own (keepPopsInView caps its height).
   function pinPop(pop, anchor) {
-    if (!anchor.closest('.f-scroll')) return false;
+    const inPop = anchor.closest('.filters .pop');
+    if (!anchor.closest('.f-scroll') && !inPop) return false;
     if (!pop._home) { pop._home = pop.parentNode; document.body.appendChild(pop); }
+    // moving the menu out shortens the popover and the browser re-clamps its scroll: ignore that one scroll
+    if (inPop) inPop._quietUntil = performance.now() + 200;
+    // a pick in a menu that left the More filters popover must not count as a click outside it (that closes the popover)
+    if (inPop && !pop._stopped) { pop.addEventListener('click', (e) => e.stopPropagation()); pop._stopped = true; }
     const r = anchor.getBoundingClientRect();
     pop.classList.remove('up'); pop.style.translate = '';
     pop.style.minWidth = `${Math.round(r.width)}px`; // its CSS min-width is a % of the select it left
-    pop.style.position = 'fixed'; pop.style.top = `${Math.round(r.bottom + 6)}px`;
+    pop.style.position = 'fixed'; pop.style.maxHeight = '';
+    // below the field when it fits, else above it when there is more room there; capped to the room it gets
+    const h = pop.offsetHeight, below = innerHeight - 8 - (r.bottom + 6), above = r.top - 6 - 8;
+    const up = h > below && above > below;
+    if (h > (up ? above : below)) pop.style.maxHeight = `${Math.floor(up ? above : below)}px`;
+    pop.style.top = `${Math.round(up ? r.top - 6 - pop.offsetHeight : r.bottom + 6)}px`;
     pop.style.left = `${Math.round(Math.max(12, Math.min(r.left, innerWidth - pop.offsetWidth - 12)))}px`;
     return true;
   }
@@ -372,14 +401,20 @@
   document.addEventListener('click', (e) => { if (selOpen && !selOpen.wrap.contains(e.target) && !selOpen.menu.contains(e.target)) closeSel(); });
   // Filter popovers (More filters) are placed by each page next to their button. When the filter row wraps
   // on smaller windows, keep an open one inside the window (2026-11-17).
-  function keepPopsInView() {
+  // Its height is capped at the space left below it in the window: it scrolls on its own with Clear / Done pinned
+  // at its bottom, so the page itself never has to scroll (CSS: .filters .pop).
+  function keepPopsInView(e) {
     document.querySelectorAll('.filters .pop:not([hidden])').forEach((pop) => {
-      pop.style.translate = '';
-      const r = pop.getBoundingClientRect(), pad = 12;
-      const dx = r.left < pad ? pad - r.left : (r.right > innerWidth - pad ? innerWidth - pad - r.right : 0);
+      pop.style.translate = ''; pop.style.maxHeight = '';
+      let r = pop.getBoundingClientRect(); const pad = 12;
+      const panel = !pop.classList.contains('sel-pop'); // a select's own menu is not capped here
+      if (panel && r.bottom > innerHeight - pad) { pop.style.maxHeight = `${Math.max(180, Math.floor(innerHeight - pad - r.top))}px`; r = pop.getBoundingClientRect(); }
+      // a near-full-width popover (phones) is centred, so its left and right gaps match the page gutter
+      const dx = r.width > innerWidth - 48 ? (innerWidth - r.width) / 2 - r.left
+        : r.left < pad ? pad - r.left : (r.right > innerWidth - pad ? innerWidth - pad - r.right : 0);
       if (dx) pop.style.translate = `${Math.round(dx)}px 0`;
-      // below the fold on a phone: bring the whole popover into view once
-      if (r.bottom > innerHeight - pad && r.height < innerHeight - 2 * pad) scrollBy({ top: r.bottom - innerHeight + pad, behavior: 'instant' });
+      // the menus of its selects are pinned to the window: close them when the fields scroll
+      if (panel && !pop._watch) { pop.addEventListener('scroll', () => { if (performance.now() > (pop._quietUntil || 0)) { closeSel(); closeDate(); } }, { passive: true }); pop._watch = true; }
     });
   }
   // capture phase: pages stop propagation on their own buttons

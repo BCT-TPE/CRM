@@ -7,10 +7,10 @@
 <title>Pipeline & forecast · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261123e">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261123j">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261123d">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261123g">
+<link rel="stylesheet" href="assets/responsive.css?v=20261123k">
 <style>
 /* Q3 forecast bar sits on the same baseline as the quarter bars in "Bookings vs target" beside it (1440 desktop) */
 @media (min-width: 1361px) { body.v2 .fc .sum-legend { margin-top: 32px; } }
@@ -67,7 +67,7 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261123e"></script>
+<script src="assets/crm.js?v=20261123m"></script>
 <script src="assets/crm-data.js?v=20261120b"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
@@ -712,7 +712,7 @@ function mixPills(list) {
     <button class="mix-c click ${isOn(x.code) ? 'on' : ''}" data-act="drill" data-type="code" data-v="${x.code}" aria-pressed="${isOn(x.code)}">
       <span class="mix-k"><i class="${x.cls}"></i>${x.cat}<span class="code">${x.code}</span></span>
       <span class="mix-v">${money(x.g)}</span>
-      <span class="mix-s">${money(x.w)} weighted · ${x.n} deal${x.n === 1 ? '' : 's'}</span>
+      <span class="mix-s"><span>${money(x.w)} weighted</span> · <span>${x.n} deal${x.n === 1 ? '' : 's'}</span></span>
     </button>`).join('');
   return `
   <section class="card mix v2-mix" aria-labelledby="mix-h">

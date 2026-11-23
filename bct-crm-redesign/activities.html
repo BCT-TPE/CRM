@@ -6,10 +6,10 @@
 <title>Activities · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261123e">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261123j">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261123d">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261123g">
+<link rel="stylesheet" href="assets/responsive.css?v=20261123k">
 <style>
 /* ---------- Page: Activities (CRM V1 §6) ----------
    Same IA as CRMpulse /activities: Mine / My teams / Everyone, a "Log what happened" composer, four summary tiles,
@@ -83,16 +83,21 @@ body.v2 .lg-form label.select.fsel { display: flex; width: 100%; height: 40px; b
 .ai-m .fu { color: var(--deep); font-weight: 500; }
 .ai-n { margin: 6px 0 0; font-size: var(--text-sm); color: var(--t2); }
 .more-wrap { position: relative; }
-#more-pop { top: 44px; left: 0; width: 280px; }
+#more-pop { top: 44px; right: 0; left: auto; width: 280px; } /* opens leftwards from the button, like the other pages, so it never runs off the right edge */
 #more-pop .grp + .grp { margin-top: 12px; }
 body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; border-radius: var(--radius-control); border-color: var(--line-2); box-shadow: none; }
 #more-pop .fsel .sel-btn { max-width: none; width: 100%; font-weight: 400; }
 @media (max-width: 1180px) { .sm4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lg-form { grid-template-columns: 160px minmax(0, 1fr); } .lg-form .in.what { grid-column: 1 / -1; } }
 @media (max-width: 768px) {
   .lg-form { grid-template-columns: 1fr; }
-  /* phone: date on one line above the card; title + edit, then purpose + ID */
-  .ai { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .ai-d { display: flex; align-items: baseline; gap: 6px; padding-top: 0; text-align: left; }
+  /* phone: type icon + date on one line above the card; title + edit, then purpose + ID */
+  .ai { grid-template-columns: 24px minmax(0, 1fr); gap: 6px 8px; align-items: center; }
+  .ai-ic { grid-row: 1; grid-column: 1; padding-top: 0; }
+  .ai-ic span { width: 24px; height: 24px; }
+  .ai-ic svg { width: 13px; height: 13px; }
+  .ai .ai-ic::after { display: none; } /* no connecting line: the cards sit between the icons */
+  .ai-d { grid-row: 1; grid-column: 2; display: flex; align-items: baseline; gap: 6px; padding-top: 0; text-align: left; }
+  .ai-c { grid-column: 1 / -1; }
   .ai-d b { display: inline; }
   .ai-c { position: relative; }
   .ai-h b { flex: 1 1 100%; padding-right: 44px; white-space: normal; } /* room for the edit button */
@@ -100,7 +105,6 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   .ai-h .ptag { order: 2; }
   .ai-h .sp { display: none; }
   .ai-h small { order: 3; }
-  .ai-ic { display: none; }
     .ai-h { flex-wrap: wrap; }
 }
 </style>
@@ -146,7 +150,7 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261123e"></script>
+<script src="assets/crm.js?v=20261123m"></script>
 <script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 const { toast } = CRM;

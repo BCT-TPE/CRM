@@ -98,7 +98,9 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
   .m-bar .avatar-img { width: 28px; height: 28px; border-radius: var(--radius-sm); }
   .v2-head { padding-top: var(--space-6); margin-bottom: var(--space-1); } /* 4px + the filter bar's 8px top padding = 12px to the search */
   .v2-head:has(> .acts) { row-gap: var(--space-3); } /* Sales pages: subtitle → action buttons 12px, same as buttons → search */
-  .v2-head > .acts { margin-left: auto; justify-content: flex-end; } /* add / export buttons sit on the right, as on desktop */
+  /* Header actions: full width, split evenly (one button = full width) */
+  .v2-head > .acts { flex: 1 1 100%; }
+  .v2-head > .acts > .btn { flex: 1 1 0; min-width: 0; justify-content: center; }
   .grid > [class*="s"] { grid-column: span 12; }
   /* Filter bar: sticky under the 56px top bar, at most two rows (crm.js compactFilters):
      row 1 = search + More filters (+ Export), row 2 = the other filters, scrolling sideways. No search = one row. */
@@ -116,6 +118,10 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
   .filters.compact.one .f-scroll { flex: 1 1 0; margin-right: 0; padding-right: var(--space-1); }
   /* More filters and Export become 40px icon buttons; the label stays for screen readers */
   .filters.compact #more-btn, .filters.compact #export { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
+  /* …and once the bar is stuck, the same actions as 40px icons at the end of row 1 (crm.js compactFilters) */
+  .filters.compact .f-acts { display: none; gap: var(--space-2); flex: none; }
+  .filters.compact.stuck .f-acts { display: flex; }
+  .filters.compact .f-acts .btn { width: 40px; padding: 0; justify-content: center; }
   .filters.compact #more-btn .count-badge { position: absolute; top: -4px; right: -4px; font-size: var(--text-2xs); }
   /* flat controls: the sideways row clips anything outside it, so the pills' soft drop shadow ended in a hard line.
      Same treatment as controls inside a card: no shadow, a hairline border. */
@@ -202,7 +208,7 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
   .filters .sp { display: none; }
   body.v2 .fc .hero-num .big { font-size: var(--text-5xl); }
   body.v2 .fc .hero-num .big sup { font-size: var(--text-xl); }
-  .mix-cols { grid-template-columns: 1fr; gap: var(--space-4); }
+  .mix-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4) var(--space-6); } /* two columns: Commit | Best case, then Pipeline */
   .qlab small, .qlab .att { white-space: normal; }
   .ad-row { gap: var(--space-1); }
   .ad { padding: var(--space-2); }
@@ -220,4 +226,14 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
 }
 @media (max-width: 400px) {
   .v2-kv { font-size: var(--text-2xl); } /* $471.3K fits half of a 360px screen */
+}
+
+/* <360px: "New sales initiative" no longer fits half the width, so the header actions stack, each full width */
+@media (max-width: 359px) {
+  .v2-head > .acts { flex-direction: column; }
+}
+
+/* ≤480: every More filters popover is full width (16px gutters, centred by crm.js keepPopsInView), like Sales initiatives' */
+@media (max-width: 480px) {
+  .filters .pop#more-pop { width: calc(100vw - 32px); min-width: 0; }
 }
