@@ -24,6 +24,19 @@ body.v2 :is(.main, .m-bar, .drill, .pop) :is(.btn.icon-only, .icon-btn, .pager b
 body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
 .m-scrim { display: none; }
 
+/* ≤1480: keep the filter bar on one row down to 1280, also once Reset shows (Pipeline's bar needs ~1460px with
+   labels and Reset) — More filters and Export become 40px icon buttons, as on phones (the label stays for screen readers) */
+@media (max-width: 1480px) {
+  .filters #more-btn, .filters #export { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
+  .filters #more-btn .count-badge { position: absolute; top: -4px; right: -4px; font-size: var(--text-2xs); }
+}
+/* Desktop filter bars: the search gives up width first (260 → 180px), then the bar wraps instead of
+   running off the edge (e.g. Activities' custom range + Reset) */
+@media (min-width: 769px) {
+  .filters { flex-wrap: wrap; row-gap: var(--space-2); }
+  .filters > .search { flex: 1 1 180px; max-width: 260px; }
+}
+
 @media (max-width: 1360px) {
   .v2-head { flex-wrap: wrap; row-gap: var(--space-6); }
   .v2-hello { flex: 1 1 420px; }
@@ -46,7 +59,7 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
 @media (max-width: 1100px) {
   :root { --pad-page: 24px; }
   .main { padding: 0 var(--pad-page) var(--pad-page); }
-  .filters { padding-left: var(--pad-page); padding-right: var(--pad-page); margin-left: calc(-1 * var(--pad-page)); margin-right: calc(-1 * var(--pad-page)); }
+  .filters, .back-bar { padding-left: var(--pad-page); padding-right: var(--pad-page); margin-left: calc(-1 * var(--pad-page)); margin-right: calc(-1 * var(--pad-page)); }
   /* Tables: same columns, scroll sideways, first column stays put */
   .tbl.opp, .tbl.si, .main .tbl.cl { min-width: 1040px; }
   .tbl.fnt, .main .tbl.att, .main .tbl.li { min-width: 760px; }
@@ -85,6 +98,7 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
   .m-bar .avatar-img { width: 28px; height: 28px; border-radius: var(--radius-sm); }
   .v2-head { padding-top: var(--space-6); margin-bottom: var(--space-1); } /* 4px + the filter bar's 8px top padding = 12px to the search */
   .v2-head:has(> .acts) { row-gap: var(--space-3); } /* Sales pages: subtitle → action buttons 12px, same as buttons → search */
+  .v2-head > .acts { margin-left: auto; justify-content: flex-end; } /* add / export buttons sit on the right, as on desktop */
   .grid > [class*="s"] { grid-column: span 12; }
   /* Filter bar: sticky under the 56px top bar, at most two rows (crm.js compactFilters):
      row 1 = search + More filters (+ Export), row 2 = the other filters, scrolling sideways. No search = one row. */

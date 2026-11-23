@@ -259,7 +259,7 @@ body.drill-open .drill { transform: none; visibility: visible; transition: trans
 .dr-r { flex: none; text-align: right; font-variant-numeric: tabular-nums; }
 .dr-r b { display: block; font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
 .dr-why .hot, .dr-r .hot { color: var(--danger); }
-.dr-foot { display: flex; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--line); }
+.dr-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--line); }
 /* the mark that opened the panel stays highlighted; nothing else on the page changes */
 .qcol.on { background: var(--info-bg); }
 

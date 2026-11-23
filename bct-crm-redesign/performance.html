@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales performance · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
-<link rel="stylesheet" href="assets/crm.css?v=20261120a">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261123e">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261123a">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261120y">
+<link rel="stylesheet" href="assets/responsive.css?v=20261123g">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
@@ -137,7 +137,7 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm.js?v=20261123e"></script>
 <script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
@@ -508,7 +508,7 @@ function renderDrill() {
           <span class="dr-r"><b>${money(o.value)}</b><small>${o.result === 'won' ? 'Won' : `Lost · ${esc(o.reason)}`}</small><small>${fmtDate(o.closed)}</small></span>
         </button>`).join('') : `<div class="empty"><b>Nothing closed</b>${d.type === 'quarter' && d.v > CUR_Q ? `Q${d.v} has not started yet.` : 'No closed deals match this selection.'}</div>`}
     </div>
-    <footer class="dr-foot"><button class="btn primary" data-act="si">Open ${rows.length} in Sales initiatives</button><button class="btn ghost" data-act="undrill">Close</button></footer>`;
+    <footer class="dr-foot"><button class="btn ghost" data-act="undrill">Close</button><button class="btn primary" data-act="si">Open ${rows.length} in Sales initiatives</button></footer>`;
 }
 drillEl.addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a) return;

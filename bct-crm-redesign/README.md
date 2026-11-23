@@ -45,3 +45,4 @@ then go to `http://localhost:5174/pipeline.html`.
 - `assets/fonts/` — Inter (OFL)
 - `CHANGELOG.md` — what changed in each push to `main`
 - `RWD.md` — responsive behaviour per breakpoint and the fixes behind it (Traditional Chinese)
+- `DESIGN.md` — the settled design rules to follow when editing these pages (Traditional Chinese)

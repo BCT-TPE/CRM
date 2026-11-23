@@ -37,8 +37,8 @@
   /* ---------- Text ---------- */
   --t1: #252728;  /* body */
   --t2: #56595b;  /* secondary */
-  --t3: #6b6e70;  /* captions, labels */
-  --t4: #8a8f96;  /* placeholders, items not built yet */
+  --t3: #65686a;  /* captions, labels (was #6b6e70: 4.15–4.46:1 on the blue canvas and tinted cards; now ≥4.5:1, 2026-11-23) */
+  --t4: #8a8f96;  /* items not built yet (greyed nav). Not for placeholders: 3.2:1 */
   --on-dark: #ffffff;
 
   /* ---------- Surfaces ---------- */
@@ -59,7 +59,7 @@
   --line-3: #c9d5e6;
 
   /* ---------- Status: red is reserved for overdue and needs attention ---------- */
-  --danger: #c2412d;  --danger-bg: #fbefec;  --danger-line: #f0c9c1;  --danger-soft: #ffd9d1;
+  --danger: #bf3e2a;  --danger-bg: #fbefec;  --danger-line: #f0c9c1;  --danger-soft: #ffd9d1;
   --warn: #94600f;    --warn-bg: #faf3e6;    --warn-soft: #fde7b0;  --warn-text: #7a4d00; /* longest stretch in stage history */
   --ok: #3a6b56;      --ok-bg: #eef4f0;      --ok-text: #1f5a35;
   /* Activity types on the timeline: one hue per type (CRMpulse hues for call, email, visit; the rest added so none repeat) */

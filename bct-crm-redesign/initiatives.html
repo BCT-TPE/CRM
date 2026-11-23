@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales initiatives · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
-<link rel="stylesheet" href="assets/crm.css?v=20261120a">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261123e">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261123a">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261120y">
+<link rel="stylesheet" href="assets/responsive.css?v=20261123g">
 <style>
 /* ---------- Page: Sales initiatives (list page) ---------- */
 /* Lifecycle strip: status tiles filter the list (list-page behaviour, as in the old CRM) */
@@ -61,10 +61,7 @@
 /* Table */
 .tbl.si { table-layout: fixed; }
 .tbl.si col.c-name { width: 21%; } .tbl.si col.c-stage { width: 25%; } .tbl.si col.c-own { width: 14%; } .tbl.si col.c-val { width: 10%; }
-.tbl.si col.c-prob { width: 6%; } .tbl.si col.c-close { width: 9%; } .tbl.si col.c-next { width: 15%; } .tbl.si col.c-act { width: 52px; }
-.qa-acts { display: flex; justify-content: flex-end; }
-.qa-acts .btn.icon-only { width: 32px; height: 32px; padding: 0; justify-content: center; }
-.qa-acts svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tbl.si col.c-prob { width: 6%; } .tbl.si col.c-close { width: 9%; } .tbl.si col.c-next { width: 15%; }
 /* More filters: CRMpulse's 13 fields as selects, two columns */
 #more-pop { width: 520px; }
 #more-pop .mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
@@ -178,7 +175,7 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm.js?v=20261123e"></script>
 <script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 /* Sales initiatives — the list behind every number on the dashboards (requirement 5.12: list, kanban and funnel views). */
@@ -329,7 +326,6 @@ function prog(o) {
     + `<div class='row'><span>One dash per sub-stage · dark = now</span></div>`;
   return `<div class="prog" tabindex="0" aria-label="Lifecycle step ${o.step + 1} of ${n}: ${esc(o.sub)}" data-tip-html="${tip}">${ALL_STEPS.map((_, i) => `<i class="${i < o.step ? 'f' : i === o.step ? 'c' : ''} ${i === 3 || i === 6 ? 'sep' : ''}"></i>`).join('')}</div>`;
 }
-const IC_EDIT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>';
 function stagePill(o) { return o.kind === 'open' ? `<span class="st ${o.status}">${o.status}</span>` : `<span class="st ${o.kind}">${o.kind === 'won' ? 'Won' : 'Lost'}</span>`; }
 function listView(rows) {
   if (!rows.length) return emptyMsg();
@@ -339,8 +335,8 @@ function listView(rows) {
   const shown = rows.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
   return `
     <div class="tbl-wrap"><table class="tbl si">
-      <colgroup><col class="c-name"><col class="c-stage"><col class="c-own"><col class="c-val"><col class="c-prob"><col class="c-close"><col class="c-next"><col class="c-act"></colgroup>
-      <thead><tr>${th('name', 'Initiative')}${th('stage', 'Stage', '', 'Main status and sub-stage. Bar = 13 steps: 3 prospect, 3 lead, 7 opportunity.')}${th('', 'Owner / team')}${th('value', 'Value', 'r')}${th('prob', 'Prob.', 'r')}${th('close', 'Close')}${th('next', 'Next step')}<th aria-label="Actions"></th></tr></thead>
+      <colgroup><col class="c-name"><col class="c-stage"><col class="c-own"><col class="c-val"><col class="c-prob"><col class="c-close"><col class="c-next"></colgroup>
+      <thead><tr>${th('name', 'Initiative')}${th('stage', 'Stage', '', 'Main status and sub-stage. Bar = 13 steps: 3 prospect, 3 lead, 7 opportunity.')}${th('', 'Owner / team')}${th('value', 'Value', 'r')}${th('prob', 'Prob.', 'r')}${th('close', 'Close')}${th('next', 'Next step')}</tr></thead>
       <tbody>${shown.map(o => {
         const local = localAmount(o.value, o.cur), late = o.follow && new Date(o.follow) < TODAY, passed = o.kind === 'open' && o.close && new Date(o.close) < TODAY;
         return `<tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
@@ -352,7 +348,6 @@ function listView(rows) {
           <td class="r num">${o.prob}%</td>
           <td class="num">${o.close ? `<span class="${passed ? 'hot' : ''}">${fmtDate(o.close)}</span>` : '<span class="muted">Not set</span>'}</td>
           <td>${o.kind !== 'open' ? '<span class="muted">—</span>' : o.next ? `<div class="next-t">${esc(o.next)}</div>${o.follow ? `<div class="fu ${late ? 'late' : ''}">${late ? 'Overdue' : 'Follow-up'} ${fu(o.follow)}</div>` : ''}` : '<span class="next-none">No next step</span>'}</td>
-          <td><div class="qa-acts">${o.kind === 'open' ? `<button class="btn icon-only" data-act="edit" data-id="${o.id}" aria-label="Edit ${esc(o.name)}" data-tip="Edit">${IC_EDIT}</button>` : `<button class="btn icon-only" aria-disabled="true" aria-label="Edit ${esc(o.name)}" data-tip="Closed initiatives can't be edited">${IC_EDIT}</button>`}</div></td>
         </tr>`;
       }).join('')}</tbody>
     </table></div>
@@ -536,7 +531,6 @@ page.addEventListener('click', (e) => {
   else if (act === 'unstage') { S.stage = ''; S.page = 1; render(); }
   else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
   else if (act === 'page') { S.page = +a.dataset.v; render(); }
-  else if (act === 'edit') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}&mode=edit`;
   else if (act === 'open') location.href = `initiative.html?id=${encodeURIComponent(a.dataset.id)}`;
   else if (act === 'reset') resetAll();
 });

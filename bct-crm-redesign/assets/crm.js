@@ -19,11 +19,12 @@
     arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>',
     chevdown: '<path d="M6 9l6 6 6-6"/>',
-    info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/>',
     logout: '<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10"/>',
     stage: '<path d="M4 17l5-5 4 4 7-7"/>',
     clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
     userplus: '<circle cx="10" cy="8" r="3.5"/><path d="M3.5 19c1-3.2 3.5-5 6.5-5s5.5 1.8 6.5 5M18 8v6M15 11h6"/>',
+    settings: '<path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.6a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.6a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+    users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 19c.9-3.2 3.4-5 6.5-5s5.6 1.8 6.5 5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c1.7.7 2.9 2.3 3.5 4.7"/>',
     panel: '<rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M9.5 4.5v15"/>'
   };
   const icon = (n) => `<svg viewBox="0 0 24 24" aria-hidden="true">${I[n] || ''}</svg>`;
@@ -34,9 +35,23 @@
     ['Sales', [['initiatives', 'Sales initiatives', 'target'], ['activities', 'Activities', 'message'], ['tasks', 'Tasks', 'check']]],
     ['Customers', [['accounts', 'Accounts', 'building', 1], ['contacts', 'Contacts', 'user', 1], ['orders', 'Customer orders', 'cart', 1]]],
     ['Plan & report', [['targets', 'Sales targets', 'flag', 1], ['reports', 'Reports', 'report', 1]]],
-    ['Setup', [['structure', 'Sales structure', 'tree', 1]]]
+    ['Setup', [['structure', 'Sales structure', 'tree', 1], ['admin', 'Administration', 'settings', 1, 'ADMIN'], ['users', 'Users', 'users', 1, 'ADMIN']]]
   ];
+  // Old CRMpulse menu-config: an entry with a role shows only to that role (Administration, Users: ADMIN)
   const BUILT = { pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html' }; // this round = Dashboards + Sales; accounts / contacts / targets pages exist but stay out of the nav
+
+  // Old CRMpulse TaskBadge: my open tasks beside Tasks (the overdue count is in its label); nothing when none are open.
+  function taskBadge() {
+    if (typeof TASKS === 'undefined' || typeof ME === 'undefined') return '';
+    const mine = TASKS.filter(t => t.to === ME && taskOpen(t));
+    if (!mine.length) return '';
+    const late = mine.filter(taskLate).length;
+    return `<b class="nav-n" aria-label="${mine.length} open, ${late} overdue">${mine.length}</b>`;
+  }
+  // Old CRMpulse profile: name · role (ROLE_LABELS), and the profile menu shows name + email + Sign out
+  // Signed in as an Administrator (ADMIN): sees Administration and Users, opens Activities on Everyone and Tasks on Team overdue
+  const USER = { name: 'Gaurav Shrotriya', code: 'ADMIN', role: 'Administrator', email: 'gaurav.shrotriya@example.com' };
+  const ASSIGNING = ['ADMIN', 'SALES_HEAD', 'SALES_MANAGER'], OVERSIGHT = ['ADMIN', 'SALES_HEAD']; // lib/api/auth.ts
 
   function renderShell(active) {
     const side = document.getElementById('side');
@@ -47,12 +62,12 @@
       ${NAV.map(([label, items]) => `
         <nav class="nav-group" aria-label="${label}">
           <div class="nav-label">${label}</div>
-          ${items.map(([id, name, ic, out]) => {
+          ${items.filter(([, , , , role]) => !role || role === USER.code).map(([id, name, ic, out]) => {
             const href = BUILT[id];
             const cls = 'nav-item' + (id === active ? ' active' : '') + (!href ? ' later' : '');
             const tip = out ? 'Not part of this redesign round' : 'Coming next in this redesign round';
             return href
-              ? `<a class="${cls}" href="${href}" data-name="${name}" ${id === active ? 'aria-current="page"' : ''}>${icon(ic)}<span>${name}</span></a>`
+              ? `<a class="${cls}" href="${href}" data-name="${name}" ${id === active ? 'aria-current="page"' : ''}>${icon(ic)}<span>${name}</span>${id === 'tasks' ? taskBadge() : ''}</a>`
               : `<span class="${cls}" aria-disabled="true" data-name="${name}" data-note="${tip}" data-tip="${tip}">${icon(ic)}<span>${name}</span></span>`;
           }).join('')}
         </nav>`).join('')}
@@ -60,7 +75,7 @@
         <button class="nav-item notes-btn" id="notes-btn" aria-haspopup="menu" aria-expanded="false" data-name="Notifications">${lucide('bell', 'i')}<span>Notifications</span><i class="udot" aria-label="Unread notifications"></i></button>
         <button class="user-btn" id="user-btn" aria-haspopup="menu" aria-expanded="false" aria-label="Account">
         <span class="avatar-w"><img class="avatar-img" src="assets/people/gaurav-shrotriya.webp" alt=""></span>
-        <span class="user-name">Gaurav Shrotriya<small>Sales · ACAP</small></span>${lucide('chevron-down', 'chev')}</button></div>`;
+        <span class="user-name">${USER.name}<small>${USER.role}</small></span>${lucide('chevron-down', 'chev')}</button></div>`;
     buildUserMenu();
     let collapsed = false;
     try { collapsed = localStorage.getItem('crm-side') === 'collapsed'; } catch (e) {}
@@ -102,20 +117,14 @@
     // other open tabs of the CRM follow a collapse / expand made here
     addEventListener('storage', (e) => { if (e.key === 'crm-side') apply(); });
   }
-  // Account menu: same content, layout and position as the BCT AI CRM prototype's profile menu.
+  // Account menu: layout and position from the BCT AI CRM prototype; content as the old CRMpulse profile menu (name, email, Sign out).
   // Lucide icons, exactly as the prototype draws them (stroke 2, round caps).
   const LUCIDE = {
     'chevron-down': '<path d="m6 9 6 6 6-6"/>',
-    mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
-    calendar: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/>',
-    'file-text': '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5Z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h2"/>',
-    sparkle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17l.7 1.8 1.8.7-1.8.7L19 22l-.7-1.8-1.8-.7 1.8-.7z"/>',
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
-    info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>'
   };
   function lucide(n, cls = 'i') { return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${LUCIDE[n]}</svg>`; }
-  const SRC = { outlook: ['Outlook mail', 'mail', true], teams: ['Teams calendar', 'calendar', true], files: ['SharePoint files', 'file-text', false], brief: ['Daily brief', 'sparkle', true] };
   // Notifications: their own sidebar item above the profile. Unread state is a blue dot (no number).
   const NOTES = [
     { id: 1, t: 'Lotus – ERP Upgrade moved to commercial negotiation', s: 'Vikram Iyer · 2 hours ago', unread: true },
@@ -138,9 +147,7 @@
       e.stopPropagation();
       const a = e.target.closest('[data-m]'); if (!a) return;
       const m = a.dataset.m;
-      if (m === 'sw') { SRC[a.dataset.k][2] = !SRC[a.dataset.k][2]; paintMenu(); }
-      else if (m === 'help') { openPop(null); toast('Esc closes panels · Tab moves between charts · Enter opens a row'); }
-      else if (m === 'out') { openPop(null); toast('Would sign you out through OneLogin'); }
+      if (m === 'out') { openPop(null); toast('Would sign you out through OneLogin'); }
     });
     notes.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -154,16 +161,8 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') openPop(null); });
   }
   function paintMenu() {
-    const sw = (k) => { const [name, ic, on] = SRC[k]; const sub = k === 'brief' ? 'Weekdays at 06:00' : on ? 'Connected' : 'Not connected';
-      return `<div class="menu-item menu-switch">${lucide(ic)}<span class="menu-switch-text"><b>${name}</b><small>${sub}</small></span><button class="switch" role="switch" aria-checked="${on}" aria-label="${name}" data-m="sw" data-k="${k}"><span></span></button></div>`; };
     menu.innerHTML = `
-      <div class="acct-head"><img src="assets/people/gaurav-shrotriya.webp" alt=""><div><b>Gaurav Shrotriya</b><small>Sales · ACAP</small><small>Signed in with OneLogin</small></div></div>
-      <div class="menu-sep"></div>
-      <div class="menu-label">The assistant can read</div>
-      ${sw('outlook')}${sw('teams')}${sw('files')}
-      <div class="menu-sep"></div>
-      ${sw('brief')}
-      <button class="menu-item" role="menuitem" data-m="help">${lucide('info')}Help and shortcuts</button>
+      <div class="acct-head"><img src="assets/people/gaurav-shrotriya.webp" alt=""><div><b>${USER.name}</b><small>${USER.email}</small></div></div>
       <div class="menu-sep"></div>
       <button class="menu-item danger" role="menuitem" data-m="out">${lucide('logout')}Sign out</button>`;
   }
@@ -545,7 +544,7 @@
 
   // Confirm dialog (Candace, 2026-11-18). CRM.confirm({ title, body, actions: [{ label, value, kind }] }) resolves to the
   // chosen action's value, or null when closed with Esc or a click outside. kind: 'primary' (focused first), 'quiet'
-  // (red text, sits on the left: the destructive choice). Styles: .dlg in crm.css.
+  // (red text, first in the right-aligned row: the destructive choice). Styles: .dlg in crm.css.
   function confirmDlg({ title, body = '', actions }) {
     return new Promise((resolve) => {
       const prev = document.activeElement;
@@ -585,5 +584,10 @@
   }
   function leave(url) { leaving = true; location.href = url; }
 
-  window.CRM = { icon, renderShell, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
+  // redraw the Tasks count after a task is completed, added or reassigned on this page
+  function refreshTaskBadge() {
+    const a = document.querySelector('#side a.nav-item[href="tasks.html"]'); if (!a) return;
+    a.querySelector('.nav-n')?.remove(); a.insertAdjacentHTML('beforeend', taskBadge());
+  }
+  window.CRM = { icon, renderShell, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
 })();

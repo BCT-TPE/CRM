@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
-<link rel="stylesheet" href="design-system/tokens.css?v=20261120c">
-<link rel="stylesheet" href="assets/crm.css?v=20261120a">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261120a">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261123e">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261123a">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261120y">
+<link rel="stylesheet" href="assets/responsive.css?v=20261123g">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
    Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
@@ -73,7 +73,7 @@
 .rec-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; margin-top: 16px; }
 .rec-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .rec-tabs { display: flex; gap: 0; padding: 6px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line-2); }
-.rtab { flex: 1 1 0; justify-content: center; display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; white-space: nowrap; min-width: 0; border: 0; border-radius: var(--radius-control); background: none; font: inherit; font-size: var(--text-sm); color: var(--t2); cursor: pointer; }
+.rtab { flex: 1 1 0; justify-content: center; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 14px; white-space: nowrap; min-width: 0; border: 0; border-radius: var(--radius-control); background: none; font: inherit; font-size: var(--text-sm); color: var(--t2); cursor: pointer; }
 .rtab:hover { background: var(--hover); color: var(--ink); }
 .rtab.on { background: var(--deep); color: var(--on-dark); font-weight: 500; }
 .rtab .tab-n { background: var(--hover); }
@@ -175,7 +175,7 @@
 .drop b { color: var(--deep); font-weight: 500; }
 
 /* v2: pill tabs and stepper on glass, owner avatars use the shared tints */
-.v2 .rec-tabs { border-radius: var(--radius-pill); padding: 4px; border-color: var(--surface); background: var(--glass); box-shadow: var(--shadow-card); }
+.v2 .rec-tabs { border-radius: var(--radius-pill); padding: 3px; border-color: var(--surface); background: var(--glass); box-shadow: var(--shadow-card); }
 .v2 .rtab { border-radius: var(--radius-pill); }
 .v2 .rtab.on { background: var(--midnight); }
 .v2 .stp.cur { background: var(--midnight); }
@@ -377,7 +377,7 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261120h"></script>
+<script src="assets/crm.js?v=20261123e"></script>
 <script src="assets/crm-data.js?v=20261120b"></script>
 <script>
 /* Data for one record. Everything shown comes from the shared demo data (assets/crm-data.js); details the list doesn't

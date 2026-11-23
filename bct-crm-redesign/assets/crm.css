@@ -60,6 +60,9 @@ body.side-collapsed .user-btn { justify-content: center; padding: 0; }
 .nav-item.active svg { color: var(--deep); }
 .nav-item.later { color: var(--t4); }
 .nav-item.later:hover { background: transparent; color: var(--t4); cursor: default; }
+/* Tasks: my open count (old CRMpulse TaskBadge), a blue circle; on the collapsed rail it sits on the icon's corner */
+.nav-n { display: inline-grid; place-items: center; margin-left: auto; min-width: 20px; height: 20px; padding: 0 5px; border-radius: var(--radius-full); background: var(--deep); font-size: var(--text-2xs); font-weight: 600; line-height: 1; color: var(--on-dark); font-variant-numeric: tabular-nums; }
+body.side-collapsed .nav-n { position: absolute; margin: -16px 0 0 10px; min-width: 16px; height: 16px; padding: 0 4px; }
 .avatar { width: 32px; height: 32px; border-radius: var(--radius-full); display: grid; place-items: center; background: var(--midnight); color: var(--on-dark); font-size: var(--text-xs); font-weight: 600; flex: none; }
 .side-bottom { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); }
 .user-btn { display: flex; align-items: center; gap: 10px; width: 100%; height: 44px; padding: 0 6px; border: 1px solid transparent; border-radius: var(--radius-sm); background: transparent; cursor: pointer; text-align: left; font: inherit; color: var(--t2); }
@@ -154,7 +157,7 @@ body.scrolled .back-bar::after { opacity: 1; }
 .select select:focus, .select select:focus-visible { outline: none; }
 .select:focus-within { border-color: var(--deep); }
 .select::after { content: ""; position: absolute; right: 12px; top: 50%; width: 6px; height: 6px; margin-top: -5px; border-right: 1.6px solid var(--t3); border-bottom: 1.6px solid var(--t3); transform: rotate(45deg); pointer-events: none; }
-.select .lbl { padding-left: 12px; font-size: var(--text-xs); color: var(--t3); white-space: nowrap; }
+.select .lbl { padding-left: 12px; font-size: var(--text-sm); color: var(--t3); white-space: nowrap; }
 .select .lbl + select { padding-left: 6px; font-weight: 500; }
 .select.set { border-color: var(--deep); background: var(--info-bg); }
 /* Custom select (assets/crm.js enhanceSelect): trigger replaces the native control, menu reuses .pop */
@@ -225,18 +228,18 @@ textarea.in { height: auto; min-height: 84px; padding: 10px 12px; resize: vertic
 .search:focus-within { border-color: var(--deep); }
 .search svg { position: absolute; left: 11px; width: 16px; height: 16px; fill: none; stroke: var(--t3); stroke-width: 2; stroke-linecap: round; }
 .search input { width: 100%; height: 100%; border: 0; background: none; padding: 0 12px 0 34px; font-size: var(--text-sm); outline: none; }
-.search input::placeholder { color: var(--t4); }
+.search input::placeholder { color: var(--t3); } /* same as other inputs; --t4 is below 4.5:1 */
 
 .count-badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: var(--radius-control); background: var(--deep); color: var(--on-dark); font-size: var(--text-2xs); font-weight: 600; }
 
 /* ---------- Popover ---------- */
 .pop { position: absolute; z-index: 50; min-width: 260px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-pop); }
 .pop[hidden] { display: none; }
-.pop h4 { margin: 0 0 8px; font-size: var(--text-xs); font-weight: 500; color: var(--t3); }
+.pop h4 { margin: 0 0 8px; font-size: var(--text-sm); font-weight: 500; color: var(--t3); } /* labels above selects / chips: 14px, same as the filter-bar labels */
 .pop .grp + .grp { margin-top: 14px; }
 .check { display: flex; align-items: center; gap: 9px; height: 30px; font-size: var(--text-sm); cursor: pointer; }
 .check input { width: 16px; height: 16px; accent-color: var(--deep); margin: 0; }
-.pop-foot { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.pop-foot { display: flex; justify-content: flex-end; align-items: center; gap: var(--space-4); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
 
 /* ---------- Grid + cards ---------- */
 .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
@@ -341,7 +344,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 .dlg-b li + li { margin-top: var(--space-1); }
 .dlg-b li b { font-weight: 500; color: var(--t1); }
 .dlg-acts { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: flex-end; margin-top: var(--space-6); }
-.dlg-acts .btn.quiet { margin-right: auto; padding-left: 0; padding-right: 0; border-color: transparent; background: transparent; box-shadow: none; color: var(--danger); }
+.dlg-acts .btn.quiet { margin-right: var(--space-2); padding-left: 0; padding-right: 0; border-color: transparent; background: transparent; box-shadow: none; color: var(--danger); }
 .dlg-acts .btn.quiet:hover { text-decoration: underline; }
 body.dlg-open { overflow: hidden; }
 @media (max-width: 480px) { .dlg-acts .btn:not(.quiet) { flex: 1 1 0; justify-content: center; } .dlg-acts .btn.quiet { flex-basis: 100%; order: 1; justify-content: center; margin: 0; } }

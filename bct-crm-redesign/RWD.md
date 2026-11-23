@@ -11,6 +11,7 @@
 | 寬度 | 版面 |
 |---|---|
 | 1440 | 桌面版，維持原設計 |
+| ≤ 1480 | More filters、Export 縮成 40×40px 圖示按鈕，讓篩選列維持一行（1440 出現 Reset 時也一樣） |
 | ≤ 1360 | 頁首 KPI 換到問候語下方；篩選列可換行 |
 | ≤ 1180 | 卡片重新排列：小卡兩兩一排，寬卡佔滿一行 |
 | ≤ 1100 | 側邊欄收成圖示列；頁面內距 24px；表格第一欄固定、其餘左右滑動 |
@@ -29,6 +30,9 @@
 | Pipeline、Performance 頁首 4 個 KPI 被擠出畫面 | 481–1100px | 桌面版為了避免數字跳動，每個 KPI 都有固定最小寬度。現在 ≤1100 改成 4 欄平均分配，≤768 改成 2×2；KPI 名稱和說明可換行 |
 | Sales initiatives 列表工具列的 List / Kanban / Funnel 被推出畫面 | 820px 左右 | ≤1100 時工具列可換行 |
 | KPI 大數字超出 4px | 360px | ≤400 時數字縮小一級 |
+| 篩選列換成兩行（Export / More filters 掉到第二行） | 1280–1460px | ≤1480 時 More filters、Export 縮成 40×40px 圖示按鈕。Pipeline、Performance 出現 Reset 時，1280 寬仍會換行（差約 20px） |
+| Activities 自訂期間 + Reset 時篩選列超出畫面，搜尋框被擠到 48px | 1280–1440px | 搜尋框先從 260px 縮到 180px，還放不下才換行 |
+| Activities 數字卡說明被截斷 | 1280px | 說明可換行並精簡文案（All contacted recently、From the last 30 days）；subgrid 讓四張卡的列仍對齊 |
 
 **驗證**：五頁 × 13 種寬度（360–1440px）掃描，都沒有內容超出畫面。
 

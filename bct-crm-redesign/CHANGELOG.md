@@ -7,7 +7,32 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-20 (docs)
+## 2026-11-23
+
+Review pass against the design team's prototype checklist, a sidebar/profile sync with old CRMpulse, and a WCAG AA contrast pass. Cache-busters: `tokens.css?v=20261123a`, `crm.css?v=20261123e`, `crm.js?v=20261123e`, `dashboard.css?v=20261123a`, `responsive.css?v=20261123g` (all pages that load them, including the out-of-scope ones).
+
+### Added
+- **`DESIGN.md`** (Traditional Chinese): the settled rules for anyone (or any AI) editing these pages: source priority, sizes (40px controls, 32px switch options, 64px rows, 14px select text), row-click tables, button order, filter-bar fallbacks, sidebar/role rules, colours, don'ts, decisions kept as they are, and the checks to run after a change.
+- **Role-gated sidebar** (old `menu-config.ts`): entries can carry a role; Setup gains **Administration** and **Users** for `ADMIN` only (greyed, not built this round).
+- **Tasks badge** in the sidebar (old `TaskBadge`): my open tasks, a 20px blue circle (`.nav-n`), on the icon's corner when the rail is collapsed; `CRM.refreshTaskBadge()` redraws it after a task is completed, added or reassigned on Tasks.
+
+### Changed
+- **Demo user signs in as Administrator** (`USER` in `crm.js`, exposed as `CRM.user` with `assigning` / `oversight`). Defaults follow old CRMpulse: Activities opens on **Everyone** (`defaultWho`), Tasks opens on **Team overdue** when anything is overdue (`defaultView`).
+- **Profile menu = old ProfileMenu**: name, email (`gaurav.shrotriya@example.com`), Sign out. Removed the assistant sources (Outlook / Teams / SharePoint), Daily brief, Help and the OneLogin line. The sidebar shows the role (Administrator) under the name instead of "Sales · ACAP".
+- **Row click only**: Tasks and Sales initiatives rows open on click (and Enter); the pencil column is gone from both. Links and the checkbox inside a Tasks row keep their own action. Initiatives' edit-mode shortcut is reached through the record page's Edit button.
+- **Button order**: side panels, popovers and dialogs align their buttons right with the primary one last: Tasks panel `Cancel` `Save`, Pipeline / Performance drill `Close` `Open N in Sales initiatives`, More filters `Clear` `Done`, confirm dialog `Discard` `Keep editing` `Save` (the quiet/destructive action no longer sits alone on the left). Page-header actions stay right on phones too.
+- **14px select labels**: filter-bar prefixes (`.select .lbl`: Assignee, Team, Fiscal year, Owner, Purpose, Period, Expected close, Sort) and the group headings in every More filters popover (`.pop h4`) go from 12px to 14px; Activities' heading override (600 / `--t2`) is removed so all match.
+- **Record page tabs**: 32px options in a 40px bar, like the other switches.
+- **Contrast (WCAG AA)**: `--t3` `#6b6e70` → `#65686a` and `--danger` `#c2412d` → `#bf3e2a` so captions and red figures reach 4.5:1 on the blue canvas and tinted cards; search placeholders use `--t3` (was `--t4`, 3.2:1).
+- **Activities tiles**: notes wrap (subgrid keeps the rows aligned) and two were shortened: "All contacted recently", "From the last 30 days".
+
+### Fixed
+- **Filter bar wrapping at 1280–1460px**: ≤1480px More filters and Export become 40×40 icon buttons (label kept for screen readers); on desktop the search shrinks 260 → 180px before the bar wraps. Activities' custom range + Reset no longer runs off the edge (it crushed the search to 48px at 1440). Known: Pipeline / Performance still wrap at 1280 once Reset shows (~20px short).
+- **Record page at 769–1100px**: the back bar kept the 40px negative margins and scrolled the page sideways by 16px; it now follows `--pad-page` like the filter bar.
+
+---
+
+## 2026-11-20 (docs) · `0999596`
 
 ### Added
 - **`RWD.md`**: the responsive work of today's two pushes in one place (Traditional Chinese, for the design team): breakpoints, what overflowed and how it was fixed, the phone filter bar, tables as card lists on phones, alignment and the 40px tap height, the record-page fixes, how it was checked, and what is still open. Linked from the README.
