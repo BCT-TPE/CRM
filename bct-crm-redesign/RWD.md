@@ -11,7 +11,8 @@
 | 寬度 | 版面 |
 |---|---|
 | 1440 | 桌面版，維持原設計 |
-| ≤ 1480 | More filters、Export 縮成 40×40px 圖示按鈕，讓篩選列維持一行（1440 出現 Reset 時也一樣） |
+| ≤ 1419 | More filters、Export 縮成 40×40px 圖示按鈕並有 tooltip（1420–1499 只在出現 Reset 時） |
+| ≤ 1279 | Pipeline、Performance 改用精簡篩選列（年度、季度下拉、篩選面板、Export） |
 | ≤ 1360 | 頁首 KPI 換到問候語下方；篩選列可換行 |
 | ≤ 1180 | 卡片重新排列：小卡兩兩一排，寬卡佔滿一行 |
 | ≤ 1100 | 側邊欄收成圖示列；頁面內距 24px；表格第一欄固定、其餘左右滑動 |
@@ -40,20 +41,21 @@
 
 ## 3. 手機版篩選列（≤768）
 
-**目標**：置頂，且最多兩行。
+**目標**：置頂，最多兩行，**不左右滑動**（2026-11-24 依主管 design review M3 改版）。
 
-| 頁面 | 第一行 | 第二行（可左右滑動） |
-|---|---|---|
-| Sales initiatives | 搜尋框、More filters | Everyone / My initiatives、Team、Expected close |
-| Activities | 搜尋框、More filters | Mine / My teams / Everyone、Purpose、Period（自訂期間時加上 From / To） |
-| Tasks | 搜尋框 | Assignee、Show completed and cancelled |
-| Pipeline、Performance | 只有一行：Fiscal year、季度切換、Team、Owner 可滑動；More filters、Export 固定在右側 | — |
+| 頁面 | 第一行 | 第二行 | 移到 More filters 最上方 |
+|---|---|---|---|
+| Sales initiatives | 搜尋框、More filters、Export | Everyone / My initiatives | Team、Expected close |
+| Activities | 搜尋框、More filters | Mine / My teams / Everyone | Purpose、Period（自訂期間時加上 From / To） |
+| Tasks | 搜尋框、Filters（手機自動加的面板） | — | Assignee、Show completed and cancelled |
+| Pipeline、Performance | 只有一行：Fiscal year、季度（Full year／Q1–Q4 改成下拉）、More filters、Export（1279px 以下就用這個精簡版） | — | Team、Owner |
 
+- **篩選數量**：More filters 的徽章 = 原本面板內的篩選數 + 移進來、已設定的篩選數。
+- **間距**：頁首下方 12px、分隔線、再 12px 才是篩選列；固定在頂端時分隔線隱藏。
 - **置頂**：固定在頂端選單列（56px）下方，捲動後加上毛玻璃背景。
 - **圖示化**：More filters 和 Export 在手機上縮成 40×40px 的圖示按鈕，篩選數量的徽章保留在角落。
-- **頁首按鈕**（Sales initiatives 的 Export to Excel、New sales initiative；Tasks 的 New task）：在頁首時滿版、兩顆各佔一半（只有一顆就佔滿）。往下捲、篩選列固定在頂端後，同樣的按鈕以 40×40px 圖示出現在第一行最右邊（New 為深藍色），點了等同按原本的按鈕。
-- **滑動提示**：可滑動的那一行右側有淡出效果。
-- **平面樣式**：篩選列的按鈕拿掉陰影，改用細框線。原因是可滑動的容器會把陰影裁成一條水平直線。
+- **頁首按鈕**（Sales initiatives 的 New sales initiative；Tasks 的 New task；Export 已移到篩選列）：在頁首時滿版、兩顆各佔一半（只有一顆就佔滿）。往下捲、篩選列固定在頂端後，同樣的按鈕以 40×40px 圖示出現在第一行最右邊（New 為深藍色），點了等同按原本的按鈕。
+- **平面樣式**：篩選列的按鈕拿掉陰影，改用細框線。
 - **彈出選單**：下拉選單和日期選擇器若從可滑動的那一行打開，會暫時移到頁面最外層顯示，關閉後放回原位，避免被遮罩或毛玻璃效果裁掉。
 - **置頂偵測**：`watchSticky` 改用捲動事件判斷，可辨識任何置頂位置。原本只認得貼在畫面最頂端的情況。
 - **程式**：`crm.js` 的 `compactFilters()`。做法是移動既有節點而不是複製，所以各頁的 id 和事件都不受影響；視窗變寬時會還原原本的順序。
@@ -137,3 +139,8 @@
 - Sales initiatives 列表卡片裡的 Sort 下拉沒有置頂；置頂的是頁面上方的篩選列。
 - 375px 以下的手機，Initiatives 的 Sort 選項文字可能以「…」截斷。
 - 紀錄頁的分頁（Overview、Line items…）是另一種分頁樣式，高度仍是 36px，沒有併入 40px 的統一規則。
+
+## 9. 手機頂端列與選單（2026-11-24）
+
+- 頭像可點，在頭像下方打開帳號選單（姓名、角色、Email）；抽屜選單不再放帳號，只留 Notifications 固定在底部，選單列 44px、可捲動。
+- 往下捲、頁面標題捲出頂端列後，Logo 淡出、改顯示頁名；捲回頂端再換回 Logo。

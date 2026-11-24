@@ -24,13 +24,13 @@ const CODE_INFO = {
 // FY targets. Company target = sum of geography targets ($14.40M). Team and salesperson targets are set independently
 // (requirement 10.6: overlapping targets are never added together).
 const TEAMS = {
-  'APAC Sales': { geo: 'APAC', people: ['Daniel Tan', 'Mei Lin Wong', 'Gaurav Shrotriya'], target: 1.10e6 },
+  'APAC Sales': { geo: 'APAC', people: ['Daniel Tan', 'Mei Lin Wong', 'Gaurav Shrotriya'], target: 1.65e6 }, // incl. Gaurav's own 0.55M (2026-11-24)
   'India Enterprise': { geo: 'India', people: ['Priya Sharma', 'Karthik Menon'], target: 2.20e6 },
   'India Strategic Accounts': { geo: 'India', people: ['Vikram Iyer', 'Ananya Reddy'], target: 1.10e6 },
   'Middle East Enterprise': { geo: 'Middle East', people: ['Omar Haddad', 'Ahmed Al-Mansoori'], target: 1.10e6 },
   'Middle East Strategic Accounts': { geo: 'Middle East', people: [], target: 1.10e6 }
 };
-const PERSON_TARGET = { 'Daniel Tan': 0.55e6, 'Mei Lin Wong': 0.55e6, 'Priya Sharma': 1.10e6, 'Karthik Menon': 1.10e6, 'Vikram Iyer': 0.55e6, 'Ananya Reddy': 0.55e6, 'Omar Haddad': 0.55e6, 'Ahmed Al-Mansoori': 0.55e6 };
+const PERSON_TARGET = { 'Daniel Tan': 0.55e6, 'Mei Lin Wong': 0.55e6, 'Gaurav Shrotriya': 0.55e6, 'Priya Sharma': 1.10e6, 'Karthik Menon': 1.10e6, 'Vikram Iyer': 0.55e6, 'Ananya Reddy': 0.55e6, 'Omar Haddad': 0.55e6, 'Ahmed Al-Mansoori': 0.55e6 };
 const ME = 'Gaurav Shrotriya';
 const PERSON_TEAM = Object.fromEntries(Object.entries(TEAMS).flatMap(([t, v]) => v.people.map(p => [p, t])));
 const GEO_TARGET = { 'APAC': 2.8e6, 'India': 5.6e6, 'Middle East': 6.0e6 };
@@ -52,6 +52,10 @@ const OPPS = [
   { id: 'SI-2026-0027', name: 'Kaveri – Data Platform Modernization', acc: 'Kaveri Pharma', owner: 'Ananya Reddy', team: 'India Strategic Accounts', st: 'cf', value: 0.12e6, prob: 90, close: '2026-12-22', days: 52, open: 95, next: true },
   { id: 'SI-2026-0029', name: 'Sundaram – Cloud Migration', acc: 'Sundaram Healthcare', owner: 'Karthik Menon', team: 'India Enterprise', st: 'ps', value: 0.12e6, prob: 70, close: '2026-12-11', days: 92, open: 85, next: true },
   { id: 'SI-2026-0018', name: 'Gulf – ERP Upgrade', acc: 'Gulf National Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', st: 'ps', value: 0.0896e6, prob: 60, close: '2027-03-20', days: 101, open: 140, next: true },
+  // Gaurav's own deals, so Home's salesperson view has a quota, commit, best case and deals needing attention (2026-11-24)
+  { id: 'SI-2026-0045', name: 'Al Dhafra – Smart Buildings', acc: 'Al Dhafra Facilities', owner: 'Gaurav Shrotriya', team: 'APAC Sales', st: 'cf', value: 0.035e6, prob: 90, close: '2026-12-12', days: 20, open: 45, next: true },
+  { id: 'SI-2026-0046', name: 'Qamar – Pipeline Monitoring', acc: 'Qamar Energy', owner: 'Gaurav Shrotriya', team: 'APAC Sales', st: 'cn', value: 0.025e6, prob: 75, close: '2026-12-20', days: 12, open: 40, next: true },
+  { id: 'SI-2026-0047', name: 'Coral Ports – Data Platform', acc: 'Coral Ports', owner: 'Gaurav Shrotriya', team: 'APAC Sales', st: 'ps', value: 0.045e6, prob: 60, close: '2026-10-31', days: 34, open: 80, next: true },
   { id: 'SI-2026-0030', name: 'Indus – Application Support', acc: 'Indus Finance Corporation', owner: 'Priya Sharma', team: 'India Enterprise', st: 'pp', value: 0.08e6, prob: 50, close: '2026-12-24', days: 27, open: 70, next: true }
 ];
 
@@ -73,6 +77,8 @@ const CLOSED = [
   { id: 'SI-2026-0010', name: 'Gulf – Digital Onboarding', acc: 'Gulf National Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', result: 'won', value: 0.70e6, closed: '2026-07-19' },
   { id: 'SI-2026-0012', name: 'Emirates Logistics Hub – Fleet Tracking', acc: 'Emirates Logistics Hub', owner: 'Omar Haddad', team: 'Middle East Enterprise', result: 'won', value: 0.55e6, closed: '2026-08-24' },
   { id: 'SI-2026-0013', name: 'ABC – Fraud Analytics', acc: 'ABC Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', result: 'won', value: 0.35e6, closed: '2026-09-26' },
+  { id: 'SI-2026-0048', name: 'Al Dhafra – Facilities Assessment', acc: 'Al Dhafra Facilities', owner: 'Gaurav Shrotriya', team: 'APAC Sales', result: 'won', value: 0.045e6, closed: '2026-10-07' },
+  { id: 'SI-2026-0049', name: 'Qamar – Site Survey', acc: 'Qamar Energy', owner: 'Gaurav Shrotriya', team: 'APAC Sales', result: 'won', value: 0.03e6, closed: '2026-11-01' },
   { id: 'SI-2026-0044', name: 'Desert – Asset Monitoring AMC', acc: 'Desert Industrial Holdings', owner: 'Omar Haddad', team: 'Middle East Enterprise', result: 'won', value: 0.35e6, closed: '2026-10-15' },
   // FY26-27 · lost (reached = furthest funnel code before it was lost, for the lifecycle funnel)
   { id: 'SI-2026-0006', name: 'Straits – Analytics Platform', acc: 'Straits Energy Pte Ltd', owner: 'Daniel Tan', team: 'APAC Sales', result: 'lost', value: 0.12e6, closed: '2026-06-03', reason: 'No budget' , reached: 'L3' },
@@ -80,6 +86,8 @@ const CLOSED = [
   { id: 'SI-2026-0017', name: 'Bharat – Customer Portal', acc: 'Bharat Steel Works', owner: 'Priya Sharma', team: 'India Enterprise', result: 'lost', value: 0.40e6, closed: '2026-08-14', reason: 'Scope mismatch' , reached: 'L2' },
   { id: 'SI-2026-0034', name: 'Lotus – Loyalty App', acc: 'Lotus Retail India', owner: 'Vikram Iyer', team: 'India Strategic Accounts', result: 'lost', value: 0.18e6, closed: '2026-10-09', reason: 'No decision / deferred' , reached: 'L3' },
   // FY25-26 · won (for "vs last year")
+  { id: 'SI-2025-0060', name: 'Pearl Transit – Ticketing Kiosks', acc: 'Pearl Transit', owner: 'Gaurav Shrotriya', team: 'APAC Sales', result: 'won', value: 0.02e6, closed: '2025-12-05' },
+  { id: 'SI-2025-0064', name: 'Mekong Freight – Customs Portal', acc: 'Mekong Freight', owner: 'Gaurav Shrotriya', team: 'APAC Sales', result: 'won', value: 0.015e6, closed: '2025-10-15' },
   { id: 'SI-2025-0041', name: 'Gulf – Branch Network Refresh', acc: 'Gulf National Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', result: 'won', value: 0.18e6, closed: '2025-11-20' },
   { id: 'SI-2025-0052', name: 'Indus – Loan Origination', acc: 'Indus Finance Corporation', owner: 'Priya Sharma', team: 'India Enterprise', result: 'won', value: 0.36e6, closed: '2026-02-15' }
 ];
@@ -102,7 +110,8 @@ const NEXT = {
   'SI-2026-0016': ['Finalise proposal pricing', '2026-11-21'], 'SI-2026-0025': ['Negotiate payment terms', '2026-11-15'],
   'SI-2026-0028': ['Follow up on proposal', '2026-11-17'], 'SI-2026-0022': ['Follow up on proposal', '2026-11-09'],
   'SI-2026-0027': ['Get PO signed', '2026-11-16'], 'SI-2026-0029': ['Answer proposal questions', '2026-11-11'],
-  'SI-2026-0018': ['Follow up on proposal', '2026-11-25'], 'SI-2026-0030': ['Draft proposal', '2026-11-20']
+  'SI-2026-0018': ['Follow up on proposal', '2026-11-25'], 'SI-2026-0030': ['Draft proposal', '2026-11-20'],
+  'SI-2026-0045': ['Confirm the signatory', '2026-11-16'], 'SI-2026-0046': ['Send revised commercials', '2026-11-10'], 'SI-2026-0047': ['Confirm the decision date', '2026-11-13']
 };
 // Account currency for showing the local amount next to USD
 const FX = { INR: 83.33, AED: 3.6725, SAR: 3.75, OMR: 0.385 };
@@ -195,7 +204,7 @@ const _hash = (x) => { let h = 0; for (const c of x) h = (h * 31 + c.charCodeAt(
 const _pick = (arr, x) => arr[_hash(x) % arr.length];
 const ACC_VERT = [[/Retail|Lotus|Al Noor/, 'Retail'], [/Health|Sundaram/, 'Healthcare'], [/Bank|Finance/, 'Banking'], [/Kaveri|Pharma/, 'Pharma'], [/Steel|Manufactur|Industrial/, 'Manufacturing'], [/Energy|Petro/, 'Energy'], [/Logistics/, 'Logistics'], [/Facilit/, 'Facilities']];
 const HQ = { India: ['Mumbai', 'Bengaluru', 'Chennai', 'New Delhi'], 'Middle East': ['Dubai', 'Abu Dhabi', 'Riyadh', 'Muscat'], APAC: ['Singapore', 'Kuala Lumpur', 'Jakarta'] };
-const STRATEGIC = ['ABC Bank', 'Desert Industrial Holdings', 'Lotus Retail India', 'Singapore Metro Bank'];
+const STRATEGIC = ['ABC Bank', 'Al Noor Retail Group', 'Desert Industrial Holdings', 'Lotus Retail India', 'Oman Energy Corporation', 'Singapore Metro Bank']; // + Al Noor, Oman Energy (2026-11-24: Home's "Strategic accounts gone quiet")
 const ACCOUNTS = [...new Set(INITS.map(o => o.acc))].sort().map((name, i) => {
   const its = INITS.filter(o => o.acc === name), top = its.slice().sort((a, b) => b.value - a.value)[0];
   const geo = TEAMS[top.team].geo, won = its.filter(o => o.kind === 'won');
@@ -317,6 +326,17 @@ const SALES_REGION_GEO = Object.fromEntries(Object.entries(SALES_REGION).flatMap
 const ACT_TYPES = ['Customer / prospect visit', 'Phone call', 'Virtual meeting', 'Email', 'Messaging', 'Internal meeting', 'Event / conference', 'Other'];
 const ACT_PURPOSES = ['Introduction', 'Discovery / requirements', 'Solution presentation', 'Proposal discussion', 'Negotiation', 'Relationship building', 'Follow-up', 'Internal review'];
 const ACT_SUBJECT = { 'Customer / prospect visit': 'Visit with', 'Phone call': 'Call with', 'Virtual meeting': 'Online meeting with', 'Email': 'Email with', 'Messaging': 'Messages with', 'Internal meeting': 'Internal meeting about', 'Event / conference': 'Met at an event:', 'Other': 'Note on' };
+// Activity notes by purpose (design review D10): varied wording and lengths, so the timeline looks real and long notes wrap
+const ACT_NOTES = {
+  'Introduction': ['First conversation. Shared our references in the sector; they asked for a short capability deck.', 'Introduced the team and agreed to meet again after their budget review.'],
+  'Discovery / requirements': ['Walked through their current setup and the pain points with reporting. Two integrations are must-haves.', 'Collected requirements from IT and finance; the data migration scope is still open.'],
+  'Solution presentation': ['Demoed the dashboard and approval flow. They liked the mobile view and asked about single sign-on.', 'Presented the architecture to their CIO; follow-up questions on hosting and support hours.'],
+  'Proposal discussion': ['Went through the proposal line by line. They want phase 2 priced separately.', 'Reviewed the commercial proposal; procurement needs a revised payment schedule.'],
+  'Negotiation': ['Discussed a 5% discount for a three-year term. Legal to review the liability clause.', 'Agreed on pricing in principle; waiting for the signed purchase order.'],
+  'Relationship building': ['Lunch with the sponsor. Good rapport; they will introduce us to the regional head.', 'Quick catch-up, no open issues.'],
+  'Follow-up': ['Sent the minutes and confirmed the next meeting date.', 'Checked in on the pending decision; expected by the end of the month.'],
+  'Internal review': ['Internal review of the deal: risks on timeline and resourcing, presales to confirm effort.', 'Aligned with delivery on staffing before the next customer call.']
+};
 const ACTIVITIES = (() => {
   const out = [], used = new Set();
   const at = (days, hour) => { const d = new Date(TODAY.getTime() - days * 864e5); return `${d.toISOString().slice(0, 10)}T${String(hour).padStart(2, '0')}:00`; }; // local wall-clock time
@@ -326,7 +346,7 @@ const ACTIVITIES = (() => {
     const type = ACT_TYPES[_hash(id + k) % 7], purpose = ACT_PURPOSES[_hash(k + id) % 8], who = contactAt(acc, k);
     const owner = o ? o.owner : (ACCOUNTS.find(a => a.name === acc) || {}).owner;
     out.push({ id, d: at(days, hour), type, purpose, acc, si: o ? o.id : null, siName: o ? o.name : '', owner, who: who ? [who] : [],
-      t: `${ACT_SUBJECT[type]} ${who || acc}`, note: note || 'Discussed scope, timelines and next steps.' });
+      t: `${ACT_SUBJECT[type]} ${who || acc}`, note: note || _pick(ACT_NOTES[purpose], id + 'n') });
   };
   // the ones tasks were created from
   TASKS.filter(t => t.act).forEach(t => { const o = INITS.find(x => x.id === t.si);
@@ -334,6 +354,8 @@ const ACTIVITIES = (() => {
     add(t.act, o, t.acc, Math.max(1, before), 10 + _hash(t.act) % 6, 'task'); });
   // Lotus – ERP Upgrade keeps the two activities CRMpulse shows on its record
   const lotus = INITS.find(o => o.id === 'SI-2026-0024');
+  // one long note, to check how long text wraps on the timeline and the record page
+  const longOne = out.find(a => a.id === 'ACT-2026-0032'); if (longOne) longOne.note = 'Long internal session on the account plan. We went through every open workstream, the people we have met so far and who still needs to be convinced. Finance wants a clearer business case before the steering committee, so presales will rebuild the ROI model with the customer\'s own numbers, and we will ask the sponsor for thirty minutes with the CFO before the end of the month.';
   const l1 = out.find(a => a.id === 'ACT-2026-0021'); if (l1) Object.assign(l1, { d: '2026-11-10T17:24', type: 'Messaging', purpose: 'Relationship building', who: [], t: 'Messages with Lotus Retail India – relationship building', note: '' });
   out.push({ id: 'ACT-2026-0014', d: '2026-07-11T16:00', type: 'Event / conference', purpose: 'Follow-up', acc: lotus.acc, si: lotus.id, siName: lotus.name, owner: lotus.owner, who: ['Arjun Patel'], t: 'Follow-up – Lotus Retail India', note: 'Discussed scope, timelines and next steps.' }); used.add('ACT-2026-0014');
   // the rest: open initiatives and some account-only touches
@@ -343,13 +365,36 @@ const ACTIVITIES = (() => {
     add(next(), o, o.acc, 1 + _hash(o.id) % 40, 9 + _hash(o.id + 'h') % 8, 'a');
     if (i % 2 === 0) add(next(), o, o.acc, 35 + _hash(o.id + 'b') % 50, 9 + _hash(o.id + 'g') % 8, 'b');
   });
+  // colleagues working Gaurav's accounts this week (Home: "Activity on your accounts")
+  [['Coral Ports', 'SI-2026-0047', 'John Mathew', 1, 15, 'Virtual meeting', 'Solution presentation', 'Solution demo with the port operations team', 'Walked their ops team through the dashboard; they want the berth planning view in phase 1.'],
+   ['Al Dhafra Facilities', 'SI-2026-0045', 'Lakshmi Pillai', 3, 11, 'Phone call', 'Negotiation', 'Call – contract redlines', 'Agreed the liability cap; one clause on data residency is still open.'],
+   ['Qamar Energy', 'SI-2026-0046', 'Neha Gupta', 4, 10, 'Email', 'Follow-up', 'Email – credit check completed', 'Credit check passed; payment terms of 45 days are fine.']]
+    .forEach(([acc, si, owner, days, hour, type, purpose, t, note]) => { const o = INITS.find(x => x.id === si), id = next(); used.add(id);
+      out.push({ id, d: at(days, hour), type, purpose, acc, si, siName: o ? o.name : '', owner, who: [], t, note }); });
   ACCOUNTS.filter((a, i) => i % 3 === 0).forEach(a => add(next(), null, a.name, Math.min(a.last, 88), 11 + _hash(a.name) % 5, 'acc'));
   return out.sort((a, b) => b.d.localeCompare(a.d));
 })();
 const actTasks = (id) => TASKS.filter(t => t.act === id).length;
+
+// Home (2026-11-24): new accounts waiting for a manager's approval. Nothing can be logged or sold on them until approved.
+const APPROVALS = [
+  { acc: 'Horizon Logistics', by: 'Daniel Tan', created: '2026-11-09', lifecycle: 'Prospect' },
+  { acc: 'Kedah Ports', by: 'Mei Lin Wong', created: '2026-11-11', lifecycle: 'Prospect' },
+  { acc: 'Red Sea Shipping', by: 'Omar Haddad', created: '2026-11-02', lifecycle: 'Prospect' },
+  { acc: 'Nilgiri Foods', by: 'Karthik Menon', created: '2026-11-06', lifecycle: 'Prospect' },
+  { acc: 'Delta Pharma', by: 'Priya Sharma', created: '2026-11-13', lifecycle: 'Prospect' }
+].map(a => ({ ...a, team: PERSON_TEAM[a.by], wait: Math.round((TODAY - new Date(a.created)) / 864e5) }));
+// Won deals whose order is still a draft (no PO yet): won in the last 45 days, as ACCOUNTS.draftOrder
+const DRAFT_ORDERS = CLOSED.filter(o => o.result === 'won' && (TODAY - new Date(o.closed)) / 864e5 <= 45)
+  .sort((a, b) => a.closed.localeCompare(b.closed))
+  .map((o, i) => ({ ...o, order: 'ORD-2026-' + String(37 + i * 4).padStart(4, '0'), age: Math.round((TODAY - new Date(o.closed)) / 864e5) }));
+// Gaurav's quiet customers (Home: "Quiet accounts"): no contact for over 60 days
+const QUIET_FIX = { 'Pearl Transit': 72, 'Mekong Freight': 64 };
+for (let i = ACTIVITIES.length - 1; i >= 0; i--) { const q = QUIET_FIX[ACTIVITIES[i].acc]; if (q != null && (TODAY - new Date(ACTIVITIES[i].d.slice(0, 10))) / 864e5 < q) ACTIVITIES.splice(i, 1); }
+ACCOUNTS.filter(a => QUIET_FIX[a.name] != null).forEach(a => { a.last = QUIET_FIX[a.name]; a.lastDate = new Date(TODAY.getTime() - a.last * 864e5).toISOString().slice(0, 10); });
 // Last interaction on Accounts = the latest activity for that account, so Accounts and Activities agree
 ACCOUNTS.forEach(a => {
   const last = ACTIVITIES.filter(x => x.acc === a.name).map(x => x.d.slice(0, 10)).sort().pop();
-  if (last) { a.lastDate = last; a.last = Math.round((TODAY - new Date(last)) / 864e5); }
+  if (last && QUIET_FIX[a.name] == null) { a.lastDate = last; a.last = Math.round((TODAY - new Date(last)) / 864e5); }
   a.attn = [a.draftOrder ? 'Won deal with a draft order · confirm the PO' : '', a.last > 60 ? `No interaction for ${a.last} days` : ''].filter(Boolean);
 });

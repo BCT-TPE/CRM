@@ -1,6 +1,7 @@
 /* Shared shell for the BCT CRM redesign pages: sidebar (old CRMpulse IA), tooltip, toast, formatting. */
 (function () {
   const I = {
+    home: '<path d="M4 11l8-7 8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
     trend: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
     gauge: '<path d="M12 14l4-4"/><path d="M3.5 18a9 9 0 1 1 17 0"/>',
     target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".5"/>',
@@ -19,6 +20,7 @@
     arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>',
     chevdown: '<path d="M6 9l6 6 6-6"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>',
     logout: '<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10"/>',
     stage: '<path d="M4 17l5-5 4 4 7-7"/>',
     clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
@@ -29,16 +31,18 @@
   };
   const icon = (n) => `<svg viewBox="0 0 24 24" aria-hidden="true">${I[n] || ''}</svg>`;
 
-  // Old CRMpulse information architecture, kept 1:1. Only the five pages in this round are live.
+  // Old CRMpulse information architecture, plus Home (2026-11-24). An entry with roles shows only to those roles:
+  // Administration / Users = ADMIN (old menu-config); Customer orders, Sales targets, Sales structure follow the
+  // requirement's Home designs per role (a salesperson sees neither; a manager sees orders and targets).
+  const MGR_UP = ['SALES_MANAGER', 'SALES_HEAD', 'ADMIN'], HEAD_UP = ['SALES_HEAD', 'ADMIN'];
   const NAV = [
-    ['Dashboards', [['pipeline', 'Pipeline & forecast', 'trend'], ['performance', 'Sales performance', 'gauge']]],
+    ['Dashboards', [['home', 'Home', 'home'], ['pipeline', 'Pipeline & forecast', 'trend'], ['performance', 'Sales performance', 'gauge']]],
     ['Sales', [['initiatives', 'Sales initiatives', 'target'], ['activities', 'Activities', 'message'], ['tasks', 'Tasks', 'check']]],
-    ['Customers', [['accounts', 'Accounts', 'building', 1], ['contacts', 'Contacts', 'user', 1], ['orders', 'Customer orders', 'cart', 1]]],
-    ['Plan & report', [['targets', 'Sales targets', 'flag', 1], ['reports', 'Reports', 'report', 1]]],
-    ['Setup', [['structure', 'Sales structure', 'tree', 1], ['admin', 'Administration', 'settings', 1, 'ADMIN'], ['users', 'Users', 'users', 1, 'ADMIN']]]
+    ['Customers', [['accounts', 'Accounts', 'building', 1], ['contacts', 'Contacts', 'user', 1], ['orders', 'Customer orders', 'cart', 1, MGR_UP]]],
+    ['Plan & report', [['targets', 'Sales targets', 'flag', 1, MGR_UP], ['reports', 'Reports', 'report', 1]]],
+    ['Setup', [['structure', 'Sales structure', 'tree', 1, HEAD_UP], ['admin', 'Administration', 'settings', 1, ['ADMIN']], ['users', 'Users', 'users', 1, ['ADMIN']]]]
   ];
-  // Old CRMpulse menu-config: an entry with a role shows only to that role (Administration, Users: ADMIN)
-  const BUILT = { pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html' }; // this round = Dashboards + Sales; accounts / contacts / targets pages exist but stay out of the nav
+  const BUILT = { home: 'home.html', pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html' }; // this round = Dashboards + Sales; accounts / contacts / targets pages exist but stay out of the nav
 
   // Old CRMpulse TaskBadge: my open tasks beside Tasks (the overdue count is in its label); nothing when none are open.
   function taskBadge() {
@@ -48,21 +52,29 @@
     const late = mine.filter(taskLate).length;
     return `<b class="nav-n" aria-label="${mine.length} open, ${late} overdue">${mine.length}</b>`;
   }
-  // Old CRMpulse profile: name · role (ROLE_LABELS), and the profile menu shows name + email + Sign out
-  // Signed in as an Administrator (ADMIN): sees Administration and Users, opens Activities on Everyone and Tasks on Team overdue
-  const USER = { name: 'Gaurav Shrotriya', code: 'ADMIN', role: 'Administrator', email: 'gaurav.shrotriya@example.com' };
+  // Old CRMpulse profile: name · role (ROLE_LABELS); the profile menu shows name, role, email, View as, Sign out (design review M2).
+  // The demo user is always Gaurav; his role is picked in the profile menu ("View as") and kept in localStorage
+  // for every page: it changes Home, the menu entries above and the Activities default (Everyone / My teams / Mine).
+  const ROLE_LABELS = { SALESPERSON: 'Salesperson', SALES_MANAGER: 'Sales Manager', SALES_HEAD: 'Sales Head', ADMIN: 'Administrator' };
+  // For now only Home switches role (Administrator is disabled there: the requirement designs Home for three roles);
+  // every other page shows the Administrator view (2026-11-24).
+  const ON_HOME = /(^|\/)home\.html$/.test(location.pathname), HOME_ROLES = ['SALESPERSON', 'SALES_MANAGER', 'SALES_HEAD'];
+  let roleCode = 'ADMIN';
+  if (ON_HOME) { roleCode = 'SALESPERSON'; try { const r = localStorage.getItem('crm-home-role'); if (HOME_ROLES.includes(r)) roleCode = r; } catch (e) {} }
+  const USER = { name: 'Gaurav Shrotriya', code: roleCode, role: ROLE_LABELS[roleCode], team: 'APAC Sales', email: 'gaurav.shrotriya@example.com' };
+  USER.sub = roleCode === 'SALES_MANAGER' ? `${USER.role} · ${USER.team}` : USER.role;
   const ASSIGNING = ['ADMIN', 'SALES_HEAD', 'SALES_MANAGER'], OVERSIGHT = ['ADMIN', 'SALES_HEAD']; // lib/api/auth.ts
 
   function renderShell(active) {
     const side = document.getElementById('side');
     if (!side) return;
     side.innerHTML = `
-      <div class="side-top"><a class="brand" href="pipeline.html" aria-label="BCT CRM"><img src="assets/bct-logo.svg" alt="Bahwan CyberTek"><span>CRM</span></a>
+      <div class="side-top"><a class="brand" href="home.html" aria-label="BCT CRM"><img src="assets/bct-logo.svg" alt="Bahwan CyberTek"><span>CRM</span></a>
         <button class="side-toggle" id="side-toggle" aria-label="Collapse sidebar" aria-expanded="true">${icon('panel')}</button></div>
-      ${NAV.map(([label, items]) => `
+      ${NAV.map(([label, all]) => [label, all.filter(([, , , , roles]) => !roles || roles.includes(USER.code))]).filter(([, items]) => items.length).map(([label, items]) => `
         <nav class="nav-group" aria-label="${label}">
           <div class="nav-label">${label}</div>
-          ${items.filter(([, , , , role]) => !role || role === USER.code).map(([id, name, ic, out]) => {
+          ${items.map(([id, name, ic, out]) => {
             const href = BUILT[id];
             const cls = 'nav-item' + (id === active ? ' active' : '') + (!href ? ' later' : '');
             const tip = out ? 'Not part of this redesign round' : 'Coming next in this redesign round';
@@ -75,7 +87,7 @@
         <button class="nav-item notes-btn" id="notes-btn" aria-haspopup="menu" aria-expanded="false" data-name="Notifications">${lucide('bell', 'i')}<span>Notifications</span><i class="udot" aria-label="Unread notifications"></i></button>
         <button class="user-btn" id="user-btn" aria-haspopup="menu" aria-expanded="false" aria-label="Account">
         <span class="avatar-w"><img class="avatar-img" src="assets/people/gaurav-shrotriya.webp" alt=""></span>
-        <span class="user-name">${USER.name}<small>${USER.role}</small></span>${lucide('chevron-down', 'chev')}</button></div>`;
+        <span class="user-name">${USER.name}<small>${USER.sub}</small></span>${lucide('chevron-down', 'chev')}</button></div>`;
     buildUserMenu();
     let collapsed = false;
     try { collapsed = localStorage.getItem('crm-side') === 'collapsed'; } catch (e) {}
@@ -91,9 +103,16 @@
     const main = document.querySelector('.main'); if (!main) return;
     const bar = document.createElement('div'); bar.className = 'm-bar';
     bar.innerHTML = `<button class="icon-btn" id="m-menu" aria-label="Open navigation" aria-expanded="false" aria-controls="side"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <a class="brand" href="pipeline.html" aria-label="BCT CRM"><img src="assets/bct-logo.svg" alt="Bahwan CyberTek"><span>CRM</span></a><span class="sp"></span>
-      <img class="avatar-img" src="assets/people/gaurav-shrotriya.webp" alt="">`;
+      <a class="brand" href="home.html" aria-label="BCT CRM"><img src="assets/bct-logo.svg" alt="Bahwan CyberTek"><span>CRM</span></a><span class="sp"></span>
+      <button class="m-user" id="m-user" aria-haspopup="menu" aria-expanded="false" aria-label="Account"><img class="avatar-img" src="assets/people/gaurav-shrotriya.webp" alt=""></button>`;
     main.before(bar); // outside <main>: some pages re-render main with innerHTML
+    // design review M8: once the page heading scrolls under the top bar, the logo fades and the page name shows
+    { const cur = side.querySelector('.nav-item[aria-current="page"]'), t = document.createElement('span');
+      t.className = 'm-title'; t.setAttribute('aria-hidden', 'true'); t.textContent = cur ? cur.dataset.name : document.title.split(' · ')[0];
+      bar.querySelector('.brand').after(t);
+      const h = document.querySelector('.main h1');
+      if (h && 'IntersectionObserver' in window) new IntersectionObserver(([e]) => bar.classList.toggle('titled', !e.isIntersecting && e.boundingClientRect.top < 56), { rootMargin: '-56px 0px 0px 0px' }).observe(h); }
+    bar.querySelector('#m-user').addEventListener('click', (e) => { e.stopPropagation(); openPop(menu.hidden ? menu : null, 'm-user'); }); // design review M2
     const scrim = document.createElement('div'); scrim.className = 'm-scrim'; document.body.appendChild(scrim);
     const btn = bar.querySelector('#m-menu');
     const setNav = (on) => {
@@ -116,6 +135,7 @@
     rail.addEventListener('change', apply); drawer.addEventListener('change', apply); apply();
     // other open tabs of the CRM follow a collapse / expand made here
     addEventListener('storage', (e) => { if (e.key === 'crm-side') apply(); });
+    addEventListener('storage', (e) => { if (ON_HOME && e.key === 'crm-home-role') location.reload(); }); // another Home tab switched role
   }
   // Account menu: layout and position from the BCT AI CRM prototype; content as the old CRMpulse profile menu (name, email, Sign out).
   // Lucide icons, exactly as the prototype draws them (stroke 2, round caps).
@@ -162,9 +182,15 @@
   }
   function paintMenu() {
     menu.innerHTML = `
-      <div class="acct-head"><img src="assets/people/gaurav-shrotriya.webp" alt=""><div><b>${USER.name}</b><small>${USER.email}</small></div></div>
+      <div class="acct-head"><img src="assets/people/gaurav-shrotriya.webp" alt=""><div><b>${USER.name}</b><small>${USER.sub}</small><small>${USER.email}</small></div></div>
+      <div class="view-as">
+        <label class="select"><span class="lbl">View as</span><select id="view-as" aria-label="View as" ${ON_HOME ? '' : 'disabled'}>${Object.entries(ROLE_LABELS)
+          .filter(([c]) => ON_HOME || c === 'ADMIN')
+          .map(([c, l]) => `<option value="${c}" ${c === USER.code ? 'selected' : ''} ${ON_HOME && !HOME_ROLES.includes(c) ? 'disabled' : ''}>${l}</option>`).join('')}</select></label></div>
       <div class="menu-sep"></div>
       <button class="menu-item danger" role="menuitem" data-m="out">${lucide('logout')}Sign out</button>`;
+    enhanceSelects(menu);
+    menu.querySelector('#view-as').addEventListener('change', (e) => { if (e.target.value === USER.code) return; try { localStorage.setItem('crm-home-role', e.target.value); } catch (err) {} location.reload(); });
   }
   // Same content as the old CRMpulse bell menu: title + Mark all read, the list (or "You're all caught up."), See all.
   function paintNotes() {
@@ -181,14 +207,18 @@
   }
   // Beside the button, bottom-aligned, kept inside the window (same rule as the prototype's toggleUserMenu).
   function openPop(pop, btnId) {
-    [[menu, 'user-btn'], [notes, 'notes-btn']].forEach(([p, id]) => {
-      const on = p === pop, b = document.getElementById(id);
-      p.hidden = !on; b.classList.toggle('active', on); b.setAttribute('aria-expanded', String(on));
+    [[menu, ['user-btn', 'm-user']], [notes, ['notes-btn']]].forEach(([p, ids]) => {
+      const on = p === pop; p.hidden = !on;
+      ids.forEach((id) => { const b = document.getElementById(id); if (!b) return; const mine = on && id === btnId; b.classList.toggle('active', mine); b.setAttribute('aria-expanded', String(mine)); });
     });
     if (!pop) return;
-    const r = document.getElementById(btnId).getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
-    pop.style.left = Math.max(12, Math.min(r.right + 16, innerWidth - w - 12)) + 'px';
-    pop.style.top = Math.max(12, Math.min(r.bottom - h, innerHeight - h - 12)) + 'px';
+    const b = document.getElementById(btnId), r = b.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+    if (b.closest('.m-bar')) { // phone top bar: under the avatar, right-aligned
+      pop.style.left = Math.max(12, innerWidth - w - 12) + 'px'; pop.style.top = Math.round(r.bottom + 8) + 'px';
+    } else { // sidebar: beside the button, bottom-aligned
+      pop.style.left = Math.max(12, Math.min(r.right + 16, innerWidth - w - 12)) + 'px';
+      pop.style.top = Math.max(12, Math.min(r.bottom - h, innerHeight - h - 12)) + 'px';
+    }
     pop.style.bottom = 'auto';
   }
 
@@ -261,14 +291,17 @@
     info: '<path d="M12 11v5M12 7.5h.01"/>'
   };
   let toastEl, toastT;
-  function toast(msg, kind = 'info') {
+  // toast(msg, kind, action): an optional { label, fn } adds a button (e.g. Undo) and keeps the toast up for 5s (design review D2)
+  function toast(msg, kind = 'info', action) {
     if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'toast'; toastEl.setAttribute('role', 'status'); document.body.appendChild(toastEl); }
     const k = TOAST_IC[kind] ? kind : 'info';
-    toastEl.className = `toast t-${k}${toastEl.classList.contains('on') ? ' on' : ''}`; // a toast already showing swaps its text without fading out
-    toastEl.innerHTML = `<i aria-hidden="true"><svg viewBox="0 0 24 24">${TOAST_IC[k]}</svg></i><span></span>`;
+    toastEl.className = `toast t-${k}${action ? ' has-act' : ''}${toastEl.classList.contains('on') ? ' on' : ''}`; // a toast already showing swaps its text without fading out
+    toastEl.innerHTML = `<i aria-hidden="true"><svg viewBox="0 0 24 24">${TOAST_IC[k]}</svg></i><span></span>${action ? '<button type="button" class="toast-act"></button>' : ''}`;
     toastEl.querySelector('span').textContent = msg;
+    if (action) { const b = toastEl.querySelector('.toast-act'); b.textContent = action.label;
+      b.addEventListener('click', () => { clearTimeout(toastT); toastEl.classList.remove('on'); action.fn(); }); }
     requestAnimationFrame(() => toastEl.classList.add('on'));
-    clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('on'), 2600);
+    clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('on'), action ? 5000 : 2600);
   }
 
 
@@ -293,15 +326,44 @@
   // Nodes are moved, not copied, so page code keeps its ids and listeners; wider windows get the original order back.
   const phone = matchMedia('(max-width: 768px)');
   function compactFilters(f) {
+    // bars with a search compact on phones; Pipeline / Sales performance (no search) already below 1280px (design review D4)
+    const mq = f.querySelector(':scope > .search') ? phone : matchMedia('(max-width: 1279px)');
     const apply = () => {
-      if (phone.matches && !f._orig) {
+      if (mq.matches && !f._orig) {
         f._orig = [...f.children];
         const search = f._orig.find(c => c.matches('.search'));
-        const more = f._orig.find(c => c.id === 'more-btn' || c.querySelector('#more-btn'));
+
         const exp = f._orig.find(c => c.id === 'export');
         const row = document.createElement('div'); row.className = 'f-scroll';
-        f._orig.forEach(c => { if (c !== search && c !== more && c !== exp && !c.matches('.sp')) row.appendChild(c); });
-        row.addEventListener('scroll', () => { closeSel(); closeDate(); }, { passive: true });
+        // Design review M3 (2026-11-24): nothing scrolls sideways. Row 2 keeps the short controls (a 2–3 option switch,
+        // Fiscal year, and the period switch shown as a dropdown); every other filter moves to the top of More filters,
+        // whose badge then counts them too. Pages without More filters (Tasks) wrap row 2 instead.
+        let pop = document.getElementById('more-pop');
+        if (!pop) { // no More filters on this page (Tasks): make a Filters button + panel so the same pattern applies (design review M3)
+          const wrap = document.createElement('div'); wrap.className = 'm-made'; wrap.style.position = 'relative';
+          wrap.innerHTML = `<button class="btn" id="more-btn" type="button" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Filters<span class="count-badge" id="more-n" hidden></span></button>
+            <div class="pop" id="more-pop" role="dialog" aria-label="Filters" hidden><div class="pop-foot"><button class="btn primary" type="button" data-done>Done</button></div></div>`;
+          pop = wrap.querySelector('.pop'); const btn = wrap.querySelector('#more-btn');
+          const set = (on) => { pop.hidden = !on; btn.setAttribute('aria-expanded', String(on)); };
+          btn.addEventListener('click', (e) => { e.stopPropagation(); set(pop.hidden); });
+          pop.addEventListener('click', (e) => { e.stopPropagation(); if (e.target.closest('[data-done]')) set(false); });
+          document.addEventListener('click', () => set(false)); document.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false); });
+          f._made = wrap; f.appendChild(wrap); f._orig.push(wrap);
+        }
+        const more = f._orig.find(c => c.id === 'more-btn' || c.querySelector('#more-btn'));
+        const keep = (c) => (c.matches('.seg') && c.querySelectorAll('button').length <= 3) || c.id === 'f-fy-wrap' || c.id === 'reset';
+        const moved = [];
+        f._orig.forEach(c => {
+          if (c === search || c === more || c === exp || c.matches('.sp')) return;
+          if (c.matches('.seg') && c.querySelectorAll('button').length > 3) { row.appendChild(c); row.appendChild(segProxy(c)); return; }
+          if (pop && !keep(c)) { moved.push(c); return; }
+          row.appendChild(c);
+        });
+        if (moved.length) {
+          const box = document.createElement('div'); box.className = 'm-moved'; box.append(...moved); pop.prepend(box); f._moved = moved; f._box = box;
+          moved.forEach(c => { const sel = c.querySelector('select'); if (sel) sel._def = sel.value; });
+          watchBadge(f);
+        }
         f.classList.add('compact', search ? 'two' : 'one');
         if (search) f.append(...[search, more, exp].filter(Boolean), row); else f.append(row, ...[more, exp].filter(Boolean));
         f._row = row;
@@ -319,11 +381,51 @@
           });
           row.before(box); f._acts = box;
         }
-      } else if (!phone.matches && f._orig) {
-        f.append(...f._orig); f._row.remove(); f._acts?.remove(); f.classList.remove('compact', 'two', 'one'); f._orig = f._row = f._acts = null;
+      } else if (!mq.matches && f._orig) {
+        f._row.querySelectorAll('.seg-proxy').forEach(x => { x._seg.classList.remove('proxied'); x._mo.disconnect(); x.remove(); });
+        if (f._made) { f._orig = f._orig.filter(c => c !== f._made); }
+        f.append(...f._orig); f._made?.remove(); f._made = null; f._row.remove(); f._acts?.remove(); f._box?.remove(); f._badgeMo?.forEach(m => m.disconnect());
+        f.classList.remove('compact', 'two', 'one'); f._orig = f._row = f._acts = f._box = f._moved = f._badgeMo = null;
+        const b = document.getElementById('more-n'); if (b && b._base != null) { b._self = true; b.textContent = b._base; b.hidden = !b._base; }
       }
     };
-    phone.addEventListener('change', apply); apply();
+    mq.addEventListener('change', apply); apply();
+  }
+  // Icon-only filter buttons (Export, More filters) get a tooltip with their name; with their text showing they need none
+  function iconTips() {
+    document.querySelectorAll('.filters :is(#export, #more-btn)').forEach(b => {
+      const icon = parseFloat(getComputedStyle(b).fontSize) === 0, name = [...b.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim(); // not the count badge
+      if (icon && name) b.dataset.tip = name; else delete b.dataset.tip;
+    });
+  }
+  addEventListener('resize', iconTips);
+  new MutationObserver(iconTips).observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  setTimeout(iconTips);
+  // A switch with 4+ options (Full year / Q1–Q4) as a dropdown on phones: it clicks the real buttons, and follows them.
+  function segProxy(seg) {
+    const btns = [...seg.querySelectorAll('button')];
+    const wrap = document.createElement('label'); wrap.className = 'select seg-proxy';
+    const sel = document.createElement('select'); sel.setAttribute('aria-label', seg.getAttribute('aria-label') || 'Period');
+    sel.innerHTML = btns.map((b, i) => `<option value="${i}">${b.firstChild.textContent.trim()}${b.querySelector('small') ? ' · ' + b.querySelector('small').textContent.trim() : ''}</option>`).join('');
+    const sync = () => { const i = btns.findIndex(b => b.classList.contains('on')); if (i >= 0 && sel.value !== String(i)) sel.value = String(i); };
+    sel.addEventListener('change', () => btns[+sel.value]?.click());
+    wrap.appendChild(sel); seg.classList.add('proxied'); sync();
+    wrap._seg = seg; wrap._mo = new MutationObserver(sync); wrap._mo.observe(seg, { subtree: true, attributes: true, attributeFilter: ['class'] });
+    setTimeout(() => enhanceSelects(wrap));
+    return wrap;
+  }
+  // More filters badge on phones = the page's own count + the moved filters that are set
+  function watchBadge(f) {
+    const b = document.getElementById('more-n'); if (!b) return;
+    b._base = b.hidden ? 0 : (+b.textContent || 0);
+    const setCount = () => f._moved.filter(c => { const sel = c.querySelector('select'), inp = c.querySelector('input');
+      return c.classList.contains('set') || (sel && sel.value !== sel._def) || (inp && inp.type !== 'checkbox' && inp.value); }).length;
+    const paint = () => { const n = b._base + setCount(); b._self = true; b.textContent = n; b.hidden = !n; };
+    const mb = new MutationObserver(() => { if (b._self) { b._self = false; return; } b._base = b.hidden ? 0 : (+b.textContent || 0); paint(); });
+    mb.observe(b, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    const mc = new MutationObserver(paint); f._moved.forEach(c => mc.observe(c, { attributes: true, subtree: true, attributeFilter: ['class'] }));
+    f._moved.forEach(c => c.addEventListener('change', paint));
+    f._badgeMo = [mb, mc]; paint();
   }
   // Menus inside the sideways-scrolling filter row would be clipped by it: place them on the page instead
   // (the row's fade mask and the stuck bar's backdrop blur would clip it, so it moves to <body> while open)
@@ -368,9 +470,9 @@
     btn.setAttribute('aria-label', sel.getAttribute('aria-label') || '');
     const menu = document.createElement('div'); menu.className = 'pop sel-pop'; menu.setAttribute('role', 'listbox'); menu.hidden = true;
     sel.before(btn); wrap.appendChild(menu); sel.hidden = true; sel.tabIndex = -1;
-    const sync = () => { const o = sel.options[sel.selectedIndex]; btn.textContent = o ? o.textContent : ''; };
+    const sync = () => { const o = sel.options[sel.selectedIndex]; btn.textContent = o ? (o.dataset.short || o.textContent) : ''; /* data-short: a shorter label for the closed control (review: "Who should do it?" shows the name only) */ btn.disabled = sel.disabled; };
     const build = () => {
-      menu.innerHTML = [...sel.options].map((o, i) => `<button type="button" class="sel-opt${i === sel.selectedIndex ? ' on' : ''}" role="option" aria-selected="${i === sel.selectedIndex}" data-i="${i}"><span>${o.textContent}</span>${selCheck}</button>`).join('');
+      menu.innerHTML = [...sel.options].map((o, i) => `<button type="button" class="sel-opt${i === sel.selectedIndex ? ' on' : ''}" role="option" aria-selected="${i === sel.selectedIndex}" data-i="${i}"${o.disabled ? ' disabled aria-disabled="true"' : ''}><span>${o.textContent}</span>${selCheck}</button>`).join('');
     };
     const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
     Object.defineProperty(sel, 'value', { get() { return desc.get.call(this); }, set(v) { desc.set.call(this, v); sync(); } });
@@ -381,8 +483,12 @@
       const bars = [...document.querySelectorAll('.ed-bar')].map(b => b.getBoundingClientRect().top).filter(t => t > 0);
       const floor = Math.min(innerHeight, ...bars) - 8, r = wrap.getBoundingClientRect(), mh = menu.offsetHeight;
       if (r.bottom + 6 + mh > floor && r.top - 6 - mh > 8) menu.classList.add('up');
-      pinPop(menu, wrap);
-      (menu.querySelector('.on') || menu.firstElementChild)?.focus(); };
+      // a menu that would run past the window's side (e.g. Sort at the right edge on a phone) shifts back inside, 16px from the edge
+      // (clientWidth, not innerWidth: on phones the open menu itself widens the layout viewport)
+      if (!pinPop(menu, wrap)) { menu.style.translate = ''; const m = menu.getBoundingClientRect(), pad = 16, vw = document.documentElement.clientWidth;
+        const dx = m.right > vw - pad ? vw - pad - m.right : m.left < pad ? pad - m.left : 0;
+        if (dx) menu.style.translate = `${Math.round(dx)}px 0`; }
+      (menu.querySelector('.on') || menu.firstElementChild)?.focus({ preventScroll: true }); };
     btn.addEventListener('click', (e) => { e.preventDefault(); if (selOpen && selOpen.menu === menu) closeSel(); else open(); });
     btn.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(); } });
     menu.addEventListener('click', (e) => {
@@ -624,5 +730,12 @@
     const a = document.querySelector('#side a.nav-item[href="tasks.html"]'); if (!a) return;
     a.querySelector('.nav-n')?.remove(); a.insertAdjacentHTML('beforeend', taskBadge());
   }
-  window.CRM = { icon, renderShell, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
+  // Page entrance, the same on every page: cards, zones and header KPIs rise in once, 40ms apart (CSS .rise; off with
+  // prefers-reduced-motion). Pages call it after their first render.
+  let risen = false;
+  function riseIn() {
+    if (risen) return; risen = true;
+    document.querySelectorAll('.main .card, .main .zone, .main .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; });
+  }
+  window.CRM = { icon, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
 })();

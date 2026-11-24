@@ -7,7 +7,36 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-23 (second push)
+## 2026-11-24
+
+New **Home** page (the first page after sign-in, three views by role) and the fixes from the second design review (desktop 10 items, phone 15 items). Cache-busters: `crm.css?v=20261124k`, `crm.js?v=20261124k`, `crm-data.js?v=20261124d`, `dashboard.css?v=20261124b`, `theme-v2.css?v=20261124b`, `responsive.css?v=20261124m` (all pages that load them).
+
+### Added
+- **`home.html`** (requirement "CRMpulse Home page – by role"). Salesperson: quota / forecast, my tasks and follow-ups, deals needing attention, orders awaiting PO confirmation, quiet accounts, colleagues' activity on my accounts. Sales Manager: quota | Waiting on you (account approvals), By salesperson table, then a 2×2 of team overdue tasks, deals, team activity this week and quiet accounts. Sales Head / Administrator: company quota, By sales team table, largest deals needing attention, strategic accounts gone quiet, with "Waiting on you" KPIs in the header. Cards in one row are equal height; lists show at most 4 rows.
+- Home has **no links that change page** for now. Header actions (New initiative, New contact, New task, Log activity) and row buttons (Log activity, Confirm PO, Review) show a toast saying what they would open. Ticking a task keeps it in the list as done, with Undo in the toast.
+- **View as** select in the profile menu (Salesperson / Sales Manager / Sales Head; Administrator disabled). It only works on Home (`localStorage` `crm-home-role`); every other page is fixed to Administrator and the select is disabled. Sidebar entries are gated by role (orders and targets: manager and up; structure: head and up; admin and users: Administrator).
+- `crm-data.js`: `APPROVALS`, `DRAFT_ORDERS`, Gaurav's own quota ($0.55M) and initiatives, two quiet accounts (`QUIET_FIX`), colleague activities, and activity notes that vary by type and purpose (one long note to test wrapping).
+- `CRM.toast(msg, kind, { label, fn })`: an action button (Undo) that stays 5 s. Also `CRM.riseIn()` (shared page entrance), `CRM.refreshTaskBadge()` and `CRM.user`.
+- `<option data-short="…">`: a shorter label for a closed select (Tasks "Who should do it?" shows the name only; the menu still shows "name · function").
+
+### Changed
+- **Greeting moved to Home.** Pipeline & forecast's title is the page name again. The header pill is gone on every page (Home included); "Updated hh:mm" ends the subtitle.
+- **Activities**: Log no longer saves straight away. The inline "Log what happened" composer is removed; the "Log activity" header button opens the full side panel (old ActivityFormDrawer fields: type, context, date, attendees, purpose, follow-up task). The filter bar sits directly under the title, like the other list pages, with the summary tiles below it. Closing a panel with input asks first. Non-admin roles see "Locked after 7 days".
+- **Tasks**: Undo after ticking a task; discard confirmation on the task panel; `?q=` (also matches the source activity) and `?new=1`; the account name links to `accounts.html?q=`.
+- **Export** sits at the end of the filter bar on Sales initiatives, Pipeline and Sales performance, as a secondary button: text when it fits, icon with a tooltip (`data-tip`) when it does not.
+- **Compact filter bar** on phones, and at ≤1279 px on Pipeline / Sales performance: row 1 never scrolls sideways; 4+ option segments become a select; other filters move into More filters with a count badge. Tasks gets a Filters panel on phones. On phones a hairline and 24 px separate the bar from the header.
+- **Phone tap sizes**: list rows 44 px (nav items, select options, checkbox rows); Clear is a 40 px button; notification links and card links are 40 px high; Won / Lost bars have a 40 px hit area with 8 px between them.
+- **Phone shell**: the top-bar avatar opens the account menu (name, role, email, View as, Sign out); the drawer keeps only Notifications pinned at the bottom and scrolls; after scrolling, the top bar shows the page name.
+- Quarter charts: amounts on one fixed row; each label row switches to a compact form together when one cell does not fit. Definition underlines only under the text. Pipeline Q3 progress minis use the same two columns as the legend above.
+
+### Fixed
+- iPhone Safari background: the gradient is a fixed `body.v2::before` layer instead of `background-attachment: fixed`.
+- Hover styles no longer stick after a tap on touch devices (`@media (hover: hover)` / `(hover: none)`).
+- Select menus stay 16 px inside the window (measured with `clientWidth`); menus inside a scrolling popover no longer close themselves on scroll.
+
+---
+
+## 2026-11-23 (second push) · `8dc5219`
 
 Layout fixes found while reviewing on desktop and phones. Cache-busters: `crm.css?v=20261123j`, `crm.js?v=20261123m`, `dashboard.css?v=20261123d`, `responsive.css?v=20261123k` (all pages that load them).
 

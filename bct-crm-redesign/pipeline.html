@@ -7,10 +7,10 @@
 <title>Pipeline & forecast · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261123j">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261123d">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261123k">
+<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
 <style>
 /* Q3 forecast bar sits on the same baseline as the quarter bars in "Bookings vs target" beside it (1440 desktop) */
 @media (min-width: 1361px) { body.v2 .fc .sum-legend { margin-top: 32px; } }
@@ -24,9 +24,8 @@
 
     <header class="v2-head">
       <div class="v2-hello">
-        <div class="v2-top"><span class="v2-eyebrow">Pipeline &amp; forecast</span><span class="updated"><i></i>Updated 10:11</span></div>
-        <h1 id="hello">Good morning, Gaurav</h1>
-        <p id="page-meta">Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · Q3 · week 7 of 14</p>
+        <h1>Pipeline &amp; forecast</h1>
+        <p><span id="page-meta">Open opportunities · FY26-27 (Apr 2026 – Mar 2027) · USD · Q3 · week 7 of 14</span> <span class="updated"><i></i>Updated 10:11</span></p>
       </div>
       <div class="v2-kpis kpis-pipe" id="hero-kpis" aria-label="Open pipeline KPIs"></div>
     </header>
@@ -54,12 +53,12 @@
         <div class="pop" id="more-pop" role="dialog" aria-label="More filters" hidden style="top:44px;right:0">
           <div class="grp"><h4>Geography</h4><div id="m-geo"></div></div>
           <div class="grp"><h4>Forecast category</h4><div id="m-cat"></div></div>
-          <div class="pop-foot"><button class="link" id="more-clear">Clear</button><button class="btn primary" id="more-done">Done</button></div>
+          <div class="pop-foot"><button class="btn" id="more-clear">Clear</button><button class="btn primary" id="more-done">Done</button></div>
         </div>
       </div>
       <button class="btn ghost" id="reset" hidden>Reset</button>
       <span class="sp"></span>
-      <button class="btn primary" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
+      <button class="btn" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
     </div>
 
     <div id="page"></div>
@@ -67,8 +66,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261123m"></script>
-<script src="assets/crm-data.js?v=20261120b"></script>
+<script src="assets/crm.js?v=20261124k"></script>
+<script src="assets/crm-data.js?v=20261124d"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
 /* Data lives in assets/crm-data.js (shared with Sales performance). */
@@ -76,6 +75,8 @@ const { money, moneyBig, icon, toast } = CRM;
 
 /* ---------- State ---------- */
 const S = { fy: '2627', q: 0, team: '', owner: '', geo: [], cats: [], drill: null, sort: 'value', page: 1, breakdown: 'team', tab: 'all' };
+// Home links here for one team or one person (?team= / ?owner=)
+{ const qp = new URLSearchParams(location.search); if (TEAMS[qp.get('team')]) S.team = qp.get('team'); if (PERSON_TEAM[qp.get('owner')]) S.owner = qp.get('owner'); }
 const PER_PAGE = 8;
 
 function scoped() { // filters that define "who" — used for both open opps and closed-won
@@ -132,7 +133,7 @@ function render() {
       ${zoneHead(3, 'Deals to act on', 'The records behind every number above')}
       ${tableCard(list)}
     </div>`;
-  if (!render.done) { document.querySelectorAll('.card, .zone, .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
+  CRM.riseIn();
   renderDrill(list, base);
   syncAgeDots();
 }
@@ -446,7 +447,7 @@ function quarterCard(base) {
         ${x.target ? `<div class="qtarget" style="bottom:${h(x.target)}" aria-hidden="true"></div>` : ''}
       </div>
       <div class="qbase"></div>
-      <div class="qlab"><b>Q${x.q}${cur ? ' · now' : ''}${chev}</b><small>Target ${x.target ? money(x.target) : 'N/A'}</small><div class="att ${attCls}">${attTxt}</div></div>
+      <div class="qlab"><b>Q${x.q}${cur ? ' · now' : ''}${chev}</b><small><em class="qk">Target</em> <span>${x.target ? money(x.target) : 'N/A'}</span></small><div class="att ${attCls}">${attTxt.replace(/^(\d+%) /, '$1 <span>')}${/^\d+% /.test(attTxt) ? '</span>' : ''}</div></div>
     </button>`;
   }).join('');
   const notes = [];
@@ -835,7 +836,6 @@ $('#export').addEventListener('click', () => {
 });
 
 CRM.renderShell('pipeline');
-{ const hr = new Date().getHours(); $('#hello').textContent = `Good ${hr < 12 ? 'morning' : hr < 18 ? 'afternoon' : 'evening'}, ${ME.split(' ')[0]}`; }
 CRM.watchSticky($('#filters'));
 render();
 </script>

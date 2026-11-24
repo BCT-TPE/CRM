@@ -6,10 +6,10 @@
 <title>Accounts · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261123j">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261123d">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261123k">
+<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
 <style>
 /* ---------- Page: Accounts ----------
    Same IA as CRMpulse /accounts: five scope tiles, search / owner / geography filters, one table with quick actions.
@@ -56,7 +56,6 @@
   <main class="main">
     <header class="v2-head">
       <div class="v2-hello">
-        <div class="v2-top"><span class="v2-eyebrow">Accounts</span></div>
         <h1>Accounts</h1>
         <p>Prospective and existing customer organisations</p>
       </div>
@@ -77,8 +76,8 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261123m"></script>
-<script src="assets/crm-data.js?v=20261120b"></script>
+<script src="assets/crm.js?v=20261124k"></script>
+<script src="assets/crm-data.js?v=20261124d"></script>
 <script>
 /* Accounts — every company that appears in the sales initiatives. Lifecycle: customer (has won business) or prospect.
    Open pipeline = open opportunities; customer value = won business; last interaction = latest activity. */
@@ -175,6 +174,8 @@ function fill(sel, opts) { sel.innerHTML = opts.map(([k, l]) => `<option value="
 fill($('#f-owner'), [['', 'All'], ...[...new Set(ACCOUNTS.map(a => a.owner))].sort().map(p => [p, p === ME ? `${p} (you)` : p])]);
 fill($('#f-geo'), [['', 'All'], ...[...new Set(ACCOUNTS.map(a => a.geo))].sort().map(g => [g, g])]);
 $('#f-search').addEventListener('input', (e) => { S.q = e.target.value; S.page = 1; render(); });
+// customer names on Tasks link here with ?q= (design review D9)
+{ const q = new URLSearchParams(location.search).get('q'); if (q) { S.q = q; $('#f-search').value = q; } }
 $('#f-owner').addEventListener('change', (e) => { S.owner = e.target.value; S.page = 1; render(); });
 $('#f-geo').addEventListener('change', (e) => { S.geo = e.target.value; S.page = 1; render(); });
 function resetAll() { S.q = S.owner = S.geo = ''; $('#f-search').value = ''; ['#f-owner', '#f-geo'].forEach(s => $(s).value = ''); S.page = 1; render(); }

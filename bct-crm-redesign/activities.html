@@ -6,30 +6,14 @@
 <title>Activities · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261123j">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261123d">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261123k">
+<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
 <style>
 /* ---------- Page: Activities (CRM V1 §6) ----------
-   Same IA as CRMpulse /activities: Mine / My teams / Everyone, a "Log what happened" composer, four summary tiles,
+   Same IA as CRMpulse /activities: Mine / My teams / Everyone, four summary tiles (the "Log activity" header button opens the full panel; design review D1 removed the inline composer),
    type chips, search / purpose / period / more filters, and the timeline grouped by week and month, newest first. */
-/* Composer */
-.lg-card { display: flex; flex-direction: column; gap: 12px; }
-.lg-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.lg-top b { flex-basis: 100%; font-size: var(--text-md); font-weight: 600; color: var(--ink); } /* title on its own line, type chips under it */
-.tchip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface); font: inherit; font-size: var(--text-xs); font-weight: 500; color: var(--t1); cursor: pointer; }
-.tchip:hover { border-color: var(--line-3); }
-.tchip.on { border-color: var(--midnight); background: var(--midnight); color: var(--on-dark); }
-.tchip svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.tchip small { font-size: var(--text-2xs); opacity: .75; font-variant-numeric: tabular-nums; }
-.lg-form { display: grid; grid-template-columns: 180px minmax(0, 1fr) minmax(0, 2fr) auto; gap: 8px; align-items: center; }
-.lg-form .in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); outline: none; }
-.lg-form .in:focus { border-color: var(--deep); }
-.lg-form .btn { height: 40px; justify-content: center; } /* full width on phones: label stays centred */
-body.v2 .lg-form label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: var(--radius-control); border-color: var(--line-2); background: var(--surface); box-shadow: none; }
-.lg-form .fsel .sel-btn { max-width: none; width: 100%; padding-left: 12px; font-weight: 400; color: var(--ink); }
-.lg-note { margin: 0; font-size: var(--text-xs); color: var(--t2); }
 /* Summary tiles */
 .sm4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap-grid); }
 /* label / figure / note share row heights across a row (subgrid), so a wrapped label never pushes one figure down */
@@ -69,7 +53,8 @@ body.v2 .lg-form label.select.fsel { display: flex; width: 100%; height: 40px; b
 .ai-ic span.k-event { background: var(--act-event-bg); color: var(--act-event); }
 .ai-ic span.k-other { background: var(--act-other-bg); color: var(--act-other); }
 .ai-ic svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.ai:not(:last-child) .ai-ic::after { content: ""; position: absolute; top: 26px; bottom: -40px; width: 2px; border-radius: 1px; background: var(--line-2); } /* this dot's centre to the next dot's centre (12px + 14px half dot; 14px row gap) */
+.ai:not(:last-child) .ai-ic::after { content: ""; position: absolute; top: 26px; bottom: -40px; width: 2px; border-radius: var(--radius-2xs); background: var(--line-2); } /* this dot's centre to the next dot's centre (12px + 14px half dot; 14px row gap) */
+.ai-h .lock { flex: none; font-size: var(--text-xs); color: var(--t3); } /* other roles can edit an activity for 7 days; Administrator always (design review) */
 .ai-c { min-width: 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
 .ai-h { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .ai-h b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
@@ -87,9 +72,8 @@ body.v2 .lg-form label.select.fsel { display: flex; width: 100%; height: 40px; b
 #more-pop .grp + .grp { margin-top: 12px; }
 body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; border-radius: var(--radius-control); border-color: var(--line-2); box-shadow: none; }
 #more-pop .fsel .sel-btn { max-width: none; width: 100%; font-weight: 400; }
-@media (max-width: 1180px) { .sm4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lg-form { grid-template-columns: 160px minmax(0, 1fr); } .lg-form .in.what { grid-column: 1 / -1; } }
+@media (max-width: 1180px) { .sm4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 768px) {
-  .lg-form { grid-template-columns: 1fr; }
   /* phone: type icon + date on one line above the card; title + edit, then purpose + ID */
   .ai { grid-template-columns: 24px minmax(0, 1fr); gap: 6px 8px; align-items: center; }
   .ai-ic { grid-row: 1; grid-column: 1; padding-top: 0; }
@@ -107,6 +91,27 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   .ai-h small { order: 3; }
     .ai-h { flex-wrap: wrap; }
 }
+/* Log activity side panel (old CRMpulse ActivityFormDrawer): opened from the "Log activity" header button;
+   same .drill panel and form styles as the Tasks panel */
+.tf-panel .tf-form { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.tf-panel .dr-body { padding: 20px 24px 24px; }
+.tf-g { display: grid; gap: 16px; }
+.tf-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.tf { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tf-l { font-size: var(--text-sm); font-weight: 500; color: var(--ink); } .tf-l .rq { margin-left: 2px; color: var(--danger); }
+.tf-h { font-size: var(--text-xs); color: var(--t3); } .tf-e { font-size: var(--text-xs); color: var(--danger); }
+.tf .in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); outline: none; }
+.tf textarea.in { height: auto; min-height: 96px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.tf .in:focus { border-color: var(--deep); }
+.tf.bad .in, .tf.bad .dt-btn, .tf.bad .sel-btn { border-color: var(--danger); }
+body.v2 .tf label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: var(--radius-control); border-color: var(--line-2); background: var(--surface); box-shadow: none; }
+.tf .fsel .sel-btn { max-width: none; width: 100%; padding-left: 12px; font-weight: 400; color: var(--ink); }
+body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shadow: none; }
+.tf-seg button { flex: 1 1 0; }
+.tf-box { display: grid; gap: 14px; padding: 16px; border: 1px solid var(--line-2); border-radius: var(--radius-lg); }
+.tf-chk { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: var(--text-sm); font-weight: 500; color: var(--ink); cursor: pointer; }
+.tf-chk input { width: 16px; height: 16px; margin: 0; accent-color: var(--deep); }
+@media (max-width: 480px) { .tf-2 { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
 <body class="v2">
@@ -116,9 +121,11 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   <main class="main">
     <header class="v2-head">
       <div class="v2-hello">
-        <div class="v2-top"><span class="v2-eyebrow">Activities</span></div>
         <h1>Activities</h1>
         <p>Every call, meeting, visit and email with customers, newest first.</p>
+      </div>
+      <div class="acts" style="display:flex;gap:8px">
+        <button class="btn primary" id="log-new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Log activity</button><!-- design review D1: the full panel from the header -->
       </div>
     </header>
 
@@ -150,8 +157,8 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261123m"></script>
-<script src="assets/crm-data.js?v=20261120b"></script>
+<script src="assets/crm.js?v=20261124k"></script>
+<script src="assets/crm-data.js?v=20261124d"></script>
 <script>
 const { toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -176,7 +183,7 @@ const PERIODS = [['60', 'Last 60 days'], ['week', 'This week'], ['month', 'This 
 const WEEK_START = new Date(TODAY.getTime() - ((TODAY.getDay() + 6) % 7) * DAY); // Monday
 const MY_TEAM = PERSON_TEAM[ME];
 // CRMpulse defaultWho: "Everyone" for Administrator / Sales Head, "My teams" for a Sales Manager, "Mine" for everyone else
-const S = { who: CRM.user.oversight ? 'all' : CRM.user.code === 'SALES_MANAGER' ? 'team' : 'mine', type: '', q: '', purpose: '', period: '60', from: '', to: '', owner: '', ctx: '', logType: '', logCtx: 'account', logTo: '', logWhat: '' };
+const S = { who: CRM.user.oversight ? 'all' : CRM.user.code === 'SALES_MANAGER' ? 'team' : 'mine', type: '', q: '', purpose: '', period: '60', from: '', to: '', owner: '', ctx: '' };
 
 const day = (a) => new Date(a.d.slice(0, 10));
 function inPeriod(a, p) {
@@ -195,20 +202,6 @@ function rows(ignoreType) {
     && (!q || [a.t, a.id, a.acc, a.siName].some(v => v.toLowerCase().includes(q))));
 }
 
-// Composer: type, context (account or initiative) and what happened; Log adds it to the timeline
-function composer() {
-  const opts = S.logCtx === 'account' ? ACCOUNTS.map(a => [a.name, a.name]) : INITS.filter(o => o.kind === 'open').map(o => [o.id, o.name]);
-  return `<section class="card tint lg-card" aria-label="Log an activity">
-    <div class="lg-top"><b>Log what happened</b>${ACT_TYPES.map(t => `<button type="button" class="tchip ${S.logType === t ? 'on' : ''}" data-act="ltype" data-v="${t}" aria-pressed="${S.logType === t}">${ic(t)}${t}</button>`).join('')}</div>
-    <form class="lg-form" id="lg-form" novalidate>
-      <label class="select fsel"><select id="lg-ctx" aria-label="Log against"><option value="account" ${S.logCtx === 'account' ? 'selected' : ''}>Account</option><option value="initiative" ${S.logCtx === 'initiative' ? 'selected' : ''}>Sales initiative</option></select></label>
-      <label class="select fsel"><select id="lg-to" aria-label="${S.logCtx === 'account' ? 'Account' : 'Sales initiative'}"><option value="">${S.logCtx === 'account' ? 'Select account…' : 'Select initiative…'}</option>${opts.map(([v, l]) => `<option value="${esc(v)}" ${S.logTo === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>
-      <input class="in what" id="lg-what" value="${esc(S.logWhat)}" placeholder="e.g. Called Layla about the proposal; she wants a demo next week" aria-label="What happened">
-      <button class="btn primary" type="submit">Log</button>
-    </form>
-    <p class="lg-note">Tip: Log activity on any initiative, account or contact fills in the details for you.</p>
-  </section>`;
-}
 function tiles() {
   const mine = ACTIVITIES.filter(a => whoMatch(a));
   const wk = mine.filter(a => day(a) >= WEEK_START), m30 = mine.filter(a => (TODAY - day(a)) / DAY <= 30);
@@ -244,15 +237,15 @@ function feed() {
       <div class="ai-d"><b>${CRM.date(a.d, false)} <span class="wd">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</span></b><span>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span></div>
       <div class="ai-ic"><span class="k-${kindOf(a.type)}">${ic(a.type)}</span></div>
       <div class="ai-c">
-        <div class="ai-h"><b>${esc(a.t)}</b><span class="ptag">${a.purpose}</span><span class="sp"></span><small>${a.id}</small><button class="btn icon-only" data-act="edit" data-v="${a.id}" aria-label="Edit ${a.id}" data-tip="Edit or delete">${EDIT}</button></div>
-        <div class="ai-m"><span class="acc">${esc(a.acc)}</span>${a.si ? `<a class="link" href="initiative.html?id=${encodeURIComponent(a.si)}#activities">${esc(a.siName)}</a>` : ''}<span>by ${a.owner === ME ? 'you' : esc(a.owner)}</span>${n ? `<span class="fu">${n} follow-up task${n === 1 ? '' : 's'}</span>` : ''}</div>
+        <div class="ai-h"><b>${esc(a.t)}</b><span class="ptag">${a.purpose}</span><span class="sp"></span><small>${a.id}</small>${CRM.user.code !== 'ADMIN' && (TODAY - day(a)) / DAY > 7 ? '<small class="lock">Locked after 7 days</small>' : `<button class="btn icon-only" data-act="edit" data-v="${a.id}" aria-label="Edit ${a.id}" data-tip="Edit or delete">${EDIT}</button>`}</div>
+        <div class="ai-m"><span class="acc">${esc(a.acc)}</span>${a.si ? `<a class="link" href="initiative.html?id=${encodeURIComponent(a.si)}#activities">${esc(a.siName)}</a>` : ''}<span>by ${a.owner === ME ? 'you' : esc(a.owner)}</span>${n ? `<a class="link fu" href="tasks.html?q=${a.id}">${n} follow-up task${n === 1 ? '' : 's'}</a>` : ''}</div>
         ${a.note ? `<p class="ai-n">${esc(a.note)}</p>` : ''}
       </div></div>`;
   };
   const items = groups.map(([k, l]) => `<section class="wkg" aria-label="${k}"><h3 class="wk">${k}<small>${l.length}</small></h3>${l.map(item).join('')}</section>`).join('');
   return `<section class="card feed" aria-label="Activity timeline">${typeChips()}${items}</section>`;
 }
-function renderTop() { $('#top').innerHTML = `<div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px">${composer()}${tiles()}</div>`; CRM.enhanceSelects($('#top')); }
+function renderTop() { $('#top').innerHTML = `<div style="margin-bottom:16px">${tiles()}</div>`; }
 function render() {
   renderTop();
   $('#page').innerHTML = feed();
@@ -268,32 +261,106 @@ function render() {
 document.addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a || !a.closest('#top, #page')) return;
   const act = a.dataset.act;
-  if (act === 'ltype') { S.logType = S.logType === a.dataset.v ? '' : a.dataset.v; renderTop(); }
-  else if (act === 'type') { S.type = a.dataset.v; render(); }
+  if (act === 'type') { S.type = a.dataset.v; render(); }
   else if (act === 'anytime') { S.period = 'all'; S.from = S.to = ''; $('#f-period').value = 'all'; $('#f-from').value = ''; $('#f-to').value = ''; render(); }
   else if (act === 'edit') toast(`Would open ${a.dataset.v} to edit or delete`);
 });
-document.addEventListener('change', (e) => {
-  if (e.target.id === 'lg-ctx') { S.logCtx = e.target.value; S.logTo = ''; renderTop(); }
-  else if (e.target.id === 'lg-to') S.logTo = e.target.value;
-});
-document.addEventListener('input', (e) => { if (e.target.id === 'lg-what') S.logWhat = e.target.value; });
-document.addEventListener('submit', (e) => {
-  if (e.target.id !== 'lg-form') return; e.preventDefault();
-  if (!S.logTo) { toast(S.logCtx === 'account' ? 'Pick the account first' : 'Pick the initiative first', 'warn'); return; }
-  const o = S.logCtx === 'initiative' ? INITS.find(x => x.id === S.logTo) : null, acc = o ? o.acc : S.logTo, type = S.logType || 'Other';
-  const id = 'ACT-2026-' + String(Math.max(...ACTIVITIES.map(x => +x.id.slice(-4))) + 1).padStart(4, '0');
-  ACTIVITIES.unshift({ id, d: `${TODAY.toISOString().slice(0, 10)}T${String(new Date().getHours()).padStart(2, '0')}:00`, type, purpose: 'Follow-up', acc, si: o ? o.id : null, siName: o ? o.name : '', owner: ME, who: [],
-    t: `${ACT_SUBJECT[type]} ${acc}`, note: S.logWhat.trim() });
-  S.logType = ''; S.logTo = ''; S.logWhat = ''; if (S.who !== 'all' && S.who !== 'mine') S.who = 'mine';
-  render(); toast(`Logged ${id}`, 'ok');
-});
+const fld = (label, ctl, { req, hint, err, id } = {}) => `<div class="tf ${err ? 'bad' : ''}" ${id ? `data-f="${id}"` : ''}><span class="tf-l">${label}${req ? '<span class="rq">*</span>' : ''}</span>${ctl}${err ? `<span class="tf-e">${err}</span>` : hint ? `<span class="tf-h">${hint}</span>` : ''}</div>`;
+const isoDay = (d) => new Date(d).toISOString().slice(0, 10);
+const TEAMMATES = [...new Set([ME, ...Object.values(TEAMS).flatMap(t => t.people), ...Object.keys(FUNC)])].sort((a, b) => a === ME ? -1 : b === ME ? 1 : a.localeCompare(b));
+function openLog(pre) {
+  const v = { ctx: pre.ctx || 'account', to: pre.to || '', type: pre.type || 'Phone call', when: 'today', date: isoDay(TODAY), time: String(new Date().getHours()).padStart(2, '0') + ':00',
+    who: '', purpose: 'Follow-up', what: pre.what || '', subject: '', subjectTouched: false,
+    doNext: false, next: '', follow: '', doTask: false, task: '', taskTo: ME, taskDue: isoDay(TODAY.getTime() + 7 * DAY) };
+  let errs = {};
+  const scrim = document.createElement('aside'); scrim.className = 'drill tf-panel'; scrim.setAttribute('role', 'dialog'); scrim.setAttribute('aria-labelledby', 'lf-t');
+  const prev = document.activeElement;
+  const close = () => { document.removeEventListener('keydown', key, true); document.body.classList.remove('drill-open'); setTimeout(() => scrim.remove(), 300); prev && prev.focus && prev.focus(); };
+  const snap = () => JSON.stringify({ ...v, subject: v.subjectTouched ? v.subject : '' }); // the auto-filled subject is not an edit
+  const start = snap();
+  const askClose = async () => { if (snap() === start) return close();
+    const r = await CRM.confirm({ title: 'Discard this activity?', body: '<p>What you entered will be lost.</p>',
+      actions: [{ label: 'Discard', value: 'discard', kind: 'quiet' }, { label: 'Keep editing', value: null, kind: 'primary' }] });
+    if (r === 'discard') close(); };
+  const key = (e) => { if (e.key === 'Escape' && !document.body.classList.contains('dlg-open')) { e.preventDefault(); askClose(); } };
+  const ctxAcc = () => v.ctx === 'initiative' ? (INITS.find(o => o.id === v.to) || {}).acc : v.to;
+  const autoSubject = () => `${ACT_SUBJECT[v.type] || 'Activity with'} ${v.who || ctxAcc() || '…'}`;
+  const opt = (val, label, on) => `<option value="${esc(val)}" ${on ? 'selected' : ''}>${esc(label)}</option>`;
+  const draw = () => {
+    if (!v.subjectTouched) v.subject = autoSubject();
+    const acc = ctxAcc(), si = v.ctx === 'initiative' ? INITS.find(o => o.id === v.to) : null;
+    const people = acc ? CONTACTS.filter(c => c.acc === acc && c.status === 'Active') : [];
+    const targets = v.ctx === 'account' ? ACCOUNTS.map(a => [a.name, a.name]) : INITS.filter(o => o.kind === 'open').map(o => [o.id, o.name]);
+    scrim.innerHTML = `<form class="tf-form" novalidate>
+      <header class="dr-head"><div><p class="dr-kind">Activities</p><h2 id="lf-t">Log activity</h2><p class="dr-sub">What happened with the customer, for the timeline and the record.</p></div>
+        <button type="button" class="icon-btn" data-x="close" aria-label="Close panel">${CRM.icon('x')}</button></header>
+      <div class="dr-body"><div class="tf-g">
+        ${fld('Log against', `<div class="seg tf-seg" role="radiogroup" aria-label="Log against">${[['initiative', 'Sales initiative'], ['account', 'Account']].map(([k, l]) => `<button type="button" role="radio" aria-checked="${v.ctx === k}" class="${v.ctx === k ? 'on' : ''}" data-ctx="${k}">${l}</button>`).join('')}</div>`)}
+        ${fld(v.ctx === 'account' ? 'Account' : 'Sales initiative', `<label class="select fsel"><select data-v="to" aria-label="${v.ctx === 'account' ? 'Account' : 'Sales initiative'}">${opt('', v.ctx === 'account' ? 'Select account…' : 'Select initiative…', !v.to)}${targets.map(([k, l]) => opt(k, l, k === v.to)).join('')}</select></label>`, { req: true, err: errs.to, hint: v.ctx === 'account' ? 'Approved accounts only.' : '', id: 'to' })}
+        ${fld('What kind of activity?', `<label class="select fsel"><select data-v="type" aria-label="What kind of activity?">${ACT_TYPES.map(t => opt(t, t, t === v.type)).join('')}</select></label>`, { req: true })}
+        ${fld('When?', `<div class="seg tf-seg" role="radiogroup" aria-label="When">${[['today', 'Today'], ['yesterday', 'Yesterday'], ['pick', 'Pick date…']].map(([k, l]) => `<button type="button" role="radio" aria-checked="${v.when === k}" class="${v.when === k ? 'on' : ''}" data-when="${k}">${l}</button>`).join('')}</div>`, { req: true })}
+        <div class="tf-2">
+          ${v.when === 'pick' ? fld('Date', `<input class="in" type="date" data-v="date" value="${v.date}" max="${isoDay(TODAY)}" aria-label="Activity date">`, { req: true }) : ''}
+          ${fld('Time', `<input class="in" type="time" data-v="time" value="${v.time}" aria-label="Time">`)}
+        </div>
+        ${fld('Who was there?', `<label class="select fsel"><select data-v="who" aria-label="Who was there?" ${acc ? '' : 'disabled'}>${opt('', acc ? 'No contact' : 'Choose the context first', !v.who)}${people.map(c => opt(c.n, c.role ? `${c.n} · ${c.role}` : c.n, c.n === v.who)).join('')}</select></label>`, { hint: acc ? `Contacts at ${esc(acc)}` : '' })}
+        ${fld('Purpose', `<label class="select fsel"><select data-v="purpose" aria-label="Purpose">${ACT_PURPOSES.map(p => opt(p, p, p === v.purpose)).join('')}</select></label>`)}
+        ${fld('What happened?', `<textarea class="in" data-v="what" aria-label="What happened?">${esc(v.what)}</textarea>`)}
+        ${fld('Subject', `<input class="in" data-v="subject" value="${esc(v.subject)}" aria-label="Subject">`, { req: true, err: errs.subject, hint: v.subjectTouched ? '' : 'Filled in for you. Edit if you like.', id: 'subject' })}
+        ${si ? `<div class="tf-box"><label class="tf-chk"><input type="checkbox" data-c="doNext" ${v.doNext ? 'checked' : ''}>Update the initiative's next step</label>
+          ${v.doNext ? `<div class="tf-2">${fld('Next step', `<input class="in" data-v="next" value="${esc(v.next)}" aria-label="Next step">`)}${fld('Follow-up date', `<input class="in" type="date" data-v="follow" value="${v.follow}" aria-label="Follow-up date">`)}</div>`
+            : `<span class="tf-h">${si.next ? `Currently: ${esc(si.next)}${si.follow ? ` (follow up ${CRM.date(si.follow)})` : ''}` : 'The list shows "No next step" for this initiative today.'}</span>`}</div>` : ''}
+        <div class="tf-box"><label class="tf-chk"><input type="checkbox" data-c="doTask" ${v.doTask ? 'checked' : ''}>Create a follow-up task</label>
+          ${v.doTask ? `${fld('Task', `<input class="in" data-v="task" value="${esc(v.task)}" aria-label="Task">`, { req: true, err: errs.task, id: 'task' })}
+            <div class="tf-2">${fld('Assign to', `<label class="select fsel"><select data-v="taskTo" aria-label="Assign to">${TEAMMATES.map(x => opt(x, x === ME ? `${x} (you)` : x, x === v.taskTo)).join('')}</select></label>`, { req: true })}
+            ${fld('Due', `<input class="in" type="date" data-v="taskDue" value="${v.taskDue}" aria-label="Due">`, { req: true })}</div>` : ''}</div>
+      </div></div>
+      <div class="dr-foot"><button type="button" class="btn ghost" data-x="close">Cancel</button><button type="submit" class="btn primary">Log activity</button></div>
+    </form>`;
+    CRM.enhanceSelects(scrim); CRM.enhanceDates(scrim);
+  };
+  scrim.addEventListener('click', (e) => {
+    if (e.target.closest('[data-x="close"]')) { askClose(); return; }
+    const c = e.target.closest('[data-ctx]'); if (c && c.dataset.ctx !== v.ctx) { v.ctx = c.dataset.ctx; v.to = ''; v.who = ''; draw(); return; }
+    const w = e.target.closest('[data-when]'); if (w) { v.when = w.dataset.when; v.date = v.when === 'yesterday' ? isoDay(TODAY.getTime() - DAY) : v.when === 'today' ? isoDay(TODAY) : v.date; draw(); }
+  });
+  scrim.addEventListener('change', (e) => {
+    const c = e.target.dataset.c; if (c) { v[c] = e.target.checked; draw(); return; }
+    const k = e.target.dataset.v; if (!k) return; v[k] = e.target.value;
+    if (k === 'to' || k === 'type' || k === 'who') { if (k === 'to') v.who = ''; draw(); }
+  });
+  scrim.addEventListener('input', (e) => { const k = e.target.dataset.v; if (!k || e.target.tagName === 'SELECT') return; v[k] = e.target.value; if (k === 'subject') v.subjectTouched = true; });
+  scrim.addEventListener('submit', (e) => {
+    e.preventDefault(); errs = {};
+    if (!v.to) errs.to = v.ctx === 'account' ? 'Pick the account.' : 'Pick the initiative.';
+    if (!v.subject.trim()) errs.subject = 'Give it a subject.';
+    if (v.doTask && !v.task.trim()) errs.task = 'Say what needs doing.';
+    if (Object.keys(errs).length) { draw(); scrim.querySelector('.tf.bad .in, .tf.bad .sel-btn')?.focus(); return; }
+    const o = v.ctx === 'initiative' ? INITS.find(x => x.id === v.to) : null, acc = o ? o.acc : v.to;
+    const id = 'ACT-2026-' + String(Math.max(...ACTIVITIES.map(x => +x.id.slice(-4))) + 1).padStart(4, '0');
+    ACTIVITIES.unshift({ id, d: `${v.date}T${v.time || '09:00'}`, type: v.type, purpose: v.purpose, acc, si: o ? o.id : null, siName: o ? o.name : '', owner: ME, who: v.who ? [v.who] : [], t: v.subject.trim(), note: v.what.trim() });
+    ACTIVITIES.sort((a, b) => b.d.localeCompare(a.d));
+    if (o && v.doNext) { if (v.next.trim()) o.next = v.next.trim(); if (v.follow) o.follow = v.follow; }
+    let extra = '';
+    if (v.doTask) { const n = String(Math.max(...TASKS.map(x => +x.id.slice(-4))) + 1).padStart(4, '0');
+      TASKS.unshift({ id: 'TSK-2026-' + n, title: v.task.trim(), si: o ? o.id : null, siName: o ? o.name : '', acc, to: v.taskTo, by: ME, status: 'ns', due: v.taskDue, act: id, done: null, desc: '' });
+      CRM.refreshTaskBadge(); extra = ' and a follow-up task'; }
+    if (S.who !== 'all' && S.who !== 'mine') S.who = 'mine';
+    close(); render(); toast(`Logged ${id}${extra}`, 'ok');
+  });
+  document.querySelectorAll('.tf-panel').forEach(x => x.remove());
+  draw(); document.body.appendChild(scrim); document.addEventListener('keydown', key, true);
+  requestAnimationFrame(() => { document.body.classList.add('drill-open'); setTimeout(() => scrim.querySelector(v.to ? '[data-v="what"]' : '[data-v="to"]')?.closest('.tf')?.querySelector('textarea, input, .sel-btn')?.focus(), 280); });
+}
+$('#log-new').addEventListener('click', () => openLog({}));
 $('#f-who').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { S.who = b.dataset.v; render(); } });
 function fill(sel, opts, v = '') { sel.innerHTML = opts.map(([k, l]) => `<option value="${esc(k)}" ${k === v ? 'selected' : ''}>${esc(l)}</option>`).join(''); }
 fill($('#f-purpose'), [['', 'All'], ...ACT_PURPOSES.map(p => [p, p])]);
 fill($('#f-period'), PERIODS, '60');
 fill($('#f-owner'), [['', 'All'], ...[...new Set(ACTIVITIES.map(a => a.owner))].sort().map(p => [p, p === ME ? `${p} (you)` : p])]);
 $('#f-search').addEventListener('input', (e) => { S.q = e.target.value; render(); });
+// links from Tasks ("from ACT-…") land on that activity: ?q= fills the search, over any period (design review D9)
+{ const q = new URLSearchParams(location.search).get('q'); if (q) { S.q = q; S.period = 'all'; S.who = 'all'; $('#f-search').value = q; $('#f-period').value = 'all'; } }
 $('#f-purpose').addEventListener('change', (e) => { S.purpose = e.target.value; render(); });
 $('#f-period').addEventListener('change', (e) => { S.period = e.target.value; if (S.period !== 'custom') { S.from = S.to = ''; $('#f-from').value = ''; $('#f-to').value = ''; } render(); });
 // a named period replaces custom dates; the two ends keep each other valid
@@ -310,6 +377,7 @@ $('#reset').addEventListener('click', () => { Object.assign(S, { q: '', purpose:
 CRM.renderShell('activities');
 CRM.watchSticky($('#filters'));
 render();
+CRM.riseIn();
 </script>
 </body>
 </html>

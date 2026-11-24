@@ -7,9 +7,11 @@
 
 body.v2 {
   /* Theme values moved to design-system/tokens.css (2026-11-17): the v2 theme is the standard. */
-  background: var(--grad-canvas);
-  background-attachment: fixed;
+  background: var(--canvas);
 }
+/* the gradient sits on a fixed layer: iOS Safari ignores background-attachment: fixed and would stretch it over the
+   whole page (design review M11) */
+body.v2::before { content: ""; position: fixed; inset: 0; z-index: -1; background: var(--grad-canvas); pointer-events: none; }
 body.v2 .c-won { background: var(--c-won); }
 body.v2 .legend i.c-won, body.v2 .sum-legend i.c-won { background: var(--c-won); }
 /* Performance: booked / won marks use the same midnight as Closed won on Pipeline */
@@ -162,7 +164,7 @@ body.v2 .tm-r { border-radius: var(--radius-lg); }
 /* Table */
 body.v2 .tbl th { background: transparent; }
 body.v2 .tbl tbody tr:hover td { background: color-mix(in srgb, var(--hover) 70%, transparent); }
-body.v2 .tabs { flex-wrap: wrap; border-bottom: 0; gap: 6px; padding: 0 24px 12px; } /* one tab style site-wide: pills at the top of the card they filter */
+body.v2 .tabs { flex-wrap: wrap; border-bottom: 0; gap: 8px; padding: 0 24px 12px; } /* one tab style site-wide: pills at the top of the card they filter */
 body.v2 .tab { height: 32px; padding: 0 14px; border-radius: var(--radius-pill); background: var(--glass-soft); border: 1px solid var(--line); }
 body.v2 .tab.on { background: var(--midnight); border-color: var(--midnight); color: var(--on-dark); }
 body.v2 .tab.on::after { display: none; }

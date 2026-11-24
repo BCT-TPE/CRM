@@ -6,10 +6,10 @@
 <title>Sales performance · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261123j">
-<link rel="stylesheet" href="assets/dashboard.css?v=20261123d">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261120a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261123k">
+<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
@@ -29,6 +29,7 @@
 .pq-pair i.ty.prog { background: var(--chart-step); }
 .pq-tot { position: absolute; left: 0; right: 0; text-align: center; font-size: var(--text-xs); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .qlab .ly-d { display: block; margin-top: 2px; font-size: var(--text-xs); color: var(--t3); white-space: normal; line-height: 1.35; }
+.qlab .ly-d span { display: block; } /* "vs last year" always on its own line, the same in all four quarters */
 .lg-ly { background: var(--chart-gray); }
 
 /* Won vs lost */
@@ -91,9 +92,8 @@
   <main class="main">
     <header class="v2-head">
       <div class="v2-hello">
-        <div class="v2-top"><span class="v2-eyebrow">Sales performance</span><span class="updated"><i></i>Updated 10:12</span></div>
         <h1>Sales performance</h1>
-        <p id="page-meta">Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD</p>
+        <p><span id="page-meta">Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD</span> <span class="updated"><i></i>Updated 10:12</span></p>
       </div>
       <div class="v2-kpis kpis-perf" id="hero-kpis" aria-label="Win and loss KPIs"></div>
     </header>
@@ -120,12 +120,12 @@
         <button class="btn" id="more-btn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>More filters<span class="count-badge" id="more-n" hidden></span></button>
         <div class="pop" id="more-pop" role="dialog" aria-label="More filters" hidden style="top:44px;right:0">
           <div class="grp"><h4>Geography</h4><div id="m-geo"></div></div>
-          <div class="pop-foot"><button class="link" id="more-clear">Clear</button><button class="btn primary" id="more-done">Done</button></div>
+          <div class="pop-foot"><button class="btn" id="more-clear">Clear</button><button class="btn primary" id="more-done">Done</button></div>
         </div>
       </div>
       <button class="btn ghost" id="reset" hidden>Reset</button>
       <span class="sp"></span>
-      <button class="btn primary" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
+      <button class="btn" id="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export</button>
     </div>
 
     <div id="page"></div>
@@ -133,8 +133,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261123m"></script>
-<script src="assets/crm-data.js?v=20261120b"></script>
+<script src="assets/crm.js?v=20261124k"></script>
+<script src="assets/crm-data.js?v=20261124d"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
    Data and rules are shared with Pipeline & forecast (assets/crm-data.js), so Q1–Q3 bookings match on both pages. */
@@ -202,7 +202,7 @@ function render() {
       ${zoneHead(4, 'Closed deals', 'The records behind every number above')}
       ${closedTable(P)}
     </div>`;
-  if (!render.done) { document.querySelectorAll('.card, .zone, .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; }); render.done = true; }
+  CRM.riseIn();
   renderDrill();
 }
 
@@ -312,7 +312,7 @@ function quarterCard() {
         ${tq ? `<div class="qtarget" style="bottom:${h(tq)}" aria-hidden="true"></div>` : ''}
       </div>
       <div class="qbase"></div>
-      <div class="qlab"><b>Q${x.q}${cur ? ' · now' : ''}${chev}</b><small>Target ${tq ? money(tq) : 'N/A'}</small><div class="att ${met ? 'met' : ''}">${status}</div><span class="ly-d">${fut ? '&nbsp;' : `${d >= 0 ? '+' : '−'}${money(Math.abs(d))} vs last year`}</span></div>
+      <div class="qlab"><b>Q${x.q}${cur ? ' · now' : ''}${chev}</b><small><em class="qk">Target</em> <span>${tq ? money(tq) : 'N/A'}</span></small><div class="att ${met ? 'met' : ''}">${status.replace(/^(\d+%) /, '$1 <span>')}${/^\d+% /.test(status) ? '</span>' : ''}</div><span class="ly-d">${fut ? '&nbsp;' : `${d >= 0 ? '+' : '−'}${money(Math.abs(d))}<span>vs last year</span>`}</span></div>
     </button>`;
   }).join('');
   const tyToDate = qs.filter(x => x.q <= CUR_Q).reduce((s, x) => s + x.ty, 0), lyToDate = qs.filter(x => x.q <= CUR_Q).reduce((s, x) => s + x.ly, 0);

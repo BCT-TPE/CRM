@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
+<style>
+/* ---------- Page: Home (requirement "CRMpulse Home page – by role", 2026-11-24) ----------
+   One page, three views by role (Salesperson / Sales Manager / Sales Head; Administrator = Sales Head view).
+   Structure follows the requirement's designs; visuals, data and numbers follow this redesign (assets/crm-data.js),
+   so every figure matches Pipeline & forecast, Sales performance, Sales initiatives, Activities and Tasks. */
+.hm-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.hm-grid > .w8 { grid-column: span 8; } .hm-grid > .w4 { grid-column: span 4; } .hm-grid > .w12 { grid-column: span 12; }
+.hm-grid > .w6 { grid-column: span 6; } .hm-grid > .w7 { grid-column: span 7; } .hm-grid > .w5 { grid-column: span 5; }
+.card-h p { line-height: 1.45; }
+
+/* Quota / forecast card */
+.q-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
+.q-of { font-size: var(--text-sm); color: var(--t2); }
+.q-of b { color: var(--ink); font-weight: 600; }
+.q-bar { position: relative; margin: 18px 0 6px; }
+.q-track { display: flex; gap: 2px; height: 12px; border-radius: var(--radius-xs); background: var(--chart-track); overflow: hidden; }
+.q-track i { display: block; height: 100%; }
+.q-target { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; border-radius: var(--radius-2xs); background: var(--ink); }
+.q-minis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
+.q-mini { min-width: 0; }
+.q-mini .k { display: flex; align-items: center; gap: 6px; font-size: var(--text-xs); color: var(--t3); }
+.q-mini .k i { width: 10px; height: 10px; border-radius: var(--radius-xs); flex: none; }
+.q-mini .v { margin-top: 4px; font-size: var(--text-xl); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.q-mini .v.neg { color: var(--danger); } .q-mini .v.pos { color: var(--ok-text); }
+.q-mini .s { margin-top: 2px; font-size: var(--text-xs); color: var(--t3); }
+.q-note { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: var(--text-xs); color: var(--t3); line-height: 1.5; }
+
+/* Header right: "Record something now" actions (salesperson, manager) or "Waiting on you" KPIs (sales head) */
+.hm-acts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+/* right column of two stacked cards beside a taller one (salesperson): together as tall as their neighbour */
+.hm-stack { display: flex; flex-direction: column; gap: 16px; }
+.hm-stack > div { flex: 1 1 auto; display: flex; flex-direction: column; }
+.hm-stack > div > .card { flex: 1; }
+.kpis-home .v2-kpi { min-width: 150px; }
+/* while they sit beside the greeting (>1360px), the KPI figures line up with the top of "Good morning, Gaurav":
+   the h1's 14px top margin + its half-leading (37.4 − 34) / 2 */
+@media (min-width: 1361px) {
+  .v2-head:has(> .kpis-home) { align-items: flex-start; } /* both sides start at the top, so the greeting does not drop */
+  .v2-head > .kpis-home { margin-top: calc(14px + 1.7px); }
+}
+
+/* Lists in cards */
+.hl { display: flex; flex-direction: column; margin: -4px -24px 0; }
+.hl-row { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 24px; border-top: 1px solid var(--line); }
+.hl-row:first-child { border-top: 0; }
+.hl-ic { flex: none; display: grid; place-items: center; width: 20px; color: var(--t3); }
+.hl-ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hl-ic input { width: 16px; height: 16px; margin: 0; accent-color: var(--deep); cursor: pointer; } /* same checkbox as the Tasks list */
+.hl-t { flex: 1; min-width: 0; }
+.hl-t b { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
+.hl-t.is-done b { color: var(--t3); font-weight: 400; text-decoration: line-through; }
+.hl-t small { display: block; margin-top: 2px; font-size: var(--text-xs); color: var(--t3); }
+.hl-r { flex: none; display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 6px 8px; max-width: 55%; }
+.hl-v { font-size: var(--text-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hl-n { min-width: 24px; text-align: right; font-size: var(--text-md); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hl-d { font-size: var(--text-xs); color: var(--t3); white-space: nowrap; }
+.hm-empty { margin: 0; padding: 18px 0 8px; font-size: var(--text-sm); color: var(--t3); }
+.hm-note { margin: 12px 0 0; font-size: var(--text-xs); color: var(--t3); line-height: 1.5; }
+.hm-grid > div:not(.hm-stack) > .card { height: 100%; } /* cards side by side end on one line */
+
+/* By salesperson / By sales team */
+.tbl.by { table-layout: fixed; }
+.tbl.by col.c-n { width: 19%; } .tbl.by col.c-m { width: 11%; } .tbl.by col.c-bar { width: 18%; } .tbl.by col.c-s { width: 9%; } .tbl.by col.c-a { width: 13%; }
+.tbl.by td { height: 56px; }
+.tbl.by tr.tot td { font-weight: 600; color: var(--ink); background: var(--surface-faint, transparent); }
+.att { display: flex; align-items: center; gap: 10px; }
+.att-t { position: relative; flex: 1; height: 8px; border-radius: var(--radius-xs); background: var(--chart-track); overflow: hidden; }
+.att-t i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--radius-xs); background: var(--deep); }
+.att-t i.low { background: var(--danger); }
+.att b { width: 40px; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.neg-t { color: var(--danger); font-weight: 600; }
+.cnt-hot { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: var(--radius-full); background: var(--danger-bg); color: var(--danger); font-weight: 600; }
+
+@media (max-width: 1180px) {
+  .hm-grid > .w8, .hm-grid > .w4, .hm-grid > .w6, .hm-grid > .w7, .hm-grid > .w5 { grid-column: span 12; }
+  .hm-grid > .w4.third { grid-column: span 6; }
+  .hm-grid > .w4.third.odd { grid-column: span 12; } /* the third card of a row of three takes the full width */
+}
+@media (max-width: 1100px) {
+  .v2-kpis.kpis-home { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .q-minis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  /* salesperson on a phone: what to do first — tasks, deals, then the quota, orders, quiet accounts, colleagues' activity */
+  .hm-stack { display: contents; }
+  .hm-grid > .o-tasks { order: 1; } .hm-stack > .o-deals { order: 2; grid-column: span 12; } .hm-grid > .o-quota { order: 3; }
+  .hm-stack > .o-orders { order: 4; grid-column: span 12; } .hm-grid > .o-quiet { order: 5; } .hm-grid > .o-act { order: 6; }
+  .main > .v2-head { margin-bottom: var(--space-4); } /* no filter bar under the header here: 16px to the first card */
+  .hm-grid > .w4.third { grid-column: span 12; }
+  .v2-head > .hm-acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v2-kpis.kpis-home { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .q-minis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hl { margin: -4px -16px 0; }
+  .hl-row { padding: 10px 16px; flex-wrap: wrap; }
+  .hl-r { max-width: none; flex: 1 1 100%; justify-content: flex-start; padding-left: 32px; }
+  .hl-row.no-ic .hl-r { padding-left: 0; }
+}
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+    <header class="v2-head">
+      <div class="v2-hello">
+        <h1 id="hello">Good morning, Gaurav</h1>
+        <p><span id="today"></span> <span class="updated"><i></i>Updated 10:10</span></p><!-- review D8: no pill; "Updated" ends the subtitle, as on the other pages -->
+      </div>
+    </header>
+    <div id="page"></div>
+  </main>
+</div>
+
+<script src="assets/crm.js?v=20261124k"></script>
+<script src="assets/crm-data.js?v=20261124d"></script>
+<script>
+const { money, moneyBig, toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const ROLE = CRM.user.code;                       // SALESPERSON · SALES_MANAGER · SALES_HEAD · ADMIN
+const VIEW = ROLE === 'SALESPERSON' ? 'me' : ROLE === 'SALES_MANAGER' ? 'team' : 'company';
+const MY_TEAM = PERSON_TEAM[ME];                   // APAC Sales
+const TEAM_PEOPLE = TEAMS[MY_TEAM].people;
+const DAY = 864e5;
+const Q = CUR_Q, [Q_START, Q_END] = Q_RANGE[Q].map(d => new Date(d));
+const PACE = Math.round((TODAY - Q_START) / DAY / ((Q_END - Q_START) / DAY + 1) * 100);
+const WEEK = Math.floor((TODAY - Q_START) / DAY / 7) + 1, WEEKS = Math.ceil(((Q_END - Q_START) / DAY + 1) / 7);
+const MONDAY = new Date(TODAY.getTime() - ((TODAY.getDay() + 6) % 7) * DAY);
+const QUIET = 30; // same rule as Activities' "Accounts idle 30+ days"
+const ICON = {
+  cal: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',
+  flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  layers: '<path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  task: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>'
+};
+const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const rel = (d) => { const x = new Date(d.slice(0, 10)), n = Math.round((TODAY - x) / DAY);
+  return n === 0 ? 'today' : n === 1 ? 'yesterday' : n < 7 ? x.toLocaleDateString('en-GB', { weekday: 'long' }) : CRM.date(d.slice(0, 10)); };
+const relShort = (d) => { const s = rel(d); return s[0].toUpperCase() + s.slice(1); };
+
+// the greeting moved here from Pipeline & forecast now that Home is the first page after sign-in
+{ const hr = new Date().getHours(); $('#hello').textContent = `Good ${hr < 12 ? 'morning' : hr < 18 ? 'afternoon' : 'evening'}, ${ME.split(' ')[0]}`; }
+$('#today').textContent = `${TODAY.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · Q${Q} FY26-27, week ${WEEK} of ${WEEKS} · USD`;
+
+/* ---------- Scope by view ---------- */
+const inScope = (owner, team) => VIEW === 'me' ? owner === ME : VIEW === 'team' ? team === MY_TEAM : true;
+const scopeOpps = () => OPPS.filter(o => inScope(o.owner, o.team));
+const scopeInits = () => INITS.filter(o => o.kind === 'open' && inScope(o.owner, o.team));
+function stats(owner, team) { // Q-quarter forecast for one person, one team, or the company (owner = team = null)
+  const ok = (o) => owner ? o.owner === owner : team ? o.team === team : true;
+  const won = CLOSED.filter(o => o.result === 'won' && o.fy === '2627' && o.q === Q && ok(o)).reduce((s, o) => s + o.value, 0);
+  const inq = OPPS.filter(o => o.q === Q && ok(o)), sum = (c) => inq.filter(o => o.cat === c).reduce((s, o) => s + o.value, 0);
+  const commit = sum('Commit'), best = sum('Best case'), pipe = sum('Pipeline');
+  const target = owner ? (PERSON_TARGET[owner] || 0) / 4 : team ? TEAMS[team].target / 4 : COMPANY_TARGET / 4;
+  const forecast = won + commit, still = Math.max(target - won, 0), open = commit + best + pipe;
+  const open_ = INITS.filter(o => o.kind === 'open' && ok(o));
+  return { won, commit, best, pipe, target, forecast, still, open, coverage: still ? open / still : null,
+    nCommit: inq.filter(o => o.cat === 'Commit').length, nOpen: open_.length, nAttn: open_.filter(o => attention(o).length).length };
+}
+const cov = (c) => c == null ? '—' : c.toFixed(1) + '×';
+const stageOf = (o) => o.status === 'Opportunity' ? `${o.code ? o.code + ' ' : ''}${o.sub}` : `${o.status} · ${o.sub}`;
+
+/* ---------- Cards ---------- */
+function quotaCard() {
+  const h = VIEW === 'me' ? stats(ME) : VIEW === 'team' ? stats(null, MY_TEAM) : stats();
+  const label = VIEW === 'me' ? 'your quota' : VIEW === 'team' ? `${MY_TEAM} team` : 'company';
+  const max = Math.max(h.target, h.won + h.commit + h.best) * 1.04 || 1, w = (v) => (v / max * 100).toFixed(2) + '%';
+  const gap = h.forecast - h.target;
+  const mini = (k, v, s, cls = '', dot = '') => `<div class="q-mini"><div class="k">${dot ? `<i class="${dot}"></i>` : ''}${k}</div><div class="v ${cls}">${v}</div><div class="s">${s}</div></div>`;
+  const note = VIEW === 'me'
+    ? `Forecast = Closed won in the quarter + Commit. Open = Commit ${money(h.commit)} + Best case ${money(h.best)} + Pipeline ${money(h.pipe)} expected to close this quarter.`
+    : VIEW === 'team' ? `Team target = the sum of its members' own targets. Pace today is ${PACE}% of the quarter.`
+    : `Company target = the sum of the geography targets. Pace today is ${PACE}% of the quarter.`;
+  return `<section class="card tint" aria-labelledby="q-h">
+    <div class="card-h"><div><h2 id="q-h">Q${Q} FY26-27 · ${label}</h2></div></div>
+    <div class="q-head"><span class="v2-kv">${moneyBig(h.forecast)}</span><span class="q-of">forecast (won + commit) vs <b>${money(h.target)}</b> target</span></div>
+    <div class="q-bar" role="img" aria-label="Closed won ${money(h.won)}, commit ${money(h.commit)}, best case ${money(h.best)}, target ${money(h.target)}">
+      <div class="q-track">${h.won ? `<i class="c-won" style="width:${w(h.won)}"></i>` : ''}${h.commit ? `<i class="c-commit" style="width:${w(h.commit)}"></i>` : ''}${h.best ? `<i class="c-best" style="width:${w(h.best)}"></i>` : ''}</div>
+      <span class="q-target" style="left:${w(h.target)}"></span>
+    </div>
+    <div class="q-minis">
+      ${mini('Closed won', money(h.won), `${pct(h.won, h.target) ?? 0}% of ${VIEW === 'me' ? 'quota' : 'target'}`, '', 'c-won')}
+      ${mini('Commit', money(h.commit), plural(h.nCommit, 'deal'), '', 'c-commit')}
+      ${mini('Best case', money(h.best), 'upside, not in forecast', '', 'c-best')}
+      ${mini('Gap to target', money(Math.abs(gap)), `${gap < 0 ? 'short' : 'ahead'} after commit`, gap < 0 ? 'neg' : 'pos')}
+      ${mini('Pipeline coverage', cov(h.coverage), h.still ? `${money(h.open)} open ÷ ${money(h.still)} still to win` : 'target already won')}
+    </div>
+    <p class="q-note">${note}</p>
+  </section>`;
+}
+
+function recordActs() { // "Record something now": the page-header actions, as on Tasks and Sales initiatives
+  return `<div class="acts hm-acts" data-hr aria-label="Record something now">
+      <button class="btn" type="button" data-act="toast" data-v="Would open New sales initiative">${svg('layers')}New initiative</button>
+      <button class="btn" type="button" data-act="toast" data-v="Would open New contact">${svg('user')}New contact</button>
+      <button class="btn" type="button" data-act="toast" data-v="Would open New task">${svg('task')}New task</button>
+      <button class="btn primary" type="button" data-act="toast" data-v="Would open Log activity">${svg('phone')}Log activity</button><!-- primary last, on the right, as everywhere -->
+    </div>`;
+}
+
+function waitingKpis() { // "Waiting on you": the page-header KPIs, as on Pipeline & forecast
+  const oldest = Math.max(0, ...APPROVALS.map(a => a.wait)), po = DRAFT_ORDERS.reduce((s, o) => s + o.value, 0), poOld = Math.max(0, ...DRAFT_ORDERS.map(o => o.age));
+  const k = (label, val, badge, sub) => `<div class="v2-kpi"><div class="v2-kv">${val}${badge ? `<span class="v2-badge">${badge}</span>` : ''}</div><div class="v2-kl">${label}</div><div class="v2-ks">${sub}</div></div>`;
+  return `<div class="v2-kpis kpis-home" data-hr aria-label="Waiting on you">
+      ${k('Accounts to approve', APPROVALS.length, '', `Oldest ${plural(oldest, 'day')}`)}
+      ${k('Won deals without a PO', DRAFT_ORDERS.length, money(po), `Oldest ${plural(poOld, 'day')}`)}
+    </div>`;
+}
+
+function byTable() { // By salesperson (manager) · By sales team (head / admin)
+  const people = VIEW === 'team';
+  const rows = (people ? TEAM_PEOPLE.map(p => ({ k: p, s: stats(p) })) : Object.keys(TEAMS).map(t => ({ k: t, s: stats(null, t) })));
+  const tot = people ? stats(null, MY_TEAM) : stats();
+  const attCell = (s) => { const p = s.target ? Math.round(s.won / s.target * 100) : null;
+    return `<div class="att"><span class="att-t"><i class="${p != null && p < 40 ? 'low' : ''}" style="width:${Math.min(p || 0, 100)}%"></i></span><b>${p == null ? 'N/A' : p + '%'}</b></div>`; };
+  const tr = (name, s, cls = '') => `<tr class="${cls}">
+      <td>${cls ? esc(name) : `<span class="t-main">${esc(name)}</span>`}</td>
+      <td class="r num">${money(s.target)}</td><td class="r num">${money(s.won)}</td><td class="r num">${money(s.commit)}</td>
+      <td>${attCell(s)}</td>
+      <td class="r num ${s.coverage != null && s.coverage < 1.8 && !cls ? 'neg-t' : ''}">${cov(s.coverage)}</td>
+      <td class="r num">${s.nOpen}</td>
+      <td class="r num">${s.nAttn >= 5 && !cls ? `<span class="cnt-hot">${s.nAttn}</span>` : s.nAttn}</td></tr>`;
+  const first = people ? 'Salesperson' : 'Sales team';
+  return `<section class="card" aria-labelledby="by-h">
+    <div class="card-h"><div><h2 id="by-h">${people ? 'By salesperson' : 'By sales team'}</h2><p>Q${Q} FY26-27</p></div></div>
+    <div class="tbl-wrap"><table class="tbl by">
+      <colgroup><col class="c-n"><col class="c-m"><col class="c-m"><col class="c-m"><col class="c-bar"><col class="c-s"><col class="c-s"><col class="c-a"></colgroup>
+      <thead><tr><th>${first}</th><th class="r">Target</th><th class="r">Closed won</th><th class="r">Commit</th><th>Won vs target</th><th class="r">Coverage</th><th class="r">Open</th><th class="r">Need attention</th></tr></thead>
+      <tbody>${rows.map(({ k, s }) => tr(k, s)).join('')}
+        ${tr(people ? MY_TEAM : 'Company', tot, 'tot')}</tbody></table></div>
+  </section>`;
+}
+
+function myTasksCard() {
+  const days = (d) => Math.round((new Date(d) - TODAY) / DAY);
+  // a task ticked here stays in the list as a ticked checkbox (it can be unticked), as in the requirement's design
+  const shown = TASKS.filter(t => t.to === ME && (taskOpen(t) || t._homeDone));
+  const items = shown.filter(t => t.due && days(t.due) <= 7).map(t => ({ kind: 'task', t, done: !taskOpen(t), d: days(t.due), title: t.title, sub: [t.acc, t.siName && t.siName.replace(/^[^–]+– /, '')].filter(Boolean).join(' · ') }));
+  // next-step follow-ups on my initiatives (skipped when a task already covers them)
+  scopeInits().filter(o => o.owner === ME && o.next && o.follow && days(o.follow) <= 0 && !shown.some(t => t.title === o.next))
+    .forEach(o => items.push({ kind: 'next', o, d: days(o.follow), title: o.next, sub: `Next step · ${o.name}` }));
+  items.sort((a, b) => a.d - b.d);
+  const late = items.filter(x => !x.done && x.d < 0).length, today = items.filter(x => !x.done && x.d === 0).length;
+  const due = (d, kind) => d < 0 ? `<span class="pill danger">${plural(-d, 'day')} overdue</span>` : d === 0 ? `<span class="pill warn">${kind === 'next' ? 'Follow-up today' : 'Due today'}</span>` : `<span class="hl-d">In ${plural(d, 'day')}</span>`;
+  return `<section class="card hm-card" aria-labelledby="mt-h">
+    <div class="card-h"><div><h2 id="mt-h">My tasks and follow-ups</h2><p>${late} overdue · ${today} today</p></div></div>
+    ${items.length ? `<div class="hl">${items.slice(0, 4).map(x => `<div class="hl-row">
+        <span class="hl-ic">${x.kind === 'task' ? `<input type="checkbox" data-act="done" data-v="${x.t.id}" ${x.done ? 'checked' : ''} aria-label="${x.done ? `Reopen ${esc(x.title)}` : `Mark ${esc(x.title)} complete`}">` : svg('flag')}</span>
+        <span class="hl-t ${x.done ? 'is-done' : ''}"><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></span>
+        <span class="hl-r">${x.done ? '<span class="pill ok">Done</span>' : due(x.d, x.kind)}</span></div>`).join('')}</div>` : `<p class="hm-empty">Nothing overdue or due this week.</p>`}
+  </section>`;
+}
+
+function teamTasksCard() {
+  const late = TASKS.filter(t => taskLate(t) && TEAM_PEOPLE.includes(t.to)).map(t => ({ t, d: Math.round((TODAY - new Date(t.due)) / DAY) })).sort((a, b) => b.d - a.d);
+  return `<section class="card hm-card" aria-labelledby="tt-h">
+    <div class="card-h"><div><h2 id="tt-h">Team overdue tasks</h2><p>${late.length ? `${late.length} overdue · oldest ${plural(late[0].d, 'day')}` : 'Nothing overdue'}</p></div></div>
+    ${late.length ? `<div class="hl">${late.slice(0, 4).map(({ t, d }) => `<div class="hl-row no-ic">
+        <span class="hl-t"><b>${esc(t.title)}</b><small>${esc(t.to)}${t.siName ? ' · ' + esc(t.siName) : t.acc ? ' · ' + esc(t.acc) : ''}</small></span>
+        <span class="hl-r"><span class="pill danger">${plural(d, 'day')} overdue</span></span></div>`).join('')}</div>` : `<p class="hm-empty">No task in the team is overdue.</p>`}
+  </section>`;
+}
+
+function dealsCard() {
+  const open = scopeInits(), flagged = open.filter(o => attention(o).length);
+  flagged.sort(VIEW === 'me' ? (a, b) => attention(b).length - attention(a).length || b.value - a.value : (a, b) => b.value - a.value);
+  const title = VIEW === 'company' ? 'Largest deals needing attention' : 'Deals needing attention';
+  const sub = VIEW === 'me' ? `${flagged.length} of your ${open.length} open · most urgent first` : VIEW === 'team' ? `${flagged.length} of the team's ${open.length} open · largest first` : `${flagged.length} across the company`;
+  const who = (o) => VIEW === 'me' ? stageOf(o) : VIEW === 'team' ? `${o.owner} · ${stageOf(o)}` : `${o.team} · ${o.owner} · ${stageOf(o)}`;
+  const tone = (f) => /Close date|No next/.test(f) ? 'danger' : 'warn';
+  return `<section class="card hm-card" aria-labelledby="dl-h">
+    <div class="card-h"><div><h2 id="dl-h">${title}</h2><p>${sub}</p></div></div>
+    ${flagged.length ? `<div class="hl">${flagged.slice(0, 4).map(o => `<div class="hl-row no-ic">
+        <span class="hl-t"><b>${esc(o.name)}</b><small>${esc(who(o))}</small></span>
+        <span class="hl-r"><span class="hl-v">${money(o.value)}</span>${attention(o).slice(0, 2).map(f => `<span class="pill ${tone(f)}">${esc(f)}</span>`).join('')}</span></div>`).join('')}</div>` : `<p class="hm-empty">No open deal needs attention.</p>`}
+  </section>`;
+}
+
+function ordersCard() {
+  const mine = DRAFT_ORDERS.filter(o => o.owner === ME), sum = mine.reduce((s, o) => s + o.value, 0);
+  return `<section class="card hm-card" aria-labelledby="po-h">
+    <div class="card-h"><div><h2 id="po-h">Orders awaiting confirmation</h2><p>${mine.length ? `${plural(mine.length, 'won deal')} without a PO` : 'Won deals without a PO'}</p></div></div>
+    ${mine.length ? `<div class="hl">${mine.slice(0, 4).map(o => `<div class="hl-row no-ic">
+        <span class="hl-t"><b>${esc(o.name)}</b><small>Draft order ${o.order} · won ${plural(o.age, 'day')} ago</small></span>
+        <span class="hl-r"><span class="hl-v">${money(o.value)}</span><button class="btn" type="button" data-act="toast" data-v="Would open ${o.order} to confirm the PO">Confirm PO</button></span></div>`).join('')}</div>
+      <p class="hm-note">Confirming a PO only updates the order: its value then counts in customer value (${money(sum)} waiting). The won initiative and your forecast do not change.</p>`
+      : `<p class="hm-empty">None of your won deals is waiting for a PO.</p>`}
+  </section>`;
+}
+
+function approvalsCard() {
+  const list = APPROVALS.filter(a => a.team === MY_TEAM).sort((a, b) => b.wait - a.wait);
+  return `<section class="card hm-card" aria-labelledby="ap-h">
+    <div class="card-h"><div><h2 id="ap-h">Waiting on you</h2><p>${plural(list.length, 'account')} to approve</p></div></div>
+    ${list.length ? `<div class="hl">${list.slice(0, 4).map(a => `<div class="hl-row no-ic">
+        <span class="hl-t"><b>${esc(a.acc)}</b><small>Created by ${esc(a.by)} · ${a.wait ? `waiting ${plural(a.wait, 'day')}` : 'today'}</small></span>
+        <span class="hl-r"><span class="pill warn">Fresh</span><button class="btn" type="button" data-act="toast" data-v="Would open ${esc(a.acc)} to approve">Review</button></span></div>`).join('')}</div>` : `<p class="hm-empty">No account is waiting for your approval.</p>`}
+    <p class="hm-note">Nothing can be logged or sold on an account until it is approved.</p>
+  </section>`;
+}
+
+function quietCard() {
+  const scope = VIEW === 'company' ? ACCOUNTS.filter(a => a.strategic) : ACCOUNTS.filter(a => inScope(a.owner, a.team));
+  const list = scope.filter(a => a.last > QUIET).sort((a, b) => b.last - a.last);
+  const title = VIEW === 'company' ? 'Strategic accounts gone quiet' : 'Quiet accounts';
+  const sub = VIEW === 'me' ? `Accounts you own · no customer interaction for over ${QUIET} days` : VIEW === 'team' ? `Team accounts with no contact for over ${QUIET} days` : `No customer contact for over ${QUIET} days`;
+  const who = (a) => VIEW === 'me' ? `${a.lifecycle} · last contact ${CRM.date(a.lastDate, false)}` : VIEW === 'team' ? `${a.owner} · ${a.lifecycle}` : `${a.team} · ${a.owner} · ${a.pipeline ? money(a.pipeline) + ' open' : a.lifecycle}`;
+  const empty = VIEW === 'me' ? `Every account you own was contacted in the last ${QUIET} days.` : VIEW === 'team' ? `Every team account was contacted in the last ${QUIET} days.` : `Every strategic account was contacted in the last ${QUIET} days.`;
+  return `<section class="card hm-card" aria-labelledby="qa-h">
+    <div class="card-h"><div><h2 id="qa-h">${title}</h2><p>${sub}</p></div></div>
+    ${list.length ? `<div class="hl">${list.slice(0, 4).map(a => `<div class="hl-row no-ic">
+        <span class="hl-t"><b>${esc(a.name)}</b><small>${esc(who(a))}</small></span>
+        <span class="hl-r"><span class="pill warn">${a.last} days</span>${VIEW === 'me' ? `<button class="btn" type="button" data-act="toast" data-v="Would open Log activity for ${esc(a.name)}">Log activity</button>` : ''}</span></div>`).join('')}</div>` : `<p class="hm-empty">${empty}</p>`}
+  </section>`;
+}
+
+function colleagueActCard() { // activity by others on the accounts I own, last 7 days
+  const accs = ACCOUNTS.filter(a => a.owner === ME).map(a => a.name), since = new Date(TODAY.getTime() - 7 * DAY).toISOString().slice(0, 10);
+  const list = ACTIVITIES.filter(x => accs.includes(x.acc) && x.owner !== ME && x.d.slice(0, 10) >= since);
+  return `<section class="card hm-card" aria-labelledby="ca-h">
+    <div class="card-h"><div><h2 id="ca-h">Activity on your accounts</h2><p>By colleagues, last 7 days</p></div></div>
+    ${list.length ? `<div class="hl">${list.slice(0, 4).map(x => `<div class="hl-row no-ic">
+        <span class="hl-t"><b>${esc(x.t)}</b><small>${esc(x.acc)} · ${esc(x.owner)}, ${funcOf(x.owner)}</small></span>
+        <span class="hl-r"><span class="hl-d">${relShort(x.d)}</span></span></div>`).join('')}</div>` : `<p class="hm-empty">No colleague logged anything on your accounts in the last 7 days.</p>`}
+  </section>`;
+}
+
+function teamActCard() { // customer-facing activities since Monday, per team member
+  const since = MONDAY.toISOString().slice(0, 10);
+  const rows = TEAM_PEOPLE.map(p => { const a = ACTIVITIES.filter(x => x.owner === p && x.type !== 'Internal meeting' && x.d.slice(0, 10) >= since);
+    return { p, n: a.length, accs: new Set(a.map(x => x.acc)).size, last: a.map(x => x.d).sort().pop() }; }).sort((a, b) => b.n - a.n);
+  return `<section class="card hm-card" aria-labelledby="ta-h">
+    <div class="card-h"><div><h2 id="ta-h">Team activity this week</h2><p>Since Monday · customer-facing only</p></div></div>
+    <div class="hl">${rows.slice(0, 4).map(r => `<div class="hl-row no-ic">
+        <span class="hl-t"><b>${esc(r.p)}</b><small>${r.n ? `${plural(r.accs, 'account')} · last activity ${rel(r.last)}` : 'No activity yet this week'}</small></span>
+        <span class="hl-r">${r.n <= 1 ? '<span class="pill danger">Low</span>' : ''}<span class="hl-n">${r.n}</span></span></div>`).join('')}</div>
+  </section>`;
+}
+
+/* ---------- Page ---------- */
+function render() {
+  let html;
+  if (VIEW === 'me') html = `
+    <div class="w12 o-quota">${quotaCard()}</div>
+    <div class="w6 o-tasks">${myTasksCard()}</div>
+    <div class="w6 hm-stack"><div class="o-deals">${dealsCard()}</div><div class="o-orders">${ordersCard()}</div></div>
+    <div class="w6 o-quiet">${quietCard()}</div><div class="w6 o-act">${colleagueActCard()}</div>`;
+  else if (VIEW === 'team') html = `
+    <div class="w8">${quotaCard()}</div><div class="w4">${approvalsCard()}</div>
+    <div class="w12">${byTable()}</div>
+    <div class="w6">${teamTasksCard()}</div><div class="w6">${dealsCard()}</div>
+    <div class="w6">${teamActCard()}</div><div class="w6">${quietCard()}</div>`;
+  else html = `
+    <div class="w12">${quotaCard()}</div>
+    <div class="w12">${byTable()}</div>
+    <div class="w8">${dealsCard()}</div><div class="w4">${quietCard()}</div>`;
+  $('#page').innerHTML = `<div class="hm-grid">${html}</div>`;
+  document.querySelectorAll('.v2-head > [data-hr]').forEach(e => e.remove());
+  $('.v2-head').insertAdjacentHTML('beforeend', VIEW === 'company' ? waitingKpis() : recordActs());
+}
+
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act="toast"]'); if (a) { toast(a.dataset.v); return; }
+});
+document.addEventListener('change', (e) => {
+  if (e.target.dataset.act !== 'done') return;
+  const t = TASKS.find(x => x.id === e.target.dataset.v);
+  if (!t) return;
+  if (e.target.checked) { t._was = { status: t.status, done: t.done }; t.status = 'done'; t.done = TODAY.toISOString().slice(0, 10); t._homeDone = true; render(); CRM.refreshTaskBadge();
+    toast(`${t.id} completed.`, 'ok', { label: 'Undo', fn: () => { Object.assign(t, t._was); t._homeDone = false; render(); CRM.refreshTaskBadge(); toast(`${t.id} is open again.`); } }); }
+  else if (t._was) { Object.assign(t, t._was); t._homeDone = false; render(); CRM.refreshTaskBadge(); toast(`${t.id} is open again.`); } // unticked: open again
+});
+
+CRM.renderShell('home');
+render();
+CRM.riseIn();
+</script>
+</body>
+</html>

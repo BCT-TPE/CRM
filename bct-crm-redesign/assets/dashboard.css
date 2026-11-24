@@ -59,7 +59,7 @@
 
 /* KPI cards (clickable) */
 .kpi { padding: 24px; text-align: left; font: inherit; color: inherit; gap: 0; }
-.kpi.click:hover { border-color: var(--line-3); background: var(--surface-faint); }
+@media (hover: hover) { .kpi.click:hover { border-color: var(--line-3); background: var(--surface-faint); } } /* no sticky hover after a tap */
 .kpi.on { border-color: var(--deep); box-shadow: var(--ring-select); }
 .kpi-k { display: flex; align-items: center; gap: 6px; font-size: var(--text-xs); color: var(--t3); }
 .kpi-k .chev { margin-left: auto; }
@@ -120,6 +120,9 @@
 .qstack { position: absolute; left: 50%; bottom: 0; width: 44px; height: 100%; margin-left: -22px; display: flex; flex-direction: column-reverse; gap: 2px; }
 .qstack i { display: block; width: 100%; transition: height .45s var(--ease); }
 .qstack i:last-child { border-radius: var(--radius-xs) var(--radius-xs) 0 0; }
+/* amounts sit on one fixed row above the plot, whatever the bar or target height (design review D6) */
+.qtot, .pq-tot { top: -22px !important; bottom: auto !important; }
+.qlab .qk { font-style: normal; }
 .qtot { position: absolute; left: 0; right: 0; text-align: center; font-size: var(--text-xs); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; margin-bottom: 6px; }
 .qtarget { position: absolute; left: 6%; right: 6%; height: 0; border-top: 2px dashed var(--ink); }
 .qbase { height: 1px; background: var(--line-3); margin: 0 -4px; }
@@ -210,7 +213,7 @@
 .ks:first-child { border-left: 0; }
 .ks .mid { margin-top: 10px; font-size: var(--text-3xl); }
 button.ks { border-radius: 0 var(--radius-card) var(--radius-card) 0; }
-button.ks:hover { background: var(--surface-faint); }
+@media (hover: hover) { button.ks:hover { background: var(--surface-faint); } }
 button.ks.on { background: var(--info-bg); }
 .ks.alert .mid { color: var(--danger); }
 /* Left column: mix on top, ageing below */

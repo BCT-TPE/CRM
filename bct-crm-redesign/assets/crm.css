@@ -83,6 +83,23 @@ body.side-collapsed .nav-n { position: absolute; margin: -16px 0 0 10px; min-wid
 .menu-item:hover { background: var(--hover); }
 .menu-item > svg.i { width: 17px; height: 17px; flex: 0 0 auto; }
 .menu-item.danger { color: var(--danger); }
+.m-title { position: absolute; left: 60px; right: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-md); font-weight: 600; color: var(--ink); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s var(--ease); pointer-events: none; }
+.m-bar .brand { transition: opacity .2s; }
+.m-bar.titled .brand { opacity: 0; pointer-events: none; }
+.m-bar.titled .m-title { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .m-title, .m-bar .brand { transition: none; } }
+.m-user { display: grid; place-items: center; width: 40px; height: 40px; margin-right: -6px; padding: 0; border: 0; border-radius: var(--radius-full); background: none; cursor: pointer; }
+.m-user.active, .m-user:focus-visible { background: var(--hover); }
+.view-as { padding: 6px 4px 4px; } /* "View as <role>": the same labelled pill as the filter bar's Team select */
+.view-as .select { display: flex; width: 100%; }
+.view-as .sel-btn { flex: 1; max-width: none; text-align: left; }
+body.v2 .view-as .select { box-shadow: none; border: 1px solid var(--line-2); } /* no shadow inside the menu, a border instead */
+.sel-btn:disabled { cursor: not-allowed; color: var(--t3); }
+/* disabled (View as on every page but Home): greyed pill, faded text and chevron */
+body.v2 .select:has(> .sel-btn:disabled) { background: var(--track); cursor: not-allowed; }
+.select:has(> .sel-btn:disabled) .lbl { color: var(--t4); }
+.select:has(> .sel-btn:disabled)::after, .select:has(> .sel-btn:disabled) > svg { opacity: .35; }
+.sel-opt:disabled { color: var(--t4); cursor: not-allowed; background: none; }
 .menu-switch { padding-top: 6px; padding-bottom: 6px; }
 .menu-switch { cursor: default; }
 .menu-switch:hover { background: transparent; }
@@ -98,7 +115,7 @@ body.side-collapsed .nav-n { position: absolute; margin: -16px 0 0 10px; min-wid
 .pop-notes { width: 320px; }
 .notes-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 6px; }
 .notes-head b { font-size: var(--text-sm); font-weight: 600; color: var(--t1); }
-.acct-link { border: 0; background: none; padding: 0; font: inherit; font-size: var(--text-xs); font-weight: 500; color: var(--deep); cursor: pointer; }
+.acct-link { display: inline-flex; align-items: center; height: 40px; border: 0; background: none; padding: 0 8px; margin: 0 -8px; border-radius: var(--radius-control); font: inherit; font-size: var(--text-xs); font-weight: 500; color: var(--deep); cursor: pointer; }
 .acct-link:disabled { color: var(--t3); opacity: .6; cursor: default; }
 .note-item { align-items: flex-start; padding-top: 8px; padding-bottom: 8px; }
 .note-item .udot { margin-top: 7px; }
@@ -123,6 +140,7 @@ body.side-collapsed .notes-btn { position: relative; }
 .page-head p { margin: 0; color: var(--t3); font-size: var(--text-sm); }
 .page-head .acts { margin-left: auto; display: flex; align-items: center; gap: 12px; flex: none; }
 .updated { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-xs); color: var(--t3); }
+p .updated { margin-left: 6px; white-space: nowrap; } /* at the end of a page subtitle */
 .updated i { width: 6px; height: 6px; border-radius: var(--radius-full); background: var(--ok); }
 
 /* ---------- Buttons ---------- */
@@ -135,6 +153,7 @@ body.side-collapsed .notes-btn { position: relative; }
 .btn.ghost:hover { background: var(--hover); }
 .link { border: 0; background: none; padding: 0; color: var(--deep); font-size: var(--text-sm); font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
 .link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.card-h .r > .link { min-height: 40px; margin: -10px 0; } /* 40px to tap, still on the title's line */ /* text links in a card header are 40px tall to tap (design review M15) */
 .link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
 /* ---------- Filter bar (one row, sticky) ---------- */
@@ -237,7 +256,7 @@ textarea.in { height: auto; min-height: 84px; padding: 10px 12px; resize: vertic
 .pop[hidden] { display: none; }
 .pop h4 { margin: 0 0 8px; font-size: var(--text-sm); font-weight: 500; color: var(--t3); } /* labels above selects / chips: 14px, same as the filter-bar labels */
 .pop .grp + .grp { margin-top: 14px; }
-.check { display: flex; align-items: center; gap: 9px; height: 30px; font-size: var(--text-sm); cursor: pointer; }
+.check { display: flex; align-items: center; gap: 9px; height: 40px; font-size: var(--text-sm); cursor: pointer; }
 .check input { width: 16px; height: 16px; accent-color: var(--deep); margin: 0; }
 /* More filters: when crm.js caps its height, the popover scrolls on its own (never the page) and Clear / Done stay pinned at its bottom */
 .filters .pop:not(.sel-pop) { overflow-y: auto; overscroll-behavior: contain; }
@@ -246,7 +265,7 @@ textarea.in { height: auto; min-height: 84px; padding: 10px 12px; resize: vertic
 .filters .pop:not(.sel-pop)::-webkit-scrollbar { width: 12px; }
 .filters .pop:not(.sel-pop)::-webkit-scrollbar-track { background: transparent; margin: 16px 0; }
 /* a straight 4px line with rounded ends: the transparent border keeps it off the popover's edge */
-.filters .pop:not(.sel-pop)::-webkit-scrollbar-thumb { background: var(--line-3); background-clip: padding-box; border: 4px solid transparent; border-radius: 6px; min-height: 40px; }
+.filters .pop:not(.sel-pop)::-webkit-scrollbar-thumb { background: var(--line-3); background-clip: padding-box; border: 4px solid transparent; border-radius: var(--radius-full); min-height: 40px; }
 .filters .pop:not(.sel-pop)::-webkit-scrollbar-button { display: none; height: 0; }
 .filters .pop > .pop-foot { position: sticky; bottom: -14px; margin-bottom: -14px; padding-bottom: 14px; background: var(--surface); }
 .pop-foot { display: flex; justify-content: flex-end; align-items: center; gap: var(--space-4); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
@@ -286,7 +305,7 @@ textarea.in { height: auto; min-height: 84px; padding: 10px 12px; resize: vertic
 .legend i.line { width: 14px; height: 0; border-radius: 0; border-top: 2px dashed var(--ink); }
 
 /* Definition tooltip trigger */
-.def { border-bottom: 1px dashed currentColor; cursor: help; }
+.def { border-bottom: 1px dashed currentColor; cursor: help; width: fit-content; max-width: 100%; justify-self: start; } /* the dotted line stays under the text, also as a grid item */
 .tip { position: fixed; z-index: 100; max-width: 260px; padding: 8px 10px; border-radius: var(--radius-md); background: var(--ink); color: var(--on-dark); font-size: var(--text-xs); line-height: 1.45; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .14s, transform .14s; }
 .tip.on { opacity: 1; transform: none; }
 .tip b { display: block; font-weight: 600; margin-bottom: 2px; }
@@ -341,6 +360,9 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 .toast.t-ok i { background: var(--ok-bg); color: var(--ok); }
 .toast.t-warn i { background: var(--danger-bg); color: var(--danger); }
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
+.toast.has-act.on { pointer-events: auto; padding-right: 6px; }
+.toast-act { height: 32px; margin-left: 4px; padding: 0 12px; border: 0; border-radius: var(--radius-pill); background: var(--hover); font: inherit; font-size: var(--text-sm); font-weight: 600; color: var(--deep); cursor: pointer; }
+.toast-act:hover { background: var(--info-bg); }
 @media (prefers-reduced-motion: reduce) { .toast { transition: opacity .2s; } }
 /* Confirm dialog: CRM.confirm() in crm.js (2026-11-18) */
 .dlg-scrim { position: fixed; inset: 0; z-index: 110; display: grid; place-items: center; padding: var(--space-4); background: color-mix(in srgb, var(--ink) 30%, transparent); opacity: 0; transition: opacity var(--dur-fast) var(--ease); }
