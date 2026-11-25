@@ -7,7 +7,31 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-24
+## 2026-11-25
+
+Third design review (desktop 6 items, phone 5 items), **Accounts and Contacts back in the sidebar**, Accounts rebuilt to match old CRMpulse, and role switching on every page. Cache-busters: `crm.css?v=20261125a`, `crm.js?v=20261125b`, `crm-data.js?v=20261124e`, `responsive.css?v=20261125b` (all pages that load them).
+
+### Added
+- **Accounts** (old CRMpulse fields): More filters (account status, lifecycle, engagement, region), totals row, customer-value note, Lead / Opportunity lifecycles, engagement note, Today / Yesterday / Never, red "No interaction" flag. Accounts waiting for approval are listed as Fresh with their actions disabled and the reason given. `crm-data.js`: `status`, `engagement`, `region`, `FRESH_ACCOUNTS` (kept apart from `ACCOUNTS`, so no other page counts them).
+- `activities.html?log=<account>` opens the Log activity panel with that account (Accounts' pencil button, as in old CRMpulse).
+- `CRM.dots(text)`: "a · b · c" as segments that never break inside. `.ck40`: 40×40 tap area around a 16px checkbox (Home, Tasks). `.nb`: names that never break.
+
+### Changed
+- **The demo user is a Sales Head** (was Administrator). "View as" switches Salesperson / Sales Manager / Sales Head on every page and is kept for all pages and open tabs; Administrator stays disabled.
+- Role rules from old CRMpulse: an activity is editable only by its creator within 7 days ("Read only" / "Locked after 7 days"; Administrator always); only Sales Manager and up can change Sales owner (locked for a salesperson on the record and the new-initiative page).
+- **Accounts**: 8px between group cards and between row buttons; the whole row is clickable (toast: there is no account page yet); prospects exclude accounts with an open lead or opportunity.
+- **Home**: list cards are as tall as their content, in two independently flowing columns (replaces equal-height rows). Deals show the amount on the right and tags under the description. By salesperson / By sales team: won is red below today's pace (as on Sales performance), the total row follows the same colours, thresholds are written under the table, 64px rows without pointer or hover; on phones the total comes first, then one row per person. Team activity shows units and what Low means. "Ahead of target" when ahead.
+- **Compact filter bar** (Pipeline, Sales performance below 1280px) starts from the left, Export stays far right. Filters moved into More filters use the panel's style (label above, square box).
+- **Tooltips** only on mouse hover and keyboard focus; a tap on a button or link opens none. Dotted-line definitions still open on tap.
+- Phones: Notifications opens inside the drawer; full-screen side panels have no rounded corners.
+
+### Fixed
+- Page subtitles never start a line with "·".
+- By sales team at 1280px: "Middle East Strategic Accounts" ran under the Target figure.
+
+---
+
+## 2026-11-24 · `1a294b6`
 
 New **Home** page (the first page after sign-in, three views by role) and the fixes from the second design review (desktop 10 items, phone 15 items). Cache-busters: `crm.css?v=20261124k`, `crm.js?v=20261124k`, `crm-data.js?v=20261124d`, `dashboard.css?v=20261124b`, `theme-v2.css?v=20261124b`, `responsive.css?v=20261124m` (all pages that load them).
 

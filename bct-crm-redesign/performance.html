@@ -6,10 +6,10 @@
 <title>Sales performance · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/crm.css?v=20261125a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
@@ -133,8 +133,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261124k"></script>
-<script src="assets/crm-data.js?v=20261124d"></script>
+<script src="assets/crm.js?v=20261125b"></script>
+<script src="assets/crm-data.js?v=20261124e"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
    Data and rules are shared with Pipeline & forecast (assets/crm-data.js), so Q1–Q3 bookings match on both pages. */
@@ -525,7 +525,7 @@ function syncControls() {
   $('#w-owner').classList.toggle('set', !!S.owner);
   $('#more-n').hidden = !S.geo.length; $('#more-n').textContent = S.geo.length;
   $('#reset').hidden = !(S.q || S.team || S.owner || S.geo.length || S.drill || S.fy !== '2627');
-  $('#page-meta').textContent = `Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD · ${S.q ? `Q${S.q}` : 'Full year'} · Q3 · week 7 of 14`;
+  $('#page-meta').innerHTML = CRM.dots(`Closed bookings vs target, win / loss · FY26-27 (Apr 2026 – Mar 2027) · USD · ${S.q ? `Q${S.q}` : 'Full year'} · Q3 · week 7 of 14`);
 }
 function buildMore() { $('#m-geo').innerHTML = Object.keys(GEO_TARGET).map(g => `<label class="check"><input type="checkbox" value="${g}" ${S.geo.includes(g) ? 'checked' : ''}>${g}</label>`).join(''); }
 function setMore(open) { $('#more-pop').hidden = !open; $('#more-btn').setAttribute('aria-expanded', open); if (open) buildMore(); }

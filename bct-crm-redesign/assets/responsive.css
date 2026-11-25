@@ -31,7 +31,8 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
 .filters.compact .f-scroll > * { flex: none; max-width: 100%; }
 .filters.compact.two .f-scroll { flex: 1 1 100%; order: 3; }
 .filters.compact.one .f-scroll { flex: 1 1 0; }
-.filters.compact.one .f-scroll > .select { flex: 1 1 auto; } /* never squeezed: Reset wraps to the next line instead */
+.filters.compact.one .f-scroll > .select { flex: 1 1 auto; }
+@media (min-width: 769px) { .filters.compact.one .f-scroll { flex: 0 1 auto; } .filters.compact.one .f-scroll > .select { flex: 0 0 196px; } .filters.compact.one > .sp { display: block; } } /* never squeezed: Reset wraps to the next line instead */
 .filters.compact.one .f-scroll .sel-btn { max-width: none; flex: 1; }
 .filters.compact .seg.proxied { display: none; }
 .filters.compact #f-fy-wrap > .lbl { display: none; } /* "FY26-27" reads on its own */
@@ -40,7 +41,15 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
 .m-moved > .select, .m-moved > .ftog { display: flex; width: 100%; }
 .m-moved .sel-btn { max-width: none; flex: 1; text-align: left; }
 .m-moved > [hidden] { display: none; }
-body.v2 .m-moved .select, body.v2 .m-moved .ftog { box-shadow: none; border: 1px solid var(--line-2); }
+body.v2 .m-moved .ftog { box-shadow: none; border: 1px solid var(--line-2); }
+/* moved controls look like the panel's own: label above, a square box with the value only (design review 3, M4) */
+.m-moved { gap: 14px; }
+body.v2 :is(.main .filters.compact, .filters) .m-moved .select { display: grid; grid-template-rows: auto 40px; height: auto; min-height: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.m-moved .select .lbl, body.v2 .m-moved .select .lbl { padding: 0; margin-bottom: 8px; font-size: var(--text-sm); font-weight: 500; line-height: 1.4; color: var(--t3); }
+.m-moved .select > .sel-btn, .m-moved .select .lbl + .sel-btn, .m-moved .select > .dt, .m-moved .select > .dt > .dt-btn { width: 100%; height: 40px; padding: 0 30px 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font-weight: 400; text-align: left; }
+.m-moved .select:is(.set, .open) > .sel-btn { border-color: var(--deep); }
+.m-moved .select::after { top: auto; bottom: 18px; margin-top: 0; }
+.m-moved .select.open::after { bottom: 14px; margin-top: 0; }
 .m-made .pop { top: 44px; right: 0; width: 300px; } /* the filter panel crm.js makes for pages without More filters (Tasks) */
 
 /* Export / More filters (design review D7): with their text when it fits — from 1420px, or from 1500px once Reset shows —
@@ -300,3 +309,12 @@ body.v2 .m-moved .select, body.v2 .m-moved .ftog { box-shadow: none; border: 1px
 @media (max-width: 1360px) {
   body.v2 .fc .fbar { margin-top: 0; padding-top: 34px; }
 }
+
+/* Design review 3 (2026-11-25) */
+@media (max-width: 480px) { body.v2 .drill { border-left: 0; border-radius: 0; } } /* full screen: no rounded corners showing the page behind */
+/* moved filters keep the panel look on phones too: placed after, and as specific as, the phone bar's bordered controls */
+body.v2 .main .filters.compact .m-moved .select:is(.select, .set, .open) { border: 0; background: none; box-shadow: none; }
+.m-moved:has(+ .pop-foot) { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; } /* nothing between them: the footer's rule is enough (Tasks, Contacts) */
+.m-moved .select > .dt { display: block; width: 100%; padding: 0; border: 0; background: none; }
+.m-moved .select.dr > .dt > .dt-btn { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); }
+.m-moved .select.dr::after { display: none; } /* the date field has its own calendar icon */

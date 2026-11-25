@@ -6,10 +6,10 @@
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/crm.css?v=20261125a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
    Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
@@ -377,8 +377,8 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261124k"></script>
-<script src="assets/crm-data.js?v=20261124d"></script>
+<script src="assets/crm.js?v=20261125b"></script>
+<script src="assets/crm-data.js?v=20261124e"></script>
 <script>
 /* Data for one record. Everything shown comes from the shared demo data (assets/crm-data.js); details the list doesn't
    carry (line items, BANT, contacts, activities, stage path) are derived here so every record opens, and the Lotus
@@ -746,7 +746,7 @@ function rail() {
   return `${ns}
     <section class="card"><h3>Account &amp; team</h3><div class="fg g1">
       ${account}
-      ${F('owner', `<div class="mem">${CRM.avatar(v.owner)}<div><b>${esc(v.owner)}</b><small>Sales owner</small></div></div>`, sel('owner'), { req: true, help: 'Not restricted by team, geography or classification.' })}
+      ${F('owner', `<div class="mem">${CRM.avatar(v.owner)}<div><b>${esc(v.owner)}</b><small>Sales owner</small></div></div>`, CRM.user.assigning ? sel('owner') : 'lock', CRM.user.assigning ? { req: true, help: 'Not restricted by team, geography or classification.' } : { lockVal: v.owner, lockHelp: 'Only a Sales Manager, Sales Head or Administrator can reassign it.' })}
       ${F('team', esc(v.team), sel('team'), { help: 'Automatic when the owner is in one team.' })}
       <div class="fg">${F('geo', esc(v.geo), sel('geo'))}${F('region', esc(v.region), sel('region'))}</div>
       <div class="fld"><span class="lab">Contributors <span class="muted" style="font-weight:400;font-size: var(--text-xs)">· no booking credit</span></span><div class="contrib"><button class="btn" data-act="toast" data-v="Would open add contributor">${SVG.plus}Add contributor</button></div></div>

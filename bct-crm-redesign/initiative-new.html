@@ -6,10 +6,10 @@
 <title>New sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/crm.css?v=20261125a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
 <style>
 /* ---------- Page: new sales initiative ----------
    Same fields and order as CRMpulse /initiatives/new (status & sub-stage, account & ownership, value & forecast,
@@ -116,8 +116,8 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261124k"></script>
-<script src="assets/crm-data.js?v=20261124d"></script>
+<script src="assets/crm.js?v=20261125b"></script>
+<script src="assets/crm-data.js?v=20261124e"></script>
 <script>
 const { money, toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -221,7 +221,7 @@ function sStatus() {
 function sAccount() {
   return `<section class="card">${secH(2, 'Account &amp; ownership')}<div class="fg">
     ${fld('acc', sel('acc'), { req: true, help: 'Only approved accounts can be selected.' })}
-    ${fld('owner', sel('owner'), { req: true, help: 'Not restricted by team, geography or classification.' })}
+    ${CRM.user.assigning ? fld('owner', sel('owner'), { req: true, help: 'Not restricted by team, geography or classification.' }) : fld('owner', `<label class="select fsel"><select data-f="owner" aria-label="Sales owner" disabled><option selected>${esc(ME)}</option></select></label>`, { help: 'You own it. Only a Sales Manager, Sales Head or Administrator can assign it to someone else.' })}
     ${fld('offering', sel('offering'), { help: 'Used for the name and the offering classification.' })}
     ${fld('name', inp('name', 'text', 'Account – Offering'), { req: true, help: 'Filled from the account and offering; editable.' })}
   </div></section>`;

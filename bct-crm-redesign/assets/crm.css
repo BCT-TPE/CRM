@@ -386,3 +386,9 @@ body.dlg-open { overflow: hidden; }
 .rise { animation: rise .32s var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) { .rise, .tbl .hl, .skel { animation: none; } }
+
+/* Design review 3 (2026-11-25) */
+.seg-nb { display: inline-block; max-width: 100%; } /* breaks only between segments */
+.nb { white-space: nowrap; }
+.ck40 { display: grid; place-items: center; width: 40px; height: 40px; margin: -12px; cursor: pointer; } /* 40×40 tap area around a 16px checkbox */
+.ck40:has(input:disabled) { cursor: not-allowed; }

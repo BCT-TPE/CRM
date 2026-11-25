@@ -6,10 +6,10 @@
 <title>Tasks · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/crm.css?v=20261125a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
 <style>
 /* ---------- Page: Tasks (CRM V1 §7) ----------
    Mirrors CRMpulse /tasks (tasks-view, task-board): five view tiles, search / assignee / "show completed and
@@ -113,8 +113,8 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261124k"></script>
-<script src="assets/crm-data.js?v=20261124d"></script>
+<script src="assets/crm.js?v=20261125b"></script>
+<script src="assets/crm-data.js?v=20261124e"></script>
 <script>
 const { toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -174,7 +174,7 @@ function row(t) {
   const block = t.status === 'done' ? 'Completed tasks are final.' : t.status === 'cxl' ? 'Cancelled tasks are final.' : '';
   const rel2 = [t.si ? `<a class="link" href="initiative.html?id=${encodeURIComponent(t.si)}#tasks">${esc(t.siName)}</a>` : t.acc ? `<a class="link" href="accounts.html?q=${encodeURIComponent(t.acc)}">${esc(t.acc)}</a>` : '', t.act ? `<a class="link" href="activities.html?q=${t.act}">from ${t.act}</a>` : ''].filter(Boolean).join(' · ');
   return `<tr class="click is-${t.status}" data-act="edit" data-v="${t.id}" data-id="${t.id}" tabindex="0">
-    <td><div class="tk-t"><input type="checkbox" data-act="done" data-v="${t.id}" ${t.status === 'done' ? 'checked' : ''} ${block ? 'disabled' : ''} aria-label="Mark ${esc(t.title)} complete${block ? ` (${block})` : ''}">
+    <td><div class="tk-t"><label class="ck40" data-act="ck"><input type="checkbox" data-act="done" data-v="${t.id}" ${t.status === 'done' ? 'checked' : ''} ${block ? 'disabled' : ''} aria-label="Mark ${esc(t.title)} complete${block ? ` (${block})` : ''}"></label>
       <div style="min-width:0"><div class="open">${esc(t.title)}</div>${ell(`${t.id}${rel2 ? ' · ' + rel2 : ''}`, 't-sub')}</div></div></td>
     <td><div class="own">${CRM.avatar(t.to)}<div class="own-t">${ell(esc(t.to))}${ell(`${funcOf(t.to)} · by ${t.by === ME ? 'you' : esc(t.by)}`, 't-sub')}</div></div></td>
     <td><span class="sb ${t.status}">${STATUS_LABEL[t.status]}</span></td>

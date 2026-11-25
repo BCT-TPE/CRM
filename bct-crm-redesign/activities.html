@@ -6,10 +6,10 @@
 <title>Activities · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/crm.css?v=20261125a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
 <style>
 /* ---------- Page: Activities (CRM V1 §6) ----------
    Same IA as CRMpulse /activities: Mine / My teams / Everyone, four summary tiles (the "Log activity" header button opens the full panel; design review D1 removed the inline composer),
@@ -157,8 +157,8 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261124k"></script>
-<script src="assets/crm-data.js?v=20261124d"></script>
+<script src="assets/crm.js?v=20261125b"></script>
+<script src="assets/crm-data.js?v=20261124e"></script>
 <script>
 const { toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -237,7 +237,7 @@ function feed() {
       <div class="ai-d"><b>${CRM.date(a.d, false)} <span class="wd">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</span></b><span>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span></div>
       <div class="ai-ic"><span class="k-${kindOf(a.type)}">${ic(a.type)}</span></div>
       <div class="ai-c">
-        <div class="ai-h"><b>${esc(a.t)}</b><span class="ptag">${a.purpose}</span><span class="sp"></span><small>${a.id}</small>${CRM.user.code !== 'ADMIN' && (TODAY - day(a)) / DAY > 7 ? '<small class="lock">Locked after 7 days</small>' : `<button class="btn icon-only" data-act="edit" data-v="${a.id}" aria-label="Edit ${a.id}" data-tip="Edit or delete">${EDIT}</button>`}</div>
+        <div class="ai-h"><b>${esc(a.t)}</b><span class="ptag">${a.purpose}</span><span class="sp"></span><small>${a.id}</small>${CRM.user.code !== 'ADMIN' && (a.owner !== ME || (TODAY - day(a)) / DAY > 7) ? `<small class="lock">${a.owner !== ME ? 'Read only' : 'Locked after 7 days'}</small>` : `<button class="btn icon-only" data-act="edit" data-v="${a.id}" aria-label="Edit ${a.id}" data-tip="Edit or delete">${EDIT}</button>`}</div>
         <div class="ai-m"><span class="acc">${esc(a.acc)}</span>${a.si ? `<a class="link" href="initiative.html?id=${encodeURIComponent(a.si)}#activities">${esc(a.siName)}</a>` : ''}<span>by ${a.owner === ME ? 'you' : esc(a.owner)}</span>${n ? `<a class="link fu" href="tasks.html?q=${a.id}">${n} follow-up task${n === 1 ? '' : 's'}</a>` : ''}</div>
         ${a.note ? `<p class="ai-n">${esc(a.note)}</p>` : ''}
       </div></div>`;
@@ -378,6 +378,8 @@ CRM.renderShell('activities');
 CRM.watchSticky($('#filters'));
 render();
 CRM.riseIn();
+// Accounts' Log activity button (old CRMpulse quick action) lands here with ?log=<account>: the panel opens with that account
+{ const acc = new URLSearchParams(location.search).get('log'); if (acc && ACCOUNTS.some(a => a.name === acc)) openLog({ ctx: 'account', to: acc }); }
 </script>
 </body>
 </html>

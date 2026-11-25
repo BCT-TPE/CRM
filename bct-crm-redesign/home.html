@@ -6,16 +6,16 @@
 <title>Home · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/crm.css?v=20261125a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
 <style>
 /* ---------- Page: Home (requirement "CRMpulse Home page – by role", 2026-11-24) ----------
    One page, three views by role (Salesperson / Sales Manager / Sales Head; Administrator = Sales Head view).
    Structure follows the requirement's designs; visuals, data and numbers follow this redesign (assets/crm-data.js),
    so every figure matches Pipeline & forecast, Sales performance, Sales initiatives, Activities and Tasks. */
-.hm-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.hm-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; align-items: start; }
 .hm-grid > .w8 { grid-column: span 8; } .hm-grid > .w4 { grid-column: span 4; } .hm-grid > .w12 { grid-column: span 12; }
 .hm-grid > .w6 { grid-column: span 6; } .hm-grid > .w7 { grid-column: span 7; } .hm-grid > .w5 { grid-column: span 5; }
 .card-h p { line-height: 1.45; }
@@ -39,10 +39,10 @@
 
 /* Header right: "Record something now" actions (salesperson, manager) or "Waiting on you" KPIs (sales head) */
 .hm-acts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-/* right column of two stacked cards beside a taller one (salesperson): together as tall as their neighbour */
-.hm-stack { display: flex; flex-direction: column; gap: 16px; }
-.hm-stack > div { flex: 1 1 auto; display: flex; flex-direction: column; }
-.hm-stack > div > .card { flex: 1; }
+.hm-grid > .same { align-self: stretch; } .hm-grid > .same > .card { height: 100%; } /* quota beside Waiting on you: 6–31px apart on their own, so they share one bottom edge (no empty block) */
+/* Two columns, each flowing on its own: a list card is as tall as its content, never stretched (design review 3, D1);
+   the cards are paired so both columns end at about the same height */
+.hm-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .kpis-home .v2-kpi { min-width: 150px; }
 /* while they sit beside the greeting (>1360px), the KPI figures line up with the top of "Good morning, Gaurav":
    the h1's 14px top margin + its half-leading (37.4 − 34) / 2 */
@@ -56,31 +56,39 @@
 .hl-row { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 24px; border-top: 1px solid var(--line); }
 .hl-row:first-child { border-top: 0; }
 .hl-ic { flex: none; display: grid; place-items: center; width: 20px; color: var(--t3); }
-.hl-ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hl-ic > span { display: grid; place-items: center; width: 20px; height: 20px; } .hl-ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .hl-ic input { width: 16px; height: 16px; margin: 0; accent-color: var(--deep); cursor: pointer; } /* same checkbox as the Tasks list */
 .hl-t { flex: 1; min-width: 0; }
 .hl-t b { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
 .hl-t.is-done b { color: var(--t3); font-weight: 400; text-decoration: line-through; }
 .hl-t small { display: block; margin-top: 2px; font-size: var(--text-xs); color: var(--t3); }
 .hl-r { flex: none; display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 6px 8px; max-width: 55%; }
-.hl-v { font-size: var(--text-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
-.hl-n { min-width: 24px; text-align: right; font-size: var(--text-md); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hl-row.tags { align-items: flex-start; } /* design review 3, D2: only the amount on the right; the tags on one line under the description */
+.hl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.hl-v { flex: none; font-size: var(--text-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hl-n { min-width: 76px; text-align: right; font-size: var(--text-sm); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .hl-d { font-size: var(--text-xs); color: var(--t3); white-space: nowrap; }
 .hm-empty { margin: 0; padding: 18px 0 8px; font-size: var(--text-sm); color: var(--t3); }
 .hm-note { margin: 12px 0 0; font-size: var(--text-xs); color: var(--t3); line-height: 1.5; }
-.hm-grid > div:not(.hm-stack) > .card { height: 100%; } /* cards side by side end on one line */
 
 /* By salesperson / By sales team */
 .tbl.by { table-layout: fixed; }
-.tbl.by col.c-n { width: 19%; } .tbl.by col.c-m { width: 11%; } .tbl.by col.c-bar { width: 18%; } .tbl.by col.c-s { width: 9%; } .tbl.by col.c-a { width: 13%; }
-.tbl.by td { height: 56px; }
+.tbl.by col.c-n { width: 24%; } .tbl.by col.c-m { width: 10%; } .tbl.by col.c-bar { width: 17%; } .tbl.by col.c-s { width: 9%; } .tbl.by col.c-a { width: 11%; }
+.tbl.by td { height: 64px; }
+.tbl.by tbody tr { cursor: default; } /* nothing opens here: no pointer, no hover fill (design review 3, D4) */
+body.v2 .tbl.by tbody tr:hover td { background: transparent; }
+body.v2 .tbl.by tbody tr:hover td:first-child, body.v2 .tbl.by tbody tr.tot:hover td { background: var(--surface-faint, transparent); }
+body.v2 .tbl.by tbody tr:not(.tot):hover td:first-child { background: var(--surface); }
+.by-note { margin: 16px 0 0; font-size: var(--text-xs); color: var(--t3); line-height: 1.5; }
+.by-note b { font-weight: 600; color: var(--danger); }
+.by-m { display: none; }
 .tbl.by tr.tot td { font-weight: 600; color: var(--ink); background: var(--surface-faint, transparent); }
 .att { display: flex; align-items: center; gap: 10px; }
 .att-t { position: relative; flex: 1; height: 8px; border-radius: var(--radius-xs); background: var(--chart-track); overflow: hidden; }
 .att-t i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--radius-xs); background: var(--deep); }
 .att-t i.low { background: var(--danger); }
 .att b { width: 40px; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
-.neg-t { color: var(--danger); font-weight: 600; }
+.neg-t, .tbl.by tr.tot td.neg-t { color: var(--danger); font-weight: 600; } /* the total row follows the same colours */
 .cnt-hot { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: var(--radius-full); background: var(--danger-bg); color: var(--danger); font-weight: 600; }
 
 @media (max-width: 1180px) {
@@ -94,16 +102,26 @@
 }
 @media (max-width: 768px) {
   /* salesperson on a phone: what to do first — tasks, deals, then the quota, orders, quiet accounts, colleagues' activity */
-  .hm-stack { display: contents; }
-  .hm-grid > .o-tasks { order: 1; } .hm-stack > .o-deals { order: 2; grid-column: span 12; } .hm-grid > .o-quota { order: 3; }
-  .hm-stack > .o-orders { order: 4; grid-column: span 12; } .hm-grid > .o-quiet { order: 5; } .hm-grid > .o-act { order: 6; }
+  .hm-col { display: contents; }
+  .hm-col > div { grid-column: span 12; }
+  .hm-col > .o-tasks { order: 1; } .hm-col > .o-deals { order: 2; } .hm-grid > .o-quota { order: 3; }
+  .hm-col > .o-orders { order: 4; } .hm-col > .o-quiet { order: 5; } .hm-grid > .o-act { order: 6; }
   .main > .v2-head { margin-bottom: var(--space-4); } /* no filter bar under the header here: 16px to the first card */
   .hm-grid > .w4.third { grid-column: span 12; }
   .v2-head > .hm-acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .v2-kpis.kpis-home { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .q-minis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hl { margin: -4px -16px 0; }
+  .card .tbl-wrap:has(> .tbl.by), .card:has(.by-m) > .tbl-sort { display: none; }
+  .by-m { display: block; }
+  .bm { display: grid; gap: 8px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .bm:first-child { padding-top: 4px; border-top: 0; }
+  .bm-h { display: flex; justify-content: space-between; gap: 12px; font-size: var(--text-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .bm .att-t { width: 100%; }
+  .bm small { font-size: var(--text-xs); color: var(--t3); line-height: 1.5; font-variant-numeric: tabular-nums; }
+  .by-note { margin-top: 0; padding-top: 12px; border-top: 1px solid var(--line); }
   .hl-row { padding: 10px 16px; flex-wrap: wrap; }
+  .hl-row.tags { flex-wrap: nowrap; }
   .hl-r { max-width: none; flex: 1 1 100%; justify-content: flex-start; padding-left: 32px; }
   .hl-row.no-ic .hl-r { padding-left: 0; }
 }
@@ -124,8 +142,8 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261124k"></script>
-<script src="assets/crm-data.js?v=20261124d"></script>
+<script src="assets/crm.js?v=20261125b"></script>
+<script src="assets/crm-data.js?v=20261124e"></script>
 <script>
 const { money, moneyBig, toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -149,6 +167,7 @@ const ICON = {
   plus: '<path d="M12 5v14M5 12h14"/>'
 };
 const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
+const nb = (name) => `<span class="nb">${esc(name)}</span>`; // a person's name never breaks ("Al-Mansoori")
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const rel = (d) => { const x = new Date(d.slice(0, 10)), n = Math.round((TODAY - x) / DAY);
   return n === 0 ? 'today' : n === 1 ? 'yesterday' : n < 7 ? x.toLocaleDateString('en-GB', { weekday: 'long' }) : CRM.date(d.slice(0, 10)); };
@@ -156,7 +175,7 @@ const relShort = (d) => { const s = rel(d); return s[0].toUpperCase() + s.slice(
 
 // the greeting moved here from Pipeline & forecast now that Home is the first page after sign-in
 { const hr = new Date().getHours(); $('#hello').textContent = `Good ${hr < 12 ? 'morning' : hr < 18 ? 'afternoon' : 'evening'}, ${ME.split(' ')[0]}`; }
-$('#today').textContent = `${TODAY.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · Q${Q} FY26-27, week ${WEEK} of ${WEEKS} · USD`;
+$('#today').innerHTML = CRM.dots(`${TODAY.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · Q${Q} FY26-27, week ${WEEK} of ${WEEKS} · USD`);
 
 /* ---------- Scope by view ---------- */
 const inScope = (owner, team) => VIEW === 'me' ? owner === ME : VIEW === 'team' ? team === MY_TEAM : true;
@@ -198,7 +217,7 @@ function quotaCard() {
       ${mini('Closed won', money(h.won), `${pct(h.won, h.target) ?? 0}% of ${VIEW === 'me' ? 'quota' : 'target'}`, '', 'c-won')}
       ${mini('Commit', money(h.commit), plural(h.nCommit, 'deal'), '', 'c-commit')}
       ${mini('Best case', money(h.best), 'upside, not in forecast', '', 'c-best')}
-      ${mini('Gap to target', money(Math.abs(gap)), `${gap < 0 ? 'short' : 'ahead'} after commit`, gap < 0 ? 'neg' : 'pos')}
+      ${mini(gap > 0 ? 'Ahead of target' : 'Gap to target', money(Math.abs(gap)), gap > 0 ? 'after commit' : 'short after commit', gap < 0 ? 'neg' : 'pos')}
       ${mini('Pipeline coverage', cov(h.coverage), h.still ? `${money(h.open)} open ÷ ${money(h.still)} still to win` : 'target already won')}
     </div>
     <p class="q-note">${note}</p>
@@ -227,15 +246,24 @@ function byTable() { // By salesperson (manager) · By sales team (head / admin)
   const people = VIEW === 'team';
   const rows = (people ? TEAM_PEOPLE.map(p => ({ k: p, s: stats(p) })) : Object.keys(TEAMS).map(t => ({ k: t, s: stats(null, t) })));
   const tot = people ? stats(null, MY_TEAM) : stats();
+  // one standard per figure, for every row and the total, written under the table: won is judged against today's pace, as on Sales performance
+  const low = (s) => s.target > 0 && s.won < s.target * PACE / 100;
+  const thin = (s) => s.coverage != null && s.coverage < 1.8, hot = (s) => s.nAttn >= 5;
   const attCell = (s) => { const p = s.target ? Math.round(s.won / s.target * 100) : null;
-    return `<div class="att"><span class="att-t"><i class="${p != null && p < 40 ? 'low' : ''}" style="width:${Math.min(p || 0, 100)}%"></i></span><b>${p == null ? 'N/A' : p + '%'}</b></div>`; };
+    return `<div class="att"><span class="att-t"><i class="${low(s) ? 'low' : ''}" style="width:${Math.min(p || 0, 100)}%"></i></span><b>${p == null ? 'N/A' : p + '%'}</b></div>`; };
   const tr = (name, s, cls = '') => `<tr class="${cls}">
       <td>${cls ? esc(name) : `<span class="t-main">${esc(name)}</span>`}</td>
       <td class="r num">${money(s.target)}</td><td class="r num">${money(s.won)}</td><td class="r num">${money(s.commit)}</td>
       <td>${attCell(s)}</td>
-      <td class="r num ${s.coverage != null && s.coverage < 1.8 && !cls ? 'neg-t' : ''}">${cov(s.coverage)}</td>
+      <td class="r num ${thin(s) ? 'neg-t' : ''}">${cov(s.coverage)}</td>
       <td class="r num">${s.nOpen}</td>
-      <td class="r num">${s.nAttn >= 5 && !cls ? `<span class="cnt-hot">${s.nAttn}</span>` : s.nAttn}</td></tr>`;
+      <td class="r num">${hot(s) ? `<span class="cnt-hot">${s.nAttn}</span>` : s.nAttn}</td></tr>`;
+  // phones: the total first, then one row per person / team with the bar and two lines of figures (design review 3, M3)
+  const seg = (x) => `<span class="seg-nb">${x}</span>`;
+  const mRow = (name, s, cls = '') => { const p = s.target ? Math.round(s.won / s.target * 100) : null;
+    return `<div class="bm ${cls}"><div class="bm-h"><b>${esc(name)}</b><b>${p == null ? 'N/A' : p + '%'}</b></div>
+      <span class="att-t"><i class="${low(s) ? 'low' : ''}" style="width:${Math.min(p || 0, 100)}%"></i></span>
+      <small>${seg(`Won ${money(s.won)} of ${money(s.target)} ·`)} ${seg(`Commit ${money(s.commit)}`)}<br>${seg(`Coverage ${thin(s) ? `<b class="neg-t">${cov(s.coverage)}</b>` : cov(s.coverage)} ·`)} ${seg(`${s.nOpen} open ·`)} ${seg(hot(s) ? `<b class="neg-t">${s.nAttn} need attention</b>` : `${s.nAttn} need attention`)}</small></div>`; };
   const first = people ? 'Salesperson' : 'Sales team';
   return `<section class="card" aria-labelledby="by-h">
     <div class="card-h"><div><h2 id="by-h">${people ? 'By salesperson' : 'By sales team'}</h2><p>Q${Q} FY26-27</p></div></div>
@@ -244,6 +272,8 @@ function byTable() { // By salesperson (manager) · By sales team (head / admin)
       <thead><tr><th>${first}</th><th class="r">Target</th><th class="r">Closed won</th><th class="r">Commit</th><th>Won vs target</th><th class="r">Coverage</th><th class="r">Open</th><th class="r">Need attention</th></tr></thead>
       <tbody>${rows.map(({ k, s }) => tr(k, s)).join('')}
         ${tr(people ? MY_TEAM : 'Company', tot, 'tot')}</tbody></table></div>
+    <div class="by-m">${mRow(people ? MY_TEAM : 'Company', tot, 'tot')}${rows.map(({ k, s }) => mRow(k, s)).join('')}</div>
+    <p class="by-note"><b>Red</b>: won below today's pace (${PACE}% of the quarter) · coverage under 1.8×. Need attention 5 or more is highlighted.</p>
   </section>`;
 }
 
@@ -261,7 +291,7 @@ function myTasksCard() {
   return `<section class="card hm-card" aria-labelledby="mt-h">
     <div class="card-h"><div><h2 id="mt-h">My tasks and follow-ups</h2><p>${late} overdue · ${today} today</p></div></div>
     ${items.length ? `<div class="hl">${items.slice(0, 4).map(x => `<div class="hl-row">
-        <span class="hl-ic">${x.kind === 'task' ? `<input type="checkbox" data-act="done" data-v="${x.t.id}" ${x.done ? 'checked' : ''} aria-label="${x.done ? `Reopen ${esc(x.title)}` : `Mark ${esc(x.title)} complete`}">` : svg('flag')}</span>
+        <span class="hl-ic">${x.kind === 'task' ? `<label class="ck40"><input type="checkbox" data-act="done" data-v="${x.t.id}" ${x.done ? 'checked' : ''} aria-label="${x.done ? `Reopen ${esc(x.title)}` : `Mark ${esc(x.title)} complete`}"></label>` : `<span role="img" tabindex="0" aria-label="Next step on an initiative" data-tip="Next step on an initiative">${svg('flag')}</span>`}</span>
         <span class="hl-t ${x.done ? 'is-done' : ''}"><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></span>
         <span class="hl-r">${x.done ? '<span class="pill ok">Done</span>' : due(x.d, x.kind)}</span></div>`).join('')}</div>` : `<p class="hm-empty">Nothing overdue or due this week.</p>`}
   </section>`;
@@ -272,7 +302,7 @@ function teamTasksCard() {
   return `<section class="card hm-card" aria-labelledby="tt-h">
     <div class="card-h"><div><h2 id="tt-h">Team overdue tasks</h2><p>${late.length ? `${late.length} overdue · oldest ${plural(late[0].d, 'day')}` : 'Nothing overdue'}</p></div></div>
     ${late.length ? `<div class="hl">${late.slice(0, 4).map(({ t, d }) => `<div class="hl-row no-ic">
-        <span class="hl-t"><b>${esc(t.title)}</b><small>${esc(t.to)}${t.siName ? ' · ' + esc(t.siName) : t.acc ? ' · ' + esc(t.acc) : ''}</small></span>
+        <span class="hl-t"><b>${esc(t.title)}</b><small>${nb(t.to)}${t.siName ? ' · ' + esc(t.siName) : t.acc ? ' · ' + esc(t.acc) : ''}</small></span>
         <span class="hl-r"><span class="pill danger">${plural(d, 'day')} overdue</span></span></div>`).join('')}</div>` : `<p class="hm-empty">No task in the team is overdue.</p>`}
   </section>`;
 }
@@ -282,13 +312,13 @@ function dealsCard() {
   flagged.sort(VIEW === 'me' ? (a, b) => attention(b).length - attention(a).length || b.value - a.value : (a, b) => b.value - a.value);
   const title = VIEW === 'company' ? 'Largest deals needing attention' : 'Deals needing attention';
   const sub = VIEW === 'me' ? `${flagged.length} of your ${open.length} open · most urgent first` : VIEW === 'team' ? `${flagged.length} of the team's ${open.length} open · largest first` : `${flagged.length} across the company`;
-  const who = (o) => VIEW === 'me' ? stageOf(o) : VIEW === 'team' ? `${o.owner} · ${stageOf(o)}` : `${o.team} · ${o.owner} · ${stageOf(o)}`;
+  const who = (o) => VIEW === 'me' ? esc(stageOf(o)) : VIEW === 'team' ? `${nb(o.owner)} · ${esc(stageOf(o))}` : `${esc(o.team)} · ${nb(o.owner)} · ${esc(stageOf(o))}`;
   const tone = (f) => /Close date|No next/.test(f) ? 'danger' : 'warn';
   return `<section class="card hm-card" aria-labelledby="dl-h">
     <div class="card-h"><div><h2 id="dl-h">${title}</h2><p>${sub}</p></div></div>
-    ${flagged.length ? `<div class="hl">${flagged.slice(0, 4).map(o => `<div class="hl-row no-ic">
-        <span class="hl-t"><b>${esc(o.name)}</b><small>${esc(who(o))}</small></span>
-        <span class="hl-r"><span class="hl-v">${money(o.value)}</span>${attention(o).slice(0, 2).map(f => `<span class="pill ${tone(f)}">${esc(f)}</span>`).join('')}</span></div>`).join('')}</div>` : `<p class="hm-empty">No open deal needs attention.</p>`}
+    ${flagged.length ? `<div class="hl">${flagged.slice(0, 4).map(o => `<div class="hl-row no-ic tags">
+        <span class="hl-t"><b>${esc(o.name)}</b><small>${who(o)}</small><span class="hl-tags">${attention(o).slice(0, 2).map(f => `<span class="pill ${tone(f)}">${esc(f)}</span>`).join('')}</span></span>
+        <span class="hl-v">${money(o.value)}</span></div>`).join('')}</div>` : `<p class="hm-empty">No open deal needs attention.</p>`}
   </section>`;
 }
 
@@ -309,7 +339,7 @@ function approvalsCard() {
   return `<section class="card hm-card" aria-labelledby="ap-h">
     <div class="card-h"><div><h2 id="ap-h">Waiting on you</h2><p>${plural(list.length, 'account')} to approve</p></div></div>
     ${list.length ? `<div class="hl">${list.slice(0, 4).map(a => `<div class="hl-row no-ic">
-        <span class="hl-t"><b>${esc(a.acc)}</b><small>Created by ${esc(a.by)} · ${a.wait ? `waiting ${plural(a.wait, 'day')}` : 'today'}</small></span>
+        <span class="hl-t"><b>${esc(a.acc)}</b><small>Created by ${nb(a.by)} · ${a.wait ? `waiting ${plural(a.wait, 'day')}` : 'today'}</small></span>
         <span class="hl-r"><span class="pill warn">Fresh</span><button class="btn" type="button" data-act="toast" data-v="Would open ${esc(a.acc)} to approve">Review</button></span></div>`).join('')}</div>` : `<p class="hm-empty">No account is waiting for your approval.</p>`}
     <p class="hm-note">Nothing can be logged or sold on an account until it is approved.</p>
   </section>`;
@@ -320,12 +350,12 @@ function quietCard() {
   const list = scope.filter(a => a.last > QUIET).sort((a, b) => b.last - a.last);
   const title = VIEW === 'company' ? 'Strategic accounts gone quiet' : 'Quiet accounts';
   const sub = VIEW === 'me' ? `Accounts you own · no customer interaction for over ${QUIET} days` : VIEW === 'team' ? `Team accounts with no contact for over ${QUIET} days` : `No customer contact for over ${QUIET} days`;
-  const who = (a) => VIEW === 'me' ? `${a.lifecycle} · last contact ${CRM.date(a.lastDate, false)}` : VIEW === 'team' ? `${a.owner} · ${a.lifecycle}` : `${a.team} · ${a.owner} · ${a.pipeline ? money(a.pipeline) + ' open' : a.lifecycle}`;
+  const who = (a) => VIEW === 'me' ? `${a.lifecycle} · last contact ${CRM.date(a.lastDate, false)}` : VIEW === 'team' ? `${nb(a.owner)} · ${a.lifecycle}` : `${esc(a.team)} · ${nb(a.owner)} · ${a.pipeline ? money(a.pipeline) + ' open' : a.lifecycle}`;
   const empty = VIEW === 'me' ? `Every account you own was contacted in the last ${QUIET} days.` : VIEW === 'team' ? `Every team account was contacted in the last ${QUIET} days.` : `Every strategic account was contacted in the last ${QUIET} days.`;
   return `<section class="card hm-card" aria-labelledby="qa-h">
     <div class="card-h"><div><h2 id="qa-h">${title}</h2><p>${sub}</p></div></div>
     ${list.length ? `<div class="hl">${list.slice(0, 4).map(a => `<div class="hl-row no-ic">
-        <span class="hl-t"><b>${esc(a.name)}</b><small>${esc(who(a))}</small></span>
+        <span class="hl-t"><b>${esc(a.name)}</b><small>${who(a)}</small></span>
         <span class="hl-r"><span class="pill warn">${a.last} days</span>${VIEW === 'me' ? `<button class="btn" type="button" data-act="toast" data-v="Would open Log activity for ${esc(a.name)}">Log activity</button>` : ''}</span></div>`).join('')}</div>` : `<p class="hm-empty">${empty}</p>`}
   </section>`;
 }
@@ -336,7 +366,7 @@ function colleagueActCard() { // activity by others on the accounts I own, last 
   return `<section class="card hm-card" aria-labelledby="ca-h">
     <div class="card-h"><div><h2 id="ca-h">Activity on your accounts</h2><p>By colleagues, last 7 days</p></div></div>
     ${list.length ? `<div class="hl">${list.slice(0, 4).map(x => `<div class="hl-row no-ic">
-        <span class="hl-t"><b>${esc(x.t)}</b><small>${esc(x.acc)} · ${esc(x.owner)}, ${funcOf(x.owner)}</small></span>
+        <span class="hl-t"><b>${esc(x.t)}</b><small>${esc(x.acc)} · ${nb(x.owner)}, ${funcOf(x.owner)}</small></span>
         <span class="hl-r"><span class="hl-d">${relShort(x.d)}</span></span></div>`).join('')}</div>` : `<p class="hm-empty">No colleague logged anything on your accounts in the last 7 days.</p>`}
   </section>`;
 }
@@ -346,10 +376,10 @@ function teamActCard() { // customer-facing activities since Monday, per team me
   const rows = TEAM_PEOPLE.map(p => { const a = ACTIVITIES.filter(x => x.owner === p && x.type !== 'Internal meeting' && x.d.slice(0, 10) >= since);
     return { p, n: a.length, accs: new Set(a.map(x => x.acc)).size, last: a.map(x => x.d).sort().pop() }; }).sort((a, b) => b.n - a.n);
   return `<section class="card hm-card" aria-labelledby="ta-h">
-    <div class="card-h"><div><h2 id="ta-h">Team activity this week</h2><p>Since Monday · customer-facing only</p></div></div>
+    <div class="card-h"><div><h2 id="ta-h">Team activity this week</h2><p>Since Monday · customer-facing only · Low = 1 or fewer</p></div></div>
     <div class="hl">${rows.slice(0, 4).map(r => `<div class="hl-row no-ic">
         <span class="hl-t"><b>${esc(r.p)}</b><small>${r.n ? `${plural(r.accs, 'account')} · last activity ${rel(r.last)}` : 'No activity yet this week'}</small></span>
-        <span class="hl-r">${r.n <= 1 ? '<span class="pill danger">Low</span>' : ''}<span class="hl-n">${r.n}</span></span></div>`).join('')}</div>
+        <span class="hl-r">${r.n <= 1 ? '<span class="pill danger">Low</span>' : ''}<span class="hl-n">${r.n} ${r.n === 1 ? 'activity' : 'activities'}</span></span></div>`).join('')}</div>
   </section>`;
 }
 
@@ -358,14 +388,14 @@ function render() {
   let html;
   if (VIEW === 'me') html = `
     <div class="w12 o-quota">${quotaCard()}</div>
-    <div class="w6 o-tasks">${myTasksCard()}</div>
-    <div class="w6 hm-stack"><div class="o-deals">${dealsCard()}</div><div class="o-orders">${ordersCard()}</div></div>
-    <div class="w6 o-quiet">${quietCard()}</div><div class="w6 o-act">${colleagueActCard()}</div>`;
+    <div class="w6 hm-col"><div class="o-tasks">${myTasksCard()}</div><div class="o-quiet">${quietCard()}</div></div>
+    <div class="w6 hm-col"><div class="o-deals">${dealsCard()}</div><div class="o-orders">${ordersCard()}</div></div>
+    <div class="w12 o-act">${colleagueActCard()}</div>`;
   else if (VIEW === 'team') html = `
-    <div class="w8">${quotaCard()}</div><div class="w4">${approvalsCard()}</div>
+    <div class="w8 same">${quotaCard()}</div><div class="w4 same">${approvalsCard()}</div>
     <div class="w12">${byTable()}</div>
-    <div class="w6">${teamTasksCard()}</div><div class="w6">${dealsCard()}</div>
-    <div class="w6">${teamActCard()}</div><div class="w6">${quietCard()}</div>`;
+    <div class="w6 hm-col"><div>${teamTasksCard()}</div><div>${teamActCard()}</div></div>
+    <div class="w6 hm-col"><div>${dealsCard()}</div><div>${quietCard()}</div></div>`;
   else html = `
     <div class="w12">${quotaCard()}</div>
     <div class="w12">${byTable()}</div>

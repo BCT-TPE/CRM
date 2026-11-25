@@ -42,7 +42,7 @@
     ['Plan & report', [['targets', 'Sales targets', 'flag', 1, MGR_UP], ['reports', 'Reports', 'report', 1]]],
     ['Setup', [['structure', 'Sales structure', 'tree', 1, HEAD_UP], ['admin', 'Administration', 'settings', 1, ['ADMIN']], ['users', 'Users', 'users', 1, ['ADMIN']]]]
   ];
-  const BUILT = { home: 'home.html', pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html' }; // this round = Dashboards + Sales; accounts / contacts / targets pages exist but stay out of the nav
+  const BUILT = { home: 'home.html', pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html', accounts: 'accounts.html', contacts: 'contacts.html' }; // Dashboards + Sales + Customers (accounts, contacts: 2026-11-24); targets page exists but stays out of the nav
 
   // Old CRMpulse TaskBadge: my open tasks beside Tasks (the overdue count is in its label); nothing when none are open.
   function taskBadge() {
@@ -56,11 +56,12 @@
   // The demo user is always Gaurav; his role is picked in the profile menu ("View as") and kept in localStorage
   // for every page: it changes Home, the menu entries above and the Activities default (Everyone / My teams / Mine).
   const ROLE_LABELS = { SALESPERSON: 'Salesperson', SALES_MANAGER: 'Sales Manager', SALES_HEAD: 'Sales Head', ADMIN: 'Administrator' };
-  // For now only Home switches role (Administrator is disabled there: the requirement designs Home for three roles);
-  // every other page shows the Administrator view (2026-11-24).
-  const ON_HOME = /(^|\/)home\.html$/.test(location.pathname), HOME_ROLES = ['SALESPERSON', 'SALES_MANAGER', 'SALES_HEAD'];
-  let roleCode = 'ADMIN';
-  if (ON_HOME) { roleCode = 'SALESPERSON'; try { const r = localStorage.getItem('crm-home-role'); if (HOME_ROLES.includes(r)) roleCode = r; } catch (e) {} }
+  // Gaurav is a Sales Head (2026-11-24, was Administrator). "View as" switches role on every page (2026-11-25) and the
+  // choice is kept for every page (localStorage crm-home-role). Administrator stays disabled: the requirement's three
+  // examples cover Salesperson, Sales Manager and Sales Head only.
+  const ROLES_ON = ['SALESPERSON', 'SALES_MANAGER', 'SALES_HEAD'];
+  let roleCode = 'SALES_HEAD';
+  try { const r = localStorage.getItem('crm-home-role'); if (ROLES_ON.includes(r)) roleCode = r; } catch (e) {}
   const USER = { name: 'Gaurav Shrotriya', code: roleCode, role: ROLE_LABELS[roleCode], team: 'APAC Sales', email: 'gaurav.shrotriya@example.com' };
   USER.sub = roleCode === 'SALES_MANAGER' ? `${USER.role} · ${USER.team}` : USER.role;
   const ASSIGNING = ['ADMIN', 'SALES_HEAD', 'SALES_MANAGER'], OVERSIGHT = ['ADMIN', 'SALES_HEAD']; // lib/api/auth.ts
@@ -135,7 +136,7 @@
     rail.addEventListener('change', apply); drawer.addEventListener('change', apply); apply();
     // other open tabs of the CRM follow a collapse / expand made here
     addEventListener('storage', (e) => { if (e.key === 'crm-side') apply(); });
-    addEventListener('storage', (e) => { if (ON_HOME && e.key === 'crm-home-role') location.reload(); }); // another Home tab switched role
+    addEventListener('storage', (e) => { if (e.key === 'crm-home-role') location.reload(); }); // another tab switched role
   }
   // Account menu: layout and position from the BCT AI CRM prototype; content as the old CRMpulse profile menu (name, email, Sign out).
   // Lucide icons, exactly as the prototype draws them (stroke 2, round caps).
@@ -184,9 +185,8 @@
     menu.innerHTML = `
       <div class="acct-head"><img src="assets/people/gaurav-shrotriya.webp" alt=""><div><b>${USER.name}</b><small>${USER.sub}</small><small>${USER.email}</small></div></div>
       <div class="view-as">
-        <label class="select"><span class="lbl">View as</span><select id="view-as" aria-label="View as" ${ON_HOME ? '' : 'disabled'}>${Object.entries(ROLE_LABELS)
-          .filter(([c]) => ON_HOME || c === 'ADMIN')
-          .map(([c, l]) => `<option value="${c}" ${c === USER.code ? 'selected' : ''} ${ON_HOME && !HOME_ROLES.includes(c) ? 'disabled' : ''}>${l}</option>`).join('')}</select></label></div>
+        <label class="select"><span class="lbl">View as</span><select id="view-as" aria-label="View as">${Object.entries(ROLE_LABELS)
+          .map(([c, l]) => `<option value="${c}" ${c === USER.code ? 'selected' : ''} ${!ROLES_ON.includes(c) ? 'disabled' : ''}>${l}</option>`).join('')}</select></label></div>
       <div class="menu-sep"></div>
       <button class="menu-item danger" role="menuitem" data-m="out">${lucide('logout')}Sign out</button>`;
     enhanceSelects(menu);
@@ -212,9 +212,15 @@
       ids.forEach((id) => { const b = document.getElementById(id); if (!b) return; const mine = on && id === btnId; b.classList.toggle('active', mine); b.setAttribute('aria-expanded', String(mine)); });
     });
     if (!pop) return;
+    pop.style.width = pop.style.maxHeight = pop.style.overflowY = '';
     const b = document.getElementById(btnId), r = b.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
     if (b.closest('.m-bar')) { // phone top bar: under the avatar, right-aligned
       pop.style.left = Math.max(12, innerWidth - w - 12) + 'px'; pop.style.top = Math.round(r.bottom + 8) + 'px';
+    } else if (phone.matches) { // inside the open drawer, above the button (design review 3)
+      const d = document.getElementById('side').getBoundingClientRect();
+      pop.style.width = Math.min(288, d.width - 24) + 'px'; pop.style.left = Math.round(d.left + 12) + 'px';
+      pop.style.maxHeight = Math.round(r.top - 24) + 'px'; pop.style.overflowY = 'auto';
+      pop.style.top = Math.max(12, Math.round(r.top - pop.offsetHeight - 8)) + 'px'; pop.style.bottom = 'auto'; return;
     } else { // sidebar: beside the button, bottom-aligned
       pop.style.left = Math.max(12, Math.min(r.right + 16, innerWidth - w - 12)) + 'px';
       pop.style.top = Math.max(12, Math.min(r.bottom - h, innerHeight - h - 12)) + 'px';
@@ -249,6 +255,12 @@
     return /[MK]/.test(unit) ? `${m.slice(0, -1)}<sup>${unit}</sup>` : m;
   }
 
+  // "a · b · c" as segments that never break inside: the "·" stays with the text before it, so no line starts with it (design review 3, M5)
+  function dots(text) {
+    const parts = text.split(' · ');
+    return parts.map((p, i) => `<span class="seg-nb">${p.replace(/&/g, '&amp;').replace(/</g, '&lt;')}${i < parts.length - 1 ? ' ·' : ''}</span>`).join(' ');
+  }
+
   // Tooltip: [data-tip] (plain), [data-tip-h] (bold first line), [data-tip-html] (rich)
   const tip = document.createElement('div');
   tip.className = 'tip'; tip.setAttribute('role', 'tooltip');
@@ -268,16 +280,23 @@
     tip.classList.toggle('below', below);
     tip.classList.add('on');
   }
+  // Tooltips are for mouse and keyboard (design review 3, M1): a tap never opens one on a button or link, where it would stay
+  // and cover its neighbours. Text with a dotted line (.def) and chart parts have no other action, so a tap still explains them.
+  let touching = false;
+  addEventListener('pointerdown', (e) => { touching = e.pointerType === 'touch'; if (touching && !e.target.closest?.('[data-tip],[data-tip-html]')) hideTip(); }, true);
+  addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') touching = false; }, { capture: true, passive: true });
+  addEventListener('keydown', () => { touching = false; }, true);
+  const noTip = (el) => touching && !!el.closest('button, a, [role="button"], [aria-disabled]');
   function hideTip() { clearTimeout(tipT); tipEl = null; tip.classList.remove('on'); }
   document.addEventListener('mouseover', (e) => {
     const el = e.target.closest('[data-tip],[data-tip-html]');
     if (el === tipEl) return;
-    if (!el) { hideTip(); return; }
+    if (!el || noTip(el)) { hideTip(); return; }
     const wasOpen = tip.classList.contains('on');
     tipEl = el; clearTimeout(tipT);
     if (wasOpen) showTip(el); else tipT = setTimeout(() => showTip(el), 300);
   });
-  document.addEventListener('focusin', (e) => { const el = e.target.closest('[data-tip],[data-tip-html]'); if (el) { tipEl = el; showTip(el); } });
+  document.addEventListener('focusin', (e) => { const el = e.target.closest('[data-tip],[data-tip-html]'); if (el && !noTip(el) && e.target.matches(':focus-visible')) { tipEl = el; showTip(el); } }); // keyboard focus only, not a click
   document.addEventListener('focusout', hideTip);
   addEventListener('scroll', hideTip, true);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideTip(); });
@@ -365,7 +384,8 @@
           watchBadge(f);
         }
         f.classList.add('compact', search ? 'two' : 'one');
-        if (search) f.append(...[search, more, exp].filter(Boolean), row); else f.append(row, ...[more, exp].filter(Boolean));
+        const sp = f._orig.find(c => c.matches('.sp')); // starts from the left like every bar; the spacer keeps Export at the far right (design review 3, D6)
+        if (search) f.append(...[search, more, sp, exp].filter(Boolean), row); else f.append(row, ...[more, sp, exp].filter(Boolean));
         f._row = row;
         // Page-header actions (Export, New …): once the bar is stuck they come back as icon buttons at the end of row 1.
         // Each icon clicks the real button, so page code keeps a single handler.
@@ -737,5 +757,5 @@
     if (risen) return; risen = true;
     document.querySelectorAll('.main .card, .main .zone, .main .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; });
   }
-  window.CRM = { icon, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
+  window.CRM = { icon, dots, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
 })();

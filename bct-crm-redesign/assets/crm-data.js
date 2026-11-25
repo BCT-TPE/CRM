@@ -215,7 +215,9 @@ const ACCOUNTS = [...new Set(INITS.map(o => o.acc))].sort().map((name, i) => {
     type: /Bank|Finance|Retail|Pte|Ltd|Pharma|Logistics|Facilities/.test(name) && !/Gulf|Oman|Deccan/.test(name) ? 'Private' : /Oman|Gulf|Deccan/.test(name) ? 'Government' : 'PSU',
     vertical: (ACC_VERT.find(([re]) => re.test(name)) || [0, 'Enterprise'])[1],
     owner: top.owner, team: top.team, strategic: STRATEGIC.includes(name),
-    lifecycle: won.length ? 'Customer' : 'Prospect',
+    // old CRMpulse lifecycle: Customer (won business) › Opportunity / Lead (an open one) › Prospect (none of these)
+    lifecycle: won.length ? 'Customer' : its.some(o => o.kind === 'open' && o.status === 'Opportunity') ? 'Opportunity' : its.some(o => o.kind === 'open' && o.status === 'Lead') ? 'Lead' : 'Prospect',
+    status: 'Approved',
     pipeline: its.filter(o => o.kind === 'open' && o.status === 'Opportunity').reduce((t, o) => t + o.value, 0),
     openAny: its.some(o => o.kind === 'open'),
     value: won.reduce((t, o) => t + o.value, 0),
@@ -397,4 +399,15 @@ ACCOUNTS.forEach(a => {
   const last = ACTIVITIES.filter(x => x.acc === a.name).map(x => x.d.slice(0, 10)).sort().pop();
   if (last && QUIET_FIX[a.name] == null) { a.lastDate = last; a.last = Math.round((TODAY - new Date(last)) / 864e5); }
   a.attn = [a.draftOrder ? 'Won deal with a draft order · confirm the PO' : '', a.last > 60 ? `No interaction for ${a.last} days` : ''].filter(Boolean);
+});
+// Accounts page (2026-11-24, old CRMpulse fields): region, engagement (Dormant = no interaction for over 60 days)
+ACCOUNTS.forEach(a => { a.region = a.name === 'Lotus Retail India' ? 'India North' : _pick(SALES_REGION[a.geo], a.name); a.engagement = a.last > 60 ? 'Dormant' : 'Active'; });
+// The accounts waiting for approval (Home's "Waiting on you") as Fresh accounts: listed on Accounts, flagged, and not usable
+// for activities or initiatives until approved. Kept apart from ACCOUNTS so no other page counts them (no activity yet).
+const FRESH_ACCOUNTS = APPROVALS.map((x, i) => {
+  const geo = TEAMS[x.team].geo;
+  return { id: 'ACC-2026-' + String(ACCOUNTS.length + i + 1).padStart(4, '0'), name: x.acc, geo, hq: _pick(HQ[geo], x.acc), type: 'Private',
+    vertical: (ACC_VERT.find(([re]) => re.test(x.acc)) || [0, 'Enterprise'])[1], owner: x.by, team: x.team, strategic: false,
+    lifecycle: x.lifecycle, status: 'Fresh', engagement: 'Active', region: _pick(SALES_REGION[geo], x.acc), pipeline: 0, openAny: false, value: 0,
+    last: null, lastDate: null, draftOrder: false, inits: [], attn: ["Waiting for approval · can't be used in initiatives yet"] };
 });

@@ -61,8 +61,9 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
   - Customer orders、Sales targets：Sales Manager 以上；Sales structure：Sales Head 以上（照需求端的 Home 設計稿）
   - 某個分組的項目全被隱藏時，連分組標題一起不顯示
 - 這輪沒做的頁面顯示灰色停用，滑上去顯示「Not part of this redesign round」。
-- 示範帳號一律是 Gaurav Shrotriya。帳號選單的「VIEW AS」是下拉選單：**只有 Home 能切換角色**（Salesperson／Sales Manager／Sales Head，Administrator 停用，預設 Salesperson，存在 localStorage `crm-home-role`）；**其他頁固定是 Administrator**，選單顯示 Administrator 並停用（2026-11-24）。角色會影響預設畫面：
+- 示範帳號一律是 Gaurav Shrotriya，預設 **Sales Head**（2026-11-24 由 Administrator 改）。帳號選單的「VIEW AS」是下拉選單，**每一頁都能切換角色**（Salesperson／Sales Manager／Sales Head；Administrator 停用，因為需求端三份範例只有這三種），選擇存在 localStorage `crm-home-role`，全站一致、其他分頁同步（2026-11-25）。側邊欄跟三份範例一樣依角色顯示。角色會影響預設畫面：
   - Activities：Administrator、Sales Head 預設 Everyone；Sales Manager 預設 My teams；其他人預設 Mine
+  - Sales initiatives（新增頁、記錄頁編輯）：Sales owner 只有 Sales Manager、Sales Head、Administrator 能改；Salesperson 鎖定為自己，並說明原因（舊版 canAssign）
   - Tasks：所有角色都預設 My open tasks（自己沒有未完成任務時，改顯示已完成的）。舊版經理類角色預設 Team overdue，這裡依設計決定不照做（2026-11-23）
 - Tasks 旁顯示自己未完成的任務數：藍色正圓、白字；收合側邊欄時放在圖示右上角；完成任務後即時更新。
 - 帳號選單：姓名、角色、Email、View as、Sign out。手機上帳號入口是頂端頭像，抽屜選單只留 Notifications（固定在底部，選單可捲動）。
@@ -81,7 +82,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 ## 7.4 主管 design review（2026-11-24）採用的規則
 
-- **手機上**側邊選單每列、下拉選項、More filters 勾選列、Clear、通知的 Mark all read／See all 都是 40px（維持全站 40px，不用 review 提議的 44px）。
+- **手機上**側邊選單每列、下拉選項、More filters 勾選列 44px；Clear、通知的 Mark all read／See all 40px。
 - **hover 樣式**只在有滑鼠的裝置生效（`@media (hover: hover)`，或在 `responsive.css` 的 `@media (hover: none)` 裡取消），觸控點過的卡片不會一直停在 hover 狀態。
 - **下拉選單**放不下時往視窗內縮，離邊 16px；量視窗寬度用 `document.documentElement.clientWidth`（手機上打開的選單會撐大 innerWidth）。
 - **頁面漸層背景**放在 `body.v2::before` 的 fixed 圖層，不用 `background-attachment: fixed`（iOS Safari 不支援）。
@@ -96,8 +97,8 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
   - Tasks 面板、Log activity 面板有填內容時，Cancel／×／Esc 先問「Discard…?」。
   - 三頁的 Export 都在篩選列最右邊（Sales initiatives 從頁首移過來）。
   - 頁首小標籤（pill）全站都拿掉，Home 也是（2026-11-24，Janet）；「Updated」放在副標結尾。手機捲動後頂端列顯示頁名（Home 顯示「Home」）。
-  - 手機篩選列不左右滑：第二行只放 2–3 個選項的切換鈕、Fiscal year，以及季度改成下拉；其他篩選移到 More filters 最上方，徽章一起計數；沒有 More filters 的頁面（Tasks）改成換行。
-  - 手機篩選列上方 12px + 分隔線 + 12px，固定在頂端時分隔線隱藏。
+  - 手機篩選列不左右滑：第二行只放 2–3 個選項的切換鈕、Fiscal year，以及季度改成下拉；其他篩選移到 More filters 最上方，徽章一起計數；沒有 More filters 的頁面（Tasks、Contacts）自動加一個 Filters 面板。
+  - 手機頁首和篩選列之間共 24px（12px＋分隔線＋12px），固定在頂端時分隔線隱藏。
   - 手機往下捲、標題捲出頂端列後，Logo 淡出、改顯示頁名。
 
 ## 7.5 動態
@@ -116,6 +117,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - 這是展示用 prototype：完成任務、新增任務、記錄活動、編輯計畫都只存在當下頁面，重新整理或換頁後回到原本的示範資料，也不會同步到其他頁（2026-11-23 確認）。
 - New task 視窗打開時，游標自動放進「What needs doing?」，方便鍵盤操作（2026-11-23 確認）。
 - 表格的省略號、1280px 寬篩選後換行（見第 2、5 節）。
+- 側邊欄名稱用「Sales initiatives」這種寫法（只有第一個字大寫），每一項都有圖示；不照舊版和需求端範例的「Sales Initiatives」、只有 Dashboards 有圖示（2026-11-25 確認）。各角色看得到的項目則跟三份範例一致。
 
 ## 10. 改完要做的事
 
@@ -140,13 +142,41 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - Activities 拿掉頁面上的快速記錄區（review D1，Janet 決定）：記錄活動只從頁首「Log activity」按鈕打開完整面板；篩選列回到標題正下方（跟 Tasks 同高），摘要卡在篩選列下面。
 - 下拉收起時可顯示短名稱：`<option data-short="…">`（Tasks「Who should do it?」收起時只顯示名字，選單裡仍是「名字 · 部門」）。
 - 連結都帶到那一筆：「1 follow-up task」→ `tasks.html?q=ACT-…`（Tasks 搜尋也比對來源活動）；Tasks 的客戶名 → `accounts.html?q=`。
-- 非 Administrator 的角色，活動超過 7 天顯示「Locked after 7 days」，不能編輯；Administrator 隨時可編輯。
+- 照舊版：活動只有記錄的人在 7 天內能改，Administrator 隨時可改。其他角色看到別人的活動顯示「Read only」，自己超過 7 天的顯示「Locked after 7 days」。
 - 觸控裝置上所有 hover 底色、底線、箭頭位移都不殘留（`responsive.css` 的 `@media (hover: none)`）。
 - ≤1360px 時，Q3 forecast／FY26-27 attainment 卡的長條接在文字下方，不再為了對齊旁邊的季度圖留空。
 
 ## 13. Home 版面（2026-11-24 調整）
 
-- 清單卡最多 4 筆，其餘用卡片底部的「View all／All my …」；同一排卡片維持等高。
-- **Salesperson**：配額卡全寬 → 左欄 My tasks、右欄 Deals needing attention 疊在 Orders awaiting confirmation 上（兩張合起來跟左欄等高）→ Quiet accounts｜Activity on your accounts。手機順序：My tasks → Deals → 配額 → Orders → Quiet → Activity。
-- **Sales Manager**（照需求稿）：頁首是跟業務相同的 Record 按鈕；配額卡（8 欄）｜Waiting on you（4 欄，APAC 待審核客戶，每筆有 Review）→ By salesperson 全寬 → 2×2：Team overdue tasks｜Deals needing attention、Team activity｜Quiet accounts。
+- 清單卡最多 4 筆，Home 目前不放「View all」等換頁連結（加回連結時，Largest deals 的「15 across the company」要一起補 View all）。卡片高度跟著內容，不再等高（見 §15）。
+- **Salesperson**：配額卡全寬 → 左欄 My tasks＋Quiet accounts、右欄 Deals＋Orders，各自往下排 → Activity on your accounts 整排。手機順序：My tasks → Deals → 配額 → Orders → Quiet → Activity。
+- **Sales Manager**（照需求稿）：頁首是跟業務相同的 Record 按鈕；配額卡（8 欄）｜Waiting on you（4 欄，APAC 待審核客戶，每筆有 Review）→ By salesperson 全寬 → 左欄 Team overdue tasks＋Team activity、右欄 Deals＋Quiet accounts，各自往下排。
 - **Sales Head／Administrator**：配額卡全寬 → By sales team → Largest deals（8 欄）｜Strategic accounts gone quiet（4 欄）。
+
+## 14. Customers：Accounts（2026-11-24 起）
+
+- Accounts、Contacts 放回側邊欄（`crm.js` 的 `BUILT`）；Customer orders 還沒做，維持停用。
+- Accounts 照舊版 CRMpulse 補齊，並套 design review 規則：
+  - 五張分組卡間距 8px；每張卡管 Lifecycle／Strategic／Need attention，卡上的數字套用其他篩選、不套卡片自己的條件。More filters 選了 Lead、Opportunity 時沒有卡片亮起。
+  - More filters：Account status、Lifecycle、Engagement、Region（依 Geography 縮小）。
+  - Lifecycle 照舊版：有成交 = Customer，有進行中的 Opportunity／Lead = Opportunity／Lead，其餘 = Prospect。下方小字：Fresh · not approved／Inactive／Active／Dormant（超過 60 天沒互動 = Dormant）。
+  - 待審核客戶（Home 的「Waiting on you」，`FRESH_ACCOUNTS`）也列出：標「Waiting for approval」，Log activity 與 New initiative 停用並用 tooltip 說明原因；只在 Accounts 出現，其他頁不計入。
+  - 標籤顏色：久未聯絡（超過 60 天）紅色，草稿訂單與待審核黃色。Last interaction 有 Today／Yesterday／Never。
+  - 整列可點（目前沒有客戶詳情頁，用 toast 表示）；Quick actions 是 Log activity（鉛筆，開 `activities.html?log=<客戶>` 並帶入客戶打開記錄面板）和 New initiative（+），按鈕間距 8px。
+  - 表格底部總計列（筆數、Open pipeline、Customer value，依目前篩選），下方說明「Customer value 只算已確認訂單」。手機上總計列跟上方卡片同兩欄、每個數字帶標籤。
+
+## 15. 主管 review 第三輪（2026-11-25，Home＋全站）
+
+- **卡片高度**：清單卡跟著內容，不為了等高撐出空白；兩欄並排時用卡片的組合讓兩欄總高度接近。例外：經理的配額卡和 Waiting on you 只差 6–31px，底部對齊。（取代 11/24「同排等高」）
+- **清單列（Deals、Largest deals）**：右邊只放金額；標籤放在說明文字下面，靠左一行。人名不斷行（`.nb`）。
+- **顏色門檻**：Won vs target 低於今天的季度進度才紅（跟 Sales performance 的 Behind pace 一樣），Coverage 低於 1.8× 紅，Need attention 5 以上標示；合計列套同一套；門檻寫在表格下方。
+- **不能點的列**：Home 的 By salesperson／By sales team 不用手指游標、不加 hover 底色，列高 64px。
+- **數字要有單位**：Team activity 寫「1 activity」，副標寫 Low = 1 or fewer。
+- **Gap to target** 超前時標題改「Ahead of target」。My tasks 的旗子圖示有說明「Next step on an initiative」（提示框＋報讀文字；副標仍寫「Next step · 商機」）。
+- **精簡篩選列**從左邊開始，Export 在最右邊。
+- **提示框**只給滑鼠移入和鍵盤聚焦；觸控點按鈕、連結不顯示。有虛線的說明文字（`.def`）沒有別的動作，手機點了仍會顯示，點別處就關。停用的按鈕在手機點了用 toast 說明原因（Accounts）。
+- **勾選框**（Home、Tasks）點擊範圍 40×40px（`.ck40`），框維持 16px。
+- **表格變卡片（By salesperson／By sales team）**：手機上合計放最上面，每人一列：名字、百分比、進度條、兩行小字。
+- **篩選面板**：從篩選列移進來的也是標籤在上、方框只放值。
+- **副標**用 `CRM.dots()`：每段不換行，「·」跟在前一段後面。
+- 手機：通知選單在抽屜寬度內往上展開；滿版側邊面板沒有圓角。

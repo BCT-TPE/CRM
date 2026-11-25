@@ -6,15 +6,16 @@
 <title>Accounts · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261124k">
+<link rel="stylesheet" href="assets/crm.css?v=20261125a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261124m">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
 <style>
 /* ---------- Page: Accounts ----------
-   Same IA as CRMpulse /accounts: five scope tiles, search / owner / geography filters, one table with quick actions.
+   Same IA as CRMpulse /accounts: five group cards, search / owner / geography + More filters (account status, lifecycle,
+   engagement, region), one table with Log activity / New initiative on every row, a totals row and the customer-value note.
    Visual language = Sales initiatives (tiles in a tinted card, glass filters, 64px rows, pager). */
-.sc-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 8px; }
+.sc-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 8px; } /* design review: 8px between scope cards */
 .tt { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 16px; border: 0; border-radius: var(--radius-lg); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .tt:hover { background: var(--hover); }
 .tt.on { background: var(--surface); box-shadow: var(--shadow-soft); }
@@ -22,30 +23,46 @@
 .tt-n { font-size: var(--text-3xl); font-weight: 400; letter-spacing: -.03em; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; }
 .tt-n.warn { color: var(--warn); }
 .tt-s { font-size: var(--text-xs); color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-
 .tbl.ac { table-layout: fixed; }
 .tbl.ac col.c-n { width: 30%; } .tbl.ac col.c-l { width: 10%; } .tbl.ac col.c-o { width: 16%; } .tbl.ac col.c-p { width: 11%; }
 .tbl.ac col.c-v { width: 11%; } .tbl.ac col.c-i { width: 12%; } .tbl.ac col.c-q { width: 10%; }
-.tbl.ac tbody tr { cursor: default; }
+.tbl.ac tbody tr { cursor: pointer; } /* the whole row opens the account, as on every list page */
 .tbl.ac td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
+.tbl.ac tfoot .ft-l { display: none; }
+.tbl.ac tfoot td { height: 52px; font-weight: 600; color: var(--ink); border-top: 1px solid var(--line-2); }
 .an { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .an .ell { min-width: 0; }
 .tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; letter-spacing: .01em; white-space: nowrap; flex: none; }
 .tag.strat { background: var(--info-bg); color: var(--deep); }
 .tag.Customer { background: var(--ok-bg); color: var(--ok-text); }
 .tag.Prospect { background: var(--cyan-50); color: var(--cyan-text); }
+.tag.Lead, .tag.Opportunity { background: var(--info-bg); color: var(--deep); }
 .attn { display: inline-flex; align-items: center; max-width: 100%; height: 20px; margin-top: 4px; padding: 0 7px; border-radius: var(--radius-sm); background: var(--warn-bg); color: var(--warn-text); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.attn.quiet { background: var(--danger-bg); color: var(--danger); } /* no recent interaction: red, apart from the amber draft-order / approval flags (old CRMpulse) */
 .late { color: var(--danger); }
-.qa-acts { display: flex; justify-content: flex-end; gap: 6px; }
-.qa-acts .btn.icon-only { width: 32px; height: 32px; padding: 0; justify-content: center; }
+.never { color: var(--t3); }
+.qa-acts { display: flex; justify-content: flex-end; gap: 8px; } /* design review: 8px between buttons */
 .qa-acts svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
+.qa-acts .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; } /* still hoverable, so the tooltip can say why */
+.ac-note { margin: 12px 4px 0; font-size: var(--text-xs); color: var(--t3); line-height: 1.5; }
+.more-wrap { position: relative; }
+#more-pop { width: 520px; }
+#more-pop .mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+#more-pop .mgrid .grp + .grp { margin-top: 0; }
+body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; border-radius: var(--radius-control); border-color: var(--line-2); box-shadow: none; }
+#more-pop .fsel .sel-btn { max-width: none; width: 100%; font-weight: 400; }
 @media (max-width: 1180px) { .sc-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 768px) {
   .sc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tt-s { white-space: normal; }
-  .tbl.ac { min-width: 940px; }
+  #more-pop { width: calc(100vw - 32px); } #more-pop .mgrid { grid-template-columns: 1fr; }
+  /* totals: a summary block under the cards, each figure with its label (the column heads are hidden on phones) */
+  .tbl.ac tfoot { display: block; }
+  .tbl.ac tfoot tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 16px; padding: 12px 17px; background: none; } /* same two columns and inset (16px + the card border) as the cards above */
+  .tbl.ac tfoot td { background: none; }
+  .tbl.ac tfoot td { display: block; height: auto; padding: 0; border: 0; text-align: left; }
+  .tbl.ac tfoot td:first-child { grid-column: 1 / -1; margin-bottom: 4px; } .tbl.ac tfoot .ft-x { display: none; }
+  .tbl.ac tfoot .ft-l { display: block; font-size: var(--text-xs); font-weight: 400; color: var(--t3); }
 }
 </style>
 </head>
@@ -68,6 +85,13 @@
       <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="f-search" type="search" placeholder="Name, code or HQ" aria-label="Search accounts"></label>
       <label class="select"><span class="lbl">Owner</span><select id="f-owner" aria-label="Owner"></select></label>
       <label class="select"><span class="lbl">Geography</span><select id="f-geo" aria-label="Geography"></select></label>
+      <div class="more-wrap">
+        <button class="btn" id="more-btn" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>More filters<span class="count-badge" id="more-n" hidden></span></button>
+        <div class="pop" id="more-pop" role="dialog" aria-label="More filters" hidden style="top:44px;right:0">
+          <div class="mgrid" id="m-grid"></div>
+          <div class="pop-foot"><button class="btn" id="more-clear">Clear</button><button class="btn primary" id="more-done">Done</button></div>
+        </div>
+      </div>
       <button class="btn ghost" id="reset" hidden>Reset</button>
       <span class="sp"></span>
     </div>
@@ -76,43 +100,53 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261124k"></script>
-<script src="assets/crm-data.js?v=20261124d"></script>
+<script src="assets/crm.js?v=20261125b"></script>
+<script src="assets/crm-data.js?v=20261124e"></script>
 <script>
-/* Accounts — every company that appears in the sales initiatives. Lifecycle: customer (has won business) or prospect.
+/* Accounts — every company in the sales initiatives (ACCOUNTS) plus the Fresh accounts waiting for approval (FRESH_ACCOUNTS).
+   Lifecycle as in old CRMpulse: Customer (won business) › Opportunity / Lead (an open one) › Prospect.
    Open pipeline = open opportunities; customer value = won business; last interaction = latest activity. */
 const { money, toast } = CRM;
 const $ = (s) => document.querySelector(s);
+const ALL = [...ACCOUNTS, ...FRESH_ACCOUNTS];
 const IC = {
-  edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
+  log: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
   plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
 };
+// Group cards (old AccountGroupCards): each owns lifecycle / strategic / attention; its count applies every other filter
+const OWN = { lc: '', strat: false, attn: false };
 const TILES = [
-  ['all', 'All accounts', () => true, 'Prospects and customers'],
-  ['Customer', 'Customers', (a) => a.lifecycle === 'Customer', 'Won business or confirmed orders'],
-  ['Prospect', 'Prospects', (a) => a.lifecycle === 'Prospect', 'No won business yet'],
-  ['strat', 'Strategic', (a) => a.strategic, 'Flagged by sales leadership'],
-  ['attn', 'Need attention', (a) => a.attn.length > 0, 'Draft orders, quiet accounts']
+  ['all', 'All accounts', OWN, 'Prospects and customers'],
+  ['Customer', 'Customers', { ...OWN, lc: 'Customer' }, 'Won business or confirmed orders'],
+  ['Prospect', 'Prospects', { ...OWN, lc: 'Prospect' }, 'No open lead or opportunity'],
+  ['strat', 'Strategic', { ...OWN, strat: true }, 'Flagged by sales leadership'],
+  ['attn', 'Need attention', { ...OWN, attn: true }, 'Approvals, draft orders, quiet accounts']
 ];
-const S = { tile: 'all', q: '', owner: '', geo: '', sort: 'name', page: 1 };
+const MORE = [['status', 'Account status', ['Fresh', 'Approved', 'Inactive']], ['lc', 'Lifecycle', ['Prospect', 'Lead', 'Opportunity', 'Customer']],
+  ['eng', 'Engagement', ['Active', 'Dormant']], ['region', 'Region', null]];
+const S = { ...OWN, q: '', owner: '', geo: '', status: '', eng: '', region: '', sort: 'name', page: 1 };
 const PER_PAGE = 10;
+const lastOf = (a) => a.last == null ? Infinity : a.last;
 const SORTS = {
   name: { fn: (a, b) => a.name.localeCompare(b.name), dir: 'asc' },
   pipeline: { fn: (a, b) => b.pipeline - a.pipeline, dir: 'desc' },
   value: { fn: (a, b) => b.value - a.value, dir: 'desc' },
-  last: { fn: (a, b) => a.last - b.last, dir: 'asc' }
+  last: { fn: (a, b) => lastOf(a) - lastOf(b), dir: 'asc' }
 };
-const anyFilter = () => S.q || S.owner || S.geo;
-
-function rows() {
-  const fn = TILES.find(t => t[0] === S.tile)[2], q = S.q.trim().toLowerCase();
-  return ACCOUNTS.filter(a => fn(a) && (!S.owner || a.owner === S.owner) && (!S.geo || a.geo === S.geo)
-    && (!q || [a.name, a.id, a.hq].some(v => v.toLowerCase().includes(q))));
-}
+const activeTile = () => (TILES.find(([, , f]) => f.lc === S.lc && f.strat === S.strat && f.attn === S.attn) || [''])[0]; // none when e.g. Lifecycle = Lead
+const moreCount = () => [S.status, S.lc && !['Customer', 'Prospect'].includes(S.lc) ? S.lc : '', S.eng, S.region].filter(Boolean).length;
+const anyFilter = () => S.q || S.owner || S.geo || S.status || S.eng || S.region;
+const others = (a) => { const q = S.q.trim().toLowerCase();
+  return (!S.owner || a.owner === S.owner) && (!S.geo || a.geo === S.geo) && (!S.region || a.region === S.region) && (!S.status || a.status === S.status)
+    && (!S.eng || a.engagement === S.eng) && (!q || [a.name, a.id, a.hq].some(v => v.toLowerCase().includes(q))); };
+const own = (a, f) => (!f.lc || a.lifecycle === f.lc) && (!f.strat || a.strategic) && (!f.attn || a.attn.length > 0);
+const rows = () => ALL.filter(a => others(a) && own(a, S));
+const usable = (a) => a.status === 'Approved' ? null : `${a.status} accounts can't be used until they are Approved`;
 function tiles() {
-  return `<section class="card tint sc-tiles" aria-label="Account scope">${TILES.map(([k, label, fn, sub]) => {
-    const n = ACCOUNTS.filter(fn).length;
-    return `<button class="tt ${S.tile === k ? 'on' : ''}" data-act="tile" data-v="${k}" aria-pressed="${S.tile === k}"><span class="tt-k">${label}</span><span class="tt-n ${k === 'attn' && n ? 'warn' : ''}">${n}</span><span class="tt-s">${sub}</span></button>`;
+  const on = activeTile();
+  return `<section class="card tint sc-tiles" role="tablist" aria-label="Account groups">${TILES.map(([k, label, f, sub]) => {
+    const n = ALL.filter(a => others(a) && own(a, f)).length;
+    return `<button class="tt ${on === k ? 'on' : ''}" role="tab" data-act="tile" data-v="${k}" aria-selected="${on === k}"><span class="tt-k">${label}</span><span class="tt-n ${k === 'attn' && n ? 'warn' : ''}">${n}</span><span class="tt-s">${sub}</span></button>`;
   }).join('')}</section>`;
 }
 function th(key, label, cls = '') {
@@ -121,67 +155,96 @@ function th(key, label, cls = '') {
   return `<th class="${cls}" aria-sort="${on ? (SORTS[key].dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on && SORTS[key].dir === 'desc' ? '↓' : '↑'}</span></button></th>`;
 }
 const ell = (html, cls = '') => `<div class="ell ${cls}">${html}</div>`;
+const statusNote = (a) => a.status === 'Fresh' ? 'Fresh · not approved' : a.status === 'Inactive' ? 'Inactive' : a.engagement;
+function lastCell(a) {
+  if (a.last == null) return `<div class="never"><b>Never</b></div><div class="t-sub">No activities logged</div>`;
+  const t = a.last === 0 ? 'Today' : a.last === 1 ? 'Yesterday' : `${a.last} days ago`;
+  return `<div class="${a.last > 60 ? 'late' : ''}">${t}</div><div class="t-sub">${CRM.date(a.lastDate)}</div>`;
+}
+function qa(a) {
+  const why = usable(a), gate = (r) => r ? `aria-disabled="true" data-tip="${esc(r)}"` : '';
+  return `<div class="qa-acts">
+      <button class="btn icon-only" data-act="log" data-v="${esc(a.name)}" aria-label="Log activity for ${esc(a.name)}" ${why ? gate(why) : 'data-tip="Log activity"'}>${IC.log}</button>
+      <button class="btn icon-only" data-act="newsi" data-v="${esc(a.name)}" aria-label="New initiative for ${esc(a.name)}" ${why ? gate(why) : 'data-tip="New initiative"'}>${IC.plus}</button>
+    </div>`;
+}
 function row(a) {
-  return `<tr data-id="${a.id}">
+  const openN = a.inits.filter(id => { const o = INITS.find(x => x.id === id); return o.kind === 'open' && o.status === 'Opportunity'; }).length;
+  return `<tr data-id="${a.id}" data-name="${esc(a.name)}" tabindex="0">
     <td><div class="an">${ell(esc(a.name), 't-main')}${a.strategic ? '<span class="tag strat">Strategic</span>' : ''}</div>
       ${ell(`${a.id} · ${a.type} · ${a.vertical} · ${a.geo}`, 't-sub')}
-      ${a.attn.map(x => `<span class="attn">${esc(x)}</span>`).join(' ')}</td>
-    <td><span class="tag ${a.lifecycle}">${a.lifecycle}</span><div class="t-sub">Active</div></td>
+      ${a.attn.map(x => `<span class="attn ${/^No interaction/.test(x) ? 'quiet' : ''}">${esc(x)}</span>`).join(' ')}</td>
+    <td><span class="tag ${a.lifecycle}">${a.lifecycle}</span><div class="t-sub">${statusNote(a)}</div></td>
     <td><div class="own">${CRM.avatar(a.owner)}<div class="own-t">${ell(esc(a.owner))}${ell(esc(a.team), 't-sub')}</div></div></td>
-    <td class="r num"><div class="t-val">${money(a.pipeline)}</div>${a.pipeline ? `<div class="t-sub">${a.inits.filter(id => { const o = INITS.find(x => x.id === id); return o.kind === 'open' && o.status === 'Opportunity'; }).length} open</div>` : ''}</td>
+    <td class="r num"><div class="t-val">${money(a.pipeline)}</div>${openN ? `<div class="t-sub">${openN} open</div>` : ''}</td>
     <td class="r num">${money(a.value)}</td>
-    <td class="num"><div class="${a.last > 60 ? 'late' : ''}">${a.last} days ago</div><div class="t-sub">${CRM.date(a.lastDate)}</div></td>
-    <td><div class="qa-acts">
-      <button class="btn icon-only" data-act="edit" data-v="${a.id}" aria-label="Edit ${esc(a.name)}" data-tip="Edit account">${IC.edit}</button>
-      <button class="btn icon-only" data-act="newsi" data-v="${esc(a.name)}" aria-label="New sales initiative for ${esc(a.name)}" data-tip="New sales initiative">${IC.plus}</button>
-    </div></td>
+    <td class="num">${lastCell(a)}</td>
+    <td>${qa(a)}</td>
   </tr>`;
 }
 function listCard() {
-  let list = rows();
-  list = list.slice().sort(SORTS[S.sort].fn);
+  const list = rows().slice().sort(SORTS[S.sort].fn);
   const pages = Math.max(1, Math.ceil(list.length / PER_PAGE)); S.page = Math.min(S.page, pages);
   const shown = list.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
+  const sum = (k) => list.reduce((t, a) => t + a[k], 0);
   const body = list.length ? `<div class="tbl-wrap"><table class="tbl ac">
       <colgroup><col class="c-n"><col class="c-l"><col class="c-o"><col class="c-p"><col class="c-v"><col class="c-i"><col class="c-q"></colgroup>
       <thead><tr>${th('name', 'Account')}${th('', 'Lifecycle')}${th('', 'Owner')}${th('pipeline', 'Open pipeline', 'r')}${th('value', 'Customer value', 'r')}${th('last', 'Last interaction')}${th('', 'Quick actions', 'r')}</tr></thead>
-      <tbody>${shown.map(row).join('')}</tbody></table></div>
+      <tbody>${shown.map(row).join('')}</tbody>
+      <tfoot><tr><td colspan="3">${list.length} ${list.length === 1 ? 'account' : 'accounts'}</td><td class="r num"><small class="ft-l">Open pipeline</small>${money(sum('pipeline'))}</td><td class="r num"><small class="ft-l">Customer value</small>${money(sum('value'))}</td><td colspan="2" class="ft-x"></td></tr></tfoot></table></div>
     <div class="pager"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, list.length)} of ${list.length}</span><span class="sp"></span>
       <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
       ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}
       <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>`
-    : `<div class="empty" style="padding:48px 12px"><b>No accounts here</b>Nothing matches these filters.${anyFilter() ? '<br><button class="link" data-act="reset">Clear filters</button>' : ''}</div>`;
-  return `<section class="card" aria-label="Accounts">
-    ${body}</section>`;
+    : `<div class="empty" style="padding:48px 12px"><b>No accounts here</b>No accounts match these filters.${anyFilter() ? '<br><button class="link" data-act="reset">Clear filters</button>' : ''}</div>`;
+  return `<section class="card" aria-label="Accounts">${body}</section>
+    ${list.length ? '<p class="ac-note">Customer value counts confirmed orders only. Draft orders waiting for a PO are flagged so a won deal never looks like a $0 customer.</p>' : ''}`;
+}
+function buildMore() {
+  const regions = [...new Set(ALL.filter(a => !S.geo || a.geo === S.geo).map(a => a.region))].sort();
+  $('#m-grid').innerHTML = MORE.map(([k, l, opts]) => `<div class="grp"><h4>${l}</h4><label class="select fsel"><select data-m="${k}" aria-label="${l}"><option value="">All</option>${(opts || regions).map(v => `<option value="${esc(v)}" ${S[k] === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select></label></div>`).join('');
+  CRM.enhanceSelects($('#m-grid'));
 }
 function render() {
   $('#page').innerHTML = tiles() + '<div style="height:16px"></div>' + listCard();
   $('#reset').hidden = !anyFilter();
+  const m = moreCount(); $('#more-n').hidden = !m; $('#more-n').textContent = m;
 }
-
 const page = $('#page');
 page.addEventListener('click', (e) => {
-  const a = e.target.closest('[data-act]'); if (!a) return;
+  const a = e.target.closest('[data-act]');
+  if (!a) { const tr = e.target.closest('tbody tr[data-id]'); if (tr) openAccount(tr); return; }
   const act = a.dataset.act;
-  if (act === 'tile') { S.tile = a.dataset.v; S.page = 1; render(); }
+  if (a.getAttribute('aria-disabled') === 'true') { toast(a.dataset.tip, 'warn'); return; } // a tap shows no tooltip: say why here
+  if (act === 'tile') { Object.assign(S, TILES.find(t => t[0] === a.dataset.v)[2]); S.page = 1; render(); }
   else if (act === 'sort') { S.sort = a.dataset.v; S.page = 1; render(); }
   else if (act === 'page') { S.page = +a.dataset.v; render(); }
-  else if (act === 'edit') toast('Would open the account editor');
+  else if (act === 'log') location.href = `activities.html?log=${encodeURIComponent(a.dataset.v)}`; // opens the Log activity panel with the account filled in
   else if (act === 'newsi') location.href = `initiative-new.html?acc=${encodeURIComponent(a.dataset.v)}`;
   else if (act === 'reset') resetAll();
 });
+// No account page in this round: the row says what it would open (rows open the record on every list page)
+const openAccount = (tr) => toast(`Would open ${tr.dataset.name}`);
+page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tbody tr[data-id]')) openAccount(e.target); });
 function fill(sel, opts) { sel.innerHTML = opts.map(([k, l]) => `<option value="${esc(k)}">${esc(l)}</option>`).join(''); }
-fill($('#f-owner'), [['', 'All'], ...[...new Set(ACCOUNTS.map(a => a.owner))].sort().map(p => [p, p === ME ? `${p} (you)` : p])]);
-fill($('#f-geo'), [['', 'All'], ...[...new Set(ACCOUNTS.map(a => a.geo))].sort().map(g => [g, g])]);
+fill($('#f-owner'), [['', 'All'], ...[...new Set(ALL.map(a => a.owner))].sort().map(p => [p, p === ME ? `${p} (you)` : p])]);
+fill($('#f-geo'), [['', 'All'], ...[...new Set(ALL.map(a => a.geo))].sort().map(g => [g, g])]);
 $('#f-search').addEventListener('input', (e) => { S.q = e.target.value; S.page = 1; render(); });
 // customer names on Tasks link here with ?q= (design review D9)
 { const q = new URLSearchParams(location.search).get('q'); if (q) { S.q = q; $('#f-search').value = q; } }
 $('#f-owner').addEventListener('change', (e) => { S.owner = e.target.value; S.page = 1; render(); });
-$('#f-geo').addEventListener('change', (e) => { S.geo = e.target.value; S.page = 1; render(); });
-function resetAll() { S.q = S.owner = S.geo = ''; $('#f-search').value = ''; ['#f-owner', '#f-geo'].forEach(s => $(s).value = ''); S.page = 1; render(); }
+$('#f-geo').addEventListener('change', (e) => { S.geo = e.target.value; S.region = ''; S.page = 1; render(); });
+function resetAll() { Object.assign(S, OWN, { q: '', owner: '', geo: '', status: '', eng: '', region: '', page: 1 }); $('#f-search').value = ''; ['#f-owner', '#f-geo'].forEach(s => $(s).value = ''); render(); }
 $('#reset').addEventListener('click', resetAll);
+function setMore(open) { $('#more-pop').hidden = !open; $('#more-btn').setAttribute('aria-expanded', open); if (open) buildMore(); }
+$('#more-btn').addEventListener('click', (e) => { e.stopPropagation(); setMore($('#more-pop').hidden); });
+$('#more-pop').addEventListener('click', (e) => e.stopPropagation());
+$('#more-pop').addEventListener('change', (e) => { const k = e.target.dataset.m; if (!k) return; S[k] = e.target.value; S.page = 1; render(); });
+$('#more-clear').addEventListener('click', () => { Object.assign(S, { status: '', eng: '', region: '' }); if (!['Customer', 'Prospect'].includes(S.lc)) S.lc = ''; buildMore(); render(); });
+$('#more-done').addEventListener('click', () => setMore(false));
+document.addEventListener('click', () => setMore(false));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMore(false); });
 $('#new').addEventListener('click', () => toast('Would open the new account form'));
-
 CRM.renderShell('accounts');
 CRM.watchSticky($('#filters'));
 render();
