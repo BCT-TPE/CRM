@@ -159,7 +159,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 ## 14. Customers：Accounts（2026-11-24 起）
 
-- **先隱藏（2026-11-25，先交付其他頁）**：Accounts、Contacts、Customer orders 在側邊欄停用，Tasks 的客戶名稱也不連過去；開關是 `crm.js` 的 `CUSTOMERS_ON`。要預覽就在任一頁網址加 `?customers=on`（存在這個瀏覽器，`?customers=off` 關掉）。開放後 Customer orders 只有 Sales Manager 以上看得到。
+- Accounts、Contacts、Customer orders 都在側邊欄（`crm.js` 的 `BUILT`），2026-11-25 開放；Customer orders 只有 Sales Manager 以上看得到。Tasks 的客戶名稱連到 `accounts.html?q=`。
 - Accounts 照舊版 CRMpulse 補齊，並套 design review 規則：
   - 五張分組卡間距 8px；每張卡管 Lifecycle／Strategic／Need attention，卡上的數字套用其他篩選、不套卡片自己的條件。More filters 選了 Lead、Opportunity 時沒有卡片亮起。
   - More filters：Account status、Lifecycle、Engagement、Region（依 Geography 縮小）。
@@ -197,9 +197,22 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 ## 17. Customers：Customer orders（2026-11-25）
 
-- 內容照舊版 CRMpulse `/orders`：等 PO 的成交（最多 6 張，1440px 以上一列四張，超過 30 天紅色）、狀態頁籤和數量、搜尋（訂單／PO／客戶）、Order date（年度和季度）、訂單表、總計列（未取消）、可展開的 Historical orders、訂單面板、Register historical order。
-- 版面跟其他列表頁一致：篩選列在標題下方；等 PO 的卡片改成一般白卡（不用舊版黃底）；狀態用卡片內的膠囊頁籤（同 Activities）；64px 列、點整列開側邊面板；總計列、頁碼、手機卡片都用共用樣式（`.tbl.totals`、`.drill.tf-panel`、`.tf` 表單移到 crm.css）。表頭可排序（Order、Order date、Order value）。
+- 內容照舊版 CRMpulse `/orders`，排法用比較後選定的 Option A（2026-11-25）：狀態卡、搜尋（訂單／PO／客戶）、Order date（年度和季度）、一張訂單表、總計列（未取消）、訂單面板、Register historical order。
+- **上方卡片**同 Sales initiatives：藍底「Current」放 All current、Draft、Open、Completed、Cancelled（Draft 寫「$ not yet counted in customer value」），白底「Historical」獨立一張、不算進 All current；點卡片篩選表格，取代舊版的等 PO 卡片、頁籤和底部收合區。表格預設等 PO 的排最前、等最久的在最上面，PO 欄寫「Waiting N days」「Confirm PO ›」，超過 30 天紅色。登記歷史訂單後自動切到 Historical。
+- 其他照列表頁規則：64px 列、點整列開側邊面板；總計列、頁碼、手機卡片用共用樣式（`.tbl.totals`、`.drill.tf-panel`、`.tf`）。表頭可排序（Order、Order date、Order value）。
 - **訂單面板**：進度 Draft → Open → Completed、Won／Order value／Difference、PO 欄位；缺 PO、日期、日期在未來、或金額不同但沒選原因時，Confirm order／Mark completed 不能按，並寫出還缺什麼。改過內容關閉前先問。取消 Open 訂單要填原因（`CRM.confirm` 的 `field`），取消後不能恢復。
 - **權限**：Sales Head／Administrator 看全部、可登記歷史訂單；Sales Manager 看自己團隊；Salesperson 看自己的（側邊欄沒有入口）。沒有權限的 Register 按鈕停用並說明原因。
 - **資料**：每筆成交一張訂單（`ORDERS`），草稿就是 Home 的 `DRAFT_ORDERS`（4 筆 $525.0K，同一編號；`PO_RECEIVED` 的兩筆已有 PO，算 Open）。幣別用 `accCurrency`、匯率用 `FX`。**Accounts 的 Customer value 改為只算已確認的訂單**（Open／Completed，含歷史訂單，以 PO 金額計），草稿不算。
 - `?open=ORD-…` 直接打開那張訂單。
+
+## 18. Customers 的新增表單（2026-11-25）
+
+- 三頁的表單共用 `CRM.openPanel(v, draw, 標題)` 和 `CRM.form`（`fld`、`pick`、`inp`、`head`、`put`），都在 crm.js：右側面板、改過內容關閉前先問、手機滿版。**輸入時要更新面板的一部分就用 `put()`**（內容沒變就不重畫）；直接改 `innerHTML` 會讓「打完字直接按按鈕」失效。
+- **New account**（欄位照舊版）：只有名稱必填；打字時列出相似的客戶，第一次按會擋下、再按一次「Create anyway」才建立。建立後是 Fresh、待審核，Log activity 和 New initiative 停用，並跳到那筆所在的頁。Owner、Strategic、Customer since 只有 Sales Manager 以上能改。
+- **New contact／Edit**：客戶、名、姓必填；選客戶後列出已有的聯絡人，角色卡寫出目前是誰；職稱和部門不合、Email 網域不同會提醒，Email 重複不能存；同客戶同名要按「Create anyway」。新增可以「Save & add another」，編輯可以取消 Active，客戶不能改。
+- 舊版的選項膠囊：Account Type 用全站的切換鈕（再點一次取消），Department 有六個選項改用下拉。
+
+## 19. Customers 對照 design review（2026-11-25）
+
+- 手機總計放列表最上面；顏色門檻寫在列表下方（`.list-note`：Accounts「no interaction for over 60 days」、Customer orders「waiting for a PO for over 30 days」）；只有一個篩選時不做面板（`data-keep`）；歷史訂單列只放狀態標籤，列高 64px。
+- 手機列表卡（Sales initiatives、Tasks、Accounts、Customer orders）還是一筆一張大卡；要改成精簡列就全站一起改，目前先不動。

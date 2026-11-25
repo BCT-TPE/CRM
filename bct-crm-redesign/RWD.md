@@ -144,3 +144,18 @@
 
 - 頭像可點，在頭像下方打開帳號選單（姓名、角色、Email）；抽屜選單不再放帳號，只留 Notifications 固定在底部，選單列 44px、可捲動。
 - 往下捲、頁面標題捲出頂端列後，Logo 淡出、改顯示頁名；捲回頂端再換回 Logo。
+
+## Customers（Accounts、Contacts、Customer orders，2026-11-25）
+
+| 項目 | 寬度 | 做法 |
+|---|---|---|
+| 分組卡 | ≤1180／≤768 | 三欄／兩欄；Customer orders 的 Historical 卡 ≤768 排到 Current 下面滿版 |
+| 表格 | ≤768 | 變成卡片；Accounts、Customer orders 的總計移到卡片最上面，每個數字帶標籤（`.tbl.totals`） |
+| Customer orders 表格 | 769–1399 | Owner 不放頭像；≤1279 表格最小 950px、≤1100 最小 1040px，在卡片內左右捲 |
+| Contacts 細節 | ≤1100 | 右欄改成右側滑出面板，名單位置不動 |
+| Contacts 人員列 | ≤768 | 名字＋狀態，下面是角色和 Email |
+| 篩選列 | ≤768 | 同其他列表頁；只有一個篩選的頁面（Customer orders）用 `data-keep` 留在第二排，不做只有一項的面板 |
+| New／Edit 面板 | ≤480 | 滿版、欄位一欄、底部按鈕分滿整排 |
+| 列表裡的文字連結 | ≤768 | 40px 高（Tasks、Activities 也是） |
+
+| 頁碼（全站列表） | ≤768 | 「Showing …」自成一行，頁碼按鈕在下一行，都置中 |

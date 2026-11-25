@@ -6,7 +6,7 @@
 <title>Accounts · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125d">
+<link rel="stylesheet" href="assets/crm.css?v=20261125g">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
 <link rel="stylesheet" href="assets/responsive.css?v=20261125c">
@@ -42,7 +42,6 @@
 .qa-acts { display: flex; justify-content: flex-end; gap: 8px; } /* design review: 8px between buttons */
 .qa-acts svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .qa-acts .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; } /* still hoverable, so the tooltip can say why */
-.ac-note { margin: 12px 4px 0; font-size: var(--text-xs); color: var(--t3); line-height: 1.5; }
 .more-wrap { position: relative; }
 #more-pop { width: 520px; }
 #more-pop .mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
@@ -91,7 +90,7 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125e"></script>
+<script src="assets/crm.js?v=20261125h"></script>
 <script src="assets/crm-data.js?v=20261125b"></script>
 <script>
 /* Accounts — every company in the sales initiatives (ACCOUNTS) plus the Fresh accounts waiting for approval (FRESH_ACCOUNTS).
@@ -163,10 +162,10 @@ function row(a) {
   const openN = a.inits.filter(id => { const o = INITS.find(x => x.id === id); return o.kind === 'open' && o.status === 'Opportunity'; }).length;
   return `<tr data-id="${a.id}" data-name="${esc(a.name)}" tabindex="0">
     <td><div class="an">${ell(esc(a.name), 't-main')}${a.strategic ? '<span class="tag strat">Strategic</span>' : ''}</div>
-      ${ell(`${a.id} · ${a.type} · ${a.vertical} · ${a.geo}`, 't-sub')}
+      ${ell([a.id, a.type, a.vertical, a.geo].filter(Boolean).map(esc).join(' · '), 't-sub')}
       ${a.attn.map(x => `<span class="attn ${/^No interaction/.test(x) ? 'quiet' : ''}">${esc(x)}</span>`).join(' ')}</td>
     <td><span class="tag ${a.lifecycle}">${a.lifecycle}</span><div class="t-sub">${statusNote(a)}</div></td>
-    <td><div class="own">${CRM.avatar(a.owner)}<div class="own-t">${ell(esc(a.owner))}${ell(esc(a.team), 't-sub')}</div></div></td>
+    <td><div class="own">${CRM.avatar(a.owner)}<div class="own-t">${ell(esc(a.owner))}${ell(esc(a.team || '—'), 't-sub')}</div></div></td>
     <td class="r num"><div class="t-val">${money(a.pipeline)}</div>${openN ? `<div class="t-sub">${openN} open</div>` : ''}</td>
     <td class="r num">${money(a.value)}</td>
     <td class="num">${lastCell(a)}</td>
@@ -189,7 +188,7 @@ function listCard() {
       <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>`
     : `<div class="empty" style="padding:48px 12px"><b>No accounts here</b>No accounts match these filters.${anyFilter() ? '<br><button class="link" data-act="reset">Clear filters</button>' : ''}</div>`;
   return `<section class="card" aria-label="Accounts">${body}</section>
-    ${list.length ? '<p class="ac-note">Customer value counts confirmed orders only. Draft orders waiting for a PO are flagged so a won deal never looks like a $0 customer.</p>' : ''}`;
+    ${list.length ? '<p class="list-note">Customer value counts confirmed orders only. Draft orders waiting for a PO are flagged so a won deal never looks like a $0 customer.<br><b>Red</b>: no interaction for over 60 days.</p>' : ''}`;
 }
 function buildMore() {
   const regions = [...new Set(ALL.filter(a => !S.geo || a.geo === S.geo).map(a => a.region))].sort();
@@ -235,7 +234,56 @@ $('#more-clear').addEventListener('click', () => { Object.assign(S, { status: ''
 $('#more-done').addEventListener('click', () => setMore(false));
 document.addEventListener('click', () => setMore(false));
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMore(false); });
-$('#new').addEventListener('click', () => toast('Would open the new account form'));
+// New account (old AccountFormDrawer): starts as Fresh; an assigning role approves it before it can be used
+const { fld, pick, inp, head, put } = CRM.form, ASSIGNERS = 'Sales Manager, Sales Head or Administrator';
+const VERTICALS = [...new Set(ALL.map(a => a.vertical))].sort(), TYPES = ['Government', 'Private', 'PSU'];
+const SELLERS = [...new Set([ME, ...Object.values(TEAMS).flatMap(t => t.people)])].sort().map(p => [p, p === ME ? `${p} (you)` : p]);
+function openNew() {
+  const can = CRM.user.assigning;
+  const v = { name: '', type: '', vertical: '', parent: '', geo: '', region: '', hq: '', cur: 'USD', phone: '', web: '', bill: '', owner: ME, strategic: false, since: '', desc: '' };
+  let conflicts = [];
+  const similar = () => { const n = v.name.trim().toLowerCase(); return n.length < 3 ? [] : ALL.filter(a => a.name.toLowerCase().includes(n) || n.includes(a.name.toLowerCase())).slice(0, 4); };
+  const li = (a) => `<li><a class="link" href="accounts.html?q=${encodeURIComponent(a.name)}" target="_blank">${esc(a.name)}</a> <small>· ${a.id} · ${esc([a.status === 'Approved' ? '' : a.status, a.geo].filter(Boolean).join(' · '))}</small></li>`;
+  const dup = () => { const l = similar(); return conflicts.length ? `<div class="op-why" role="status"><p><b>Possible duplicates. Review before saving:</b></p><ul>${conflicts.map(li).join('')}</ul><p>Save again to create the record anyway.</p></div>`
+    : l.length ? `<div class="op-why" role="status"><p><b>Similar account already exists.</b> Open it instead of creating a duplicate:</p><ul>${l.map(li).join('')}</ul></div>` : ''; };
+  const foot = () => `<div class="op-r1"><span class="op-msg" role="status">${similar().length ? 'Check the similar account first' : 'Only the name is required'}</span></div><button type="button" class="btn ghost" data-x="close">Cancel</button><button type="submit" class="btn primary" ${v.name.trim() ? '' : 'disabled'}>${conflicts.length ? 'Create anyway' : 'Create account'}</button>`;
+  const none = (l, first = 'Not set') => [['', first], ...l.map(x => [x, x])];
+  const draw = () => `<form class="tf-form" novalidate>${head('Accounts', 'New account', `Starts as Fresh. A ${ASSIGNERS} approves it before it can be used in initiatives, activities or orders.`)}
+    <div class="dr-body"><div class="tf-g">
+      <h3 class="op-h" style="margin:0">Organisation</h3>
+      ${fld('Account Name', inp('name', v.name, 'Account Name', { ph: 'e.g. Gulf National Bank' }), { req: true, hint: 'Legal or trading name, as the customer writes it' })}
+      <div data-dup>${dup()}</div>
+      ${fld('Account Type', `<div class="seg tf-seg" role="radiogroup" aria-label="Account Type">${TYPES.map(t => `<button type="button" role="radio" aria-checked="${v.type === t}" class="${v.type === t ? 'on' : ''}" data-type="${t}">${t}</button>`).join('')}</div>`)}
+      <div class="tf-2">${fld('Industry / Vertical', pick('vertical', none(VERTICALS), v.vertical, 'Industry / Vertical'))}${fld('Parent Account', pick('parent', none(ALL.map(a => a.name)), v.parent, 'Parent Account'), { hint: 'For group companies' })}</div>
+      <h3 class="op-h">Location</h3>
+      <div class="tf-2">${fld('Geography', pick('geo', none(Object.keys(SALES_REGION)), v.geo, 'Geography'))}${fld('Region', pick('region', none(v.geo ? SALES_REGION[v.geo] : [], v.geo ? 'Not set' : 'Choose a geography first'), v.region, 'Region', !v.geo), { hint: v.geo ? '' : 'Regions follow the geography' })}</div>
+      <div class="tf-2">${fld('HQ city', inp('hq', v.hq, 'HQ city', { ph: 'e.g. Riyadh' }))}${fld('Account Currency', pick('cur', ['USD', 'AED', 'INR', 'OMR', 'SAR'].map(c => [c, c]), v.cur, 'Account Currency'), { hint: 'Default for transactions; each can use another' })}</div>
+      <h3 class="op-h">Contact details</h3>
+      <div class="tf-2">${fld('Phone', inp('phone', v.phone, 'Phone', { type: 'tel' }), { hint: 'Include the country code, e.g. +966' })}${fld('Website', inp('web', v.web, 'Website', { type: 'url', ph: 'https://' }))}</div>
+      ${fld('Billing Address', `<textarea class="in" data-v="bill" aria-label="Billing Address">${esc(v.bill)}</textarea>`)}
+      <h3 class="op-h">Ownership</h3>
+      ${fld('Account Owner', pick('owner', SELLERS, v.owner, 'Account Owner', !can), { hint: can ? 'Ownership changes are kept in the history.' : `Only a ${ASSIGNERS} transfers ownership.` })}
+      <h3 class="op-h">Set by ${ASSIGNERS}</h3>${can ? '' : `<span class="tf-h">Read-only: only a ${ASSIGNERS} can change these.</span>`}
+      <div class="tf-2">${fld('Strategic Account', `<label class="tf-chk"><input type="checkbox" data-c="strategic" ${v.strategic ? 'checked' : ''} ${can ? '' : 'disabled'}><span>Strategic <small>· shown with a Strategic label everywhere</small></span></label>`)}${fld('Customer since (legacy)', inp('since', v.since, 'Customer since (legacy)', { type: 'date', dis: !can }), { hint: 'For customers from older systems. Makes the account a Customer.' })}</div>
+      ${fld('Description / Remarks', `<textarea class="in" data-v="desc" aria-label="Description / Remarks">${esc(v.desc)}</textarea>`)}
+      <span class="tf-h">Documents can be attached after the account is saved.</span>
+    </div></div><div class="dr-foot op-foot">${foot()}</div></form>`;
+  const P = CRM.openPanel(v, draw, 'Discard this account?');
+  const live = () => { put(P.el.querySelector('[data-dup]'), dup()); put(P.el.querySelector('.op-foot'), foot()); };
+  P.el.addEventListener('input', (e) => { const k = e.target.dataset.v; if (!k) return; v[k] = e.target.value; if (k === 'name') { conflicts = []; live(); } });
+  P.el.addEventListener('change', (e) => { if (e.target.dataset.c) { v[e.target.dataset.c] = e.target.checked; return; } const k = e.target.dataset.v; if (!k) return; v[k] = e.target.value; if (k === 'geo') { v.region = ''; P.redraw(); } });
+  P.el.addEventListener('click', (e) => { const b = e.target.closest('[data-type]'); if (!b) return; v.type = v.type === b.dataset.type ? '' : b.dataset.type; // a second click clears it: the type is optional
+    P.el.querySelectorAll('[data-type]').forEach(x => { const on = x.dataset.type === v.type; x.classList.toggle('on', on); x.setAttribute('aria-checked', String(on)); }); });
+  P.el.addEventListener('submit', () => {
+    if (!v.name.trim()) return;
+    if (!conflicts.length && similar().length) { conflicts = similar(); live(); P.el.querySelector('[data-dup]').scrollIntoView({ block: 'center' }); toast('Potential duplicate accounts found. Review them, then save again to create anyway.', 'warn'); return; }
+    const a = { id: 'ACC-2026-' + String(Math.max(...ALL.map(x => +x.id.slice(-4))) + 1).padStart(4, '0'), name: v.name.trim(), geo: v.geo, hq: v.hq.trim(), type: v.type, vertical: v.vertical || 'Vertical not set', owner: v.owner, team: PERSON_TEAM[v.owner] || '', strategic: v.strategic,
+      lifecycle: v.since ? 'Customer' : 'Prospect', status: 'Fresh', engagement: 'Active', region: v.region, pipeline: 0, openAny: false, value: 0, last: null, lastDate: null, draftOrder: false, inits: [], attn: ["Waiting for approval · can't be used in initiatives yet"] };
+    ALL.push(a); resetAll(); S.sort = 'name'; S.page = Math.floor(rows().sort(SORTS.name.fn).indexOf(a) / PER_PAGE) + 1; render(); // the page that lists it
+    P.close(); toast(`${a.name} created as Fresh; a ${ASSIGNERS} approves it.`, 'ok');
+  });
+}
+$('#new').addEventListener('click', openNew);
 CRM.renderShell('accounts');
 CRM.watchSticky($('#filters'));
 render();

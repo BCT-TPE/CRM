@@ -7,7 +7,27 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-25 (third push)
+## 2026-11-25 (fourth push)
+
+**Accounts, Contacts and Customer orders are open** in the menu (Customer orders: Sales Manager and up), and the account names on Tasks link to Accounts again. The `?customers=on` preview switch is gone. Cache-busters: `crm.css?v=20261125g`, `crm.js?v=20261125h` (all pages that load them).
+
+### Added
+- **Customer orders** (`orders.html`, old CRMpulse `/orders`): status cards (Current: all, Draft, Open, Completed, Cancelled; Historical on its own white card) that filter one register, drafts first; search, order date, totals; order panel (progress, won vs order value, PO fields, Save draft, Confirm order, Mark completed, Cancel order with a reason) and Register historical order. `?open=ORD-...` opens an order. The old waiting cards, status tabs and collapsed history became the status cards.
+- **New account** and **New contact / Edit contact** side panels (old AccountFormDrawer / ContactFormDrawer): duplicate checks with "Create anyway", title / email checks, who holds each role, Save & add another, fields locked for salespeople.
+- `CRM.openPanel(values, draw, title)` and `CRM.form` (`fld`, `pick`, `inp`, `head`, `put`): shared side-panel forms. Use `put()` to refresh a part of a panel while typing: redrawing unchanged HTML could swallow the click on a footer button.
+
+### Changed
+- **Contacts**: "Show only no active decision maker" toggle in the filter bar instead of the warning strip; details slide in from the right at 1100px and below; Log call / Log meeting open the Log activity panel filled in; old title / department rules.
+- **Phones, every list page**: the pager count sits on its own line above the page buttons, both centred. Text links inside Tasks and Activities rows are 40px tall.
+- **Phones, Accounts and Customer orders**: totals come first, above the cards. A page with a single filter keeps it in row 2 (`data-keep`) instead of a one-item panel.
+- Colour thresholds are written under the list (Accounts: over 60 days; Customer orders: over 30 days).
+
+### Fixed
+- Historical orders: the second status chip was cut off; orders without a date sorted last.
+
+---
+
+## 2026-11-25 (third push) · `3ac39bb`
 
 Home only (page-level CSS in `home.html`; no shared asset changed).
 

@@ -42,11 +42,8 @@
     ['Plan & report', [['targets', 'Sales targets', 'flag', 1, MGR_UP], ['reports', 'Reports', 'report', 1]]],
     ['Setup', [['structure', 'Sales structure', 'tree', 1, HEAD_UP], ['admin', 'Administration', 'settings', 1, ['ADMIN']], ['users', 'Users', 'users', 1, ['ADMIN']]]]
   ];
-  // The Customers pages (Accounts, Contacts, Customer orders) are not handed over yet (2026-11-25): their menu entries are off and no
-  // page links to them. Preview: open any page once with ?customers=on (kept in this browser; ?customers=off hides them again).
-  const CUSTOMERS_ON = (() => { try { const q = new URLSearchParams(location.search).get('customers'); if (q) localStorage.setItem('crm-customers', q === 'on' ? '1' : ''); return localStorage.getItem('crm-customers') === '1'; } catch (e) { return false; } })();
   const BUILT = { home: 'home.html', pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html',
-    ...(CUSTOMERS_ON ? { accounts: 'accounts.html', contacts: 'contacts.html', orders: 'orders.html' } : {}) }; // the targets page exists but stays out of the nav
+    accounts: 'accounts.html', contacts: 'contacts.html', orders: 'orders.html' }; // the targets page exists but stays out of the nav
 
   // Old CRMpulse TaskBadge: my open tasks beside Tasks (the overdue count is in its label); nothing when none are open.
   function taskBadge() {
@@ -361,8 +358,10 @@
         // Design review M3 (2026-11-24): nothing scrolls sideways. Row 2 keeps the short controls (a 2–3 option switch,
         // Fiscal year, and the period switch shown as a dropdown); every other filter moves to the top of More filters,
         // whose badge then counts them too. Pages without More filters (Tasks) wrap row 2 instead.
+        const keep = (c) => (c.matches('.seg') && c.querySelectorAll('button').length <= 3) || c.id === 'f-fy-wrap' || c.id === 'reset' || c.matches('[data-keep]'); // data-keep: a page's only filter stays in row 2 instead of a panel of one
+        const moves = (c) => !keep(c) && !c.matches('.search, .sp, .seg') && c.id !== 'export' && c.id !== 'more-btn' && !c.querySelector('#more-btn');
         let pop = document.getElementById('more-pop');
-        if (!pop) { // no More filters on this page (Tasks): make a Filters button + panel so the same pattern applies (design review M3)
+        if (!pop && f._orig.some(moves)) { // no More filters on this page (Tasks): make a Filters button + panel so the same pattern applies (design review M3)
           const wrap = document.createElement('div'); wrap.className = 'm-made'; wrap.style.position = 'relative';
           wrap.innerHTML = `<button class="btn" id="more-btn" type="button" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Filters<span class="count-badge" id="more-n" hidden></span></button>
             <div class="pop" id="more-pop" role="dialog" aria-label="Filters" hidden><div class="pop-foot"><button class="btn primary" type="button" data-done>Done</button></div></div>`;
@@ -374,7 +373,6 @@
           f._made = wrap; f.appendChild(wrap); f._orig.push(wrap);
         }
         const more = f._orig.find(c => c.id === 'more-btn' || c.querySelector('#more-btn'));
-        const keep = (c) => (c.matches('.seg') && c.querySelectorAll('button').length <= 3) || c.id === 'f-fy-wrap' || c.id === 'reset';
         const moved = [];
         f._orig.forEach(c => {
           if (c === search || c === more || c === exp || c.matches('.sp')) return;
@@ -762,5 +760,35 @@
     if (risen) return; risen = true;
     document.querySelectorAll('.main .card, .main .zone, .main .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; });
   }
-  window.CRM = { icon, dots, customersOn: CUSTOMERS_ON, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
+  // ---- Side-panel forms ----
+  // Replace a part of the form only when its HTML changed: leaving a field fires "change" between mousedown and mouseup on a footer
+  // button, and a button redrawn at that moment would never get its click.
+  const put = (el, html) => { if (el && el._h !== html) { el.innerHTML = html; el._h = html; } };
+  const fEsc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const fld = (label, ctl, { req, hint, err, id } = {}) => `<div class="tf ${err ? 'bad' : ''}" ${id ? `data-f="${id}"` : ''}><span class="tf-l">${label}${req ? '<span class="rq">*</span>' : ''}</span>${ctl}${err ? `<span class="tf-e">${err}</span>` : hint ? `<span class="tf-h">${hint}</span>` : ''}</div>`;
+  const opt = (v, l, on) => `<option value="${fEsc(v)}" ${on ? 'selected' : ''}>${fEsc(l)}</option>`;
+  const pick = (k, opts, cur, label, dis) => `<label class="select fsel"><select data-v="${k}" aria-label="${label}" ${dis ? 'disabled' : ''}>${opts.map(([v, l]) => opt(v, l, v === cur)).join('')}</select></label>`;
+  const inp = (k, val, label, { type = 'text', dis, ph = '', max } = {}) => `<input class="in" type="${type}" data-v="${k}" value="${fEsc(String(val ?? ''))}" aria-label="${label}" ${ph ? `placeholder="${ph}"` : ''} ${type === 'number' ? 'min="0"' : ''} ${max ? `max="${max}"` : ''} ${dis ? 'disabled' : ''}>`;
+  const head = (kind, t, sub) => `<header class="dr-head"><div><p class="dr-kind">${kind}</p><h2 id="op-t">${t}</h2><p class="dr-sub">${sub}</p></div><button type="button" class="icon-btn" data-x="close" aria-label="Close panel">${icon('x')}</button></header>`;
+  // Side-panel form (Accounts, Contacts, Customer orders): Esc, × and Cancel ask first when something was entered (as Tasks and Log activity).
+    // v = the form's values, draw() = its HTML; clean() makes the current values the new starting point.
+  function openPanel(v, draw, discard) {
+    document.querySelectorAll('.tf-panel').forEach(x => x.remove());
+    const el = document.createElement('aside'); el.className = 'drill tf-panel'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-labelledby', 'op-t');
+    const prev = document.activeElement, back = prev?.dataset?.v, snap = () => JSON.stringify(v); let start = snap();
+    const key = (e) => { if (e.key === 'Escape' && !document.body.classList.contains('dlg-open')) { e.preventDefault(); ask(); } };
+    const close = () => { document.removeEventListener('keydown', key, true); document.body.classList.remove('drill-open'); setTimeout(() => el.remove(), 300);
+      (prev?.isConnected ? prev : back && document.querySelector(`#page [data-v="${back}"]`))?.focus?.({ preventScroll: true }); };
+    const ask = async () => { if (snap() === start) return close();
+      const r = await confirmDlg({ title: discard, body: '<p>What you entered will be lost.</p>', actions: [{ label: 'Discard', value: 'discard', kind: 'quiet' }, { label: 'Keep editing', value: null, kind: 'primary' }] });
+      if (r === 'discard') close(); };
+    const redraw = () => { const b = el.querySelector('.dr-body'), y = b ? b.scrollTop : 0, f = el.contains(document.activeElement) ? document.activeElement.dataset?.v : null; el.innerHTML = draw(); enhanceSelects(el); el.querySelector('.dr-body').scrollTop = y; if (f) el.querySelector(`[data-v="${f}"]:not([hidden])`)?.focus({ preventScroll: true }); };
+    el.addEventListener('click', (e) => { if (e.target.closest('[data-x="close"]')) ask(); });
+    el.addEventListener('submit', (e) => e.preventDefault());
+    redraw(); document.body.appendChild(el); document.addEventListener('keydown', key, true);
+    requestAnimationFrame(() => { document.body.classList.add('drill-open'); setTimeout(() => (el.querySelector('input.in:not(:disabled)') || el.querySelector('[data-x="close"]'))?.focus({ preventScroll: true }), 280); });
+    return { el, close, redraw, clean: () => { start = snap(); } };
+  }
+
+  window.CRM = { icon, dots, openPanel, form: { fld, opt, pick, inp, head, put }, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
 })();

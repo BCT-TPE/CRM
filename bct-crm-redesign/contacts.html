@@ -6,7 +6,7 @@
 <title>Contacts · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125d">
+<link rel="stylesheet" href="assets/crm.css?v=20261125g">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
 <link rel="stylesheet" href="assets/responsive.css?v=20261125c">
@@ -58,7 +58,7 @@
 .cp-h .btn { flex: none; }
 .acc-l { color: inherit; font-size: inherit; font-weight: inherit; text-decoration: none; }
 .cp-h p .acc-l { color: var(--deep); }
-body.v2 .grp-h a.acc-l { color: var(--ink); } body.v2 .grp-h a.acc-l:hover { color: var(--deep); }
+body.v2 .grp-h a.acc-l { color: var(--ink); } @media (hover: hover) { body.v2 .grp-h a.acc-l:hover { color: var(--deep); } .rc button:not(.on):hover { border-color: var(--line-3); } }
 .cp-h svg, .cp-acts svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .cp-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 14px 0; }
 .cp-tags small { font-size: var(--text-xs); color: var(--t3); font-variant-numeric: tabular-nums; }
@@ -93,6 +93,10 @@ body.v2 .grp-h a.acc-l { color: var(--ink); } body.v2 .grp-h a.acc-l:hover { col
   .ct-grid > .cp { display: none; } /* shown in the side panel instead */
   body:not(.drill-open) .cr.on { background: none; } body:not(.drill-open) .tbl.ct tr.on td { background: none; } /* nothing is open: no row looks selected */
 }
+.rc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.rc button { display: grid; align-content: center; gap: 2px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.rc button.on { border-color: var(--deep); background: var(--info-bg); }
+.rc b { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); font-weight: 500; color: var(--ink); } .rc small { font-size: var(--text-xs); color: var(--t3); }
 .cp-panel .dr-body { padding: 24px; }
 @media (max-width: 768px) { .cp-panel .dr-body { padding: 20px 16px 24px; } .cp-acts .btn { font-size: var(--text-xs); gap: 4px; } }
 @media (hover: none) { .cr:hover:not(.on) { background: none; } .cp-in a:hover { text-decoration: none; } }
@@ -141,7 +145,7 @@ body.v2 .grp-h a.acc-l { color: var(--ink); } body.v2 .grp-h a.acc-l:hover { col
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125e"></script>
+<script src="assets/crm.js?v=20261125h"></script>
 <script src="assets/crm-data.js?v=20261125b"></script>
 <script>
 /* Contacts — people at the accounts. A decision maker is an active contact in the decision-maker role;
@@ -156,9 +160,10 @@ const IC = {
   phone: '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/></svg>',
   meet: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>'
 };
+const ROLE_ALL = [...ROLES, 'Primary contact', 'Other'];
 const PER_PAGE = 20;
 const S = { q: '', role: '', status: '', view: 'acc', noDM: false, sel: CONTACTS[0].id, page: 1, sort: 'name' };
-const noDMAccounts = ACCOUNTS.filter(a => !hasDM(a.name)).map(a => a.name);
+const noDMAccounts = () => ACCOUNTS.filter(a => !hasDM(a.name)).map(a => a.name);
 const anyFilter = () => S.q || S.role || S.status || S.noDM;
 // old CRMpulse contact-hints.ts: the title points at another department than the recorded one (first matching rule)
 const TITLE_DEPTS = [['Finance', /\b(cfo|finance|financial|accountant|accounts|accounting|treasur\w*|controller|risk)\b/i],
@@ -168,13 +173,14 @@ const deptNote = (c) => { const r = c.dept === 'Other' ? null : TITLE_DEPTS.find
 const accLink = (acc) => `<a class="link acc-l" href="accounts.html?q=${encodeURIComponent(acc)}">${esc(acc)}</a>`;
 
 function rows() {
-  const q = S.q.trim().toLowerCase();
-  return CONTACTS.filter(c => (!S.role || c.role === S.role) && (!S.status || c.status === S.status) && (!S.noDM || noDMAccounts.includes(c.acc))
+  const q = S.q.trim().toLowerCase(), gaps = noDMAccounts();
+  return CONTACTS.filter(c => (!S.role || c.role === S.role) && (!S.status || c.status === S.status) && (!S.noDM || gaps.includes(c.acc))
     && (!q || [c.n, c.email, c.title, c.acc].some(v => v.toLowerCase().includes(q))))
-    .sort((a, b) => a.acc.localeCompare(b.acc) || ROLES.indexOf(a.role) - ROLES.indexOf(b.role) || a.n.localeCompare(b.n));
+    .sort((a, b) => a.acc.localeCompare(b.acc) || ROLE_ALL.indexOf(a.role || 'Other') - ROLE_ALL.indexOf(b.role || 'Other') || a.n.localeCompare(b.n));
 }
 const ell = (html, cls = '') => `<div class="ell ${cls}">${html}</div>`;
-const roleChip = (c) => `<span class="chip role ${c.role === 'Decision maker' ? 'dm' : ''}">${c.role}</span>`;
+const roleChip = (c) => c.role ? `<span class="chip role ${c.role === 'Decision maker' ? 'dm' : ''}">${c.role}</span>` : '<span class="t-sub">No role</span>';
+const jobOf = (c) => esc([c.title, c.dept].filter(Boolean).join(' · ') || '—');
 function byAccount(list) {
   const accs = [...new Set(list.map(c => c.acc))];
   return accs.map(acc => {
@@ -183,7 +189,7 @@ function byAccount(list) {
       <div class="grp-h"><b>${accLink(acc)}</b><small>${cs.length === all ? `${all} contact${all === 1 ? '' : 's'}` : `${cs.length} of ${all} on this page`}</small><span class="sp"></span>
         ${hasDM(acc) ? `<span class="ok-tag">${IC.check}Decision maker</span>` : `<span class="need-tag">${IC.plus}Needs a decision maker</span>`}</div>
       ${cs.map(c => `<button class="cr ${S.sel === c.id ? 'on' : ''}" data-act="sel" data-v="${c.id}" aria-pressed="${S.sel === c.id}">
-        <div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t">${ell(esc(c.n), 't-main')}${ell(`${esc(c.title)} · ${c.dept}`, 't-sub')}</div></div>
+        <div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t">${ell(esc(c.n), 't-main')}${ell(`${jobOf(c)}`, 't-sub')}</div></div>
         <span class="rl">${roleChip(c)}</span>${ell(esc(c.email), 'mail')}<span class="chip ${c.status}">${c.status}</span></button>`).join('')}
     </section>`;
   }).join('');
@@ -195,7 +201,7 @@ function listView(list) {
     <colgroup><col class="c-n"><col class="c-a"><col class="c-r"><col class="c-e"><col class="c-s"></colgroup>
     <thead><tr>${th('name', 'Contact')}${th('acc', 'Account')}<th>Role</th><th>Email</th><th>Status</th></tr></thead>
     <tbody>${sorted.map(c => `<tr class="${S.sel === c.id ? 'on' : ''}" data-act="sel" data-v="${c.id}" tabindex="0">
-      <td><div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t">${ell(esc(c.n), 't-main')}${ell(`${esc(c.title)} · ${c.dept}`, 't-sub')}</div></div></td>
+      <td><div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t">${ell(esc(c.n), 't-main')}${ell(`${jobOf(c)}`, 't-sub')}</div></div></td>
       <td>${ell(esc(c.acc))}${ell(c.accId, 't-sub')}</td><td>${roleChip(c)}</td><td>${ell(esc(c.email), 'mail')}</td><td><span class="chip ${c.status}">${c.status}</span></td></tr>`).join('')}</tbody>
   </table></div></section>`;
 }
@@ -212,7 +218,7 @@ function panel(drill) { // beside the list above 1100px; a side panel (drill) be
   const dt = (d) => { const x = new Date(d); return `${x.getDate()} ${'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')[x.getMonth()]} ${x.getFullYear()}`; };
   const f = (k, v, full) => `<div class="${full ? 'full' : ''}"><small>${k}</small><b class="${v ? '' : 'none'}">${v ? esc(v) : 'Not recorded'}</b></div>`;
   const body = `
-    <div class="cp-h">${CRM.avatar(c.n, c.id)}<div><h2 ${drill ? 'id="cp-t"' : ''}>${esc(c.n)}</h2><p>${esc(c.title)} · ${accLink(c.acc)}</p></div><button class="btn" data-act="edit" aria-label="Edit ${esc(c.n)}">${IC.edit}Edit</button>${drill ? `<button type="button" class="icon-btn" data-x="close" aria-label="Close panel">${CRM.icon('x')}</button>` : ''}</div>
+    <div class="cp-h">${CRM.avatar(c.n, c.id)}<div><h2 ${drill ? 'id="cp-t"' : ''}>${esc(c.n)}</h2><p>${esc(c.title || 'No designation')} · ${accLink(c.acc)}</p></div><button class="btn" data-act="edit" aria-label="Edit ${esc(c.n)}">${IC.edit}Edit</button>${drill ? `<button type="button" class="icon-btn" data-x="close" aria-label="Close panel">${CRM.icon('x')}</button>` : ''}</div>
     <div class="cp-tags">${roleChip(c)}<span class="chip ${c.status}">${c.status}</span><small>${c.id}</small></div>
     <div class="cp-acts"><button class="btn" data-act="email"${mailOff}>${IC.mail}Email</button><button class="btn" data-act="call" ${logOff}>${IC.phone}Log call</button><button class="btn" data-act="meet" ${logOff}>${IC.meet}Log meeting</button></div>
     <div class="cp-f">${f('Business email', c.email, true)}${f('Mobile', c.mobile)}${f('Office phone', c.office)}${f('Department', c.dept)}${f('Account role', c.role)}</div>
@@ -229,7 +235,7 @@ function render() {
   const pages = Math.max(1, Math.ceil(list.length / PER_PAGE)); S.page = Math.min(S.page, pages);
   const ordered = S.view === 'acc' ? list : list.slice().sort(S.sort === 'acc' ? (a, b) => a.acc.localeCompare(b.acc) || a.n.localeCompare(b.n) : (a, b) => a.n.localeCompare(b.n));
   const shown = ordered.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
-  const pager = pages > 1 ? `<div class="pager" style="border-top:0"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, list.length)} of ${list.length} contacts</span><span class="sp"></span>
+  const pager = pages > 1 ? `<div class="pager" style="border-top:0;padding-top:0"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, list.length)} of ${list.length} contacts</span><span class="sp"></span>
     <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
     ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}
     <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>` : '';
@@ -275,7 +281,7 @@ function onAct(e) {
   else if (act === 'email') toast(`Would open a new email to ${c.email}`);
   else if (act === 'call') location.href = logUrl(c, 'Phone call');
   else if (act === 'meet') location.href = logUrl(c, 'Virtual meeting');
-  else if (act === 'edit') toast('Would open the contact editor');
+  else if (act === 'edit') { closeDrill(true); openForm(c); }
   else if (act === 'reset') resetAll();
 }
 page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-act]')) e.target.click(); });
@@ -290,7 +296,65 @@ $('#f-view').addEventListener('click', (e) => { const b = e.target.closest('butt
   $('#f-view').querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', String(x === b)); }); S.page = 1; render(); });
 function resetAll() { S.q = S.role = S.status = ''; S.noDM = false; $('#f-search').value = ''; $('#f-role').value = ''; $('#f-status').value = ''; S.page = 1; render(); }
 $('#reset').addEventListener('click', () => { const on = S.noDM; resetAll(); S.noDM = on; render(); }); // Reset leaves the toggle alone, as on Tasks
-$('#new').addEventListener('click', () => toast('Would open the new contact form'));
+// New / edit contact (old ContactFormDrawer): account first with the people already there, title and email checks, who holds each role
+const { fld, pick, inp, head, put } = CRM.form, DEPTS = ['IT', 'Business', 'Finance', 'Procurement', 'Operations', 'Other'];
+const ACC_ALL = [...ACCOUNTS, ...FRESH_ACCOUNTS];
+const siteOf = (acc) => acc ? acc.replace(/^Al /, '').split(' ')[0].toLowerCase() + '.example' : ''; // the account's website domain, as in the demo emails
+function openForm(c) {
+  const [first, ...rest] = c ? c.n.split(' ') : [''];
+  const blank = (acc) => ({ acc, first: '', last: '', title: '', dept: '', email: '', mobile: '', office: '', role: '', active: true, remarks: '' });
+  const v = c ? { acc: c.acc, first, last: rest.join(' '), title: c.title, dept: c.dept, email: c.email, mobile: c.mobile, office: c.office, role: c.role, active: c.status === 'Active', remarks: c.remarks || '' } : blank('');
+  let dups = [];
+  const people = () => CONTACTS.filter(p => p.acc === v.acc && p !== c);
+  const mailOwner = () => { const m = v.email.trim().toLowerCase(); return m && CONTACTS.find(p => p !== c && p.email.toLowerCase() === m); };
+  const foreign = () => { const d = v.email.includes('@') ? v.email.split('@').pop().trim().toLowerCase() : '', s = siteOf(v.acc); return d && d.includes('.') && s && d !== s && !d.endsWith('.' + s) ? d : ''; };
+  const ready = () => v.acc && v.first.trim() && v.last.trim() && !mailOwner();
+  const hint = () => mailOwner() ? 'Fix the duplicate email first' : !v.acc ? 'Choose the account first' : 'Account, first and last name are required';
+  const exist = () => { if (!v.acc) return ''; const l = people(); return `<span class="tf-h">${l.length ? `<b>${l.length} ${l.length === 1 ? 'contact' : 'contacts'} already:</b> ${l.map(p => esc(p.n) + (p.role ? ` (${p.role})` : '') + (p.status === 'Inactive' ? ' · inactive' : '')).join(', ')}` : 'No contacts at this account yet.'}</span>`; };
+  const titleNote = () => { const n = v.title.trim() && v.dept ? deptNote({ title: v.title.trim(), dept: v.dept }) : ''; return n ? `<span class="tf-warn">${esc(n)}</span>` : ''; };
+  const mailNote = () => { const o = mailOwner(), f = foreign(); return o ? `<span class="tf-e">This email already belongs to another contact: ${esc(o.n)} (${esc(o.acc)}).</span>` : f ? `<span class="tf-warn">The domain ${esc(f)} isn't the account website's. That's fine for personal or partner emails; otherwise check it.</span>` : '<span class="tf-h">Unique across contacts.</span>'; };
+  const dupBox = () => dups.length ? `<div class="op-why" role="status"><p><b>Possible duplicates. Review before saving:</b></p><ul>${dups.map(p => `<li>${esc(p.n)} <small>· ${p.id} · ${esc(p.acc)}</small></li>`).join('')}</ul><p>Save again to create the record anyway.</p></div>` : '';
+  const foot = () => `<div class="op-r1"><span class="op-msg" role="status">${ready() ? '' : hint()}</span></div><button type="button" class="btn ghost" data-x="close">Cancel</button>${c ? '' : `<button type="button" class="btn" data-x="another" ${ready() ? '' : 'disabled'}>Save &amp; add another</button>`}<button type="submit" class="btn primary" ${ready() ? '' : 'disabled'}>${c ? 'Save changes' : dups.length ? 'Create anyway' : 'Add contact'}</button>`;
+  const draw = () => `<form class="tf-form" novalidate>${head('Contacts', c ? `Edit ${esc(c.n)}` : 'New contact', c ? `${c.id} · ${esc(c.acc)}` : 'A contact belongs to exactly one account. Someone who moves to another organization gets a new contact there.')}
+    <div class="dr-body"><div class="tf-g">
+      <div data-dup>${dupBox()}</div>
+      <h3 class="op-h" style="margin:0">Account</h3>
+      ${fld('Account', pick('acc', [['', 'Select account…'], ...ACC_ALL.map(a => [a.name, a.name])], v.acc, 'Account', !!c), { req: true, hint: c ? 'The account cannot change.' : '' })}
+      ${exist()}
+      <h3 class="op-h">Person</h3>
+      <div class="tf-2">${fld('First Name', inp('first', v.first, 'First Name'), { req: true })}${fld('Last Name', inp('last', v.last, 'Last Name'), { req: true })}</div>
+      ${fld('Designation / Job Title', inp('title', v.title, 'Designation / Job Title', { ph: 'e.g. Head of Digital' }))}
+      <div class="tf"><span class="tf-l">Department</span>${pick('dept', [['', 'Not set'], ...DEPTS.map(d => [d, d])], v.dept, 'Department')}<span data-title>${titleNote()}</span></div>
+      <h3 class="op-h">How to reach them</h3>
+      <div class="tf" data-mail><span class="tf-l">Business Email</span>${inp('email', v.email, 'Business Email', { type: 'email', ph: `name@${siteOf(v.acc) || 'company.com'}` })}<span data-note>${mailNote()}</span></div>
+      <div class="tf-2">${fld('Mobile Number', inp('mobile', v.mobile, 'Mobile Number', { type: 'tel' }), { hint: 'Include the country code.' })}${fld('Office Phone', inp('office', v.office, 'Office Phone', { type: 'tel' }), { hint: 'Include the country code.' })}</div>
+      <h3 class="op-h">Role at the account</h3><span class="tf-h">Roles on a specific deal are set inside each initiative's Contacts tab.</span>
+      <div class="rc" role="radiogroup" aria-label="Account-level role">${ROLE_ALL.map(r => { const h = people().filter(p => p.status === 'Active' && p.role === r); return `<button type="button" role="radio" aria-checked="${v.role === r}" class="${v.role === r ? 'on' : ''}" data-role="${r}"><b>${r}${r === 'Decision maker' ? '<span class="chip role dm">Key</span>' : ''}</b>${h.length ? `<small>Already: ${h.map(p => esc(p.n)).join(', ')}</small>` : ''}</button>`; }).join('')}</div>
+      ${c ? `<label class="tf-chk"><input type="checkbox" data-c="active" ${v.active ? 'checked' : ''}><span>Active <small>Untick when they leave the company. Their history stays.</small></span></label>` : ''}
+      <h3 class="op-h">Notes</h3>
+      ${fld('Remarks', `<textarea class="in" data-v="remarks" aria-label="Remarks" placeholder="e.g. Prefers WhatsApp, met at GITEX">${esc(v.remarks)}</textarea>`)}
+    </div></div><div class="dr-foot op-foot">${foot()}</div></form>`;
+  const P = CRM.openPanel(v, draw, c ? 'Discard changes to this contact?' : 'Discard this contact?');
+  const q = (s) => P.el.querySelector(s);
+  const live = () => { put(q('[data-dup]'), dupBox()); put(q('[data-title]'), titleNote()); put(q('[data-note]'), mailNote()); q('[data-mail]').classList.toggle('bad', !!mailOwner()); put(q('.op-foot'), foot()); };
+  P.el.addEventListener('input', (e) => { const k = e.target.dataset.v; if (!k) return; v[k] = e.target.value; if (k === 'first' || k === 'last') dups = []; live(); });
+  P.el.addEventListener('change', (e) => { if (e.target.dataset.c) { v.active = e.target.checked; return; } const k = e.target.dataset.v; if (!k) return; v[k] = e.target.value; if (k === 'acc') { v.role = ''; dups = []; P.redraw(); } else live(); });
+  P.el.addEventListener('click', (e) => { const b = e.target.closest('[data-role]');
+    if (b) { v.role = v.role === b.dataset.role ? '' : b.dataset.role; P.el.querySelectorAll('[data-role]').forEach(x => { const on = x.dataset.role === v.role; x.classList.toggle('on', on); x.setAttribute('aria-checked', String(on)); }); } // a second click clears it: the role is optional
+    else if (e.target.closest('[data-x="another"]')) save(true); });
+  P.el.addEventListener('submit', () => save(false));
+  function save(again) {
+    if (!ready()) return;
+    const n = `${v.first.trim()} ${v.last.trim()}`, body = { n, title: v.title.trim(), dept: v.dept, role: v.role, email: v.email.trim(), mobile: v.mobile.trim(), office: v.office.trim(), remarks: v.remarks };
+    if (c) { Object.assign(c, body, { status: v.active ? 'Active' : 'Inactive' }); P.close(); render(); toast('Contact updated.', 'ok'); return; }
+    if (!dups.length) { dups = people().filter(p => p.n.toLowerCase() === n.toLowerCase()); if (dups.length) { live(); q('.dr-body').scrollTop = 0; toast('Potential duplicate contacts found. Review them, then save again to create anyway.', 'warn'); return; } }
+    const x = { id: 'CON-2026-' + String(Math.max(...CONTACTS.map(p => +p.id.slice(-4))) + 1).padStart(4, '0'), acc: v.acc, accId: ACC_ALL.find(a => a.name === v.acc).id, status: 'Active', ...body };
+    CONTACTS.push(x); resetAll(); S.sel = x.id; const l = rows(); S.page = Math.floor(l.indexOf(x) / PER_PAGE) + 1; render(); toast(`${n} added.`, 'ok');
+    if (!again) return P.close();
+    Object.assign(v, blank(v.acc)); dups = []; P.clean(); P.redraw(); q('.dr-body').scrollTop = 0; q('[data-v="first"]').focus({ preventScroll: true }); // same account, a clean slate for the next person
+  }
+}
+$('#new').addEventListener('click', () => openForm(null));
 
 CRM.renderShell('contacts');
 CRM.watchSticky($('#filters'));
