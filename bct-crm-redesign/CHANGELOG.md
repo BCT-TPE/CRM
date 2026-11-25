@@ -7,7 +7,14 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-25 (fourth push)
+## 2026-11-25 (fifth push)
+
+### Changed
+- README: Home and Customer orders added to the page list; the local address opens Home.
+
+---
+
+## 2026-11-25 (fourth push) · `16b3f19`
 
 **Accounts, Contacts and Customer orders are open** in the menu (Customer orders: Sales Manager and up), and the account names on Tasks link to Accounts again. The `?customers=on` preview switch is gone. Cache-busters: `crm.css?v=20261125g`, `crm.js?v=20261125h` (all pages that load them).
 

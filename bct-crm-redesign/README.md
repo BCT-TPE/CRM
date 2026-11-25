@@ -6,6 +6,7 @@ Redesign of the CRM V1 classic pages, following the old CRMpulse information arc
 
 | Page | File | What it answers |
 |---|---|---|
+| Home | `home.html` | The first page after sign-in, by role (Salesperson, Sales Manager, Sales Head): forecast vs target, what is waiting, tasks, deals needing attention, quiet accounts |
 | Pipeline & forecast | `pipeline.html` | Will we hit target? Where is open pipeline, what is stuck? |
 | Sales performance | `performance.html` | How did we do? Bookings vs target, win / loss, attainment by team and salesperson |
 | Sales initiatives | `initiatives.html` | Every prospect, lead and opportunity: list, kanban and lifecycle funnel views |
@@ -16,6 +17,7 @@ Redesign of the CRM V1 classic pages, following the old CRMpulse information arc
 | Tasks | `tasks.html` | Follow-ups for anyone (sales, presales, delivery, finance, legal): my tasks, ones I gave, team overdue, due this week; quick add, complete, edit |
 | Accounts | `accounts.html` | Every customer and prospect organisation: lifecycle, owner, open pipeline, customer value, last interaction, what needs attention |
 | Contacts | `contacts.html` | People at each account, by account or as a list; accounts without an active decision maker; contact details beside the list |
+| Customer orders | `orders.html` | Won deals waiting for a PO, open, completed and cancelled orders, and historical orders: confirm a PO, compare it with the won value, register past business |
 | Sales targets | `targets.html` | Quarterly booking targets per dimension (geography, region, salesperson, SBU, practice, offering, technology, vertical) against closed won; edit a row's targets |
 | Pipeline (archived layout) | `pipeline_archieve.html` | The first Pipeline layout, kept for reference |
 
@@ -31,7 +33,7 @@ Open any page in Chrome or Edge, or run a local server from this folder:
 python3 -m http.server 5174
 ```
 
-then go to `http://localhost:5174/pipeline.html`.
+then go to `http://localhost:5174/home.html`.
 
 ## Files
 
