@@ -7,7 +7,16 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-25 (second push)
+## 2026-11-25 (third push)
+
+Home only (page-level CSS in `home.html`; no shared asset changed).
+
+### Changed
+- **Home**: cards end on one line above 1180px. The last card of the shorter column grows to the other column's bottom edge (Salesperson: Orders awaiting confirmation; Sales Manager: Team activity this week), and Strategic accounts gone quiet ends with Largest deals (Sales Head). Single-column widths keep content height.
+
+---
+
+## 2026-11-25 (second push) · `d3e7956`
 
 Accounts, Contacts and Customer orders are **hidden for this hand-over**; fixes on the visible pages. Cache-busters: `crm.css?v=20261125d`, `crm.js?v=20261125e`, `crm-data.js?v=20261125b`, `responsive.css?v=20261125c` (all pages that load them).
 

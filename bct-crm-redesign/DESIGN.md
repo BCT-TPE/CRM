@@ -171,7 +171,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 ## 15. 主管 review 第三輪（2026-11-25，Home＋全站）
 
-- **卡片高度**：清單卡跟著內容，不為了等高撐出空白；兩欄並排時用卡片的組合讓兩欄總高度接近。例外：經理的配額卡和 Waiting on you 只差 6–31px，底部對齊。（取代 11/24「同排等高」）
+- **卡片高度**：清單卡跟著內容，兩欄用卡片的組合讓總高度接近；剩下的差距由較短那欄的**最後一張卡**長高補齊，兩欄底部對齊（2026-11-25，Candace：Orders awaiting confirmation、Team activity this week、Strategic accounts gone quiet）。經理的配額卡｜Waiting on you、Sales Head 的 Largest deals｜Strategic accounts 也底部對齊。單欄（≤1180px）時不長高。
 - **清單列（Deals、Largest deals）**：右邊只放金額；標籤放在說明文字下面，靠左一行。人名不斷行（`.nb`）。
 - **顏色門檻**：Won vs target 低於今天的季度進度才紅（跟 Sales performance 的 Behind pace 一樣），Coverage 低於 1.8× 紅，Need attention 5 以上標示；合計列套同一套；門檻寫在表格下方。
 - **不能點的列**：Home 的 By salesperson／By sales team 不用手指游標、不加 hover 底色，列高 64px。

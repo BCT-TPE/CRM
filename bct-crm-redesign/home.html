@@ -39,10 +39,12 @@
 
 /* Header right: "Record something now" actions (salesperson, manager) or "Waiting on you" KPIs (sales head) */
 .hm-acts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-.hm-grid > .same { align-self: stretch; } .hm-grid > .same > .card { height: 100%; } /* quota beside Waiting on you: 6–31px apart on their own, so they share one bottom edge (no empty block) */
+.hm-grid > .same { align-self: stretch; } .hm-grid > .same > .card { height: 100%; } /* two cards side by side share one bottom edge: quota | Waiting on you, Largest deals | Strategic accounts */
 /* Two columns, each flowing on its own: a list card is as tall as its content, never stretched (design review 3, D1);
    the cards are paired so both columns end at about the same height */
-.hm-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.hm-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; align-self: stretch; }
+/* the last card of the shorter column grows to the other column's bottom edge (2026-11-25, Candace) */
+.hm-col > div:last-child { flex: 1 1 auto; } .hm-col > div:last-child > .card { height: 100%; }
 .kpis-home .v2-kpi { min-width: 150px; }
 /* while they sit beside the greeting (>1360px), the KPI figures line up with the top of "Good morning, Gaurav":
    the h1's 14px top margin + its half-leading (37.4 − 34) / 2 */
@@ -399,7 +401,7 @@ function render() {
   else html = `
     <div class="w12">${quotaCard()}</div>
     <div class="w12">${byTable()}</div>
-    <div class="w8">${dealsCard()}</div><div class="w4">${quietCard()}</div>`;
+    <div class="w8 same">${dealsCard()}</div><div class="w4 same">${quietCard()}</div>`;
   $('#page').innerHTML = `<div class="hm-grid">${html}</div>`;
   document.querySelectorAll('.v2-head > [data-hr]').forEach(e => e.remove());
   $('.v2-head').insertAdjacentHTML('beforeend', VIEW === 'company' ? waitingKpis() : recordActs());
