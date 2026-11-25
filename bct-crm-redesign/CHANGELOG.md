@@ -7,7 +7,14 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-25 (fifth push)
+## 2026-11-25 (sixth push)
+
+### Changed
+- **Contacts, By account**: an account with a decision maker shows no tag; "Needs a decision maker" has an alert icon instead of a plus.
+
+---
+
+## 2026-11-25 (fifth push) · `e28b08b`
 
 ### Changed
 - README: Home and Customer orders added to the page list; the local address opens Home.

@@ -193,7 +193,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - 客戶名稱（分組標題、面板）連到 `accounts.html?q=`；Edit 是有文字的按鈕。
 - 「沒有決策者」的篩選用篩選列的勾選鈕「Show only no active decision maker」，跟 Tasks 的「Show completed and cancelled」同一個元件（`.ftog`，在 crm.css），取代舊版的黃色提示條和按鈕（2026-11-25，Janet）。
 - 照舊版：Role 篩選六種（加 Primary contact、Other）、部門提醒依 Finance／Procurement／IT 職稱、停用聯絡人且客戶沒有主要角色時提醒。沒有「Open full profile」（還沒有聯絡人頁）。
-- 維持新版：List 用表格、分組標題寫「3 contacts」。
+- 維持新版：List 用表格、分組標題寫「3 contacts」。分組標題只標缺的：沒有決策者顯示驚嘆號「Needs a decision maker」，有的不顯示標籤（2026-11-25）。
 
 ## 17. Customers：Customer orders（2026-11-25）
 

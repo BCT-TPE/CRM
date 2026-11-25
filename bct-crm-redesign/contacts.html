@@ -24,10 +24,9 @@
 .grp-h b { font-size: var(--text-md); font-weight: 600; color: var(--ink); }
 .grp-h small { font-size: var(--text-xs); color: var(--t3); }
 .grp-h .sp { flex: 1; }
-.ok-tag, .need-tag { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; }
-.ok-tag { background: var(--ok-bg); color: var(--ok-text); }
+.need-tag { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; }
 .need-tag { background: var(--warn-bg); color: var(--warn-text); }
-.ok-tag svg, .need-tag svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.need-tag svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 .cr { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .9fr) minmax(0, 1.3fr) auto; gap: 16px; align-items: center; width: 100%; min-height: 64px; padding: 10px var(--pad-card); border: 0; border-top: 1px solid var(--line); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .cr:hover { background: var(--surface-faint); }
 .cr.on { background: var(--hover); } /* selected: soft fill only, like the other selected rows */
@@ -153,8 +152,7 @@ body.v2 .grp-h a.acc-l { color: var(--ink); } @media (hover: hover) { body.v2 .g
 const { toast } = CRM;
 const $ = (s) => document.querySelector(s);
 const IC = {
-  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v6M12 16.6h.01"/></svg>',
   edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
   mail: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></svg>',
   phone: '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/></svg>',
@@ -187,7 +185,7 @@ function byAccount(list) {
     const cs = list.filter(c => c.acc === acc), all = CONTACTS.filter(c => c.acc === acc).length;
     return `<section class="card grp-card" aria-label="${esc(acc)}">
       <div class="grp-h"><b>${accLink(acc)}</b><small>${cs.length === all ? `${all} contact${all === 1 ? '' : 's'}` : `${cs.length} of ${all} on this page`}</small><span class="sp"></span>
-        ${hasDM(acc) ? `<span class="ok-tag">${IC.check}Decision maker</span>` : `<span class="need-tag">${IC.plus}Needs a decision maker</span>`}</div>
+        ${hasDM(acc) ? '' : `<span class="need-tag">${IC.alert}Needs a decision maker</span>`}</div>
       ${cs.map(c => `<button class="cr ${S.sel === c.id ? 'on' : ''}" data-act="sel" data-v="${c.id}" aria-pressed="${S.sel === c.id}">
         <div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t">${ell(esc(c.n), 't-main')}${ell(`${jobOf(c)}`, 't-sub')}</div></div>
         <span class="rl">${roleChip(c)}</span>${ell(esc(c.email), 'mail')}<span class="chip ${c.status}">${c.status}</span></button>`).join('')}
