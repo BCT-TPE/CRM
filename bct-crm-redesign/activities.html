@@ -6,10 +6,10 @@
 <title>Activities · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125a">
+<link rel="stylesheet" href="assets/crm.css?v=20261125d">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
 <style>
 /* ---------- Page: Activities (CRM V1 §6) ----------
    Same IA as CRMpulse /activities: Mine / My teams / Everyone, four summary tiles (the "Log activity" header button opens the full panel; design review D1 removed the inline composer),
@@ -93,21 +93,10 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
 }
 /* Log activity side panel (old CRMpulse ActivityFormDrawer): opened from the "Log activity" header button;
    same .drill panel and form styles as the Tasks panel */
-.tf-panel .tf-form { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-.tf-panel .dr-body { padding: 20px 24px 24px; }
-.tf-g { display: grid; gap: 16px; }
-.tf-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
-.tf { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.tf-l { font-size: var(--text-sm); font-weight: 500; color: var(--ink); } .tf-l .rq { margin-left: 2px; color: var(--danger); }
-.tf-h { font-size: var(--text-xs); color: var(--t3); } .tf-e { font-size: var(--text-xs); color: var(--danger); }
-.tf .in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); outline: none; }
 .tf textarea.in { height: auto; min-height: 96px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
 .tf .in:focus { border-color: var(--deep); }
 .tf.bad .in, .tf.bad .dt-btn, .tf.bad .sel-btn { border-color: var(--danger); }
-body.v2 .tf label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: var(--radius-control); border-color: var(--line-2); background: var(--surface); box-shadow: none; }
-.tf .fsel .sel-btn { max-width: none; width: 100%; padding-left: 12px; font-weight: 400; color: var(--ink); }
 body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shadow: none; }
-.tf-seg button { flex: 1 1 0; }
 .tf-box { display: grid; gap: 14px; padding: 16px; border: 1px solid var(--line-2); border-radius: var(--radius-lg); }
 .tf-chk { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: var(--text-sm); font-weight: 500; color: var(--ink); cursor: pointer; }
 .tf-chk input { width: 16px; height: 16px; margin: 0; accent-color: var(--deep); }
@@ -145,6 +134,7 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
         <div class="pop" id="more-pop" role="dialog" aria-label="More filters" hidden>
           <div class="grp"><h4>Owner</h4><label class="select fsel"><select id="f-owner" aria-label="Owner"></select></label></div>
           <div class="grp"><h4>Context</h4><label class="select fsel"><select id="f-ctx" aria-label="Context"><option value="">All</option><option value="account">Account-level only</option><option value="initiative">Sales initiative only</option></select></label></div>
+          <div class="pop-foot"><button class="btn" id="more-clear" type="button">Clear</button><button class="btn primary" id="more-done" type="button">Done</button></div>
         </div>
       </div>
       <button class="btn ghost" id="reset" hidden>Reset</button>
@@ -157,8 +147,8 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125b"></script>
-<script src="assets/crm-data.js?v=20261124e"></script>
+<script src="assets/crm.js?v=20261125e"></script>
+<script src="assets/crm-data.js?v=20261125b"></script>
 <script>
 const { toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -270,7 +260,7 @@ const isoDay = (d) => new Date(d).toISOString().slice(0, 10);
 const TEAMMATES = [...new Set([ME, ...Object.values(TEAMS).flatMap(t => t.people), ...Object.keys(FUNC)])].sort((a, b) => a === ME ? -1 : b === ME ? 1 : a.localeCompare(b));
 function openLog(pre) {
   const v = { ctx: pre.ctx || 'account', to: pre.to || '', type: pre.type || 'Phone call', when: 'today', date: isoDay(TODAY), time: String(new Date().getHours()).padStart(2, '0') + ':00',
-    who: '', purpose: 'Follow-up', what: pre.what || '', subject: '', subjectTouched: false,
+    who: pre.who || '', purpose: 'Follow-up', what: pre.what || '', subject: '', subjectTouched: false,
     doNext: false, next: '', follow: '', doTask: false, task: '', taskTo: ME, taskDue: isoDay(TODAY.getTime() + 7 * DAY) };
   let errs = {};
   const scrim = document.createElement('aside'); scrim.className = 'drill tf-panel'; scrim.setAttribute('role', 'dialog'); scrim.setAttribute('aria-labelledby', 'lf-t');
@@ -372,6 +362,9 @@ const setMore = (on) => { $('#more-pop').hidden = !on; $('#more-btn').setAttribu
 $('#more-btn').addEventListener('click', (e) => { e.stopPropagation(); setMore($('#more-pop').hidden); });
 $('#more-pop').addEventListener('click', (e) => e.stopPropagation());
 document.addEventListener('click', () => setMore(false));
+$('#more-clear').addEventListener('click', () => { S.owner = S.ctx = ''; $('#f-owner').value = ''; $('#f-ctx').value = ''; render(); }); // as on the other pages: clears what this panel owns
+$('#more-done').addEventListener('click', () => setMore(false));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMore(false); });
 $('#reset').addEventListener('click', () => { Object.assign(S, { q: '', purpose: '', period: '60', from: '', to: '', owner: '', ctx: '', type: '' }); $('#f-from').value = ''; $('#f-to').value = ''; $('#f-search').value = ''; $('#f-purpose').value = ''; $('#f-period').value = '60'; $('#f-owner').value = ''; $('#f-ctx').value = ''; render(); });
 
 CRM.renderShell('activities');
@@ -379,7 +372,8 @@ CRM.watchSticky($('#filters'));
 render();
 CRM.riseIn();
 // Accounts' Log activity button (old CRMpulse quick action) lands here with ?log=<account>: the panel opens with that account
-{ const acc = new URLSearchParams(location.search).get('log'); if (acc && ACCOUNTS.some(a => a.name === acc)) openLog({ ctx: 'account', to: acc }); }
+{ const acc = new URLSearchParams(location.search).get('log'); if (acc && ACCOUNTS.some(a => a.name === acc)) { const g = (k) => new URLSearchParams(location.search).get(k), who = g('who'), type = g('type'); // Contacts' Log call / Log meeting add the person and the type
+    openLog({ ctx: 'account', to: acc, who: CONTACTS.some(c => c.acc === acc && c.n === who && c.status === 'Active') ? who : '', type: ACT_TYPES.includes(type) ? type : '' }); } }
 </script>
 </body>
 </html>

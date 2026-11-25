@@ -7,7 +7,26 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-25
+## 2026-11-25 (second push)
+
+Accounts, Contacts and Customer orders are **hidden for this hand-over**; fixes on the visible pages. Cache-busters: `crm.css?v=20261125d`, `crm.js?v=20261125e`, `crm-data.js?v=20261125b`, `responsive.css?v=20261125c` (all pages that load them).
+
+### Changed
+- **The Customers group is hidden**: its three menu entries are disabled (`CUSTOMERS_ON` in `crm.js`) and the account name on Tasks is plain text. The page files stay in the repo as work in progress. To preview them, open any page once with `?customers=on` (kept in that browser; `?customers=off` hides them again).
+- **Activities More filters** has Clear and Done, as on the other pages.
+- **Home**: four won deals wait for a PO ($525.0K, was six / $711.5K): `PO_RECEIVED` in `crm-data.js`.
+- Shared styles moved out of single pages into `crm.css`: side-panel forms (`.tf`), filter toggles (`.ftog`), list totals (`.tbl.totals`).
+- `CRM.confirm` takes an optional text `field`, which an action may require (`needsText`).
+
+### Fixed
+- On phones, a checkbox toggle inside the filter panel (Tasks "Show completed and cancelled") now counts in the filter badge.
+
+### Work in progress (hidden)
+- `contacts.html`, `orders.html` (new) and `accounts.html`, with `ORDERS` in `crm-data.js`. Account customer value now counts confirmed orders only.
+
+---
+
+## 2026-11-25 · `4327d59`
 
 Third design review (desktop 6 items, phone 5 items), **Accounts and Contacts back in the sidebar**, Accounts rebuilt to match old CRMpulse, and role switching on every page. Cache-busters: `crm.css?v=20261125a`, `crm.js?v=20261125b`, `crm-data.js?v=20261124e`, `responsive.css?v=20261125b` (all pages that load them).
 

@@ -6,10 +6,10 @@
 <title>Accounts · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125a">
+<link rel="stylesheet" href="assets/crm.css?v=20261125d">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
 <style>
 /* ---------- Page: Accounts ----------
    Same IA as CRMpulse /accounts: five group cards, search / owner / geography + More filters (account status, lifecycle,
@@ -28,8 +28,6 @@
 .tbl.ac col.c-v { width: 11%; } .tbl.ac col.c-i { width: 12%; } .tbl.ac col.c-q { width: 10%; }
 .tbl.ac tbody tr { cursor: pointer; } /* the whole row opens the account, as on every list page */
 .tbl.ac td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
-.tbl.ac tfoot .ft-l { display: none; }
-.tbl.ac tfoot td { height: 52px; font-weight: 600; color: var(--ink); border-top: 1px solid var(--line-2); }
 .an { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .an .ell { min-width: 0; }
 .tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; letter-spacing: .01em; white-space: nowrap; flex: none; }
@@ -56,13 +54,6 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   .sc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tt-s { white-space: normal; }
   #more-pop { width: calc(100vw - 32px); } #more-pop .mgrid { grid-template-columns: 1fr; }
-  /* totals: a summary block under the cards, each figure with its label (the column heads are hidden on phones) */
-  .tbl.ac tfoot { display: block; }
-  .tbl.ac tfoot tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 16px; padding: 12px 17px; background: none; } /* same two columns and inset (16px + the card border) as the cards above */
-  .tbl.ac tfoot td { background: none; }
-  .tbl.ac tfoot td { display: block; height: auto; padding: 0; border: 0; text-align: left; }
-  .tbl.ac tfoot td:first-child { grid-column: 1 / -1; margin-bottom: 4px; } .tbl.ac tfoot .ft-x { display: none; }
-  .tbl.ac tfoot .ft-l { display: block; font-size: var(--text-xs); font-weight: 400; color: var(--t3); }
 }
 </style>
 </head>
@@ -100,8 +91,8 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125b"></script>
-<script src="assets/crm-data.js?v=20261124e"></script>
+<script src="assets/crm.js?v=20261125e"></script>
+<script src="assets/crm-data.js?v=20261125b"></script>
 <script>
 /* Accounts — every company in the sales initiatives (ACCOUNTS) plus the Fresh accounts waiting for approval (FRESH_ACCOUNTS).
    Lifecycle as in old CRMpulse: Customer (won business) › Opportunity / Lead (an open one) › Prospect.
@@ -187,7 +178,7 @@ function listCard() {
   const pages = Math.max(1, Math.ceil(list.length / PER_PAGE)); S.page = Math.min(S.page, pages);
   const shown = list.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
   const sum = (k) => list.reduce((t, a) => t + a[k], 0);
-  const body = list.length ? `<div class="tbl-wrap"><table class="tbl ac">
+  const body = list.length ? `<div class="tbl-wrap"><table class="tbl ac totals">
       <colgroup><col class="c-n"><col class="c-l"><col class="c-o"><col class="c-p"><col class="c-v"><col class="c-i"><col class="c-q"></colgroup>
       <thead><tr>${th('name', 'Account')}${th('', 'Lifecycle')}${th('', 'Owner')}${th('pipeline', 'Open pipeline', 'r')}${th('value', 'Customer value', 'r')}${th('last', 'Last interaction')}${th('', 'Quick actions', 'r')}</tr></thead>
       <tbody>${shown.map(row).join('')}</tbody>
@@ -248,6 +239,7 @@ $('#new').addEventListener('click', () => toast('Would open the new account form
 CRM.renderShell('accounts');
 CRM.watchSticky($('#filters'));
 render();
+CRM.riseIn();
 </script>
 </body>
 </html>

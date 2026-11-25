@@ -392,3 +392,42 @@ body.dlg-open { overflow: hidden; }
 .nb { white-space: nowrap; }
 .ck40 { display: grid; place-items: center; width: 40px; height: 40px; margin: -12px; cursor: pointer; } /* 40×40 tap area around a 16px checkbox */
 .ck40:has(input:disabled) { cursor: not-allowed; }
+
+/* Checkbox toggle in a filter bar ("Show completed and cancelled", "Show only …"): the one control for show / hide filters, on every page */
+.ftog { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--t1); cursor: pointer; white-space: nowrap; }
+body.v2 .ftog { border-radius: var(--radius-pill); border-color: var(--surface); background: var(--glass); box-shadow: var(--shadow-card); }
+body.v2 .ftog:hover { background: var(--surface); }
+.ftog i { display: grid; place-items: center; width: 16px; height: 16px; border: 1.5px solid var(--line-3); border-radius: var(--radius-2xs); color: var(--on-dark); }
+.ftog i svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+body.v2 .ftog[aria-pressed="true"] { border-color: var(--deep); background: var(--surface); }
+.ftog[aria-pressed="true"] i { border-color: var(--midnight); background: var(--midnight); }
+.ftog[aria-pressed="true"] i svg { opacity: 1; }
+
+/* Form in a side panel (.drill.tf-panel): Tasks, Log activity, Customer orders */
+.tf-panel .tf-form { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.tf-panel .dr-body { padding: 20px 24px 24px; }
+.tf-g { display: grid; gap: 16px; }
+.tf-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.tf { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tf-l { font-size: var(--text-sm); font-weight: 500; color: var(--ink); } .tf-l .rq { margin-left: 2px; color: var(--danger); }
+.tf-h { font-size: var(--text-xs); color: var(--t3); } .tf-e { font-size: var(--text-xs); color: var(--danger); }
+.tf .in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); outline: none; }
+.tf .fsel .sel-btn { max-width: none; width: 100%; padding-left: 12px; font-weight: 400; color: var(--ink); }
+.tf-seg button { flex: 1 1 0; }
+.tf textarea.in { height: auto; min-height: 76px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.tf .in:focus { border-color: var(--deep); } .tf .in:disabled { background: var(--field); color: var(--t2); }
+.tf.bad .in, .tf.bad .dt-btn, .tf.bad .sel-btn { border-color: var(--danger); }
+.dlg-in { display: block; width: 100%; height: 40px; margin-top: 12px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); outline: none; }
+.dlg-in:focus { border-color: var(--deep); }
+body.v2 .tf label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: var(--radius-control); border-color: var(--line-2); background: var(--surface); box-shadow: none; }
+/* Totals row under a list table (Accounts, Customer orders); on phones a summary block, each figure with its label */
+.tbl.totals tfoot .ft-l { display: none; }
+.tbl.totals tfoot td { height: 52px; font-weight: 600; color: var(--ink); border-top: 1px solid var(--line-2); border-bottom: 0; }
+.tbl.totals tfoot td .ft-n { margin-left: 4px; font-weight: 400; color: var(--t3); }
+@media (max-width: 768px) {
+  .tbl.totals tfoot { display: block; }
+  .tbl.totals tfoot tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 16px; padding: 12px 17px; background: none; }
+  .tbl.totals tfoot td { display: block; height: auto; padding: 0; border: 0; background: none; text-align: left; }
+  .tbl.totals tfoot td:first-child { grid-column: 1 / -1; margin-bottom: 4px; } .tbl.totals tfoot .ft-x { display: none; }
+  .tbl.totals tfoot .ft-l { display: block; font-size: var(--text-xs); font-weight: 400; color: var(--t3); }
+}

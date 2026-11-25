@@ -42,7 +42,11 @@
     ['Plan & report', [['targets', 'Sales targets', 'flag', 1, MGR_UP], ['reports', 'Reports', 'report', 1]]],
     ['Setup', [['structure', 'Sales structure', 'tree', 1, HEAD_UP], ['admin', 'Administration', 'settings', 1, ['ADMIN']], ['users', 'Users', 'users', 1, ['ADMIN']]]]
   ];
-  const BUILT = { home: 'home.html', pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html', accounts: 'accounts.html', contacts: 'contacts.html' }; // Dashboards + Sales + Customers (accounts, contacts: 2026-11-24); targets page exists but stays out of the nav
+  // The Customers pages (Accounts, Contacts, Customer orders) are not handed over yet (2026-11-25): their menu entries are off and no
+  // page links to them. Preview: open any page once with ?customers=on (kept in this browser; ?customers=off hides them again).
+  const CUSTOMERS_ON = (() => { try { const q = new URLSearchParams(location.search).get('customers'); if (q) localStorage.setItem('crm-customers', q === 'on' ? '1' : ''); return localStorage.getItem('crm-customers') === '1'; } catch (e) { return false; } })();
+  const BUILT = { home: 'home.html', pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html',
+    ...(CUSTOMERS_ON ? { accounts: 'accounts.html', contacts: 'contacts.html', orders: 'orders.html' } : {}) }; // the targets page exists but stays out of the nav
 
   // Old CRMpulse TaskBadge: my open tasks beside Tasks (the overdue count is in its label); nothing when none are open.
   function taskBadge() {
@@ -439,11 +443,11 @@
     const b = document.getElementById('more-n'); if (!b) return;
     b._base = b.hidden ? 0 : (+b.textContent || 0);
     const setCount = () => f._moved.filter(c => { const sel = c.querySelector('select'), inp = c.querySelector('input');
-      return c.classList.contains('set') || (sel && sel.value !== sel._def) || (inp && inp.type !== 'checkbox' && inp.value); }).length;
+      return c.classList.contains('set') || c.getAttribute('aria-pressed') === 'true' || (sel && sel.value !== sel._def) || (inp && inp.type !== 'checkbox' && inp.value); }).length;
     const paint = () => { const n = b._base + setCount(); b._self = true; b.textContent = n; b.hidden = !n; };
     const mb = new MutationObserver(() => { if (b._self) { b._self = false; return; } b._base = b.hidden ? 0 : (+b.textContent || 0); paint(); });
     mb.observe(b, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
-    const mc = new MutationObserver(paint); f._moved.forEach(c => mc.observe(c, { attributes: true, subtree: true, attributeFilter: ['class'] }));
+    const mc = new MutationObserver(paint); f._moved.forEach(c => mc.observe(c, { attributes: true, subtree: true, attributeFilter: ['class', 'aria-pressed'] }));
     f._moved.forEach(c => c.addEventListener('change', paint));
     f._badgeMo = [mb, mc]; paint();
   }
@@ -706,15 +710,16 @@
   // Confirm dialog (Candace, 2026-11-18). CRM.confirm({ title, body, actions: [{ label, value, kind }] }) resolves to the
   // chosen action's value, or null when closed with Esc or a click outside. kind: 'primary' (focused first), 'quiet'
   // (red text, first in the right-aligned row: the destructive choice). Styles: .dlg in crm.css.
-  function confirmDlg({ title, body = '', actions }) {
+  function confirmDlg({ title, body = '', actions, field }) { // field { label, onText }: one text box the last action may require (action.needsText)
     return new Promise((resolve) => {
       const prev = document.activeElement;
       const wrap = document.createElement('div'); wrap.className = 'dlg-scrim';
       wrap.innerHTML = `<div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-b">
-        <h2 id="dlg-t">${title}</h2><div class="dlg-b" id="dlg-b">${body}</div>
+        <h2 id="dlg-t">${title}</h2><div class="dlg-b" id="dlg-b">${body}${field ? `<input class="in dlg-in" aria-label="${field.label}" placeholder="${field.label}">` : ''}</div>
         <div class="dlg-acts">${actions.map((a, i) => `<button type="button" class="btn ${a.kind || ''}" data-i="${i}">${a.label}</button>`).join('')}</div></div>`;
       document.body.appendChild(wrap); document.body.classList.add('dlg-open');
-      const btns = [...wrap.querySelectorAll('button')];
+      const btns = [...wrap.querySelectorAll('.dlg-in, button')], inp = wrap.querySelector('.dlg-in');
+      if (inp) { const gate = () => { field.onText(inp.value.trim()); actions.forEach((a, i) => { if (a.needsText) wrap.querySelector(`[data-i="${i}"]`).disabled = !inp.value.trim(); }); }; inp.addEventListener('input', gate); gate(); }
       const key = (e) => {
         if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(null); }
         else if (e.key === 'Tab') { // keep focus inside the dialog
@@ -726,7 +731,7 @@
       wrap.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) done(actions[+b.dataset.i].value); else if (e.target === wrap) done(null); });
       document.addEventListener('keydown', key, true);
       requestAnimationFrame(() => wrap.classList.add('on'));
-      (btns.find(b => b.classList.contains('primary')) || btns[btns.length - 1]).focus();
+      (inp || btns.find(b => b.classList.contains('primary')) || btns[btns.length - 1]).focus();
     });
   }
 
@@ -757,5 +762,5 @@
     if (risen) return; risen = true;
     document.querySelectorAll('.main .card, .main .zone, .main .v2-kpi').forEach((el, i) => { el.classList.add('rise'); el.style.animationDelay = Math.min(i, 8) * 40 + 'ms'; });
   }
-  window.CRM = { icon, dots, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
+  window.CRM = { icon, dots, customersOn: CUSTOMERS_ON, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
 })();

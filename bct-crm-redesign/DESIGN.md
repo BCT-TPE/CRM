@@ -105,6 +105,10 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 - 進場動畫全站一致：每頁第一次畫完後呼叫 `CRM.riseIn()`，卡片、區塊和頁首 KPI 由下往上淡入（`.rise`，0.32 秒），依序錯開 40ms，最多錯開 8 張。系統設定「減少動態」時不播放。之後的重畫（篩選、切換分頁）不再播放。
 
+## 7.6 新頁面的 UX 一致
+
+- 之後新增的頁面，同樣的操作要用同樣的元件和行為，先找現有頁面怎麼做再動手（2026-11-25，Janet）：顯示／隱藏類篩選用 `.ftog` 放在篩選列；點列打開；小尺寸用右側滑出面板；停用按鈕點了用 toast 說明；進場動畫 `CRM.riseIn()`；Reset、空狀態、手機 Filters 面板與徽章同一套。共用樣式放 assets，不寫在單頁。
+
 ## 8. 不要做的事
 
 - 不加 `title` tooltip，也不加多餘的 alt／說明文字。
@@ -155,7 +159,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 ## 14. Customers：Accounts（2026-11-24 起）
 
-- Accounts、Contacts 放回側邊欄（`crm.js` 的 `BUILT`）；Customer orders 還沒做，維持停用。
+- **先隱藏（2026-11-25，先交付其他頁）**：Accounts、Contacts、Customer orders 在側邊欄停用，Tasks 的客戶名稱也不連過去；開關是 `crm.js` 的 `CUSTOMERS_ON`。要預覽就在任一頁網址加 `?customers=on`（存在這個瀏覽器，`?customers=off` 關掉）。開放後 Customer orders 只有 Sales Manager 以上看得到。
 - Accounts 照舊版 CRMpulse 補齊，並套 design review 規則：
   - 五張分組卡間距 8px；每張卡管 Lifecycle／Strategic／Need attention，卡上的數字套用其他篩選、不套卡片自己的條件。More filters 選了 Lead、Opportunity 時沒有卡片亮起。
   - More filters：Account status、Lifecycle、Engagement、Region（依 Geography 縮小）。
@@ -180,3 +184,22 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - **篩選面板**：從篩選列移進來的也是標籤在上、方框只放值。
 - **副標**用 `CRM.dots()`：每段不換行，「·」跟在前一段後面。
 - 手機：通知選單在抽屜寬度內往上展開；滿版側邊面板沒有圓角。
+
+## 16. Customers：Contacts（2026-11-25）
+
+- 1100px 以下點一個人，詳細資料從右邊滑出（`.drill.cp-panel`，跟 Tasks 一樣；Esc、×、點外面都能關，名單位置不動、焦點回到那一列）；以上維持右欄。
+- 手機的人員列：名字＋狀態，下面是角色和 Email。商機的標籤放在名稱下面。
+- Log call／Log meeting 開 `activities.html?log=<客戶>&who=<人>&type=<類型>`，記錄面板帶入客戶、聯絡人、類型。停用的按鈕點了用 toast 說明原因。
+- 客戶名稱（分組標題、面板）連到 `accounts.html?q=`；Edit 是有文字的按鈕。
+- 「沒有決策者」的篩選用篩選列的勾選鈕「Show only no active decision maker」，跟 Tasks 的「Show completed and cancelled」同一個元件（`.ftog`，在 crm.css），取代舊版的黃色提示條和按鈕（2026-11-25，Janet）。
+- 照舊版：Role 篩選六種（加 Primary contact、Other）、部門提醒依 Finance／Procurement／IT 職稱、停用聯絡人且客戶沒有主要角色時提醒。沒有「Open full profile」（還沒有聯絡人頁）。
+- 維持新版：List 用表格、分組標題寫「3 contacts」。
+
+## 17. Customers：Customer orders（2026-11-25）
+
+- 內容照舊版 CRMpulse `/orders`：等 PO 的成交（最多 6 張，1440px 以上一列四張，超過 30 天紅色）、狀態頁籤和數量、搜尋（訂單／PO／客戶）、Order date（年度和季度）、訂單表、總計列（未取消）、可展開的 Historical orders、訂單面板、Register historical order。
+- 版面跟其他列表頁一致：篩選列在標題下方；等 PO 的卡片改成一般白卡（不用舊版黃底）；狀態用卡片內的膠囊頁籤（同 Activities）；64px 列、點整列開側邊面板；總計列、頁碼、手機卡片都用共用樣式（`.tbl.totals`、`.drill.tf-panel`、`.tf` 表單移到 crm.css）。表頭可排序（Order、Order date、Order value）。
+- **訂單面板**：進度 Draft → Open → Completed、Won／Order value／Difference、PO 欄位；缺 PO、日期、日期在未來、或金額不同但沒選原因時，Confirm order／Mark completed 不能按，並寫出還缺什麼。改過內容關閉前先問。取消 Open 訂單要填原因（`CRM.confirm` 的 `field`），取消後不能恢復。
+- **權限**：Sales Head／Administrator 看全部、可登記歷史訂單；Sales Manager 看自己團隊；Salesperson 看自己的（側邊欄沒有入口）。沒有權限的 Register 按鈕停用並說明原因。
+- **資料**：每筆成交一張訂單（`ORDERS`），草稿就是 Home 的 `DRAFT_ORDERS`（4 筆 $525.0K，同一編號；`PO_RECEIVED` 的兩筆已有 PO，算 Open）。幣別用 `accCurrency`、匯率用 `FX`。**Accounts 的 Customer value 改為只算已確認的訂單**（Open／Completed，含歷史訂單，以 PO 金額計），草稿不算。
+- `?open=ORD-…` 直接打開那張訂單。

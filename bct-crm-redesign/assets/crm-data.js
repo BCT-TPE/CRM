@@ -387,9 +387,13 @@ const APPROVALS = [
   { acc: 'Delta Pharma', by: 'Priya Sharma', created: '2026-11-13', lifecycle: 'Prospect' }
 ].map(a => ({ ...a, team: PERSON_TEAM[a.by], wait: Math.round((TODAY - new Date(a.created)) / 864e5) }));
 // Won deals whose order is still a draft (no PO yet): won in the last 45 days, as ACCOUNTS.draftOrder
-const DRAFT_ORDERS = CLOSED.filter(o => o.result === 'won' && (TODAY - new Date(o.closed)) / 864e5 <= 45)
+// Two of them already have their PO (2026-11-25): four drafts are left, as in old CRMpulse
+const PO_RECEIVED = ['SI-2026-0035', 'SI-2026-0036'];
+const RECENT_WON = CLOSED.filter(o => o.result === 'won' && (TODAY - new Date(o.closed)) / 864e5 <= 45)
   .sort((a, b) => a.closed.localeCompare(b.closed))
   .map((o, i) => ({ ...o, order: 'ORD-2026-' + String(37 + i * 4).padStart(4, '0'), age: Math.round((TODAY - new Date(o.closed)) / 864e5) }));
+const DRAFT_ORDERS = RECENT_WON.filter(o => !PO_RECEIVED.includes(o.id));
+ACCOUNTS.forEach(a => { a.draftOrder = DRAFT_ORDERS.some(o => o.acc === a.name); });
 // Gaurav's quiet customers (Home: "Quiet accounts"): no contact for over 60 days
 const QUIET_FIX = { 'Pearl Transit': 72, 'Mekong Freight': 64 };
 for (let i = ACTIVITIES.length - 1; i >= 0; i--) { const q = QUIET_FIX[ACTIVITIES[i].acc]; if (q != null && (TODAY - new Date(ACTIVITIES[i].d.slice(0, 10))) / 864e5 < q) ACTIVITIES.splice(i, 1); }
@@ -411,3 +415,30 @@ const FRESH_ACCOUNTS = APPROVALS.map((x, i) => {
     lifecycle: x.lifecycle, status: 'Fresh', engagement: 'Active', region: _pick(SALES_REGION[geo], x.acc), pipeline: 0, openAny: false, value: 0,
     last: null, lastDate: null, draftOrder: false, inits: [], attn: ["Waiting for approval · can't be used in initiatives yet"] };
 });
+
+// Customer orders (2026-11-25, old CRMpulse Customer Order Register). Every won initiative has one current order: a Draft until
+// the customer's PO confirms it (DRAFT_ORDERS: won in the last 45 days, no PO yet), then Open, then Completed. Three historical orders are
+// from before CRMpulse. Order values are in the customer's currency; the rates are the site's FX.
+const USD_PER = { USD: 1, ...Object.fromEntries(Object.entries(FX).map(([c, r]) => [c, 1 / r])) }; // the site's demo rates (FX = units per USD)
+const FX_OF = (acc) => { const a = ACCOUNTS.find(x => x.name === acc) || {}; return accCurrency(acc, a.team); }; // same currency as the account's initiatives
+const VARIANCE_REASONS = ['Discount agreed at PO', 'Scope changed', 'Tax or currency difference', 'Phased order (more POs to follow)'];
+const ORDERS = (() => {
+  const day = (d, n) => new Date(new Date(d).getTime() + n * 864e5).toISOString().slice(0, 10);
+  const VAR = { 'SI-2026-0010': [0.95, 'Discount agreed at PO'], 'SI-2026-0001': [0.95, 'Tax or currency difference'], 'SI-2026-0013': [1.04, 'Scope changed'] };
+  let n26 = 1, n25 = 12, po = 1001;
+  const cur = CLOSED.filter(o => o.result === 'won').slice().sort((a, b) => a.closed.localeCompare(b.closed)).map(o => {
+    const c = FX_OF(o.acc), dr = DRAFT_ORDERS.find(d => d.id === o.id), [k, why] = VAR[o.id] || [1, ''];
+    const status = dr ? 'Draft' : o.closed < '2026-07-01' ? 'Completed' : 'Open';
+    const rec = RECENT_WON.find(d => d.id === o.id), id = rec ? rec.order : o.fy === '2526' ? 'ORD-2025-' + String(n25 += 4).padStart(4, '0') : 'ORD-2026-' + String(n26 += 3).padStart(4, '0');
+    const date = dr ? '' : day(o.closed, 4 + _hash(o.id) % 9);
+    return { id, type: 'Current', acc: o.acc, si: o.id, siName: o.name, owner: o.owner, po: dr ? '' : 'PO-' + po++, date, won: Math.round(o.value / USD_PER[c]), wonCur: c, wonOn: o.closed,
+      value: Math.round(o.value * k / USD_PER[c]), cur: c, status, why, exp: day(o.closed, 120), doneOn: status === 'Completed' ? day(o.closed, 118 + _hash(o.id) % 5 - 4) : '', remarks: '', cancel: '', wait: dr ? dr.age : null };
+  });
+  const hist = [['ORD-2024-0003', 'ABC Bank', 'Ahmed Al-Mansoori', 'PO-0412', '2024-03-18', 4e5], ['ORD-2023-0009', 'Oman Energy Corporation', 'Omar Haddad', 'PO-0377', '2023-11-06', 3.3e5], ['ORD-2024-0007', 'Lotus Retail India', 'Vikram Iyer', 'PO-0455', '2024-07-22', 2.5e5]]
+    .map(([id, acc, owner, p, date, usd]) => ({ id, type: 'Historical', acc, si: '', siName: '', owner, po: p, date, won: null, wonCur: '', wonOn: '', value: Math.round(usd / USD_PER[FX_OF(acc)]), cur: FX_OF(acc), status: 'Completed', why: '', exp: '', doneOn: day(date, 150), remarks: '', cancel: '', wait: null }));
+  return [...cur, ...hist];
+})();
+const orderUsd = (o) => o.value * USD_PER[o.cur];
+// Customer value = confirmed orders only (Open or Completed), at the PO value; a draft does not count yet
+const customerValue = (acc) => ORDERS.filter(o => o.acc === acc && (o.status === 'Open' || o.status === 'Completed')).reduce((t, o) => t + orderUsd(o), 0);
+ACCOUNTS.forEach(a => { a.value = customerValue(a.name); });

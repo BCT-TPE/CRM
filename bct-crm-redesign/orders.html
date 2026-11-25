@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer orders · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261125d">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<style>
+/* ---------- Page: Customer orders ----------
+   Same content as CRMpulse /orders: the won deals waiting for a PO, status tabs with counts, search / order date, the order
+   register with owner, PO, value and "vs won value", a totals row, the historical orders (collapsed), and the order panel
+   (progress, won vs order value, PO fields, confirm / complete / cancel) or the Register historical order form.
+   Components = the other list pages: filter bar, pill tabs in the card, 64px rows that open a side panel, pager. */
+.po { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 1440px) { .po { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.po-c { display: grid; gap: 4px; min-width: 0; padding: 14px 12px; border: 1px solid var(--line-2); border-radius: var(--radius-lg); background: var(--surface); font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.po-c:hover { border-color: var(--line-3); background: var(--hover); }
+.po-c > span { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-width: 0; }
+.po-c b { font-size: var(--text-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.po-c .ell { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.po-c small { font-size: var(--text-xs); color: var(--t3); }
+.po-c em { flex: none; font-style: normal; font-size: var(--text-xs); font-weight: 500; color: var(--deep); }
+.po-c > span:last-child { margin-top: 6px; }
+.po-w { font-size: var(--text-xs); font-weight: 500; color: var(--warn-text); white-space: nowrap; } .po-w.late { color: var(--danger); }
+@media (min-width: 1440px) and (max-width: 1599px) { .po { gap: 8px; } .po-c { padding-left: 10px; padding-right: 10px; } .po-c > span:last-child { gap: 6px; } } /* the four drafts on one row */
+.po-more { justify-self: start; margin-top: 12px; }
+.tbl.or { table-layout: fixed; }
+.tbl.or col.c-o { width: 14%; } .tbl.or col.c-a { width: 19%; } .tbl.or col.c-w { width: 14%; } .tbl.or col.c-p { width: 12%; } .tbl.or col.c-d { width: 10.5%; } .tbl.or col.c-v { width: 10.5%; } .tbl.or col.c-x { width: 10%; } .tbl.or col.c-s { width: 10%; }
+@media (min-width: 1400px) { .tbl.or col.c-o { width: 12%; } .tbl.or col.c-a { width: 21%; } .tbl.or col.c-w { width: 17%; } .tbl.or col.c-p { width: 10.5%; } .tbl.or col.c-d { width: 10%; } .tbl.or col.c-x { width: 9.5%; } .tbl.or col.c-s { width: 9.5%; } }
+@media (min-width: 769px) and (max-width: 1399px) { .tbl.or .own > :first-child { display: none; } } /* the name needs the room */
+.tbl.or td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
+.tbl.or .ord-id { font-size: var(--text-xs); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbl.or th { white-space: nowrap; }
+.wt { font-weight: 500; color: var(--warn); } .off { font-weight: 600; color: var(--warn); } .mut { color: var(--t3); }
+.os { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; }
+.os.Draft { background: var(--warn-bg); color: var(--warn-text); } .os.Open { background: var(--info-bg); color: var(--deep); } .os.Completed { background: var(--ok-bg); color: var(--ok-text); } .os.Cancelled, .os.Historical { background: var(--field); color: var(--t3); }
+.or-stack { display: flex; flex-direction: column; gap: 16px; }
+.hist-b { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 40px; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.hist-b b { font-size: var(--text-md); font-weight: 600; color: var(--ink); } .hist-b small { font-size: var(--text-sm); color: var(--t3); }
+.hist-b > svg { width: 16px; height: 16px; flex: none; fill: none; stroke: var(--t3); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.hist-b[aria-expanded="true"] > svg { transform: rotate(180deg); }
+.hist-b + .tbl-wrap, .hist-b + .tbl-sort { margin-top: 12px; }
+/* Order panel */
+.op-steps { display: flex; gap: 8px; margin: 0; padding: 12px 24px; border-bottom: 1px solid var(--line); list-style: none; }
+.op-steps li { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; padding: 6px 8px; border-radius: var(--radius-md); font-size: var(--text-xs); color: var(--t3); }
+.op-steps li[aria-current] { background: var(--info-bg); font-weight: 500; color: var(--deep); }
+.op-steps i { display: grid; place-items: center; flex: none; width: 20px; height: 20px; border-radius: var(--radius-full); background: var(--field); font-size: var(--text-2xs); font-style: normal; font-weight: 600; }
+.op-steps li.done i { background: var(--ok-bg); color: var(--ok-text); } .op-steps li[aria-current] i { background: var(--deep); color: var(--on-dark); }
+.op-fig { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 14px 16px; border-radius: var(--radius-lg); background: var(--field); }
+.op-fig small { display: block; font-size: var(--text-xs); color: var(--t3); } .op-fig b { display: block; margin: 2px 0; font-size: var(--text-md); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.op-fig b.off { color: var(--warn); } .op-fig b.same { color: var(--ok-text); }
+.op-h { margin: 8px 0 0; font-size: var(--text-md); font-weight: 600; color: var(--ink); } .op-h + .tf-h { margin-top: -12px; }
+.op-why { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--warn-soft); border-radius: var(--radius-lg); background: var(--warn-bg); }
+.op-3 { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px; }
+.op-hist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: var(--text-sm); color: var(--t2); } .op-hist li { display: flex; justify-content: space-between; gap: 12px; } .op-hist small { flex: none; color: var(--t3); }
+.op-foot { flex-wrap: wrap; } .op-r1 { display: flex; flex: 1 1 100%; align-items: center; gap: 12px; } .op-r1:has(.op-msg:empty:only-child) { display: none; } .op-msg { flex: 1; min-width: 0; font-size: var(--text-xs); color: var(--t3); } .op-cancel { flex: none; } body.v2 .op-foot .btn.op-cancel { color: var(--danger); }
+@media (max-width: 1279px) { .tbl.or { min-width: 950px; } }
+@media (max-width: 1100px) { .tbl.or { min-width: 1040px; } }
+@media (max-width: 768px) {
+  .po { grid-template-columns: minmax(0, 1fr); }
+  .tbl.or td[data-label="Account · Initiative"] { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) { .tf-2 { grid-template-columns: minmax(0, 1fr); } .op-steps { padding: 10px 16px; } .op-steps li span span { display: none; } .op-foot > .btn { flex: 1 1 auto; justify-content: center; padding: 0 12px; } }
+@media (hover: none) { .po-c:hover { border-color: var(--line-2); background: var(--surface); } }
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+    <header class="v2-head">
+      <div class="v2-hello">
+        <h1>Customer orders</h1>
+        <p>A draft order is created when an initiative is won. Confirming it with the customer's PO counts it in customer value.</p>
+      </div>
+      <div class="acts" style="display:flex;gap:8px">
+        <button class="btn primary" id="new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Register historical order</button>
+      </div>
+    </header>
+
+    <div class="filters" id="filters" role="toolbar" aria-label="Filters">
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="f-search" type="search" placeholder="Order, PO or account" aria-label="Search orders"></label>
+      <label class="select"><span class="lbl">Order date</span><select id="f-period" aria-label="Order date"></select></label>
+      <button class="btn ghost" id="reset" hidden>Reset</button>
+      <span class="sp"></span>
+    </div>
+
+    <div id="page"></div>
+  </main>
+</div>
+
+<script src="assets/crm.js?v=20261125e"></script>
+<script src="assets/crm-data.js?v=20261125b"></script>
+<script>
+const { money, toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const ROLE = CRM.user.code, MY_PEOPLE = ROLE === 'SALES_MANAGER' ? TEAMS[PERSON_TEAM[ME]].people : [ME];
+// Old scope: Sales Head / Administrator see every order; a manager the team's; a salesperson their own. Who sees an order here may change it.
+const VISIBLE = () => ORDERS.filter(o => CRM.user.oversight || MY_PEOPLE.includes(o.owner));
+const CAN_REGISTER = CRM.user.oversight; // HISTORICAL_ORDER_ROLES
+const iso = (d) => new Date(d).toISOString().slice(0, 10), TODAY_ISO = iso(TODAY);
+const TABS = [['', 'All current'], ['Draft', 'Draft'], ['Open', 'Open'], ['Completed', 'Completed'], ['Cancelled', 'Cancelled']];
+const STEPS = [['Draft', 'waiting for PO'], ['Open', 'counts in customer value'], ['Completed', '']];
+const CURS = ['USD', 'AED', 'INR', 'OMR', 'SAR'];
+const PER_PAGE = 10;
+const S = { q: '', period: '', tab: '', sort: 'id', page: 1, hist: false, hpage: 1 };
+const pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+// Transaction values keep their own currency ($1.25M · AED 540.0K · ₹1.00 Cr)
+function cash(v, c) {
+  if (c === 'USD') return money(v);
+  if (c === 'INR') return v >= 1e7 ? `₹${(v / 1e7).toFixed(2)} Cr` : v >= 1e5 ? `₹${(v / 1e5).toFixed(1)} L` : `₹${Math.round(v).toLocaleString('en-IN')}`;
+  return `${c} ${money(v).replace('$', '')}`;
+}
+const PERIODS = [['', 'All'], ...[['25-26', 2025], ['26-27', 2026], ['27-28', 2027]].flatMap(([l, y]) => [[`${y}`, `FY${l}`], ...[1, 2, 3, 4].map(q => [`${y}-${q}`, `Q${q} FY${l}`])])];
+const inPeriod = (d) => { if (!S.period) return true; if (!d) return false; const x = new Date(d), m = x.getMonth(), y = m < 3 ? x.getFullYear() - 1 : x.getFullYear(), q = Math.floor(((m + 9) % 12) / 3) + 1;
+  return S.period === `${y}` || S.period === `${y}-${q}`; };
+const match = (o) => { const q = S.q.trim().toLowerCase(); return inPeriod(o.date) && (!q || [o.id, o.po, o.acc].some(v => v.toLowerCase().includes(q))); };
+const anyFilter = () => S.q || S.period;
+const created = (o) => o.wonOn || o.date; // newest first, as in the old register
+const SORTS = {
+  id: { fn: (a, b) => created(b).localeCompare(created(a)), dir: 'desc' },
+  date: { fn: (a, b) => (b.date || '').localeCompare(a.date || ''), dir: 'desc' },
+  value: { fn: (a, b) => orderUsd(b) - orderUsd(a), dir: 'desc' }
+};
+const signed = (g, base) => `${g > 0 ? '+' : '−'}${(Math.abs(g) / (base || 1) * 100).toFixed(1)}%`;
+function vsWon(o) {
+  if (o.won == null || o.cur !== o.wonCur) return '<span class="mut">—</span>';
+  const g = o.value - o.won; return Math.abs(g) < 0.5 ? '<span class="mut">Same</span>' : `<span class="off">${signed(g, o.won)}</span>`;
+}
+const ell = (html, cls = '') => `<div class="ell ${cls}">${html}</div>`;
+const chip = (o) => `<span class="os ${o.status}">${o.status}</span>${o.type === 'Historical' ? ' <span class="os Historical">Historical</span>' : ''}`;
+function waiting() {
+  const l = VISIBLE().filter(o => o.type === 'Current' && o.status === 'Draft').sort((a, b) => b.wait - a.wait); if (!l.length) return '';
+  return `<section class="card" aria-labelledby="po-h"><div class="card-h"><div><h2 id="po-h">${l.length} won ${l.length === 1 ? 'deal is' : 'deals are'} waiting for a customer PO</h2><p>${money(l.reduce((t, o) => t + orderUsd(o), 0))} not yet counted in customer value</p></div></div>
+    <div class="po">${l.slice(0, 6).map(o => `<button type="button" class="po-c" data-act="open" data-v="${o.id}"><span><b class="ell">${esc(o.acc)}</b><b>${money(orderUsd(o))}</b></span><small class="ell">${esc(o.siName)}</small>
+      <span><span class="po-w ${o.wait > 30 ? 'late' : ''}">Waiting ${pl(o.wait, 'day')} since won</span><em>Confirm PO ›</em></span></button>`).join('')}</div>
+    ${l.length > 6 ? `<button type="button" class="link po-more" data-act="tab" data-v="Draft">Show all ${l.length} drafts</button>` : ''}</section>`;
+}
+function th(key, label, cls = '') {
+  if (!key) return `<th class="${cls}">${label}</th>`;
+  const on = S.sort === key;
+  return `<th class="${cls}" aria-sort="${on ? 'descending' : 'none'}"><button class="th-sort ${on ? 'on' : ''}" data-act="sort" data-v="${key}">${label}<span class="arr" aria-hidden="true">${on ? '↓' : '↑'}</span></button></th>`;
+}
+function row(o) {
+  return `<tr class="click" data-act="open" data-v="${o.id}" tabindex="0">
+    <td><span class="ord-id">${o.id}</span></td>
+    <td>${ell(esc(o.acc), 't-main')}${ell(o.si ? `${o.si} · ${esc(o.siName)}` : 'No linked initiative', 't-sub')}</td>
+    <td>${o.owner ? `<div class="own">${CRM.avatar(o.owner)}<div class="own-t">${ell(esc(o.owner))}</div></div>` : '—'}</td>
+    <td>${o.po ? esc(o.po) : o.status === 'Cancelled' ? '—' : '<span class="wt">Waiting for PO</span>'}</td>
+    <td class="num">${o.date ? CRM.date(o.date) : '—'}${o.date > TODAY_ISO ? '<div class="t-sub wt">In the future</div>' : ''}</td>
+    <td class="r num"><div class="t-val">${cash(o.value, o.cur)}</div><div class="t-sub">${o.cur === 'USD' ? 'USD' : money(orderUsd(o))}</div></td>
+    <td class="r num">${vsWon(o)}</td><td>${chip(o)}</td></tr>`;
+}
+const COLS = '<colgroup><col class="c-o"><col class="c-a"><col class="c-w"><col class="c-p"><col class="c-d"><col class="c-v"><col class="c-x"><col class="c-s"></colgroup>';
+const heads = (s) => `<thead><tr>${th(s && 'id', 'Order')}${th('', 'Account · Initiative')}${th('', 'Owner')}${th('', 'PO')}${th(s && 'date', 'Order date')}${th(s && 'value', 'Order value', 'r')}${th('', 'vs won value', 'r')}${th('', 'Status')}</tr></thead>`;
+function pager(act, page, n) {
+  const pages = Math.ceil(n / PER_PAGE); 
+  return `<div class="pager"><span>Showing ${(page - 1) * PER_PAGE + 1}–${Math.min(page * PER_PAGE, n)} of ${n}</span><span class="sp"></span>
+      <button data-act="${act}" data-v="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
+      ${Array.from({ length: pages }, (_, i) => `<button data-act="${act}" data-v="${i + 1}" class="${page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}
+      <button data-act="${act}" data-v="${page + 1}" ${page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>`;
+}
+function register() {
+  const base = VISIBLE().filter(o => o.type === 'Current' && match(o)), list = base.filter(o => !S.tab || o.status === S.tab).sort(SORTS[S.sort].fn);
+  const tabs = `<div class="tabs" role="tablist" aria-label="Order status">${TABS.map(([k, l]) => `<button class="tab ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-act="tab" data-v="${k}">${l}<span class="tab-n">${base.filter(o => !k || o.status === k).length}</span></button>`).join('')}</div>`;
+  if (!list.length) return `<section class="card" aria-label="Orders">${tabs}<div class="empty" style="padding:48px 12px"><b>No orders here</b>${anyFilter() || S.tab ? 'No orders match these filters.' : 'No customer orders yet. Draft orders arrive when an initiative is Closed Won.'}${anyFilter() ? '<br><button class="link" data-act="reset">Clear filters</button>' : ''}</div></section>`;
+  S.page = Math.min(S.page, Math.ceil(list.length / PER_PAGE));
+  const counted = list.filter(o => S.tab || o.status !== 'Cancelled');
+  return `<section class="card" aria-label="Orders">${tabs}<div class="tbl-wrap"><table class="tbl or totals">${COLS}${heads(true)}
+      <tbody>${list.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE).map(row).join('')}</tbody>
+      <tfoot><tr><td colspan="5">${pl(counted.length, 'order')}${S.tab ? '' : '<span class="ft-n">(cancelled not counted)</span>'}</td><td class="r num"><small class="ft-l">Order value</small>${money(counted.reduce((t, o) => t + orderUsd(o), 0))}</td><td colspan="2" class="ft-x"></td></tr></tfoot></table></div>
+    ${pager('page', S.page, list.length)}</section>`;
+}
+function historical() {
+  const l = VISIBLE().filter(o => o.type === 'Historical' && match(o)).sort((a, b) => b.date.localeCompare(a.date)), live = l.filter(o => o.status !== 'Cancelled');
+  S.hpage = Math.min(S.hpage, Math.max(1, Math.ceil(l.length / PER_PAGE)));
+  return `<section class="card" aria-label="Historical orders"><button type="button" class="hist-b" data-act="hist" aria-expanded="${S.hist}"><span><b>Historical orders</b> <small>· ${pl(live.length, 'order')} from before CRMpulse · ${money(live.reduce((t, o) => t + orderUsd(o), 0))}</small></span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    ${!S.hist ? '' : l.length ? `<div class="tbl-wrap"><table class="tbl or">${COLS}${heads(false)}<tbody>${l.slice((S.hpage - 1) * PER_PAGE, S.hpage * PER_PAGE).map(row).join('')}</tbody></table></div>${l.length > PER_PAGE ? pager('hpage', S.hpage, l.length) : ''}` : '<div class="empty" style="padding:24px 12px"><b>No historical orders.</b></div>'}</section>`;
+}
+function render() {
+  $('#page').innerHTML = `<div class="or-stack">${waiting()}${register()}${historical()}</div>`;
+  $('#reset').hidden = !anyFilter();
+}
+
+// ---- Panels ----
+const fld = (label, ctl, { req, hint, err, id } = {}) => `<div class="tf ${err ? 'bad' : ''}" ${id ? `data-f="${id}"` : ''}><span class="tf-l">${label}${req ? '<span class="rq">*</span>' : ''}</span>${ctl}${err ? `<span class="tf-e">${err}</span>` : hint ? `<span class="tf-h">${hint}</span>` : ''}</div>`;
+const opt = (v, l, on) => `<option value="${esc(v)}" ${on ? 'selected' : ''}>${esc(l)}</option>`;
+const pick = (k, opts, cur, label, dis) => `<label class="select fsel"><select data-v="${k}" aria-label="${label}" ${dis ? 'disabled' : ''}>${opts.map(([v, l]) => opt(v, l, v === cur)).join('')}</select></label>`;
+const PEOPLE = [...new Set([ME, ...Object.values(TEAMS).flatMap(t => t.people)])].sort().map(p => [p, p === ME ? `${p} (you)` : p]);
+const FUTURE = 'This date is in the future. Check it against the PO.';
+// One side panel for both forms: Esc, × and Close ask first when something was entered (as Tasks and Log activity)
+function openPanel(v, draw, discard) {
+  document.querySelectorAll('.tf-panel').forEach(x => x.remove());
+  const el = document.createElement('aside'); el.className = 'drill tf-panel'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-labelledby', 'op-t');
+  const prev = document.activeElement, back = prev?.dataset?.v, start = JSON.stringify(v);
+  const key = (e) => { if (e.key === 'Escape' && !document.body.classList.contains('dlg-open')) { e.preventDefault(); ask(); } };
+  const close = () => { document.removeEventListener('keydown', key, true); document.body.classList.remove('drill-open'); setTimeout(() => el.remove(), 300);
+    (prev?.isConnected ? prev : back && document.querySelector(`#page [data-v="${back}"]`))?.focus?.({ preventScroll: true }); };
+  const ask = async () => { if (JSON.stringify(v) === start) return close();
+    const r = await CRM.confirm({ title: discard, body: '<p>What you entered will be lost.</p>', actions: [{ label: 'Discard', value: 'discard', kind: 'quiet' }, { label: 'Keep editing', value: null, kind: 'primary' }] });
+    if (r === 'discard') close(); };
+  const redraw = () => { const b = el.querySelector('.dr-body'), y = b ? b.scrollTop : 0, f = el.contains(document.activeElement) ? document.activeElement.dataset?.v : null; el.innerHTML = draw(); CRM.enhanceSelects(el); CRM.enhanceDates(el); el.querySelector('.dr-body').scrollTop = y; if (f) el.querySelector(`[data-v="${f}"]:not([hidden])`)?.focus({ preventScroll: true }); };
+  el.addEventListener('click', (e) => { if (e.target.closest('[data-x="close"]')) ask(); });
+  el.addEventListener('submit', (e) => e.preventDefault());
+  redraw(); document.body.appendChild(el); document.addEventListener('keydown', key, true);
+  requestAnimationFrame(() => { document.body.classList.add('drill-open'); setTimeout(() => (el.querySelector('input.in:not(:disabled)') || el.querySelector('[data-x="close"]'))?.focus({ preventScroll: true }), 280); });
+  return { el, close, redraw };
+}
+const head = (t, sub) => `<header class="dr-head"><div><p class="dr-kind">Customer orders</p><h2 id="op-t">${t}</h2><p class="dr-sub">${sub}</p></div><button type="button" class="icon-btn" data-x="close" aria-label="Close panel">${CRM.icon('x')}</button></header>`;
+const inp = (k, val, label, { type = 'text', dis, ph = '', max } = {}) => `<input class="in" type="${type}" data-v="${k}" value="${esc(String(val ?? ''))}" aria-label="${label}" ${ph ? `placeholder="${ph}"` : ''} ${type === 'number' ? 'min="0"' : ''} ${max ? `max="${max}"` : ''} ${dis ? 'disabled' : ''}>`;
+
+function openOrder(o) {
+  const known = VARIANCE_REASONS.includes(o.why);
+  const v = { po: o.po, date: o.date, value: String(o.value), cur: o.cur, exp: o.exp, owner: o.owner, remarks: o.remarks, why: o.why ? (known ? o.why : 'Other') : '', whyText: o.why && !known ? o.why : '' };
+  const final = o.status === 'Completed' || o.status === 'Cancelled', tracked = o.won != null && o.type === 'Current';
+  const num = () => Number(v.value) || 0;
+  const calc = () => { const inWon = num() * USD_PER[v.cur] / USD_PER[o.wonCur || 'USD'], gap = tracked ? inWon - o.won : 0, off = tracked && Math.abs(gap) >= 0.5 && (v.cur !== o.cur || num() !== o.value || o.value !== o.won) && Math.abs(gap) / o.won > 0.0005;
+    return { gap, off: off && o.status !== 'Cancelled', why: (v.why === 'Other' ? v.whyText : v.why).trim(), future: !!v.date && v.date > TODAY_ISO }; };
+  const blockers = () => { const c = calc(); return [!v.po.trim() && 'add the PO reference', !v.date && 'add the order date', c.future && 'the order date is in the future', (v.value === '' || num() < 0) && 'enter the order value', c.off && !c.why && 'choose why the value differs'].filter(Boolean); };
+  const foot = () => { const b = blockers(), c = calc(), can = v.value !== '' && num() >= 0 && !c.future;
+    const msg = o.status === 'Draft' ? (b.length ? `To confirm: ${b.join(', ')}` : 'Ready to confirm') : o.status === 'Open' ? (b.length ? `To save: ${b.join(', ')}` : 'Confirmed. Counts in customer value.') : '';
+    return `<div class="op-r1"><span class="op-msg" role="status">${msg}</span>${final ? '' : '<button type="button" class="btn ghost op-cancel" data-x="cancel">Cancel order…</button>'}</div>
+      <button type="button" class="btn ghost" data-x="close">Close</button>
+      ${final ? '<button type="button" class="btn" data-x="save">Save remarks</button>' : `<button type="button" class="btn" data-x="save" ${can && (o.status === 'Draft' || !b.length) ? '' : 'disabled'}>${o.status === 'Draft' ? 'Save draft' : 'Save changes'}</button>
+      <button type="button" class="btn primary" data-x="next" ${b.length ? 'disabled' : ''}>${o.status === 'Draft' ? 'Confirm order' : 'Mark completed'}</button>`}`; };
+  const figs = () => { const c = calc(); return `<div><small>Won value</small><b>${cash(o.won, o.wonCur)}</b><small>Booking value stays as won</small></div><div><small>Order value</small><b>${cash(num(), v.cur)}</b><small>${v.cur === 'USD' ? 'USD' : money(num() * USD_PER[v.cur])}</small></div><div><small>Difference</small><b class="${c.off ? 'off' : 'same'}">${c.off ? signed(c.gap, o.won) : 'Same'}</b><small>Order against won value</small></div>`; };
+  const at = STEPS.findIndex(([s]) => s === o.status);
+  const history = [o.cancel !== '' || o.status === 'Cancelled' ? ['Cancelled', o.cancelOn || TODAY_ISO] : null, o.doneOn ? ['Completed', o.doneOn] : null, o.status !== 'Draft' && o.date && o.type === 'Current' && o.po ? [`Confirmed with ${o.po}`, o.date] : null, o.wonOn ? ['Draft created when the initiative was won', o.wonOn] : ['Registered as a historical order', o.date]].filter(Boolean);
+  const why = () => { const c = calc(); return c.off || (final && o.why) ? `<div class="op-why">${fld('Why is the PO value different from the won value?', pick('why', [['', 'Choose a reason'], ...VARIANCE_REASONS.map(r => [r, r]), ['Other', 'Other']], v.why, 'Why is the PO value different from the won value?', final), { req: true })}${v.why === 'Other' ? `<div class="tf">${inp('whyText', v.whyText, 'Other reason', { ph: 'Say what changed', dis: final })}</div>` : ''}</div>` : ''; };
+  const draw = () => `<form class="tf-form" novalidate>${head(`${o.id} ${chip(o)}`, `${esc(o.acc)}${o.si ? ` · from <a class="link" href="initiative.html?id=${encodeURIComponent(o.si)}">${o.si} ${esc(o.siName)}</a>` : ''}`)}
+      ${o.status === 'Cancelled' ? '<p class="op-steps tf-h">Cancelled: this order no longer counts in customer value.</p>' : `<ol class="op-steps" aria-label="Order progress">${STEPS.map(([s, n], i) => { const done = i < at || o.status === 'Completed', cur = i === at && !done; return `<li class="${done ? 'done' : ''}" ${cur ? 'aria-current="step"' : ''}><i aria-hidden="true">${done ? '✓' : i + 1}</i><span>${s}${n ? `<span> · ${n}</span>` : ''}</span></li>`; }).join('')}</ol>`}
+      <div class="dr-body"><div class="tf-g">
+        ${tracked ? `<div class="op-fig">${figs()}</div>` : ''}
+        <h3 class="op-h">Customer PO / contract</h3><span class="tf-h">The order value is the actual PO value; it never changes the initiative's booking value.</span>
+        <div class="tf-2">${fld('PO / contract reference', inp('po', v.po, 'PO / contract reference', { dis: final, ph: 'e.g. OEC-PO-2026-118' }), { hint: 'Needed to confirm' })}
+          ${fld('Order date', inp('date', v.date, 'Order date', { type: 'date', dis: final }), { hint: 'Date on the PO', err: calc().future ? FUTURE : '', id: 'date' })}</div>
+        <div class="tf-2"><div class="op-3">${fld('Order value', inp('value', v.value, 'Order value', { type: 'number', dis: final }), { req: true })}${fld('Currency', pick('cur', CURS.map(c => [c, c]), v.cur, 'Currency', final))}</div>
+          ${fld('Expected completion', inp('exp', v.exp, 'Expected completion', { type: 'date', dis: final }))}</div>
+        <div data-why>${why()}</div>
+        <h3 class="op-h">Delivery</h3>
+        ${fld('Responsible salesperson', pick('owner', PEOPLE, v.owner, 'Responsible salesperson', final), { hint: 'Defaults to the initiative owner.' })}
+        ${fld('Remarks', `<textarea class="in" data-v="remarks" aria-label="Remarks">${esc(v.remarks)}</textarea>`)}
+        ${o.doneOn ? `<p class="tf-h" style="margin:0">Completed on ${CRM.date(o.doneOn)}.</p>` : ''}${o.cancel ? `<p class="tf-h" style="margin:0">Cancellation reason: ${esc(o.cancel)}</p>` : ''}
+        <h3 class="op-h">Attachments</h3><div class="tf"><button type="button" class="btn" data-x="file" style="align-self:flex-start">Attach file</button><span class="tf-h">No attachments yet. Attach the signed PO here after confirming.</span></div>
+        <h3 class="op-h">History</h3><ul class="op-hist">${history.map(([t, d]) => `<li><span>${esc(t)}</span><small>${CRM.date(d)}</small></li>`).join('')}</ul>
+      </div></div><div class="dr-foot op-foot">${foot()}</div></form>`;
+  const P = openPanel(v, draw, `Discard changes to ${o.id}?`);
+  const save = () => { Object.assign(o, final ? { remarks: v.remarks } : { po: v.po.trim(), date: v.date, value: num(), cur: v.cur, exp: v.exp, owner: v.owner, remarks: v.remarks, why: calc().off ? calc().why : '' }); };
+  const done = (msg) => { ACCOUNTS.forEach(a => { a.value = customerValue(a.name); }); P.close(); render(); toast(msg, 'ok'); };
+  const refresh = () => { const f = P.el.querySelector('.op-fig'); if (f) f.innerHTML = figs(); P.el.querySelector('.op-foot').innerHTML = foot(); };
+  P.el.addEventListener('input', (e) => { const k = e.target.dataset.v; if (!k) return; const off = calc().off; v[k] = e.target.value; if (e.target.type !== 'date' && off !== calc().off) { const w = P.el.querySelector('[data-why]'); w.innerHTML = why(); CRM.enhanceSelects(w); } refresh(); });
+  P.el.addEventListener('change', (e) => { const k = e.target.dataset.v; if (!k) return; v[k] = e.target.value; if (e.target.type === 'date' || ['cur', 'why'].includes(k)) P.redraw(); else refresh(); });
+  P.el.addEventListener('click', async (e) => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x || x === 'close') return;
+    if (x === 'file') toast('Would open the file picker');
+    else if (x === 'save') { save(); done(`${o.id} saved.`); }
+    else if (x === 'next') { const draft = o.status === 'Draft'; save(); if (draft) { o.status = 'Open'; o.wait = null; } else { o.status = 'Completed'; o.doneOn = TODAY_ISO; }
+      done(draft ? `${o.id} confirmed. It now counts in customer value.` : `${o.id} is now Completed.`); }
+    else if (x === 'cancel') { const open = o.status === 'Open'; let reason = '';
+      const r = await CRM.confirm({ title: `Cancel order ${o.id}?`, body: `<p>${open ? 'It leaves customer value. Say why it is being cancelled.' : 'The draft is closed and the PO is no longer expected.'} A cancelled order can't be reopened.</p>`,
+        field: open ? { label: 'Cancellation reason', onText: (t) => { reason = t; } } : null, actions: [{ label: 'Cancel order', value: 'yes', kind: 'quiet', needsText: open }, { label: 'Keep order', value: null, kind: 'primary' }] });
+      if (r === 'yes') { o.status = 'Cancelled'; o.cancel = reason; o.cancelOn = TODAY_ISO; o.wait = null; done(`${o.id} cancelled.`); } }
+  });
+}
+
+function openRegister() {
+  const v = { acc: '', status: 'Completed', si: '', po: '', date: '', value: '', cur: 'USD', exp: '', owner: '', remarks: '' }; let errs = {};
+  const draw = () => `<form class="tf-form" novalidate>${head('Register historical order', 'Past business from before CRMpulse. It counts in customer value once Open or Completed.')}
+      <div class="dr-body"><div class="tf-g">
+        <h3 class="op-h" style="margin:0">Order type</h3>
+        <div class="tf-2">${fld('Account', pick('acc', [['', 'Select account…'], ...ACCOUNTS.map(a => [a.name, a.name])], v.acc, 'Account'), { req: true, err: errs.acc, id: 'acc' })}
+          ${fld('Status', pick('status', ['Completed', 'Open', 'Draft'].map(s => [s, s]), v.status, 'Status'))}</div>
+        ${fld('Linked Sales Initiative (optional)', pick('si', [['', v.acc ? 'None' : 'Choose the account first'], ...INITS.filter(o => o.acc === v.acc).map(o => [o.id, o.name])], v.si, 'Linked Sales Initiative', !v.acc))}
+        <h3 class="op-h">Customer PO / contract</h3><span class="tf-h">The order value is the actual PO value; it never changes the initiative's booking value.</span>
+        <div class="tf-2">${fld('Customer PO / Contract Reference', inp('po', v.po, 'Customer PO / Contract Reference'))}
+          ${fld('Order date', inp('date', v.date, 'Order date', { type: 'date' }), { hint: "Date on the PO. Can't be in the future.", err: v.date > TODAY_ISO ? FUTURE : '', id: 'date' })}</div>
+        <div class="tf-2"><div class="op-3">${fld('Order value', inp('value', v.value, 'Order value', { type: 'number' }), { req: true, err: errs.value, id: 'value' })}${fld('Currency', pick('cur', CURS.map(c => [c, c]), v.cur, 'Currency'))}</div>
+          ${fld('Expected completion date', inp('exp', v.exp, 'Expected completion date', { type: 'date' }))}</div>
+        ${fld('Responsible salesperson', pick('owner', [['', 'Not set'], ...PEOPLE], v.owner, 'Responsible salesperson'))}
+        ${fld('Description / remarks', `<textarea class="in" data-v="remarks" aria-label="Description / remarks">${esc(v.remarks)}</textarea>`)}
+      </div></div><div class="dr-foot"><button type="button" class="btn ghost" data-x="close">Cancel</button><button type="submit" class="btn primary">Register order</button></div></form>`;
+  const P = openPanel(v, draw, 'Discard this order?');
+  P.el.addEventListener('input', (e) => { if (e.target.dataset.v) v[e.target.dataset.v] = e.target.value; });
+  P.el.addEventListener('change', (e) => { const k = e.target.dataset.v; if (!k) return; v[k] = e.target.value; delete errs[k]; if (k === 'acc') v.si = ''; if (k === 'acc' || k === 'date') P.redraw(); });
+  P.el.addEventListener('submit', () => {
+    errs = {}; if (!v.acc) errs.acc = 'Historical orders need an account.'; if (v.value === '' || Number(v.value) < 0) errs.value = 'Enter the order value.';
+    if (Object.keys(errs).length || v.date > TODAY_ISO) { P.redraw(); P.el.querySelector('.tf.bad :is(.sel-btn, .in)')?.focus(); return; }
+    const si = INITS.find(x => x.id === v.si), id = 'ORD-2026-' + String(Math.max(...ORDERS.filter(o => o.id.startsWith('ORD-2026')).map(o => +o.id.slice(-4))) + 1).padStart(4, '0');
+    ORDERS.push({ id, type: 'Historical', acc: v.acc, si: v.si, siName: si ? si.name : '', owner: v.owner, po: v.po.trim(), date: v.date, won: null, wonCur: '', wonOn: '', value: Number(v.value), cur: v.cur, status: v.status, why: '', exp: v.exp, doneOn: '', remarks: v.remarks, cancel: '', wait: null });
+    S.hist = true; P.close(); render(); toast(`${id} registered.`, 'ok');
+  });
+}
+
+// ---- Events ----
+const page = $('#page');
+page.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act, v = a.dataset.v;
+  if (act === 'open') openOrder(ORDERS.find(o => o.id === v));
+  else if (act === 'tab') { S.tab = v; S.page = 1; render(); }
+  else if (act === 'sort') { S.sort = v; S.page = 1; render(); }
+  else if (act === 'page') { S.page = +v; render(); }
+  else if (act === 'hpage') { S.hpage = +v; render(); }
+  else if (act === 'hist') { S.hist = !S.hist; render(); document.querySelector('.hist-b').focus({ preventScroll: true }); }
+  else if (act === 'reset') resetAll();
+});
+page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-act]')) e.target.click(); });
+$('#f-period').innerHTML = PERIODS.map(([k, l]) => `<option value="${k}">${l}</option>`).join('');
+$('#f-search').addEventListener('input', (e) => { S.q = e.target.value; S.page = S.hpage = 1; render(); });
+$('#f-period').addEventListener('change', (e) => { S.period = e.target.value; S.page = S.hpage = 1; render(); });
+function resetAll() { S.q = S.period = ''; $('#f-search').value = ''; $('#f-period').value = ''; S.page = S.hpage = 1; render(); }
+$('#reset').addEventListener('click', resetAll);
+{ const b = $('#new'); if (!CAN_REGISTER) { b.setAttribute('aria-disabled', 'true'); b.dataset.tip = 'Only Administrators, Sales Heads and Finance can register historical orders'; }
+  b.addEventListener('click', () => CAN_REGISTER ? openRegister() : toast(b.dataset.tip, 'warn')); }
+
+CRM.renderShell('orders');
+CRM.watchSticky($('#filters'));
+render();
+CRM.riseIn();
+// notification links open that order: ?open=ORD-…
+{ const id = new URLSearchParams(location.search).get('open'), o = id && VISIBLE().find(x => x.id === id); if (o) openOrder(o); }
+</script>
+</body>
+</html>
