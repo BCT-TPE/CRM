@@ -7,10 +7,10 @@
 <title>Pipeline & forecast · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* Q3 forecast bar sits on the same baseline as the quarter bars in "Bookings vs target" beside it (1440 desktop) */
 @media (min-width: 1361px) { body.v2 .fc .sum-legend { margin-top: 32px; } }
@@ -66,8 +66,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script src="assets/region-map.js?v=20261113w"></script>
 <script>
 /* Data lives in assets/crm-data.js (shared with Sales performance). */
@@ -759,7 +759,7 @@ function syncControls() {
   document.querySelectorAll('#f-q button').forEach(b => { const on = +b.dataset.q === S.q; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
   const teams = Object.keys(TEAMS).filter(t => !S.geo.length || S.geo.includes(TEAMS[t].geo));
   $('#f-team').innerHTML = `<option value="">All teams</option>` + teams.map(t => `<option ${S.team === t ? 'selected' : ''}>${esc(t)}</option>`).join('');
-  const people = (S.team ? TEAMS[S.team].people : teams.flatMap(t => TEAMS[t].people)).slice().sort();
+  const people = [...new Set(S.team ? TEAMS[S.team].people : teams.flatMap(t => TEAMS[t].people))].sort(); // a person can be in two teams
   $('#f-owner').innerHTML = `<option value="">All owners</option>` + people.map(p => `<option ${S.owner === p ? 'selected' : ''}>${esc(p)}</option>`).join('');
   $('#w-team').classList.toggle('set', !!S.team);
   $('#w-owner').classList.toggle('set', !!S.owner);

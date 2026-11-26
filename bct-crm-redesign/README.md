@@ -19,6 +19,9 @@ Redesign of the CRM V1 classic pages, following the old CRMpulse information arc
 | Contacts | `contacts.html` | People at each account, by account or as a list; accounts without an active decision maker; contact details beside the list |
 | Customer orders | `orders.html` | Won deals waiting for a PO, open, completed and cancelled orders, and historical orders: confirm a PO, compare it with the won value, register past business |
 | Sales targets | `targets.html` | Quarterly booking targets per dimension (geography, region, salesperson, SBU, practice, offering, technology, vertical) against closed won; edit a row's targets |
+| Reports | `reports.html` | The 15 predefined reports in seven groups; each opens its own page |
+| Report | `report.html?id=open-pipeline` | One report: summary figures, filters, sortable table, Excel / CSV export. Rows that stand for one record open it |
+| Sales structure | `structure.html` | Read only: sales teams with manager and members, geographies, regions, and the sales classifications with every value |
 | Pipeline (archived layout) | `pipeline_archieve.html` | The first Pipeline layout, kept for reference |
 
 Every page works from 1440 down to a 390 px phone. What changes at each width, and why, is in `RWD.md` (Traditional Chinese).

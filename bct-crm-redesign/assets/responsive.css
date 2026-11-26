@@ -55,11 +55,11 @@ body.v2 :is(.main .filters.compact, .filters) .m-moved .select { display: grid; 
 /* Export / More filters (design review D7): with their text when it fits — from 1420px, or from 1500px once Reset shows —
    otherwise 40px icon buttons with a tooltip (crm.js iconTips; the label stays for screen readers) */
 @media (max-width: 1419px) {
-  .filters #more-btn, .filters #export { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
+  .filters #more-btn, .filters #export, .filters #details { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
   .filters #more-btn .count-badge { position: absolute; top: -4px; right: -4px; font-size: var(--text-2xs); }
 }
 @media (min-width: 1420px) and (max-width: 1499px) {
-  .filters:has(#reset:not([hidden])) :is(#more-btn, #export) { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
+  .filters:has(#reset:not([hidden])) :is(#more-btn, #export, #details) { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
   .filters:has(#reset:not([hidden])) #more-btn .count-badge { position: absolute; top: -4px; right: -4px; font-size: var(--text-2xs); }
 }
 /* Desktop filter bars: the search gives up width first (260 → 180px), then the bar wraps instead of
@@ -102,7 +102,7 @@ body.v2 :is(.main .filters.compact, .filters) .m-moved .select { display: grid; 
   .tbl th:first-child, .tbl td:first-child { position: sticky; left: 0; z-index: 1; background: var(--surface); }
   .tbl th:first-child { z-index: 2; }
   body.v2 .tbl th:first-child { background: var(--surface); } /* theme-v2 makes headers transparent: the pinned one must cover what scrolls under it */
-  body.v2 .tbl tbody tr:hover td:first-child { background: var(--hover); }
+  body.v2 .tbl tbody tr.click:hover td:first-child { background: var(--hover); }
   .tbl-wrap { -webkit-overflow-scrolling: touch; }
   /* header KPIs share the width evenly (the desktop min-widths that stop jitter no longer fit) */
   .v2-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); width: 100%; }
@@ -144,7 +144,7 @@ body.v2 :is(.main .filters.compact, .filters) .m-moved .select { display: grid; 
   .filters.compact .sp { display: none; }
   .main .filters.compact .search { flex: 1 1 0; min-width: 0; width: auto; }
   /* More filters and Export become 40px icon buttons; the label stays for screen readers */
-  .filters.compact #more-btn, .filters.compact #export { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
+  .filters.compact #more-btn, .filters.compact #export, .filters.compact #details { position: relative; width: 40px; padding: 0; justify-content: center; font-size: 0; gap: 0; flex: none; }
   /* …and once the bar is stuck, the same actions as 40px icons at the end of row 1 (crm.js compactFilters) */
   .filters.compact .f-acts { display: none; gap: var(--space-2); flex: none; }
   .filters.compact.stuck .f-acts { display: flex; }
@@ -192,13 +192,13 @@ body.v2 :is(.main .filters.compact, .filters) .m-moved .select { display: grid; 
   /* Tables → card list (crm.js prepTables adds data-label / data-wide and the Sort select) */
   .main .tbl-sort { display: inline-flex; margin-bottom: var(--space-3); }
   body.v2 .main .tbl-sort { border-color: var(--line-2); box-shadow: none; }
-  .main .tbl-wrap, .main .card > .tbl-sort:first-child + .tbl-wrap { overflow: visible; margin: 0; } /* Sort is visible here: no pull-up */
+  .main .tbl-wrap, .main .card > .tbl-wrap:first-child, .main .card > .tbl-sort:first-child + .tbl-wrap { overflow: visible; margin: 0; } /* cards, no header row: no pull-up (with or without Sort) */
   .main .tbl, .main .tbl tbody { display: block; width: 100%; min-width: 0 !important; } /* beats the per-table min-widths (some in page styles) */
   .main .tbl colgroup, .main .tbl thead { display: none; }
   .main .tbl tbody { display: flex; flex-direction: column; gap: var(--space-3); }
   .main .tbl tbody tr { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3) var(--space-4);
     padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
-  body.v2 .main .tbl tbody tr:hover { background: var(--hover); }
+  body.v2 .main .tbl tbody tr.click:hover { background: var(--hover); }
   .main .tbl tbody td, body.v2 .main .tbl tbody td { display: block; position: static; height: auto; min-width: 0; padding: 0; border: 0; background: none; text-align: left; white-space: normal; }
   body.v2 .main .tbl tbody tr:hover td, body.v2 .main .tbl tbody tr:hover td:first-child { background: none; }
   .main .tbl tbody td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; font-size: var(--text-2xs); font-weight: 400; color: var(--t3); }

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales structure · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
+<style>
+/* ---------- Page: Sales structure (CRM V1 Sales Structure Management, old CRMpulse /sales-structure; the title follows the menu) ----------
+   As the old page shows it to a Sales Head: read only (no New, Edit, History or add-value; the old page keeps those for the
+   Administrator, a role this site no longer has). The same four tabs with counts; Sales teams, Geographies and Regions are
+   tables, Sales classifications one card per classification listing its values. No search, pager or row click: the old page
+   has none. The data is the site's own (teams, regions and classification values used by initiatives, targets and
+   reports), so every page names things the same way. */
+.tbl.ss { table-layout: fixed; }
+.tbl.ss td { padding-top: 12px; padding-bottom: 12px; height: 60px; }
+.tbl.ss col.c-s { width: 11%; }
+.tbl.ss.t-team col.c-n { width: 26%; } .tbl.ss.t-team col.c-p { width: 22%; }
+.tbl.ss.t-geo col.c-n { width: 26%; } .tbl.ss.t-geo col.c-p { width: 24%; }
+.tbl.ss.t-reg col.c-n { width: 28%; } .tbl.ss.t-reg col.c-g { width: 24%; }
+.tbl.ss .t-sub.code { margin-top: 4px; }
+.code { font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: var(--text-xs); color: var(--t2); }
+.none { color: var(--t3); }
+.chip { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
+.chip.Active { background: var(--ok-bg); color: var(--ok-text); }
+.chip.Inactive { background: var(--field); color: var(--t3); }
+.chip.Mandatory { background: var(--info-bg); color: var(--deep); }
+/* members: avatars overlap, every name beside them (DESIGN §7.8; the old page lists all members) */
+.mem { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.mem > span:last-child { min-width: 0; }
+.avs { display: flex; flex: none; } .avs .av { box-shadow: 0 0 0 2px var(--surface, #fff); } .avs .av + .av { margin-left: -8px; }
+/* Sales classifications: old ClassificationCard, two per row from 1280px */
+.cls-g { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; } /* the card's own padding is the inset: cards line up with the tabs */
+@media (min-width: 1280px) { .cls-g { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } } /* cards in a row share one height */
+.cls-c { display: flex; flex-direction: column; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.cls-h { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.cls-h h3 { margin: 0; font-size: var(--text-base); font-weight: 600; color: var(--ink); }
+.cls-sub { margin: 6px 0 0; font-size: var(--text-xs); color: var(--t3); }
+.cls-v { display: grid; margin: 14px 0 0; padding: 0; list-style: none; }
+.cls-v li { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 36px; padding: 4px 0; font-size: var(--text-sm); color: var(--ink); }
+.cls-v li + li { border-top: 1px solid var(--line); }
+.cls-v li small { font-size: var(--text-xs); color: var(--t3); text-align: right; }
+.cls-v li.off span:nth-child(2) { color: var(--t3); }
+.cls-foot { margin: auto 0 0; padding-top: 12px; font-size: var(--text-xs); color: var(--t3); }
+@media (max-width: 1100px) { .tbl.ss { min-width: 900px; } }
+@media (max-width: 767px) { .main .tbl.ss.t-team tbody td:nth-child(3) { grid-column: 1 / -1; order: 1; } .cls-c { padding: 16px; } .cls-v li { grid-template-columns: 64px minmax(0, 1fr); } .cls-v li small { grid-column: 2; text-align: left; margin-top: -8px; } }
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+
+  <main class="main">
+    <header class="v2-head">
+      <div class="v2-hello">
+        <h1>Sales structure</h1>
+        <p>Flat sales teams with one team manager, geographies and regions with heads, and the business classifications used across CRM.</p>
+      </div>
+    </header>
+
+    <div id="page"></div>
+  </main>
+</div>
+
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const S = { tab: 'teams' };
+
+// ---- Data: built from the site's own structure so every page agrees (TEAMS, SALES_REGION, sellOf values) ----
+const MANAGER = TEAM_MANAGER; // crm-data.js
+const TEAM_CODE = { 'APAC Sales': 'APAC', 'India Enterprise': 'IN-ENT', 'India Strategic Accounts': 'IN-SA', 'Middle East Enterprise': 'ME-ENT', 'Middle East Strategic Accounts': 'ME-SA' };
+const GEO_CODE = { APAC: 'APAC', India: 'IN', 'Middle East': 'ME' }, GEO_HEAD = { APAC: 'Kevin Lim', India: 'Suresh Menon', 'Middle East': 'Khalid Rahman' };
+const REG_CODE = { 'India North': 'IN-N', 'India South': 'IN-S', UAE: 'UAE', 'Saudi Arabia': 'KSA', Oman: 'OM', Singapore: 'SG', Malaysia: 'MY' }; // old codes
+const REG_HEAD = { 'India South': 'Anita Desai', UAE: 'Ahmed Al-Mansoori' };
+
+const STRUCT = {
+  teams: Object.entries(TEAMS).map(([n, t]) => ({ code: TEAM_CODE[n], name: n, manager: MANAGER[n], members: [...t.members], active: true })),
+  geos: Object.keys(SALES_REGION).map(g => ({ code: GEO_CODE[g], name: g, head: GEO_HEAD[g] || '', active: true })),
+  regions: Object.entries(SALES_REGION).flatMap(([g, rs]) => rs.map(r => ({ code: REG_CODE[r], name: r, geo: g, head: REG_HEAD[r] || '', active: true }))).sort((a, b) => a.name.localeCompare(b.name)),
+  cls: []
+};
+STRUCT.geos.sort((a, b) => a.name.localeCompare(b.name));
+STRUCT.cls = CLASSIFICATIONS; // old CRMpulse values, shared with initiatives, targets and reports (crm-data.js)
+const clsBy = (code) => STRUCT.cls.find(c => c.code === code);
+
+const TABS = [['teams', 'Sales teams'], ['geos', 'Geographies'], ['regions', 'Regions'], ['cls', 'Sales classifications']];
+
+// ---- Tables (old: Code, name, person, list, Status; here the code sits under the name, as on the other pages) ----
+const person = (n) => n ? `<div class="own">${CRM.avatar(n)}<div class="own-t"><div class="ell t-main">${esc(n)}</div></div></div>` : '<span class="none">—</span>';
+const people = (l) => l.length ? `<div class="mem"><span class="avs">${l.slice(0, 4).map(n => CRM.avatar(n)).join('')}</span><span>${esc(l.join(', '))}</span></div>` : '<span class="none">—</span>';
+const status = (on) => `<span class="chip ${on ? 'Active' : 'Inactive'}">${on ? 'Active' : 'Inactive'}</span>`;
+const nameCell = (r) => `<div class="ell t-main">${esc(r.name)}</div><div class="ell t-sub code">${esc(r.code)}</div>`;
+const regionsOf = (g) => STRUCT.regions.filter(r => r.geo === g).map(r => r.name);
+const SPEC = {
+  teams: { cls: 't-team', cols: ['c-n', 'c-p', '', 'c-s'], head: ['Sales team', 'Team manager', 'Members', 'Status'],
+    cells: (r) => [nameCell(r), person(r.manager), people(r.members), status(r.active)] },
+  geos: { cls: 't-geo', cols: ['c-n', 'c-p', '', 'c-s'], head: ['Geography', 'Geography head', 'Regions', 'Status'],
+    cells: (r) => [nameCell(r), person(r.head), regionsOf(r.name).length ? esc(regionsOf(r.name).join(', ')) : '<span class="none">—</span>', status(r.active)] },
+  regions: { cls: 't-reg', cols: ['c-n', 'c-g', '', 'c-s'], head: ['Region', 'Geography', 'Region head', 'Status'],
+    cells: (r) => [nameCell(r), esc(r.geo), person(r.head), status(r.active)] }
+};
+const table = (k) => { const sp = SPEC[k];
+  return `<div class="tbl-wrap"><table class="tbl ss ${sp.cls}"><colgroup>${sp.cols.map(c => `<col${c ? ` class="${c}"` : ''}>`).join('')}</colgroup>
+    <thead><tr>${sp.head.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${STRUCT[k].map(r => `<tr>${sp.cells(r).map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
+
+// ---- Sales classifications (old ClassificationCard, read only) ----
+const card = (c) => { const p = c.dep ? clsBy(c.dep) : null;
+  return `<article class="cls-c" aria-label="${esc(c.name)}"><div class="cls-h"><h3>${esc(c.name)}</h3><span class="code">${esc(c.code)}</span>${c.mandatory ? '<span class="chip Mandatory">Mandatory</span>' : ''}${c.active ? '' : status(false)}</div>
+    <p class="cls-sub">${esc([c.desc, p ? `Values filtered by ${p.name}` : ''].filter(Boolean).join(' · '))}</p>
+    ${c.values.length ? `<ul class="cls-v">${c.values.map(v => `<li class="${v.active ? '' : 'off'}"><span class="code">${esc(v.code)}</span><span>${esc(v.name)}</span>${p ? `<small>${esc(v.parent || `Any ${p.name}`)}</small>` : ''}</li>`).join('')}</ul>` : '<p class="cls-sub">No values yet.</p>'}
+    <p class="cls-foot">Values used by records cannot be deleted; deactivate them instead.</p></article>`; };
+
+function render() {
+  const tabs = `<div class="tabs" role="tablist" aria-label="Sales structure">${TABS.map(([k, l]) => `<button class="tab ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-tab="${k}">${l} <span class="tab-n">${STRUCT[k].length}</span></button>`).join('')}</div>`;
+  const label = TABS.find(t => t[0] === S.tab)[1];
+  $('#page').innerHTML = `<section class="card" aria-label="${label}">${tabs}${S.tab === 'cls' ? `<div class="cls-g">${STRUCT.cls.map(card).join('')}</div>` : table(S.tab)}</section>`;
+}
+$('#page').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) { S.tab = b.dataset.tab; render(); } });
+
+CRM.renderShell('structure');
+render();
+CRM.riseIn();
+</script>
+</body>
+</html>

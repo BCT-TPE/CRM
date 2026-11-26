@@ -23,16 +23,21 @@ const CODE_INFO = {
 };
 // FY targets. Company target = sum of geography targets ($14.40M). Team and salesperson targets are set independently
 // (requirement 10.6: overlapping targets are never added together).
+// Sales teams and members: the old CRMpulse Sales structure (2026-11-26). people = members, plus Gaurav (ME) in APAC Sales:
+// he manages that team and also sells, as before. A member may be in two teams (Rajesh Kumar, Omar Haddad); PERSON_TEAM
+// keeps the first. The former Karthik Menon is now Rajesh Kumar (same initiatives, target and photo).
 const TEAMS = {
-  'APAC Sales': { geo: 'APAC', people: ['Daniel Tan', 'Mei Lin Wong', 'Gaurav Shrotriya'], target: 1.65e6 }, // incl. Gaurav's own 0.55M (2026-11-24)
-  'India Enterprise': { geo: 'India', people: ['Priya Sharma', 'Karthik Menon'], target: 2.20e6 },
-  'India Strategic Accounts': { geo: 'India', people: ['Vikram Iyer', 'Ananya Reddy'], target: 1.10e6 },
-  'Middle East Enterprise': { geo: 'Middle East', people: ['Omar Haddad', 'Ahmed Al-Mansoori'], target: 1.10e6 },
-  'Middle East Strategic Accounts': { geo: 'Middle East', people: [], target: 1.10e6 }
+  'APAC Sales': { geo: 'APAC', members: ['Daniel Tan', 'Mei Lin Wong'], people: ['Daniel Tan', 'Mei Lin Wong', 'Gaurav Shrotriya'], target: 1.65e6 }, // incl. Gaurav's own 0.55M (2026-11-24)
+  'India Enterprise': { geo: 'India', members: ['Priya Sharma', 'Rajesh Kumar', 'Sneha Nair'], target: 2.20e6 },
+  'India Strategic Accounts': { geo: 'India', members: ['Ananya Reddy', 'Vikram Iyer'], target: 1.10e6 },
+  'Middle East Enterprise': { geo: 'Middle East', members: ['Ahmed Al-Mansoori', 'Omar Haddad', 'Rajesh Kumar'], target: 1.10e6 },
+  'Middle East Strategic Accounts': { geo: 'Middle East', members: ['Fatima Al-Zahra', 'Omar Haddad'], target: 1.10e6 }
 };
-const PERSON_TARGET = { 'Daniel Tan': 0.55e6, 'Mei Lin Wong': 0.55e6, 'Gaurav Shrotriya': 0.55e6, 'Priya Sharma': 1.10e6, 'Karthik Menon': 1.10e6, 'Vikram Iyer': 0.55e6, 'Ananya Reddy': 0.55e6, 'Omar Haddad': 0.55e6, 'Ahmed Al-Mansoori': 0.55e6 };
+Object.values(TEAMS).forEach(t => { if (!t.people) t.people = [...t.members]; });
+const TEAM_MANAGER = { 'APAC Sales': 'Gaurav Shrotriya', 'India Enterprise': 'Suresh Menon', 'India Strategic Accounts': 'Anita Desai', 'Middle East Enterprise': 'Khalid Rahman', 'Middle East Strategic Accounts': 'Khalid Rahman' };
+const PERSON_TARGET = { 'Daniel Tan': 0.55e6, 'Mei Lin Wong': 0.55e6, 'Gaurav Shrotriya': 0.55e6, 'Priya Sharma': 1.10e6, 'Rajesh Kumar': 1.10e6, 'Vikram Iyer': 0.55e6, 'Ananya Reddy': 0.55e6, 'Omar Haddad': 0.55e6, 'Ahmed Al-Mansoori': 0.55e6 };
 const ME = 'Gaurav Shrotriya';
-const PERSON_TEAM = Object.fromEntries(Object.entries(TEAMS).flatMap(([t, v]) => v.people.map(p => [p, t])));
+const PERSON_TEAM = Object.fromEntries(Object.entries(TEAMS).reverse().flatMap(([t, v]) => v.people.map(p => [p, t]))); // reversed: a person in two teams keeps the first
 const GEO_TARGET = { 'APAC': 2.8e6, 'India': 5.6e6, 'Middle East': 6.0e6 };
 const COMPANY_TARGET = 14.4e6;
 
@@ -50,7 +55,7 @@ const OPPS = [
   { id: 'SI-2026-0028', name: 'Emirates Logistics Hub – Data Platform Modernization', acc: 'Emirates Logistics Hub', owner: 'Omar Haddad', team: 'Middle East Enterprise', st: 'ps', value: 0.18e6, prob: 60, close: '2027-02-10', days: 68, open: 80, next: true },
   { id: 'SI-2026-0022', name: 'Oman – Identity & Access Management', acc: 'Oman Energy Corporation', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', st: 'ps', value: 0.15e6, prob: 60, close: '2027-03-05', days: 96, open: 120, next: true },
   { id: 'SI-2026-0027', name: 'Kaveri – Data Platform Modernization', acc: 'Kaveri Pharma', owner: 'Ananya Reddy', team: 'India Strategic Accounts', st: 'cf', value: 0.12e6, prob: 90, close: '2026-12-22', days: 52, open: 95, next: true },
-  { id: 'SI-2026-0029', name: 'Sundaram – Cloud Migration', acc: 'Sundaram Healthcare', owner: 'Karthik Menon', team: 'India Enterprise', st: 'ps', value: 0.12e6, prob: 70, close: '2026-12-11', days: 92, open: 85, next: true },
+  { id: 'SI-2026-0029', name: 'Sundaram – Cloud Migration', acc: 'Sundaram Healthcare', owner: 'Rajesh Kumar', team: 'India Enterprise', st: 'ps', value: 0.12e6, prob: 70, close: '2026-12-11', days: 92, open: 85, next: true },
   { id: 'SI-2026-0018', name: 'Gulf – ERP Upgrade', acc: 'Gulf National Bank', owner: 'Ahmed Al-Mansoori', team: 'Middle East Enterprise', st: 'ps', value: 0.0896e6, prob: 60, close: '2027-03-20', days: 101, open: 140, next: true },
   // Gaurav's own deals, so Home's salesperson view has a quota, commit, best case and deals needing attention (2026-11-24)
   { id: 'SI-2026-0045', name: 'Al Dhafra – Smart Buildings', acc: 'Al Dhafra Facilities', owner: 'Gaurav Shrotriya', team: 'APAC Sales', st: 'cf', value: 0.035e6, prob: 90, close: '2026-12-12', days: 20, open: 45, next: true },
@@ -67,7 +72,7 @@ const CLOSED = [
   { id: 'SI-2026-0007', name: 'Singapore – Data Warehouse Support', acc: 'Singapore Metro Bank', owner: 'Mei Lin Wong', team: 'APAC Sales', result: 'won', value: 0.46e6, closed: '2026-08-28' },
   { id: 'SI-2026-0035', name: 'Pacific – Service Desk Extension', acc: 'Pacific Health Systems', owner: 'Daniel Tan', team: 'APAC Sales', result: 'won', value: 0.0565e6, closed: '2026-10-22' },
   { id: 'SI-2026-0002', name: 'Indus – Core Banking Integration', acc: 'Indus Finance Corporation', owner: 'Priya Sharma', team: 'India Enterprise', result: 'won', value: 0.62e6, closed: '2026-06-17' },
-  { id: 'SI-2026-0008', name: 'Bharat – SAP S/4 Migration', acc: 'Bharat Steel Works', owner: 'Karthik Menon', team: 'India Enterprise', result: 'won', value: 1.30e6, closed: '2026-09-12' },
+  { id: 'SI-2026-0008', name: 'Bharat – SAP S/4 Migration', acc: 'Bharat Steel Works', owner: 'Rajesh Kumar', team: 'India Enterprise', result: 'won', value: 1.30e6, closed: '2026-09-12' },
   { id: 'SI-2026-0036', name: 'Sundaram – Patient Portal AMC', acc: 'Sundaram Healthcare', owner: 'Priya Sharma', team: 'India Enterprise', result: 'won', value: 0.13e6, closed: '2026-10-30' },
   { id: 'SI-2026-0004', name: 'Lotus – POS Rollout', acc: 'Lotus Retail India', owner: 'Vikram Iyer', team: 'India Strategic Accounts', result: 'won', value: 0.25e6, closed: '2026-05-08' },
   { id: 'SI-2026-0009', name: 'Kaveri – Quality Analytics', acc: 'Kaveri Pharma', owner: 'Ananya Reddy', team: 'India Strategic Accounts', result: 'won', value: 0.42e6, closed: '2026-08-05' },
@@ -178,7 +183,7 @@ const TASK_ROWS = [
   ['0038', 'Get PO signed', 'SI-2026-0027', 'Ananya Reddy', 'Suresh Menon', 'ns', 3],
   ['0039', 'Legal review of the MSA', 'SI-2026-0024', 'Lakshmi Pillai', 'Vikram Iyer', 'ns', 6],
   ['0040', 'Finalise proposal pricing', 'SI-2026-0016', 'Neha Gupta', 'Ahmed Al-Mansoori', 'ns', 8],
-  ['0041', 'Plan the migration workshop', 'SI-2026-0029', 'John Mathew', 'Karthik Menon', 'ns', null],
+  ['0041', 'Plan the migration workshop', 'SI-2026-0029', 'John Mathew', 'Rajesh Kumar', 'ns', null],
   ['0042', 'Collect reference letters', 'SI-2026-0022', 'Ahmed Al-Mansoori', 'Ahmed Al-Mansoori', 'ns', null],
   ['0005', 'Send revised commercial terms', 'SI-2026-0024', 'Vikram Iyer', 'Vikram Iyer', 'done', -6, 'ACT-2026-0021', -5],
   ['0009', 'Solution demo for security team', 'SI-2026-0032', 'John Mathew', 'Ananya Reddy', 'done', -10, null, -11],
@@ -202,8 +207,11 @@ const taskLate = (t) => taskOpen(t) && t.due && new Date(t.due) < TODAY; // §7.
 // generator as the record page's Contacts tab (initiative.html), so a person has the same name and role on both pages.
 const _hash = (x) => { let h = 0; for (const c of x) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
 const _pick = (arr, x) => arr[_hash(x) % arr.length];
-const ACC_VERT = [[/Retail|Lotus|Al Noor/, 'Retail'], [/Health|Sundaram/, 'Healthcare'], [/Bank|Finance/, 'Banking'], [/Kaveri|Pharma/, 'Pharma'], [/Steel|Manufactur|Industrial/, 'Manufacturing'], [/Energy|Petro/, 'Energy'], [/Logistics/, 'Logistics'], [/Facilit/, 'Facilities']];
-const HQ = { India: ['Mumbai', 'Bengaluru', 'Chennai', 'New Delhi'], 'Middle East': ['Dubai', 'Abu Dhabi', 'Riyadh', 'Muscat'], APAC: ['Singapore', 'Kuala Lumpur', 'Jakarta'] };
+// Industry / Vertical uses the VERTICAL classification (old CRMpulse account form), so only its five values; ports, freight,
+// logistics and facilities companies have none of them and stay "not set" ('') (2026-11-26).
+const ACC_VERT = [[/Retail|Lotus|Al Noor/, 'Retail'], [/Health|Sundaram|Kaveri|Pharma/, 'Healthcare'], [/Bank|Finance/, 'Banking'], [/Steel|Manufactur|Industrial/, 'Manufacturing'], [/Energy|Petro/, 'Energy']];
+const accVertical = (name) => (ACC_VERT.find(([re]) => re.test(name)) || [0, ''])[1];
+const HQ = { India: ['Mumbai', 'Bengaluru', 'Chennai', 'New Delhi'], 'Middle East': ['Dubai', 'Abu Dhabi', 'Riyadh', 'Muscat'], APAC: ['Singapore', 'Kuala Lumpur'] };
 const STRATEGIC = ['ABC Bank', 'Al Noor Retail Group', 'Desert Industrial Holdings', 'Lotus Retail India', 'Oman Energy Corporation', 'Singapore Metro Bank']; // + Al Noor, Oman Energy (2026-11-24: Home's "Strategic accounts gone quiet")
 const ACCOUNTS = [...new Set(INITS.map(o => o.acc))].sort().map((name, i) => {
   const its = INITS.filter(o => o.acc === name), top = its.slice().sort((a, b) => b.value - a.value)[0];
@@ -213,7 +221,7 @@ const ACCOUNTS = [...new Set(INITS.map(o => o.acc))].sort().map((name, i) => {
   return {
     id: 'ACC-2026-' + String(i + 1).padStart(4, '0'), name, geo, hq: _pick(HQ[geo], name),
     type: /Bank|Finance|Retail|Pte|Ltd|Pharma|Logistics|Facilities/.test(name) && !/Gulf|Oman|Deccan/.test(name) ? 'Private' : /Oman|Gulf|Deccan/.test(name) ? 'Government' : 'PSU',
-    vertical: (ACC_VERT.find(([re]) => re.test(name)) || [0, 'Enterprise'])[1],
+    vertical: accVertical(name),
     owner: top.owner, team: top.team, strategic: STRATEGIC.includes(name),
     // old CRMpulse lifecycle: Customer (won business) › Opportunity / Lead (an open one) › Prospect (none of these)
     lifecycle: won.length ? 'Customer' : its.some(o => o.kind === 'open' && o.status === 'Opportunity') ? 'Opportunity' : its.some(o => o.kind === 'open' && o.status === 'Lead') ? 'Lead' : 'Prospect',
@@ -291,20 +299,42 @@ const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;
 // across dimensions. Geography and salesperson use the targets the dashboards already use (GEO_TARGET,
 // PERSON_TARGET); the other dimensions split the company target by each value's share of FY26-27 won + open
 // opportunity value, rounded to $50K. Quarterly target = annual ÷ 4, as on Sales performance.
-const SALES_REGION = { India: ['India North', 'India West', 'India South'], 'Middle East': ['UAE', 'KSA', 'Oman'], APAC: ['Singapore', 'Malaysia', 'Indonesia'] };
-function sellOf(o) { // same rules as the record page (initiative.html selling())
+// Regions: the old CRMpulse Sales structure (7; 2026-11-26)
+const SALES_REGION = { India: ['India North', 'India South'], 'Middle East': ['Oman', 'Saudi Arabia', 'UAE'], APAC: ['Malaysia', 'Singapore'] };
+// Sales classifications: the old CRMpulse values exactly (Sales structure; seed in the old app). Offering values are filtered
+// by Practice. Technology and Vertical are optional: '' = not set. (2026-11-26: replaced this site's own SBU/practice/... lists)
+const CLASSIFICATIONS = [
+  { code: 'SBU', name: 'SBU', desc: 'Classifies Sales Initiatives by Strategic Business Unit', mandatory: true, dep: '',
+    values: [['DIG', 'Digital'], ['INF', 'Infrastructure'], ['EAP', 'Enterprise Applications']] },
+  { code: 'PRACTICE', name: 'Practice / Service Line', desc: 'Identifies the business practice or service line', mandatory: false, dep: '',
+    values: [['AID', 'AI & Data'], ['SEC', 'Cybersecurity'], ['CLD', 'Cloud'], ['APP', 'Application Services'], ['MS', 'Managed Services']] },
+  { code: 'OFFERING', name: 'Offering', desc: 'Identifies the service or solution offering', mandatory: false, dep: 'PRACTICE',
+    values: [['GENAI', 'GenAI Assistant', 'AI & Data'], ['DLAKE', 'Data Platform Modernization', 'AI & Data'], ['SOC', 'SOC-as-a-Service', 'Cybersecurity'], ['IAM', 'Identity & Access Management', 'Cybersecurity'],
+      ['MIG', 'Cloud Migration', 'Cloud'], ['DR', 'Disaster Recovery on Cloud', 'Cloud'], ['PORTAL', 'Customer Portal', 'Application Services'], ['ERP', 'ERP Upgrade', 'Application Services'],
+      ['IMS', 'Infrastructure Managed Services', 'Managed Services'], ['AMS', 'Application Support', 'Managed Services']] },
+  { code: 'TECHNOLOGY', name: 'Technology', desc: 'Identifies the associated technology', mandatory: false, dep: '',
+    values: [['AZ', 'Microsoft Azure'], ['AWS', 'AWS'], ['SAP', 'SAP'], ['OAI', 'OpenAI']] },
+  { code: 'VERTICAL', name: 'Vertical', desc: 'Identifies the customer industry or business vertical', mandatory: false, dep: '',
+    values: [['BFS', 'Banking'], ['NRG', 'Energy'], ['MFG', 'Manufacturing'], ['HC', 'Healthcare'], ['RTL', 'Retail']] }
+].map(c => ({ ...c, active: true, values: c.values.map(([code, name, parent = '']) => ({ code, name, parent, active: true })) }));
+const CLASS_VALUES = (code) => CLASSIFICATIONS.find(c => c.code === code).values.map(v => v.name);
+function sellOf(o) { // the record page (initiative.html) uses this too; off = what the initiative name says it sells
   const off = o.name.split(' – ').slice(1).join(' – ') || o.name, m = (re) => re.test(off);
-  const sbu = m(/ERP|SAP|Application|POS|Portal|App/) ? 'Enterprise applications' : m(/Cloud|Infrastructure|Network|Recovery|Service Desk/) ? 'Cloud & infrastructure' : m(/Identity|Security|Fraud/) ? 'Cybersecurity' : 'Data & AI';
-  const practice = { 'Enterprise applications': 'Application services', 'Cloud & infrastructure': 'Cloud services', 'Cybersecurity': 'Security services', 'Data & AI': 'Data services' }[sbu];
-  const tech = m(/ERP|SAP/) ? 'SAP' : m(/Cloud|Recovery/) ? 'AWS' : m(/Identity/) ? 'Okta' : m(/GenAI/) ? 'Azure OpenAI' : m(/Data|Analytics|Warehouse|Lake/) ? 'Databricks' : m(/Infrastructure|Network/) ? 'VMware' : m(/Support|Service Desk/) ? 'ServiceNow' : 'Other';
+  const practice = m(/Identity|Security|Fraud/) ? 'Cybersecurity' : m(/Support|Service Desk|Managed|AMC|Network/) ? 'Managed Services' : m(/Cloud|Recovery/) ? 'Cloud'
+    : m(/GenAI|Data|Analytics|Warehouse|Lake|IoT|Monitoring|SCADA|Fleet|Smart|Quality/) ? 'AI & Data' : 'Application Services';
+  const offering = { 'AI & Data': m(/GenAI/) ? 'GenAI Assistant' : 'Data Platform Modernization', 'Cybersecurity': m(/Identity/) ? 'Identity & Access Management' : 'SOC-as-a-Service',
+    'Cloud': m(/Recovery/) ? 'Disaster Recovery on Cloud' : 'Cloud Migration', 'Application Services': m(/ERP|SAP/) ? 'ERP Upgrade' : 'Customer Portal',
+    'Managed Services': m(/Infrastructure|Network|Service Desk/) ? 'Infrastructure Managed Services' : 'Application Support' }[practice];
+  const sbu = practice === 'AI & Data' ? 'Digital' : practice === 'Application Services' ? 'Enterprise Applications' : 'Infrastructure';
+  const tech = m(/ERP|SAP/) ? 'SAP' : m(/GenAI/) ? 'OpenAI' : m(/Cloud Migration/) ? 'AWS' : m(/Recovery|Data|Analytics|Warehouse|Lake/) ? 'Microsoft Azure' : '';
   const geo = TEAMS[o.team].geo;
-  return { geography: geo, region: o.acc === 'Lotus Retail India' ? 'India North' : _pick(SALES_REGION[geo], o.acc), salesperson: o.owner,
-    sbu, practice, offering: off, technology: tech, vertical: (ACC_VERT.find(([re]) => re.test(o.acc)) || [0, 'Enterprise'])[1] };
+  return { off, geography: geo, region: o.acc === 'Lotus Retail India' ? 'India North' : _pick(SALES_REGION[geo], o.acc), salesperson: o.owner,
+    sbu, practice, offering, technology: tech, vertical: accVertical(o.acc) };
 }
 const TARGET_DIMS = [['geography', 'Geography'], ['region', 'Region'], ['salesperson', 'Salesperson'], ['sbu', 'SBU'], ['practice', 'Practice / service line'], ['offering', 'Offering'], ['technology', 'Technology'], ['vertical', 'Vertical']];
 function targetRows(dim, fy = '2627') {
   const won = INITS.filter(o => o.kind === 'won' && o.fy === fy), open = INITS.filter(o => o.kind === 'open' && o.status === 'Opportunity');
-  const vals = [...new Set([...won, ...open].map(o => sellOf(o)[dim]))];
+  const vals = [...new Set([...won, ...open].map(o => sellOf(o)[dim]))].filter(Boolean); // '' = not set: no target row
   if (dim === 'geography') vals.splice(0, vals.length, ...Object.keys(GEO_TARGET));
   if (dim === 'salesperson') Object.keys(PERSON_TARGET).forEach(p => { if (!vals.includes(p)) vals.push(p); });
   const weight = (v) => [...won, ...open].filter(o => sellOf(o)[dim] === v).reduce((t, o) => t + o.value, 0);
@@ -383,7 +413,7 @@ const APPROVALS = [
   { acc: 'Horizon Logistics', by: 'Daniel Tan', created: '2026-11-09', lifecycle: 'Prospect' },
   { acc: 'Kedah Ports', by: 'Mei Lin Wong', created: '2026-11-11', lifecycle: 'Prospect' },
   { acc: 'Red Sea Shipping', by: 'Omar Haddad', created: '2026-11-02', lifecycle: 'Prospect' },
-  { acc: 'Nilgiri Foods', by: 'Karthik Menon', created: '2026-11-06', lifecycle: 'Prospect' },
+  { acc: 'Nilgiri Foods', by: 'Rajesh Kumar', created: '2026-11-06', lifecycle: 'Prospect' },
   { acc: 'Delta Pharma', by: 'Priya Sharma', created: '2026-11-13', lifecycle: 'Prospect' }
 ].map(a => ({ ...a, team: PERSON_TEAM[a.by], wait: Math.round((TODAY - new Date(a.created)) / 864e5) }));
 // Won deals whose order is still a draft (no PO yet): won in the last 45 days, as ACCOUNTS.draftOrder
@@ -411,7 +441,7 @@ ACCOUNTS.forEach(a => { a.region = a.name === 'Lotus Retail India' ? 'India Nort
 const FRESH_ACCOUNTS = APPROVALS.map((x, i) => {
   const geo = TEAMS[x.team].geo;
   return { id: 'ACC-2026-' + String(ACCOUNTS.length + i + 1).padStart(4, '0'), name: x.acc, geo, hq: _pick(HQ[geo], x.acc), type: 'Private',
-    vertical: (ACC_VERT.find(([re]) => re.test(x.acc)) || [0, 'Enterprise'])[1], owner: x.by, team: x.team, strategic: false,
+    vertical: accVertical(x.acc), owner: x.by, team: x.team, strategic: false,
     lifecycle: x.lifecycle, status: 'Fresh', engagement: 'Active', region: _pick(SALES_REGION[geo], x.acc), pipeline: 0, openAny: false, value: 0,
     last: null, lastDate: null, draftOrder: false, inits: [], attn: ["Waiting for approval · can't be used in initiatives yet"] };
 });
@@ -442,3 +472,24 @@ const orderUsd = (o) => o.value * USD_PER[o.cur];
 // Customer value = confirmed orders only (Open or Completed), at the PO value; a draft does not count yet
 const customerValue = (acc) => ORDERS.filter(o => o.acc === acc && (o.status === 'Open' || o.status === 'Completed')).reduce((t, o) => t + orderUsd(o), 0);
 ACCOUNTS.forEach(a => { a.value = customerValue(a.name); });
+
+// Reports (old CRMpulse /reports): the fixed catalogue; report.html builds each one from the data above
+const REPORT_GROUPS = ['Sales Management', 'Pipeline & Forecast', 'Performance', 'Targets', 'Activities & Tasks', 'Customer Orders'];
+const REPORTS = [
+  ['initiative-register', 'Sales Management', 'Sales Initiative Register', 'Every Prospect, Lead and Opportunity with owner, team, status, value and expected close.', ['main_status', 'state']],
+  ['open-pipeline', 'Pipeline & Forecast', 'Open Opportunity Pipeline', 'Open, active Opportunities with stage, value, probability and weighted value.', []],
+  ['sales-funnel', 'Pipeline & Forecast', 'Sales Funnel Report', 'Opportunity count, value and weighted value by stage and funnel classification.', []],
+  ['pipeline-ageing', 'Pipeline & Forecast', 'Pipeline Ageing Report', 'Open Opportunities grouped by days in their current stage.', []],
+  ['quarterly-forecast', 'Pipeline & Forecast', 'Quarterly Sales Forecast', 'Expected close quarter, opportunity count, gross and weighted value.', []],
+  ['closed-won', 'Performance', 'Closed Won Bookings', 'Won Opportunities with booking value, actual close date, owner and team.', []],
+  ['closed-lost', 'Performance', 'Closed Lost Analysis', 'Lost Opportunities with value, loss reason, owner and team.', []],
+  ['salesperson-performance', 'Performance', 'Salesperson Performance', 'Bookings, salesperson targets, achievement % and won / lost counts per salesperson.', []],
+  ['team-performance', 'Performance', 'Sales Team Performance', 'Bookings and won / lost counts per sales team (targets are not set for teams).', []],
+  ['geo-performance', 'Performance', 'Geography / Region Performance', 'Bookings and the applicable geography / region targets.', []],
+  ['classification-performance', 'Performance', 'Sales Classification Performance', 'Bookings and applicable targets per value of a classification (SBU, Practice, ...).', ['classification_id']],
+  ['target-achievement', 'Targets', 'Sales Target vs Achievement', 'Each target with its achievement, variance and achievement % (targets are never summed).', []],
+  ['activities', 'Activities & Tasks', 'Sales Activities Report', 'Activities by type, purpose, owner and date in the period.', []],
+  ['task-status', 'Activities & Tasks', 'Task Status Report', 'Tasks by owner, status, due date and overdue status.', []],
+  ['order-register', 'Customer Orders', 'Customer Order Register Report', 'Order details, status, value, account and linked Opportunity.', []]
+].map(([id, group, title, desc, params]) => ({ id, group, title, desc, params }));
+const REPORT_PARAM = { main_status: 'Main Status', state: 'State', classification_id: 'Classification' };

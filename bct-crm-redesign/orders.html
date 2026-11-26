@@ -6,10 +6,10 @@
 <title>Customer orders · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: Customer orders ----------
    Same content as CRMpulse /orders, as Option A (2026-11-25): one card per status (Draft carries the value waiting for a PO) and a
@@ -17,9 +17,8 @@
    (progress, won vs order value, PO fields, confirm / complete / cancel) or the Register historical order form.
    Components = the other list pages: filter bar, scope cards as on Sales initiatives, 64px rows that open a side panel, pager. */
 .tbl.or { table-layout: fixed; }
-.tbl.or col.c-o { width: 14%; } .tbl.or col.c-a { width: 19%; } .tbl.or col.c-w { width: 14%; } .tbl.or col.c-p { width: 12%; } .tbl.or col.c-d { width: 10.5%; } .tbl.or col.c-v { width: 10.5%; } .tbl.or col.c-x { width: 10%; } .tbl.or col.c-s { width: 10%; }
+.tbl.or col.c-o { width: 14%; } .tbl.or col.c-a { width: 15%; } .tbl.or col.c-w { width: 18%; } .tbl.or col.c-p { width: 12%; } .tbl.or col.c-d { width: 10.5%; } .tbl.or col.c-v { width: 10.5%; } .tbl.or col.c-x { width: 10%; } .tbl.or col.c-s { width: 10%; }
 @media (min-width: 1400px) { .tbl.or col.c-o { width: 12%; } .tbl.or col.c-a { width: 21%; } .tbl.or col.c-w { width: 17%; } .tbl.or col.c-p { width: 10.5%; } .tbl.or col.c-d { width: 10%; } .tbl.or col.c-x { width: 9.5%; } .tbl.or col.c-s { width: 9.5%; } }
-@media (min-width: 769px) and (max-width: 1399px) { .tbl.or .own > :first-child { display: none; } } /* the name needs the room */
 .tbl.or td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
 .tbl.or .ord-id { font-size: var(--text-xs); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tbl.or th { white-space: nowrap; }
@@ -88,8 +87,8 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 const { money, toast } = CRM;
 const $ = (s) => document.querySelector(s);

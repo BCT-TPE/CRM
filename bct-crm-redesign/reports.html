@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
+<style>
+/* ---------- Page: Reports (old CRMpulse /reports) ----------
+   Laid out like the other list pages (Accounts, Customer orders): one card per report group with its count, selecting it
+   filters the one table below; the search in the filter bar. A row opens report.html?id=…; every report exports. */
+.sc-tiles { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; padding: 8px; }
+.sc-tiles { grid-auto-rows: auto; } /* label, number, unit share rows across a line of cards (as Tasks): a two-line name keeps the numbers level */
+.tt { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 4px; align-content: start; min-width: 0; padding: 16px; border: 0; border-radius: var(--radius-lg); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.tt:hover { background: var(--hover); } .tt.on { background: var(--surface); box-shadow: var(--shadow-soft); }
+.tt-k { display: flex; align-items: flex-start; gap: 7px; min-width: 0; font-size: var(--text-xs); color: var(--t3); } .tt-k span { min-width: 0; } /* a group name wraps rather than being cut */
+.tt-k i { width: 8px; height: 8px; margin-top: 5px; flex: none; border-radius: var(--radius-full); }
+.tt-n { font-size: var(--text-3xl); font-weight: 400; letter-spacing: -.03em; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tt-s { font-size: var(--text-xs); color: var(--t3); }
+/* the list: one table like Accounts and Customer orders; the cards above filter it, so there are no group headings */
+.tbl.rl { table-layout: fixed; } .tbl.rl col.c-r { width: 58%; } .tbl.rl col.c-g { width: 22%; } .tbl.rl col.c-f { width: 20%; }
+.tbl.rl td { height: 64px; padding-top: 10px; padding-bottom: 10px; }
+.tbl.rl .t-sub { white-space: normal; }
+.rp-tag { display: inline-flex; align-items: center; height: 20px; margin: 2px 4px 2px 0; padding: 0 7px; border-radius: var(--radius-sm); background: var(--hover); font-size: var(--text-2xs); font-weight: 600; color: var(--t2); white-space: nowrap; }
+.rg-n { display: inline-flex; align-items: center; gap: 7px; } .rg-n i { width: 8px; height: 8px; flex: none; border-radius: var(--radius-full); }
+@media (max-width: 1280px) { .sc-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 768px) { .sc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+  <main class="main">
+    <header class="v2-head">
+      <div class="v2-hello">
+        <h1>Reports</h1>
+        <p>Predefined reports using the same definitions as the dashboards. Every report exports to Excel.</p>
+      </div>
+    </header>
+    <div class="filters" id="filters" role="toolbar" aria-label="Filters">
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="f-search" type="search" placeholder="Search reports" aria-label="Search reports"></label>
+      <button class="btn ghost" id="reset" hidden>Reset</button>
+      <span class="sp"></span>
+    </div>
+    <div id="page"></div>
+  </main>
+</div>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const DOTS = ['var(--cyan-300)', 'var(--c-best)', 'var(--c-commit)', 'var(--c-won)', 'var(--cyan-text)', 'var(--warn)']; // token colours, one per group
+const S = { q: '', group: '' };
+const match = (r) => { const t = S.q.trim().toLowerCase(); return !t || `${r.title} ${r.desc} ${r.group}`.toLowerCase().includes(t); };
+const pl = (n) => `${n === 1 ? 'report' : 'reports'}`;
+function render() {
+  const found = REPORTS.filter(match), shown = found.filter(r => !S.group || r.group === S.group);
+  const tiles = [['', 'All reports', 'var(--t3)'], ...REPORT_GROUPS.map((g, i) => [g, g, DOTS[i]])].map(([k, l, dot]) => { const n = found.filter(r => !k || r.group === k).length;
+    return `<button class="tt ${S.group === k ? 'on' : ''}" role="tab" aria-selected="${S.group === k}" data-g="${esc(k)}"><span class="tt-k"><i style="background:${dot}"></i><span>${esc(l)}</span></span><span class="tt-n">${n}</span><span class="tt-s">${pl(n)}</span></button>`; }).join('');
+  const dot = (g) => DOTS[REPORT_GROUPS.indexOf(g)];
+  $('#page').innerHTML = `<div style="display:flex;flex-direction:column;gap:16px"><section class="card tint sc-tiles" role="tablist" aria-label="Report groups">${tiles}</section>
+    <section class="card" aria-label="Reports">${shown.length ? `<div class="tbl-wrap"><table class="tbl rl"><colgroup><col class="c-r"><col class="c-g"><col class="c-f"></colgroup>
+      <thead><tr><th>Report</th><th>Group</th><th>Report filters</th></tr></thead>
+      <tbody>${shown.map(r => `<tr class="click" data-href="report.html?id=${r.id}" tabindex="0"><td><div class="ell t-main">${esc(r.title)}</div><div class="t-sub">${esc(r.desc)}</div></td>
+        <td><span class="rg-n"><i style="background:${dot(r.group)}"></i>${esc(r.group)}</span></td><td>${r.params.length ? r.params.map(p => `<span class="rp-tag">${REPORT_PARAM[p]}</span>`).join('') : '<span class="t-sub">—</span>'}</td></tr>`).join('')}</tbody></table></div>`
+      : `<div class="empty" style="padding:48px 12px"><b>No reports match.</b><button class="link" data-reset>Clear filters</button></div>`}</section></div>`;
+  $('#reset').hidden = !(S.q || S.group);
+}
+$('#page').addEventListener('click', (e) => { const t = e.target.closest('[data-g]'); if (t) { S.group = t.dataset.g; render(); } else if (e.target.closest('[data-reset]')) resetAll(); else { const r = e.target.closest('tr[data-href]'); if (r) location.href = r.dataset.href; } });
+$('#page').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-href]')) location.href = e.target.dataset.href; });
+$('#f-search').addEventListener('input', (e) => { S.q = e.target.value; render(); });
+function resetAll() { S.q = S.group = ''; $('#f-search').value = ''; render(); }
+$('#reset').addEventListener('click', resetAll);
+CRM.renderShell('reports');
+CRM.watchSticky($('#filters'));
+render();
+CRM.riseIn();
+</script>
+</body>
+</html>

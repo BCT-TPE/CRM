@@ -61,9 +61,9 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
   - Customer orders、Sales targets：Sales Manager 以上；Sales structure：Sales Head 以上（照需求端的 Home 設計稿）
   - 某個分組的項目全被隱藏時，連分組標題一起不顯示
 - 這輪沒做的頁面顯示灰色停用，滑上去顯示「Not part of this redesign round」。
-- 示範帳號一律是 Gaurav Shrotriya，預設 **Sales Head**（2026-11-24 由 Administrator 改）。帳號選單的「VIEW AS」是下拉選單，**每一頁都能切換角色**（Salesperson／Sales Manager／Sales Head；Administrator 停用，因為需求端三份範例只有這三種），選擇存在 localStorage `crm-home-role`，全站一致、其他分頁同步（2026-11-25）。側邊欄跟三份範例一樣依角色顯示。角色會影響預設畫面：
-  - Activities：Administrator、Sales Head 預設 Everyone；Sales Manager 預設 My teams；其他人預設 Mine
-  - Sales initiatives（新增頁、記錄頁編輯）：Sales owner 只有 Sales Manager、Sales Head、Administrator 能改；Salesperson 鎖定為自己，並說明原因（舊版 canAssign）
+- 示範帳號一律是 Gaurav Shrotriya，預設 **Sales Head**（2026-11-24 由 Administrator 改）。帳號選單的「VIEW AS」是下拉選單，**每一頁都能切換角色**（Salesperson／Sales Manager／Sales Head；Administrator 停用，因為需求端三份範例只有這三種），選擇存在 localStorage `crm-home-role`，全站一致、其他分頁同步（2026-11-25）。側邊欄跟三份範例一樣依角色顯示。
+  - **角色規則（2026-11-26）**：沒有 Administrator，**Sales Head 是最高角色**，畫面和功能完全照舊版 Sales Head 看到的（舊版只給 Administrator 的功能一律不做，例如 Sales structure 的新增、編輯，刪除帳戶，改超過 7 天的活動）。**Salesperson、Sales Manager 只差在側邊欄少幾頁**；除了 Home 以外，每一頁的資料範圍和功能都跟 Sales Head 一樣（`CRM.user.assigning`、`oversight` 一律為 true）。
+  - Activities 預設 Everyone；Sales owner 可以改（舊版 Sales Head 的 canAssign）
   - Tasks：所有角色都預設 My open tasks（自己沒有未完成任務時，改顯示已完成的）。舊版經理類角色預設 Team overdue，這裡依設計決定不照做（2026-11-23）
 - Tasks 旁顯示自己未完成的任務數：藍色正圓、白字；收合側邊欄時放在圖示右上角；完成任務後即時更新。
 - 帳號選單：姓名、角色、Email、View as、Sign out。手機上帳號入口是頂端頭像，抽屜選單只留 Notifications（固定在底部，選單可捲動）。
@@ -108,6 +108,20 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 ## 7.6 新頁面的 UX 一致
 
 - 之後新增的頁面，同樣的操作要用同樣的元件和行為，先找現有頁面怎麼做再動手（2026-11-25，Janet）：顯示／隱藏類篩選用 `.ftog` 放在篩選列；點列打開；小尺寸用右側滑出面板；停用按鈕點了用 toast 說明；進場動畫 `CRM.riseIn()`；Reset、空狀態、手機 Filters 面板與徽章同一套。共用樣式放 assets，不寫在單頁。
+
+## 7.7 頁面標題與搜尋框（2026-11-26）
+
+- **頁面大標跟側邊欄的名稱一致**（例如 Sales targets，不用舊版的「Sales Targets & Allocation」）。Home 的大標是招呼語（§11），報表頁是報表名稱。
+- **有搜尋框的篩選列，搜尋框一律排第一個**，在最左邊；其他篩選接在後面。沒有搜尋框的頁面（Pipeline、Sales performance）從年度開始。
+
+## 7.8 人名欄（2026-11-26）
+
+- **表格裡的人名欄一律「頭像＋名字」**（`.own` + `CRM.avatar()`）：Owner、Assigned to、Salesperson、報表的 Owner／Name（是人時）、Sales targets 的 Salesperson 分頁、Home 的 By salesperson。名字太長就截斷，不拿掉頭像。句子裡提到的人（例如「by John Mathew」）維持文字。
+
+## 7.9 表格列的 hover 與游標（2026-11-26）
+
+- **只有能打開東西的列才有 hover 底色和手指游標**：列加 `class="click"`（`crm.css`、`theme-v2.css`、`responsive.css` 都只對 `tr.click:hover` 上色）。其他列一律一般游標（`cursor: default`）、滑過不變色，例如 Home 的 By salesperson、報表的彙總列、商機頁的明細、Sales structure。
+- 新表格：列能點就加 `click`，不能點就什麼都不加；不要在頁面裡另外寫覆寫來關掉 hover。
 
 ## 8. 不要做的事
 
@@ -201,7 +215,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - **上方卡片**同 Sales initiatives：藍底「Current」放 All current、Draft、Open、Completed、Cancelled（Draft 寫「$ not yet counted in customer value」），白底「Historical」獨立一張、不算進 All current；點卡片篩選表格，取代舊版的等 PO 卡片、頁籤和底部收合區。表格預設等 PO 的排最前、等最久的在最上面，PO 欄寫「Waiting N days」「Confirm PO ›」，超過 30 天紅色。登記歷史訂單後自動切到 Historical。
 - 其他照列表頁規則：64px 列、點整列開側邊面板；總計列、頁碼、手機卡片用共用樣式（`.tbl.totals`、`.drill.tf-panel`、`.tf`）。表頭可排序（Order、Order date、Order value）。
 - **訂單面板**：進度 Draft → Open → Completed、Won／Order value／Difference、PO 欄位；缺 PO、日期、日期在未來、或金額不同但沒選原因時，Confirm order／Mark completed 不能按，並寫出還缺什麼。改過內容關閉前先問。取消 Open 訂單要填原因（`CRM.confirm` 的 `field`），取消後不能恢復。
-- **權限**：Sales Head／Administrator 看全部、可登記歷史訂單；Sales Manager 看自己團隊；Salesperson 看自己的（側邊欄沒有入口）。沒有權限的 Register 按鈕停用並說明原因。
+- **權限**：照 Sales Head：看全部訂單、可登記歷史訂單（舊版 HISTORICAL_ORDER_ROLES 含 Sales Head）。其他角色也一樣（§3 角色規則）。
 - **資料**：每筆成交一張訂單（`ORDERS`），草稿就是 Home 的 `DRAFT_ORDERS`（4 筆 $525.0K，同一編號；`PO_RECEIVED` 的兩筆已有 PO，算 Open）。幣別用 `accCurrency`、匯率用 `FX`。**Accounts 的 Customer value 改為只算已確認的訂單**（Open／Completed，含歷史訂單，以 PO 金額計），草稿不算。
 - `?open=ORD-…` 直接打開那張訂單。
 
@@ -216,3 +230,24 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 - 手機總計放列表最上面；顏色門檻寫在列表下方（`.list-note`：Accounts「no interaction for over 60 days」、Customer orders「waiting for a PO for over 30 days」）；只有一個篩選時不做面板（`data-keep`）；歷史訂單列只放狀態標籤，列高 64px。
 - 手機列表卡（Sales initiatives、Tasks、Accounts、Customer orders）還是一筆一張大卡；要改成精簡列就全站一起改，目前先不動。
+
+## 20. Plan & report：Sales targets、Reports（2026-11-26）
+
+- 兩頁放進側邊欄（`BUILT`）；Sales targets 只有 Sales Manager 以上看得到，Reports 所有角色都有。
+- **Sales targets**（舊版 `/targets` 的資料架構；大標跟側邊欄一樣叫 Sales targets）：搜尋、FY25-26／26-27／27-28、九個維度一個分頁（各自規劃、不加總）、Q1–Q4 目標和每季成交與 %、年度目標、達成、%。
+  - 照列表頁規則：拿掉鉛筆欄，**點整列**打開側邊面板：四季的目標、備註、編號和修改紀錄，下面有 Edit。編輯四季金額、備註、新目標的幣別；清空一季要先確認刪除；改過內容關閉前先問。
+  - 誰能改：照舊版 Sales Head，全部都能改；其他角色也一樣（角色規則）。
+  - 顏色照舊版：達成 100% 綠色；已結束的季度低於 90% 紅色、90% 以上黃色；進行中的季度和全年未達 100% 黃色。門檻寫在表格下方。
+- **Reports**：目錄頁跟 Accounts、Customer orders 一樣——七張分組卡篩選下面**一張表格**（Report、Group、Report filters），表格不再依組分段加小標題（2026-11-26）；搜尋在篩選列；整列打開那份報表。
+- **單份報表 `report.html?id=…`**：返回 Reports 的連結、標題、說明 · 期間 · USD；篩選列放搜尋、年度、季度、業務、團隊，More filters 放地區和報表專屬篩選（Main status、State、Classification），最後是 Details 和 Export（Excel／CSV）。這列比較長，**1499px 以下就用精簡篩選列**（`data-compact`）。摘要數字放在頁首右上（同 Home 的頁首 KPI，數字頂端跟標題對齊；≤1360 排到標題下面），不顯示「N rows」，表格可排序、每頁 20 筆；代表單一紀錄的列整列可點（商機、活動、任務、訂單），彙總列不能點。
+- 報表數字用本站資料計算，跟各頁一致：Open pipeline 等於 Pipeline & forecast；全公司的紀錄（照 Sales Head；角色只影響 Home 和側邊欄）。
+
+## 21. Setup：Sales structure（2026-11-26）
+
+- 放進側邊欄（`BUILT`）；跟舊版一樣只有 Sales Head 在側邊欄看得到。大標 Sales structure，說明照舊版。
+- **完全照舊版 Sales Head 看到的畫面：只能看**。舊版的 New、Edit、History、分類卡片的新增值，都只給 Administrator；本站已經沒有 Administrator，所以這頁沒有任何新增或編輯（2026-11-26 確認）。也沒有搜尋、分頁器、列點擊，因為舊版沒有。
+- **舊版的四個分頁**，分頁上有數量：Sales teams、Geographies、Regions 是表格；**第一欄是名稱、代碼在下面**（手機卡片標題就是名稱）。人名欄照 §7.8：Team manager、Geography／Region head 頭像＋名字；Members 用重疊頭像＋全部名字（舊版列出全部成員）。
+- **Sales classifications 照舊版卡片**：每個分類一張，名稱、代碼、Mandatory，說明 · Values filtered by；列出全部值（代碼、名稱，Offering 右邊是所屬 Practice），卡片底下有舊版那句「Values used by records cannot be deleted; deactivate them instead.」。1280px 以上兩張一排，**同一排的卡片等高**，底下那句貼齊卡片底部。這頁沒有任何連結，表格列沒有 hover 效果（§7.9）。卡片網格沒有自己的左右 padding，卡片跟分頁左邊對齊。
+- **Sales classifications 全站照舊版的值**（2026-11-26，`crm-data.js` 的 `CLASSIFICATIONS`）：SBU 3、Practice / Service Line 5、Offering 10（依 Practice 篩選）、Technology 4、Vertical 5，代碼和順序同舊版。商機的分類（`sellOf`，記錄頁、新增頁、Sales initiatives 篩選、Sales targets、Reports 共用）都對應到這些值；Technology、Vertical 可以未設定。帳戶的 Industry / Vertical 也用 VERTICAL（舊版帳戶表單）：Pharma 歸 Healthcare，物流、港口、設施公司沒有對應值，顯示未設定。商機名稱裡的服務名（例如 Field Service App）不變，Offering 欄位是分類值。
+- **團隊、成員、地區全站照舊版**（2026-11-26，`crm-data.js`）：`TEAMS[].members` 是舊版成員（Rajesh Kumar、Omar Haddad 各在兩個團隊，`PERSON_TEAM` 取第一個）；`TEAM_MANAGER` 照舊版，只有 APAC Sales 是 Gaurav（取代 Kevin Lim，示範帳號的 Sales Manager 視角要有團隊；他不是成員，但跟以前一樣自己也賣，所以 `TEAMS[].people` 是成員加上他，儀表板的業務名單用 people）。原本的 Karthik Menon 改名 Rajesh Kumar（商機、目標、照片不變）；Sneha Nair、Fatima Al-Zahra 沒有商機和目標，業績頁顯示 No target。地區 `SALES_REGION` 是舊版 7 個（India North／South；Oman、Saudi Arabia、UAE；Malaysia、Singapore），代碼和 head 照舊版。
+- 表格下方不放自己加的說明（`.list-note` 只用來寫顏色門檻）。

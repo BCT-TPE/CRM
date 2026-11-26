@@ -6,10 +6,10 @@
 <title>Contacts · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: Contacts ----------
    Same IA as CRMpulse /contacts: search / role / status filters, By account or List view, a toggle for accounts
@@ -144,8 +144,8 @@ body.v2 .grp-h a.acc-l { color: var(--ink); } @media (hover: hover) { body.v2 .g
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 /* Contacts — people at the accounts. A decision maker is an active contact in the decision-maker role;
    accounts without one are flagged (they can't move an opportunity's authority question forward). */
@@ -198,7 +198,7 @@ function listView(list) {
   return `<section class="card"><div class="tbl-wrap"><table class="tbl ct">
     <colgroup><col class="c-n"><col class="c-a"><col class="c-r"><col class="c-e"><col class="c-s"></colgroup>
     <thead><tr>${th('name', 'Contact')}${th('acc', 'Account')}<th>Role</th><th>Email</th><th>Status</th></tr></thead>
-    <tbody>${sorted.map(c => `<tr class="${S.sel === c.id ? 'on' : ''}" data-act="sel" data-v="${c.id}" tabindex="0">
+    <tbody>${sorted.map(c => `<tr class="click ${S.sel === c.id ? 'on' : ''}" data-act="sel" data-v="${c.id}" tabindex="0">
       <td><div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t">${ell(esc(c.n), 't-main')}${ell(`${jobOf(c)}`, 't-sub')}</div></div></td>
       <td>${ell(esc(c.acc))}${ell(c.accId, 't-sub')}</td><td>${roleChip(c)}</td><td>${ell(esc(c.email), 'mail')}</td><td><span class="chip ${c.status}">${c.status}</span></td></tr>`).join('')}</tbody>
   </table></div></section>`;

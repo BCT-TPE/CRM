@@ -323,8 +323,10 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 .tbl th:first-child, .tbl td:first-child { padding-left: 24px; }
 .tbl th:last-child, .tbl td:last-child { padding-right: 24px; }
 .tbl th.r, .tbl td.r { text-align: right; }
-.tbl tbody tr { cursor: pointer; }
-.tbl tbody tr:hover td { background: var(--surface-faint); }
+/* only rows that open something (tr.click) get the pointer and a hover fill; every other row keeps the default cursor (2026-11-26) */
+.tbl tbody tr { cursor: default; }
+.tbl tbody tr.click { cursor: pointer; }
+.tbl tbody tr.click:hover td { background: var(--surface-faint); }
 .tbl tbody tr:last-child td { border-bottom: 0; }
 .tbl td.wrap { white-space: normal; min-width: 220px; }
 .tbl .t-main { font-weight: 500; color: var(--ink); }

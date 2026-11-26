@@ -6,10 +6,10 @@
 <title>Home · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: Home (requirement "CRMpulse Home page – by role", 2026-11-24) ----------
    One page, three views by role (Salesperson / Sales Manager / Sales Head; Administrator = Sales Head view).
@@ -77,10 +77,6 @@
 .tbl.by { table-layout: fixed; }
 .tbl.by col.c-n { width: 24%; } .tbl.by col.c-m { width: 10%; } .tbl.by col.c-bar { width: 17%; } .tbl.by col.c-s { width: 9%; } .tbl.by col.c-a { width: 11%; }
 .tbl.by td { height: 64px; }
-.tbl.by tbody tr { cursor: default; } /* nothing opens here: no pointer, no hover fill (design review 3, D4) */
-body.v2 .tbl.by tbody tr:hover td { background: transparent; }
-body.v2 .tbl.by tbody tr:hover td:first-child, body.v2 .tbl.by tbody tr.tot:hover td { background: var(--surface-faint, transparent); }
-body.v2 .tbl.by tbody tr:not(.tot):hover td:first-child { background: var(--surface); }
 .by-note { margin: 16px 0 0; font-size: var(--text-xs); color: var(--t3); line-height: 1.5; }
 .by-note b { font-weight: 600; color: var(--danger); }
 .by-m { display: none; }
@@ -118,7 +114,8 @@ body.v2 .tbl.by tbody tr:not(.tot):hover td:first-child { background: var(--surf
   .by-m { display: block; }
   .bm { display: grid; gap: 8px; padding: 16px 0; border-top: 1px solid var(--line); }
   .bm:first-child { padding-top: 4px; border-top: 0; }
-  .bm-h { display: flex; justify-content: space-between; gap: 12px; font-size: var(--text-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .bm-n { display: flex; align-items: center; gap: 8px; } .bm-n .av, .bm-n .avatar-w { width: 24px; height: 24px; font-size: 10px; }
+  .bm-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: var(--text-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
   .bm .att-t { width: 100%; }
   .bm small { font-size: var(--text-xs); color: var(--t3); line-height: 1.5; font-variant-numeric: tabular-nums; }
   .by-note { margin-top: 0; padding-top: 12px; border-top: 1px solid var(--line); }
@@ -144,8 +141,8 @@ body.v2 .tbl.by tbody tr:not(.tot):hover td:first-child { background: var(--surf
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 const { money, moneyBig, toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -254,7 +251,7 @@ function byTable() { // By salesperson (manager) · By sales team (head / admin)
   const attCell = (s) => { const p = s.target ? Math.round(s.won / s.target * 100) : null;
     return `<div class="att"><span class="att-t"><i class="${low(s) ? 'low' : ''}" style="width:${Math.min(p || 0, 100)}%"></i></span><b>${p == null ? 'N/A' : p + '%'}</b></div>`; };
   const tr = (name, s, cls = '') => `<tr class="${cls}">
-      <td>${cls ? esc(name) : `<span class="t-main">${esc(name)}</span>`}</td>
+      <td>${cls ? esc(name) : people ? `<div class="own">${CRM.avatar(name)}<div class="own-t"><div class="ell t-main">${esc(name)}</div></div></div>` : `<span class="t-main">${esc(name)}</span>`}</td> <!-- a person: avatar + name, as in every table -->
       <td class="r num">${money(s.target)}</td><td class="r num">${money(s.won)}</td><td class="r num">${money(s.commit)}</td>
       <td>${attCell(s)}</td>
       <td class="r num ${thin(s) ? 'neg-t' : ''}">${cov(s.coverage)}</td>
@@ -263,7 +260,7 @@ function byTable() { // By salesperson (manager) · By sales team (head / admin)
   // phones: the total first, then one row per person / team with the bar and two lines of figures (design review 3, M3)
   const seg = (x) => `<span class="seg-nb">${x}</span>`;
   const mRow = (name, s, cls = '') => { const p = s.target ? Math.round(s.won / s.target * 100) : null;
-    return `<div class="bm ${cls}"><div class="bm-h"><b>${esc(name)}</b><b>${p == null ? 'N/A' : p + '%'}</b></div>
+    return `<div class="bm ${cls}"><div class="bm-h"><b class="bm-n">${people && !cls ? CRM.avatar(name) : ''}${esc(name)}</b><b>${p == null ? 'N/A' : p + '%'}</b></div>
       <span class="att-t"><i class="${low(s) ? 'low' : ''}" style="width:${Math.min(p || 0, 100)}%"></i></span>
       <small>${seg(`Won ${money(s.won)} of ${money(s.target)} ·`)} ${seg(`Commit ${money(s.commit)}`)}<br>${seg(`Coverage ${thin(s) ? `<b class="neg-t">${cov(s.coverage)}</b>` : cov(s.coverage)} ·`)} ${seg(`${s.nOpen} open ·`)} ${seg(hot(s) ? `<b class="neg-t">${s.nAttn} need attention</b>` : `${s.nAttn} need attention`)}</small></div>`; };
   const first = people ? 'Salesperson' : 'Sales team';

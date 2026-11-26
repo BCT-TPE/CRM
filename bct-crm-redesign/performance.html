@@ -6,10 +6,10 @@
 <title>Sales performance · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: Sales performance (only what the shared dashboard.css does not cover) ---------- */
 /* Attainment bar: booked (ink) against the full-year target; dashed marker = expected by today */
@@ -133,8 +133,8 @@
 </div>
 <aside class="drill" id="drill" role="dialog" aria-labelledby="drill-title" aria-hidden="true"></aside>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 /* Sales performance: actual results. Closed won = bookings on the actual close date; closed lost needs a loss reason.
    Data and rules are shared with Pipeline & forecast (assets/crm-data.js), so Q1–Q3 bookings match on both pages. */
@@ -369,7 +369,7 @@ function whoCard(P) {
   const teams = teamsInScope();
   const units = S.who === 'teams'
     ? teams.map(t => ({ key: t, type: 'team', name: t, sub: `${TEAMS[t].people.length} salespeople · ${TEAMS[t].geo}`, target: TEAMS[t].target / 4 * qs, rows: P.rows.filter(o => o.team === t) }))
-    : teams.flatMap(t => TEAMS[t].people).filter(p => !S.owner || p === S.owner).map(p => ({ key: p, type: 'person', name: p, sub: PERSON_TEAM[p], target: PERSON_TARGET[p] / 4 * qs, rows: P.rows.filter(o => o.owner === p) }));
+    : [...new Set(teams.flatMap(t => TEAMS[t].people))].filter(p => !S.owner || p === S.owner).map(p => ({ key: p, type: 'person', name: p, sub: PERSON_TEAM[p], target: PERSON_TARGET[p] == null ? null : PERSON_TARGET[p] / 4 * qs, rows: P.rows.filter(o => o.owner === p) }));
   units.forEach(u => { u.won = u.rows.filter(o => o.result === 'won'); u.lost = u.rows.filter(o => o.result === 'lost'); u.booked = u.won.reduce((s, o) => s + o.value, 0); u.att = u.target ? u.booked / u.target * 100 : null; });
   units.sort((a, b) => (b.att ?? -1) - (a.att ?? -1));
   const scale = Math.max(100, ...units.map(u => u.att || 0)) * 1.05;
@@ -378,7 +378,7 @@ function whoCard(P) {
     const nW = u.won.length, nL = u.lost.length;
     return `<tr class="click ${on ? 'on-row' : ''}" data-act="drill" data-type="${u.type}" data-v="${esc(u.key)}" tabindex="0">
       <td>${u.type === 'person' ? `<div class="own">${CRM.avatar(u.name)}<div class="own-t">` : '<div>'}<div class="ell t-main">${esc(u.name)}</div><div class="ell t-sub">${esc(u.sub)}</div>${u.type === 'person' ? '</div></div>' : '</div>'}</td>
-      <td class="r num">${money(u.target)}</td>
+      <td class="r num">${u.target == null ? '<span class="muted">No target</span>' : money(u.target)}</td>
       <td class="r num t-val">${money(u.booked)}</td>
       <td><div class="attn-cell"><span class="attn-track" data-tip="${u.att == null ? 'No target' : `${Math.round(u.att)}% of ${money(u.target)}`}">${u.booked ? `<i class="${u.att != null && u.att < 100 ? 'under' : ''}" style="width:${Math.min((u.att || 0) / scale * 100, 100).toFixed(1)}%"></i>` : ''}<span class="t100" style="left:${(100 / scale * 100).toFixed(1)}%"></span></span>
         <span class="attn-p ${u.att == null ? 'na' : u.att >= 100 ? 'met' : ''}">${u.att == null ? 'N/A' : Math.round(u.att) + '%'}</span></div></td>
@@ -394,7 +394,7 @@ function whoCard(P) {
       <div class="r legend"><span><i class="c-won"></i>Met target</span><span><i style="background: var(--chart-under)"></i>Below target</span><span><i class="lg-tick"></i>100%</span></div></div>
     <div class="tabs" role="tablist" aria-label="Group by">
       <button role="tab" aria-selected="${S.who === 'teams'}" class="tab ${S.who === 'teams' ? 'on' : ''}" data-act="who" data-v="teams">Teams<span class="tab-n">${teams.length}</span></button>
-      <button role="tab" aria-selected="${S.who === 'people'}" class="tab ${S.who === 'people' ? 'on' : ''}" data-act="who" data-v="people">Salespeople<span class="tab-n">${teams.flatMap(t => TEAMS[t].people).length}</span></button>
+      <button role="tab" aria-selected="${S.who === 'people'}" class="tab ${S.who === 'people' ? 'on' : ''}" data-act="who" data-v="people">Salespeople<span class="tab-n">${new Set(teams.flatMap(t => TEAMS[t].people)).size}</span></button>
     </div>
     ${units.length ? `<div class="tbl-wrap"><table class="tbl att">
       <colgroup><col class="c-name"><col class="c-tgt"><col class="c-bkd"><col class="c-bar"><col class="c-wl"><col class="c-wr"><col class="c-avg"></colgroup>
@@ -485,7 +485,7 @@ function renderDrill() {
   const title = d.type === 'quarter' ? `Closed in Q${d.v} FY26-27` : d.type === 'result' ? (d.v === 'won' ? 'Won deals' : 'Lost deals') : d.v;
   let extra = '';
   if (d.type === 'team' || d.type === 'person' || d.type === 'quarter') {
-    const tq = d.type === 'team' ? TEAMS[d.v].target / 4 : d.type === 'person' ? PERSON_TARGET[d.v] / 4 : quarterTarget();
+    const tq = d.type === 'team' ? TEAMS[d.v].target / 4 : d.type === 'person' ? (PERSON_TARGET[d.v] == null ? null : PERSON_TARGET[d.v] / 4) : quarterTarget();
     const tgt = tq == null ? null : tq * (d.type === 'quarter' || S.q ? 1 : 4);
     const bk = won.reduce((s, o) => s + o.value, 0);
     extra = `<div class="dr-kpis"><div><span>Booked</span><b>${money(bk)}</b></div><div><span>Target</span><b>${tgt == null ? 'N/A' : money(tgt)}</b></div><div><span>Attainment</span><b>${tgt ? pct(bk, tgt) + '%' : 'N/A'}</b></div></div>`;
@@ -519,7 +519,7 @@ function syncControls() {
   document.querySelectorAll('#f-q button').forEach(b => { const on = +b.dataset.q === S.q; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
   const teams = Object.keys(TEAMS).filter(t => !S.geo.length || S.geo.includes(TEAMS[t].geo));
   $('#f-team').innerHTML = `<option value="">All teams</option>` + teams.map(t => `<option ${S.team === t ? 'selected' : ''}>${esc(t)}</option>`).join('');
-  const people = (S.team ? TEAMS[S.team].people : teams.flatMap(t => TEAMS[t].people)).slice().sort();
+  const people = [...new Set(S.team ? TEAMS[S.team].people : teams.flatMap(t => TEAMS[t].people))].sort(); // a person can be in two teams
   $('#f-owner').innerHTML = `<option value="">All owners</option>` + people.map(p => `<option ${S.owner === p ? 'selected' : ''}>${esc(p)}</option>`).join('');
   $('#w-team').classList.toggle('set', !!S.team);
   $('#w-owner').classList.toggle('set', !!S.owner);

@@ -7,7 +7,33 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-25 (sixth push)
+## 2026-11-26 (seventh push)
+
+**Plan & report and Setup are open**: Sales targets, Reports (catalogue + one page per report) and Sales structure are in the menu. Reference data now follows the old CRMpulse Sales structure exactly, and outside Home every role works with Sales Head permissions. Cache-busters: `crm.css?v=20261126a`, `crm.js?v=20261126e`, `crm-data.js?v=20261126d`, `responsive.css?v=20261126c`, `theme-v2.css?v=20261126a` (all pages that load them).
+
+### Added
+- **Sales targets** (`targets.html`, old `/targets`), rebuilt: search, fiscal year (FY25-26 / 26-27 / 27-28), one tab per dimension (never added across), Q1–Q4 target with what each quarter won and its %, annual target, achieved, %. The whole row opens a side panel: the four quarters with remarks, target IDs (`TGT-…`) and revision history; Edit changes amounts, remarks and currency (clearing a quarter asks first). Old colour tones; thresholds written under the table.
+- **Reports** (`reports.html`): seven group tiles filter one table (Report, Group, Report filters); the whole row opens the report.
+- **Report page** (`report.html?id=…`), 15 reports built from the site's data (Open pipeline matches Pipeline & forecast): back link, header KPIs top-right (under the title at 1360px and below), filter bar (search, FY, quarter, salesperson, team, More filters with geography and report-specific filters, Details, Export Excel / CSV; compact bar at 1499px and below), sortable, 20 rows per page. Rows that stand for one record open it; summary rows don't.
+- **Sales structure** (`structure.html`, old `/sales-structure`): read only, as the old page shows it to a Sales Head (New, Edit, History and add-value were Administrator-only). Tabs Sales teams / Geographies / Regions with counts as tables (name with the code under it, people with avatars); Sales classifications as the old cards listing every value, two per row from 1280px with equal heights.
+- `CLASSIFICATIONS` and `CLASS_VALUES(code)` in `crm-data.js`: the old classification values (SBU 3, Practice / Service Line 5, Offering 10 filtered by Practice, Technology 4, Vertical 5). `TEAMS[].members`, `TEAM_MANAGER`, `accVertical(name)`.
+
+### Changed
+- **Classifications site-wide** use the old values: `sellOf()` maps every initiative to them, and the record page (`selling()` now calls `sellOf`), New initiative, Sales initiatives filters, Sales targets and Reports share it. Offering options are filtered by the chosen Practice. Technology and Vertical can be empty ("not set"); no target row is made for an empty value.
+- **Account Industry / Vertical** uses the VERTICAL classification: Pharma → Healthcare; logistics, ports and facilities companies have no value. New account offers the five values.
+- **Regions**: the old seven (India North / South; Oman, Saudi Arabia, UAE; Malaysia, Singapore). India West and Indonesia are gone; record and New initiative pages use `SALES_REGION`.
+- **Teams**: old members (Rajesh Kumar and Omar Haddad are in two teams; `PERSON_TEAM` keeps the first). Gaurav manages APAC Sales and still sells, so `TEAMS['APAC Sales'].people` = members + Gaurav. Karthik Menon is renamed Rajesh Kumar (same initiatives, target, photo: `assets/people/rajesh-kumar.webp`). Sneha Nair and Fatima Al-Zahra have no initiatives or targets.
+- **Roles**: there is no Administrator; Sales Head is the top role. `CRM.user.assigning` and `oversight` are always true: outside Home, Salesperson and Sales Manager see and do what a Sales Head does (Activities defaults to Everyone, owner can be changed, all orders and historical registration, whole-company reports, all targets editable). View as changes only Home and the menu.
+- **Person columns** always show avatar + name (DESIGN §7.8): report Owner / Name, Sales targets Salesperson tab, Home By salesperson; Customer orders keeps avatars at 769–1399px (columns rebalanced, account names truncate instead).
+- **Table rows**: only rows that open something (`tr.click`) get the pointer and a hover fill; all other rows use the default cursor (DESIGN §7.9). Accounts and Contacts rows got `click`; page-level hover overrides were removed.
+- Page titles match the menu; search is the first item of every filter bar.
+- **Phones**: a table that opens a card is no longer pulled up 10px; Sales targets shows the % after Achieved instead of on its own row.
+
+### Fixed
+- Sales performance: people in two teams were listed twice; people without a target showed $0 (now "No target") and a NaN target in the drill panel.
+---
+
+## 2026-11-25 (sixth push) · `c5cb29f`
 
 ### Changed
 - **Contacts, By account**: an account with a decision maker shows no tag; "Needs a decision maker" has an alert icon instead of a plus.

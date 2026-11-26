@@ -6,10 +6,10 @@
 <title>Sales initiatives · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: Sales initiatives (list page) ---------- */
 /* Lifecycle strip: status tiles filter the list (list-page behaviour, as in the old CRM) */
@@ -174,8 +174,8 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 /* Sales initiatives — the list behind every number on the dashboards (requirement 5.12: list, kanban and funnel views). */
 const { money, moneyBig, icon, toast } = CRM;
@@ -489,7 +489,7 @@ function buildMore() {
     ['category', 'Business category', ['New customer – new business', 'Existing customer – new business'].map(x => [x, x])],
     ['sbu', 'SBU', uniq(o => META[o.id].sell.sbu).map(x => [x, x])],
     ['practice', 'Practice / service line', uniq(o => META[o.id].sell.practice).map(x => [x, x])],
-    ['tech', 'Technology', uniq(o => META[o.id].sell.technology).map(x => [x, x === 'Other' ? 'Not set' : x])],
+    ['tech', 'Technology', uniq(o => META[o.id].sell.technology).map(x => [x, x])],
     ['vertical', 'Vertical', uniq(o => META[o.id].sell.vertical).map(x => [x, x])]
   ];
   $('#m-grid').innerHTML = F.map(([k, l, opts]) => `<div class="grp"><h4>${l}</h4><label class="select fsel"><select data-m="${k}" aria-label="${l}"><option value="">All</option>${opts.map(([v, n]) => `<option value="${esc(v)}" ${S.m[k] === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label></div>`).join('');

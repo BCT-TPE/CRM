@@ -6,10 +6,10 @@
 <title>Activities · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: Activities (CRM V1 §6) ----------
    Same IA as CRMpulse /activities: Mine / My teams / Everyone, four summary tiles (the "Log activity" header button opens the full panel; design review D1 removed the inline composer),
@@ -147,8 +147,8 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 const { toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -172,7 +172,7 @@ const EDIT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6
 const PERIODS = [['60', 'Last 60 days'], ['week', 'This week'], ['month', 'This month'], ['quarter', 'This quarter'], ['all', 'Any time'], ['custom', 'Custom range…']];
 const WEEK_START = new Date(TODAY.getTime() - ((TODAY.getDay() + 6) % 7) * DAY); // Monday
 const MY_TEAM = PERSON_TEAM[ME];
-// CRMpulse defaultWho: "Everyone" for Administrator / Sales Head, "My teams" for a Sales Manager, "Mine" for everyone else
+// CRMpulse defaultWho for a Sales Head: "Everyone". Every role works with Sales Head permissions outside Home (2026-11-26)
 const S = { who: CRM.user.oversight ? 'all' : CRM.user.code === 'SALES_MANAGER' ? 'team' : 'mine', type: '', q: '', purpose: '', period: '60', from: '', to: '', owner: '', ctx: '' };
 
 const day = (a) => new Date(a.d.slice(0, 10));

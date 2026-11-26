@@ -163,7 +163,7 @@ body.v2 .tm-r { border-radius: var(--radius-lg); }
 
 /* Table */
 body.v2 .tbl th { background: transparent; }
-body.v2 .tbl tbody tr:hover td { background: color-mix(in srgb, var(--hover) 70%, transparent); }
+body.v2 .tbl tbody tr.click:hover td { background: color-mix(in srgb, var(--hover) 70%, transparent); }
 body.v2 .tabs { flex-wrap: wrap; border-bottom: 0; gap: 8px; padding: 0 24px 12px; } /* one tab style site-wide: pills at the top of the card they filter */
 body.v2 .tab { height: 32px; padding: 0 14px; border-radius: var(--radius-pill); background: var(--glass-soft); border: 1px solid var(--line); }
 body.v2 .tab.on { background: var(--midnight); border-color: var(--midnight); color: var(--on-dark); }

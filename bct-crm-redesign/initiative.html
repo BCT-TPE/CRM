@@ -6,10 +6,10 @@
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
    Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
@@ -99,7 +99,7 @@
 .desc { margin: 0; font-size: var(--text-sm); color: var(--t1); }
 
 .tbl.li col.c-i { width: 4%; } .tbl.li col.c-n { width: 30%; } .tbl.li col.c-c { width: 24%; } .tbl.li col.c-q { width: 7%; } .tbl.li col.c-u { width: 11%; } .tbl.li col.c-a { width: 12%; } .tbl.li col.c-t { width: 12%; }
-.tbl.li tbody tr { cursor: default; }
+
 .tbl.li tfoot td { padding: 14px 10px; border-top: 1px solid var(--line); font-weight: 600; color: var(--ink); }
 .tbl.li tfoot td:first-child { padding-left: 24px; } .tbl.li tfoot td:last-child { padding-right: 24px; }
 .tbl.li tfoot small { display: block; font-size: var(--text-xs); font-weight: 400; color: var(--t3); }
@@ -377,8 +377,8 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 /* Data for one record. Everything shown comes from the shared demo data (assets/crm-data.js); details the list doesn't
    carry (line items, BANT, contacts, activities, stage path) are derived here so every record opens, and the Lotus
@@ -431,17 +431,8 @@ const REQ = {
   'Commercial negotiation': [['Agree final price and terms', 'Record the agreed value'], ['Get discount approvals', 'If below standard margin'], ['Confirm the decision date', 'Update expected close']],
   'Contract finalization': [['Get the signed contract or PO', 'Attach it'], ['Confirm the booking value', 'Matches the line items'], ['Set the actual close date', 'Books it in the quarter']]
 };
-const VERTICAL = [[/Retail|Lotus|Al Noor/, 'Retail'], [/Health|Sundaram/, 'Healthcare'], [/Bank|Finance/, 'Banking'], [/Kaveri|Pharma/, 'Pharma'], [/Steel|Manufactur|Industrial/, 'Manufacturing'], [/Energy|Petro/, 'Energy'], [/Logistics/, 'Logistics'], [/Facilit/, 'Facilities']];
-const REGION = { India: ['India North', 'India West', 'India South'], 'Middle East': ['UAE', 'KSA', 'Oman'], APAC: ['Singapore', 'Malaysia', 'Indonesia'] };
-function selling(o) {
-  const off = o.name.split(' – ').slice(1).join(' – ') || o.name;
-  const m = (re) => re.test(off);
-  const sbu = m(/ERP|SAP|Application|POS|Portal|App/) ? 'Enterprise applications' : m(/Cloud|Infrastructure|Network|Recovery|Service Desk/) ? 'Cloud & infrastructure' : m(/Identity|Security|Fraud/) ? 'Cybersecurity' : 'Data & AI';
-  const practice = { 'Enterprise applications': 'Application services', 'Cloud & infrastructure': 'Cloud services', 'Cybersecurity': 'Security services', 'Data & AI': 'Data services' }[sbu];
-  const tech = m(/ERP|SAP/) ? 'SAP' : m(/Cloud|Recovery/) ? 'AWS' : m(/Identity/) ? 'Okta' : m(/GenAI/) ? 'Azure OpenAI' : m(/Data|Analytics|Warehouse|Lake/) ? 'Databricks' : m(/Infrastructure|Network/) ? 'VMware' : m(/Support|Service Desk/) ? 'ServiceNow' : '—';
-  const vertical = (VERTICAL.find(([re]) => re.test(o.acc)) || [0, 'Enterprise'])[1];
-  return { off, sbu, practice, tech, vertical };
-}
+const REGION = SALES_REGION; // crm-data.js (old CRMpulse regions)
+function selling(o) { const x = sellOf(o); return { off: x.off, offering: x.offering, sbu: x.sbu, practice: x.practice, tech: x.technology, vertical: x.vertical }; } // one rule set: crm-data.js sellOf (old CRMpulse classification values)
 function details(o) {
   const lotus = o.id === 'SI-2026-0024';
   const closeD = o.kind === 'open' ? null : new Date(o.close);
@@ -503,7 +494,7 @@ const ED = () => T.edit;
 const val = (k) => (ED() ? E.v : saved())[k];
 function saved() {
   const b = Object.fromEntries(D.bant.map(([k, v]) => [k.toLowerCase(), v || '']));
-  return { owner: o.owner, offering: D.sell.off, name: o.name, close: o.close || '', prob: String(o.prob), next: o.next || '', follow: o.follow || '',
+  return { owner: o.owner, offering: D.sell.offering, name: o.name, close: o.close || '', prob: String(o.prob), next: o.next || '', follow: o.follow || '',
     need: b.need, budget: b.budget, authority: b.authority, timeline: b.timeline, remarks: D.remarks || '',
     leadType: D.leadType, source: D.source, category: D.category, team: o.team, geo: D.geo, region: D.region,
     sbu: D.sell.sbu, practice: D.sell.practice, tech: D.sell.tech, vertical: D.sell.vertical, desc: D.desc || `${D.sell.off} for ${o.acc}.` };
@@ -704,7 +695,7 @@ function historyTab() {
     <div class="jr-start">Start · created as ${startAs}</div></div>
     <div class="road-lg"><span><i></i>Stage entered</span><span><em>${longest.days}d</em>Longest stretch</span>${skipped ? `<span>${skipped}</span>` : ''}</div>`;
   const list = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Stage</th><th>Entered</th><th class="r">Days in stage</th></tr></thead>
-    <tbody>${segs.map((s, i) => `<tr style="cursor:default"><td class="muted">${i + 1}</td><td class="t-main">${esc(s.n)}</td><td>${dd(s.d)}</td><td class="r num ${s === longest ? 'hot' : ''}">${s.days}${s.cur ? ' so far' : ''}</td></tr>`).join('')}</tbody></table></div>`;
+    <tbody>${segs.map((s, i) => `<tr><td class="muted">${i + 1}</td><td class="t-main">${esc(s.n)}</td><td>${dd(s.d)}</td><td class="r num ${s === longest ? 'hot' : ''}">${s.days}${s.cur ? ' so far' : ''}</td></tr>`).join('')}</tbody></table></div>`;
   return `<section class="card"><div class="card-h"><div><h2>The journey so far</h2><p>Every stage this initiative passed through, and how long it stayed</p></div>
       <div class="r"><div class="seg">${[['road', 'Road'], ['list', 'List']].map(([k, l]) => `<button class="${T.road === k ? 'on' : ''}" data-act="road" data-v="${k}">${l}</button>`).join('')}</div></div></div>
     <div class="sum3">
@@ -741,7 +732,7 @@ function rail() {
       <div class="kv" style="border-top: 0;margin-top:0;padding-top:8px"><span>Closed</span><b>${dd(o.close)}</b></div>
       ${o.kind === 'lost' ? `<div class="kv" style="border-top: 0;margin-top:0;padding-top:8px"><span>Loss reason</span><b>${esc(o.reason)}</b></div>` : ''}</section>`;
   const account = ed ? lockedF('Account', o.acc, o.status === 'Opportunity' ? 'Locked for opportunities · use split / duplicate to move it.' : 'Locked after the initiative is created.')
-    : `<div class="fld"><span class="lab">Account</span><div class="acc"><span class="av">${ini(o.acc)}</span><div><a href="#" data-act="acc">${esc(o.acc)}</a><small>${D.sell.vertical} · ${D.geo} · ${D.existing || o.kind === 'won' ? 'Customer' : 'Prospect'}</small></div></div>
+    : `<div class="fld"><span class="lab">Account</span><div class="acc"><span class="av">${ini(o.acc)}</span><div><a href="#" data-act="acc">${esc(o.acc)}</a><small>${[D.sell.vertical, D.geo].filter(Boolean).join(' · ')} · ${D.existing || o.kind === 'won' ? 'Customer' : 'Prospect'}</small></div></div>
        <div class="links"><button class="link" data-act="toast" data-v="Would list the other ${others} initiatives at ${esc(o.acc)}">Other initiatives${others ? ` (${others})` : ''}</button><button class="link" data-act="acc">Account 360°</button></div></div>`;
   return `${ns}
     <section class="card"><h3>Account &amp; team</h3><div class="fg g1">
@@ -758,17 +749,17 @@ const LOCK = '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" 
 const CHEV_D = '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
 const OPT = {
   owner: () => [...new Set(Object.values(TEAMS).flatMap(t => t.people))].sort(),
-  offering: () => [...new Set(INITS.map(x => x.name.split(' – ').slice(1).join(' – ')).filter(Boolean))].sort(),
+  offering: (v) => CLASSIFICATIONS.find(c => c.code === 'OFFERING').values.filter(x => !v || !v.practice || x.parent === v.practice).map(x => x.name), // filtered by Practice (old selectableValues)
   leadType: () => ['New account new lead', 'Existing account new lead'],
   source: () => ['Event / conference', 'Referral', 'Website', 'Partner', 'Outbound'],
   category: () => ['New customer – new business', 'Existing customer – new business'],
   team: () => Object.keys(TEAMS),
   geo: () => Object.keys(REGION),
   region: (v) => REGION[v.geo] || [],
-  sbu: () => ['Enterprise applications', 'Cloud & infrastructure', 'Cybersecurity', 'Data & AI'],
-  practice: () => ['Application services', 'Cloud services', 'Security services', 'Data services'],
-  tech: () => ['SAP', 'AWS', 'Okta', 'Azure OpenAI', 'Databricks', 'VMware', 'ServiceNow', '—'],
-  vertical: () => ['Retail', 'Healthcare', 'Banking', 'Pharma', 'Manufacturing', 'Energy', 'Logistics', 'Facilities', 'Enterprise']
+  sbu: () => CLASS_VALUES('SBU'),
+  practice: () => CLASS_VALUES('PRACTICE'),
+  tech: () => CLASS_VALUES('TECHNOLOGY'),
+  vertical: () => CLASS_VALUES('VERTICAL')
 };
 const LABEL = { owner: 'Sales owner', offering: 'Offering', name: 'Initiative name', close: 'Expected close', prob: 'Probability', next: 'Next step on record', follow: 'Next follow-up',
   need: 'Need', budget: 'Budget', authority: 'Authority', timeline: 'Timeline', remarks: 'Qualification remarks', leadType: 'Lead type', source: 'Lead source', category: 'Business category',

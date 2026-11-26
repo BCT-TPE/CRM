@@ -43,7 +43,7 @@
     ['Setup', [['structure', 'Sales structure', 'tree', 1, HEAD_UP], ['admin', 'Administration', 'settings', 1, ['ADMIN']], ['users', 'Users', 'users', 1, ['ADMIN']]]]
   ];
   const BUILT = { home: 'home.html', pipeline: 'pipeline.html', performance: 'performance.html', initiatives: 'initiatives.html', activities: 'activities.html', tasks: 'tasks.html',
-    accounts: 'accounts.html', contacts: 'contacts.html', orders: 'orders.html' }; // the targets page exists but stays out of the nav
+    accounts: 'accounts.html', contacts: 'contacts.html', orders: 'orders.html', targets: 'targets.html', reports: 'reports.html', structure: 'structure.html' };
 
   // Old CRMpulse TaskBadge: my open tasks beside Tasks (the overdue count is in its label); nothing when none are open.
   function taskBadge() {
@@ -65,7 +65,6 @@
   try { const r = localStorage.getItem('crm-home-role'); if (ROLES_ON.includes(r)) roleCode = r; } catch (e) {}
   const USER = { name: 'Gaurav Shrotriya', code: roleCode, role: ROLE_LABELS[roleCode], team: 'APAC Sales', email: 'gaurav.shrotriya@example.com' };
   USER.sub = roleCode === 'SALES_MANAGER' ? `${USER.role} · ${USER.team}` : USER.role;
-  const ASSIGNING = ['ADMIN', 'SALES_HEAD', 'SALES_MANAGER'], OVERSIGHT = ['ADMIN', 'SALES_HEAD']; // lib/api/auth.ts
 
   function renderShell(active) {
     const side = document.getElementById('side');
@@ -347,19 +346,19 @@
   const phone = matchMedia('(max-width: 768px)');
   function compactFilters(f) {
     // bars with a search compact on phones; Pipeline / Sales performance (no search) already below 1280px (design review D4)
-    const mq = f.querySelector(':scope > .search') ? phone : matchMedia('(max-width: 1279px)');
+    const mq = f.dataset.compact ? matchMedia(`(max-width: ${f.dataset.compact}px)`) : f.querySelector(':scope > .search') ? phone : matchMedia('(max-width: 1279px)'); // data-compact: a bar too long for mid widths compacts earlier
     const apply = () => {
       if (mq.matches && !f._orig) {
         f._orig = [...f.children];
         const search = f._orig.find(c => c.matches('.search'));
 
-        const exp = f._orig.find(c => c.id === 'export');
+        const exp = f._orig.find(c => c.id === 'export' || c.querySelector?.('#export')), det = f._orig.find(c => c.id === 'details'); // row-1 actions at the end
         const row = document.createElement('div'); row.className = 'f-scroll';
         // Design review M3 (2026-11-24): nothing scrolls sideways. Row 2 keeps the short controls (a 2–3 option switch,
         // Fiscal year, and the period switch shown as a dropdown); every other filter moves to the top of More filters,
         // whose badge then counts them too. Pages without More filters (Tasks) wrap row 2 instead.
         const keep = (c) => (c.matches('.seg') && c.querySelectorAll('button').length <= 3) || c.id === 'f-fy-wrap' || c.id === 'reset' || c.matches('[data-keep]'); // data-keep: a page's only filter stays in row 2 instead of a panel of one
-        const moves = (c) => !keep(c) && !c.matches('.search, .sp, .seg') && c.id !== 'export' && c.id !== 'more-btn' && !c.querySelector('#more-btn');
+        const moves = (c) => !keep(c) && !c.matches('.search, .sp, .seg') && c !== exp && c !== det && c.id !== 'more-btn' && !c.querySelector('#more-btn');
         let pop = document.getElementById('more-pop');
         if (!pop && f._orig.some(moves)) { // no More filters on this page (Tasks): make a Filters button + panel so the same pattern applies (design review M3)
           const wrap = document.createElement('div'); wrap.className = 'm-made'; wrap.style.position = 'relative';
@@ -375,7 +374,7 @@
         const more = f._orig.find(c => c.id === 'more-btn' || c.querySelector('#more-btn'));
         const moved = [];
         f._orig.forEach(c => {
-          if (c === search || c === more || c === exp || c.matches('.sp')) return;
+          if (c === search || c === more || c === exp || c === det || c.matches('.sp')) return;
           if (c.matches('.seg') && c.querySelectorAll('button').length > 3) { row.appendChild(c); row.appendChild(segProxy(c)); return; }
           if (pop && !keep(c)) { moved.push(c); return; }
           row.appendChild(c);
@@ -387,7 +386,7 @@
         }
         f.classList.add('compact', search ? 'two' : 'one');
         const sp = f._orig.find(c => c.matches('.sp')); // starts from the left like every bar; the spacer keeps Export at the far right (design review 3, D6)
-        if (search) f.append(...[search, more, sp, exp].filter(Boolean), row); else f.append(row, ...[more, sp, exp].filter(Boolean));
+        if (search) f.append(...[search, more, sp, det, exp].filter(Boolean), row); else f.append(row, ...[more, sp, det, exp].filter(Boolean));
         f._row = row;
         // Page-header actions (Export, New …): once the bar is stuck they come back as icon buttons at the end of row 1.
         // Each icon clicks the real button, so page code keeps a single handler.
@@ -415,7 +414,7 @@
   }
   // Icon-only filter buttons (Export, More filters) get a tooltip with their name; with their text showing they need none
   function iconTips() {
-    document.querySelectorAll('.filters :is(#export, #more-btn)').forEach(b => {
+    document.querySelectorAll('.filters :is(#export, #more-btn, #details)').forEach(b => {
       const icon = parseFloat(getComputedStyle(b).fontSize) === 0, name = [...b.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim(); // not the count badge
       if (icon && name) b.dataset.tip = name; else delete b.dataset.tip;
     });
@@ -692,9 +691,9 @@
 
   // Owner avatar: initials on a blue-family tint, fixed per person (styles .av / .av-a…e in theme-v2.css)
   // Photo when the person has one in assets/people (sales owners), initials otherwise (contacts, cross-functional staff).
-  // Sales-owner photos: Gaurav, Omar, Ahmed, Karthik and Vikram from the manager's prototype set; Daniel, Mei Lin,
+  // Sales-owner photos: Gaurav, Omar, Ahmed, Rajesh (was Karthik Menon until 2026-11-26) and Vikram from the manager's prototype set; Daniel, Mei Lin,
   // Priya and Ananya are AI-generated portraits of these fictional people (2026-11-19).
-  const PHOTOS = ['Gaurav Shrotriya', 'Omar Haddad', 'Ahmed Al-Mansoori', 'Karthik Menon', 'Vikram Iyer', 'Daniel Tan', 'Mei Lin Wong', 'Priya Sharma', 'Ananya Reddy'];
+  const PHOTOS = ['Gaurav Shrotriya', 'Omar Haddad', 'Ahmed Al-Mansoori', 'Rajesh Kumar', 'Vikram Iyer', 'Daniel Tan', 'Mei Lin Wong', 'Priya Sharma', 'Ananya Reddy'];
   const PEOPLE_DIR = (document.currentScript && document.currentScript.src || '').replace(/crm\.js.*$/, 'people/');
   // avatar(name, contactId): contacts have one portrait each, by ID (assets/people/contacts/CON-….webp, AI-generated),
   // because the demo reuses some names across accounts.
@@ -790,5 +789,5 @@
     return { el, close, redraw, clean: () => { start = snap(); } };
   }
 
-  window.CRM = { icon, dots, openPanel, form: { fld, opt, pick, inp, head, put }, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: ASSIGNING.includes(USER.code), oversight: OVERSIGHT.includes(USER.code) }, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
+  window.CRM = { icon, dots, openPanel, form: { fld, opt, pick, inp, head, put }, renderShell, riseIn, refreshTaskBadge, user: { ...USER, assigning: true, oversight: true } /* 2026-11-26: Sales Head is the top role; outside Home every role works with its permissions (View as only changes Home and the sidebar) */, money, moneyBig, toast, watchSticky, enhanceSelects, avatar, confirm: confirmDlg, guardLeave, leave, date: fmtDate, enhanceDates };
 })();

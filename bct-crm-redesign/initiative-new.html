@@ -6,10 +6,10 @@
 <title>New sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: new sales initiative ----------
    Same fields and order as CRMpulse /initiatives/new (status & sub-stage, account & ownership, value & forecast,
@@ -116,8 +116,8 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
   <main class="main" id="main"></main>
 </div>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 const { money, toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -152,12 +152,11 @@ const PICKS = {
   'Commercial negotiation': ['Agree final price and terms', 'Get discount approvals', 'Confirm the decision date'],
   'Contract finalization': ['Get the signed contract or PO', 'Confirm the booking value', 'Set the actual close date']
 };
-const VERTICAL = [[/Retail|Lotus|Al Noor/, 'Retail'], [/Health|Sundaram/, 'Healthcare'], [/Bank|Finance/, 'Banking'], [/Kaveri|Pharma/, 'Pharma'], [/Steel|Manufactur|Industrial/, 'Manufacturing'], [/Energy|Petro|Qamar/, 'Energy'], [/Logistics/, 'Logistics'], [/Facilit/, 'Facilities']];
-const REGION = { India: ['India North', 'India West', 'India South'], 'Middle East': ['UAE', 'KSA', 'Oman'], APAC: ['Singapore', 'Malaysia', 'Indonesia'] };
+const REGION = SALES_REGION; // crm-data.js (old CRMpulse regions)
 const OPT = {
   acc: () => [...new Set(INITS.map(x => x.acc))].sort(),
   owner: () => [...new Set(Object.values(TEAMS).flatMap(t => t.people))].sort(),
-  offering: () => [...new Set(INITS.map(x => x.name.split(' – ').slice(1).join(' – ')).filter(Boolean))].sort(),
+  offering: (v) => CLASSIFICATIONS.find(c => c.code === 'OFFERING').values.filter(x => !v || !v.practice || x.parent === v.practice).map(x => x.name), // filtered by Practice (old selectableValues)
   cur: () => ['AED', 'INR', 'OMR', 'SAR', 'USD'],
   leadType: () => ['New account new lead', 'Existing account new lead'],
   source: () => ['Event / conference', 'Referral', 'Website', 'Partner', 'Outbound'],
@@ -165,10 +164,10 @@ const OPT = {
   team: () => ['Automatic', ...Object.keys(TEAMS)],
   geo: () => Object.keys(REGION),
   region: (v) => REGION[v.geo] || [],
-  sbu: () => ['Enterprise applications', 'Cloud & infrastructure', 'Cybersecurity', 'Data & AI'],
-  practice: () => ['Application services', 'Cloud services', 'Security services', 'Data services'],
-  tech: () => ['SAP', 'AWS', 'Okta', 'Azure OpenAI', 'Databricks', 'VMware', 'ServiceNow'],
-  vertical: () => ['Retail', 'Healthcare', 'Banking', 'Pharma', 'Manufacturing', 'Energy', 'Logistics', 'Facilities', 'Enterprise']
+  sbu: () => CLASS_VALUES('SBU'),
+  practice: () => CLASS_VALUES('PRACTICE'),
+  tech: () => CLASS_VALUES('TECHNOLOGY'),
+  vertical: () => CLASS_VALUES('VERTICAL')
 };
 const PH = { acc: 'Select account…', offering: 'Choose an offering…', leadType: 'Not set', source: 'Not set', category: 'Not set', geo: 'Not set', region: 'Select a geography first', sbu: 'Select…', practice: 'Not set', tech: 'Not set', vertical: 'Not set' };
 const LABEL = { acc: 'Account', owner: 'Sales owner', offering: 'What are we selling?', name: 'Initiative name', value: 'Estimated value', cur: 'Currency', close: 'Expected close date', prob: 'Probability',
@@ -184,7 +183,7 @@ const isOpp = () => S.status === 'Opportunity';
 const usd = () => { const n = +S.v.value || 0; return S.v.cur === 'USD' ? n : n / FX[S.v.cur]; };
 const autoTeam = () => { const ts = Object.entries(TEAMS).filter(([, t]) => t.people.includes(S.v.owner)); return ts.length === 1 ? ts[0][0] : null; };
 const teamNow = () => S.v.team === 'Automatic' ? autoTeam() : S.v.team;
-const vertDefault = () => S.v.acc ? (VERTICAL.find(([re]) => re.test(S.v.acc)) || [0, 'Enterprise'])[1] : '';
+const vertDefault = () => S.v.acc ? accVertical(S.v.acc) : ''; // the account's Industry / Vertical (crm-data.js)
 
 // What creating needs (CRMpulse: name, approved account, owner, SBU; an opportunity also needs the need and a value)
 function needs() {

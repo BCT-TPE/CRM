@@ -6,10 +6,10 @@
 <title>Accounts · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261125g">
+<link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261124b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261125c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
 <style>
 /* ---------- Page: Accounts ----------
    Same IA as CRMpulse /accounts: five group cards, search / owner / geography + More filters (account status, lifecycle,
@@ -90,8 +90,8 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261125h"></script>
-<script src="assets/crm-data.js?v=20261125b"></script>
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 /* Accounts — every company in the sales initiatives (ACCOUNTS) plus the Fresh accounts waiting for approval (FRESH_ACCOUNTS).
    Lifecycle as in old CRMpulse: Customer (won business) › Opportunity / Lead (an open one) › Prospect.
@@ -160,7 +160,7 @@ function qa(a) {
 }
 function row(a) {
   const openN = a.inits.filter(id => { const o = INITS.find(x => x.id === id); return o.kind === 'open' && o.status === 'Opportunity'; }).length;
-  return `<tr data-id="${a.id}" data-name="${esc(a.name)}" tabindex="0">
+  return `<tr class="click" data-id="${a.id}" data-name="${esc(a.name)}" tabindex="0">
     <td><div class="an">${ell(esc(a.name), 't-main')}${a.strategic ? '<span class="tag strat">Strategic</span>' : ''}</div>
       ${ell([a.id, a.type, a.vertical, a.geo].filter(Boolean).map(esc).join(' · '), 't-sub')}
       ${a.attn.map(x => `<span class="attn ${/^No interaction/.test(x) ? 'quiet' : ''}">${esc(x)}</span>`).join(' ')}</td>
@@ -236,7 +236,7 @@ document.addEventListener('click', () => setMore(false));
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMore(false); });
 // New account (old AccountFormDrawer): starts as Fresh; an assigning role approves it before it can be used
 const { fld, pick, inp, head, put } = CRM.form, ASSIGNERS = 'Sales Manager, Sales Head or Administrator';
-const VERTICALS = [...new Set(ALL.map(a => a.vertical))].sort(), TYPES = ['Government', 'Private', 'PSU'];
+const VERTICALS = CLASS_VALUES('VERTICAL') /* the VERTICAL classification (old account form) */, TYPES = ['Government', 'Private', 'PSU'];
 const SELLERS = [...new Set([ME, ...Object.values(TEAMS).flatMap(t => t.people)])].sort().map(p => [p, p === ME ? `${p} (you)` : p]);
 function openNew() {
   const can = CRM.user.assigning;
@@ -277,7 +277,7 @@ function openNew() {
   P.el.addEventListener('submit', () => {
     if (!v.name.trim()) return;
     if (!conflicts.length && similar().length) { conflicts = similar(); live(); P.el.querySelector('[data-dup]').scrollIntoView({ block: 'center' }); toast('Potential duplicate accounts found. Review them, then save again to create anyway.', 'warn'); return; }
-    const a = { id: 'ACC-2026-' + String(Math.max(...ALL.map(x => +x.id.slice(-4))) + 1).padStart(4, '0'), name: v.name.trim(), geo: v.geo, hq: v.hq.trim(), type: v.type, vertical: v.vertical || 'Vertical not set', owner: v.owner, team: PERSON_TEAM[v.owner] || '', strategic: v.strategic,
+    const a = { id: 'ACC-2026-' + String(Math.max(...ALL.map(x => +x.id.slice(-4))) + 1).padStart(4, '0'), name: v.name.trim(), geo: v.geo, hq: v.hq.trim(), type: v.type, vertical: v.vertical, owner: v.owner, team: PERSON_TEAM[v.owner] || '', strategic: v.strategic,
       lifecycle: v.since ? 'Customer' : 'Prospect', status: 'Fresh', engagement: 'Active', region: v.region, pipeline: 0, openAny: false, value: 0, last: null, lastDate: null, draftOrder: false, inits: [], attn: ["Waiting for approval · can't be used in initiatives yet"] };
     ALL.push(a); resetAll(); S.sort = 'name'; S.page = Math.floor(rows().sort(SORTS.name.fn).indexOf(a) / PER_PAGE) + 1; render(); // the page that lists it
     P.close(); toast(`${a.name} created as Fresh; a ${ASSIGNERS} approves it.`, 'ok');
