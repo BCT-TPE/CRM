@@ -7,7 +7,18 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-26 (seventh push)
+## 2026-11-26 (eighth push)
+
+Today's three pages checked against the design review rounds 1–3.
+
+### Changed
+- **Sales targets colours** follow the same standard as Sales performance and Home: green = target met; red = below today's pace; amber = on pace, not met yet. Pace = the share of the period gone: a finished quarter 100%, the quarter in progress today's share of its days, one not started 0%; the year is the average of its quarters. The note under the table states today's pace. (Was the old CRMpulse tone: amber until met, red only for a finished quarter under 90%.)
+- **Report page and Sales structure**: table rows are 64px (DESIGN §2); report rows were 56px, Sales structure rows 69px.
+- **Report Export menu**: items are 44px on phones; the hover fill is mouse-only (`@media (hover: hover)`), so a tap leaves no fill.
+
+---
+
+## 2026-11-26 (seventh push) · `631be2f`
 
 **Plan & report and Setup are open**: Sales targets, Reports (catalogue + one page per report) and Sales structure are in the menu. Reference data now follows the old CRMpulse Sales structure exactly, and outside Home every role works with Sales Head permissions. Cache-busters: `crm.css?v=20261126a`, `crm.js?v=20261126e`, `crm-data.js?v=20261126d`, `responsive.css?v=20261126c`, `theme-v2.css?v=20261126a` (all pages that load them).
 

@@ -75,8 +75,14 @@ const PER_PAGE = 10;
 const S = { dim: 'geography', fy: '2627', q: '', page: 1 };
 const EDITS = {}; // `${fy}|${dim}|${name}` → { q: [4 values or null], rem: [4 remarks], cur } saved in this session
 const NOUN = { geography: ['geography', 'geographies'], region: ['region', 'regions'], salesperson: ['salesperson', 'salespeople'], sbu: ['SBU', 'SBUs'], practice: ['practice', 'practices'], offering: ['offering', 'offerings'], technology: ['technology', 'technologies'], vertical: ['vertical', 'verticals'] };
-// old attainmentTone: 100% and over green; a finished quarter under 90% red (amber from 90%); the quarter in progress and the year are amber until met
-const pctCls = (p, running) => p >= 100 ? 'ok' : running || p >= 90 ? 'warn' : 'low';
+// Same standard as Sales performance and Home (design review round 3, 2026-11-26): met = green; below today's pace = red;
+// on pace but not met = amber. Pace = how much of the period has gone: a finished quarter 100%, the one in progress today's
+// share of its days, one not started 0%; the year = the average of its quarters.
+const DAY = 864e5, [Q_START, Q_END] = Q_RANGE[CUR_Q].map(d => new Date(d));
+const PACE_NOW = Math.round((TODAY - Q_START) / DAY / ((Q_END - Q_START) / DAY + 1) * 100);
+const qPace = (qn) => { const cq = curQ(); return qn < cq ? 100 : qn > cq ? 0 : PACE_NOW; };
+const yPace = () => Math.round([1, 2, 3, 4].reduce((t, q) => t + qPace(q), 0) / 4);
+const pctCls = (p, pace) => p >= 100 ? 'ok' : p >= pace ? 'warn' : 'low';
 const curQ = () => S.fy === '2627' ? CUR_Q : S.fy === '2526' ? 5 : 0; // FY25-26 is over, FY27-28 hasn't started
 const FYL = () => `FY${S.fy.slice(0, 2)}-${S.fy.slice(2)}`;
 // planners (Settings, old seed): Administrator, Sales Head, Sales Manager; a manager only for their own team's salespeople
@@ -92,7 +98,7 @@ function qCell(r, i) {
   const cq = curQ(), t = r.q[i], a = r.ach[i], qn = i + 1;
   if (t == null) return `<td class="qt ${qn === cq ? 'cur' : ''}"><b class="no-t">—</b><small>${a ? `${money(a)} won` : 'No target'}</small></td>`;
   const p = t ? Math.round(a / t * 100) : 0;
-  const sub = qn > cq && !a ? 'Not started' : `${money(a)} · <span class="pc ${pctCls(p, qn === cq)}">${p}%${qn === cq ? ' so far' : ''}</span>`;
+  const sub = qn > cq && !a ? 'Not started' : `${money(a)} · <span class="pc ${pctCls(p, qPace(qn))}">${p}%${qn === cq ? ' so far' : ''}</span>`;
   return `<td class="qt ${qn === cq ? 'cur' : ''}"><b>${money(t)}</b><small>${sub}</small></td>`;
 }
 function body() {
@@ -108,8 +114,8 @@ function body() {
         return `<tr class="click" data-act="open" data-v="${esc(r.name)}" tabindex="0"><td>${S.dim === 'salesperson' ? `<div class="own">${CRM.avatar(r.name)}<div class="own-t"><div class="ell t-main">${esc(r.name)}</div><div class="ell t-sub">${esc(PERSON_TEAM[r.name] || '')}</div></div></div>` : `<div class="ell t-main">${esc(r.name)}</div>`}</td>
           ${[0, 1, 2, 3].map(i => qCell(r, i)).join('')}
           <td class="r num"><b class="${r.annual ? '' : 'no-t'}">${r.annual ? money(r.annual) : 'No target'}</b></td>
-          <td class="r num">${money(h)}${p == null ? '' : `<span class="ph-pc"> · <span class="pc ${pctCls(p, true)}">${p}%</span></span>`}</td>
-          <td class="r num tg-p">${p == null ? '<span class="no-t">—</span>' : `<span class="pc ${pctCls(p, true)}">${p}%</span>`}</td></tr>`; }).join('')}</tbody>
+          <td class="r num">${money(h)}${p == null ? '' : `<span class="ph-pc"> · <span class="pc ${pctCls(p, yPace())}">${p}%</span></span>`}</td>
+          <td class="r num tg-p">${p == null ? '<span class="no-t">—</span>' : `<span class="pc ${pctCls(p, yPace())}">${p}%</span>`}</td></tr>`; }).join('')}</tbody>
     </table></div>
     <div class="pager"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, list.length)} of ${list.length}</span><span class="sp"></span>
       <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
@@ -119,7 +125,7 @@ function body() {
   const ro = list.length && !list.some(r => canPlan(r.name)) ? `<p class="ro-note">You can read these targets; your role cannot plan ${one} targets.</p>` : '';
   return `<section class="card" aria-label="Targets by ${one}">${tabs}
     ${ro}${table}</section>
-    <p class="list-note">Under each quarter's target: closed won in that quarter and the share of the target.<br><b>Red</b>: a finished quarter under 90% of its target (amber from 90%). The quarter in progress and the year stay amber until they reach 100%.</p>`;
+    <p class="list-note">Under each quarter's target: closed won in that quarter and the share of the target.<br>${S.fy === '2627' ? `<b>Red</b>: below today's pace (Q${CUR_Q} is ${PACE_NOW}% through, the year ${yPace()}%; a finished quarter counts as 100%). <b>Amber</b>: on pace, target not met yet. <b>Green</b>: target met.` : S.fy === '2526' ? '<b>Red</b>: under 100% of the target (the year is over). <b>Green</b>: target met.' : 'The year has not started.'}</p>`;
 }
 function render() {
   $('#page').innerHTML = body();

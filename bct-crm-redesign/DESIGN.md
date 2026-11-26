@@ -237,9 +237,10 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - **Sales targets**（舊版 `/targets` 的資料架構；大標跟側邊欄一樣叫 Sales targets）：搜尋、FY25-26／26-27／27-28、九個維度一個分頁（各自規劃、不加總）、Q1–Q4 目標和每季成交與 %、年度目標、達成、%。
   - 照列表頁規則：拿掉鉛筆欄，**點整列**打開側邊面板：四季的目標、備註、編號和修改紀錄，下面有 Edit。編輯四季金額、備註、新目標的幣別；清空一季要先確認刪除；改過內容關閉前先問。
   - 誰能改：照舊版 Sales Head，全部都能改；其他角色也一樣（角色規則）。
-  - 顏色照舊版：達成 100% 綠色；已結束的季度低於 90% 紅色、90% 以上黃色；進行中的季度和全年未達 100% 黃色。門檻寫在表格下方。
+  - 顏色跟 Sales performance、Home 同一個標準（design review 第三輪，2026-11-26 改，不再照舊版）：達成 100% 綠色；**低於今天的進度紅色**；跟上進度但還沒達成黃色。進度＝期間已過的比例：已結束的季度 100%、進行中的季度用今天的進度、還沒開始 0%；全年是四季平均。門檻和今天的進度寫在表格下方。
 - **Reports**：目錄頁跟 Accounts、Customer orders 一樣——七張分組卡篩選下面**一張表格**（Report、Group、Report filters），表格不再依組分段加小標題（2026-11-26）；搜尋在篩選列；整列打開那份報表。
 - **單份報表 `report.html?id=…`**：返回 Reports 的連結、標題、說明 · 期間 · USD；篩選列放搜尋、年度、季度、業務、團隊，More filters 放地區和報表專屬篩選（Main status、State、Classification），最後是 Details 和 Export（Excel／CSV）。這列比較長，**1499px 以下就用精簡篩選列**（`data-compact`）。摘要數字放在頁首右上（同 Home 的頁首 KPI，數字頂端跟標題對齊；≤1360 排到標題下面），不顯示「N rows」，表格可排序、每頁 20 筆；代表單一紀錄的列整列可點（商機、活動、任務、訂單），彙總列不能點。
+- 對照 design review（2026-11-26）：報表列高 64px（原本 56px）；Export 選單在手機上每項 44px，hover 只給滑鼠（`@media (hover: hover)`）。Sales structure 的列也是 64px（名稱＋代碼）。
 - 報表數字用本站資料計算，跟各頁一致：Open pipeline 等於 Pipeline & forecast；全公司的紀錄（照 Sales Head；角色只影響 Home 和側邊欄）。
 
 ## 21. Setup：Sales structure（2026-11-26）
