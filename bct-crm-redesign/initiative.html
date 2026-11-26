@@ -562,7 +562,7 @@ function header() {
       </div>`}
     </header>
     <section class="card sum-card ${ed ? 'editing' : ''}" aria-label="Summary">
-      <div class="steps2" style="--n:${n}" aria-label="${st.label} stages" ${ed ? 'data-tip="Use Change stage so the change is logged in stage history."' : ''}>
+      <div class="steps2" style="--n:${n}" aria-label="${st.label} stages">
         <ol>${steps}</ol>
         <div class="sp-bar ${o.kind === 'lost' ? 'lost' : ''}"><i style="width:${fill.toFixed(1)}%"></i></div>
         <div class="sp-now">${o.kind === 'open' ? `Step ${cur + 1} of ${n} · <b>${esc(st.list[cur])}</b>` : o.kind === 'won' ? '<b>Closed won</b>' : `<b>Closed lost</b> · after ${esc(lostAt)}`}</div>
@@ -606,15 +606,15 @@ function overview() {
       ${F('leadType', esc(v.leadType), sel('leadType'))}
       ${F('source', esc(v.source), sel('source'))}
       ${F('category', esc(v.category), sel('category'))}
-      ${F('created', `${dd(D.created)} · ${esc(o.owner)}`, 'lock', { label: 'Created', lockHelp: 'Set when the record was created.' })}
-      ${F('modified', `${dd(D.modified)} · ${esc(o.owner)}`, 'lock', { label: 'Last modified', lockHelp: 'Updated when you save.' })}
+      ${F('created', `${dd(D.created)} · ${esc(o.owner)}`, 'lock', { label: 'Created' })}
+      ${F('modified', `${dd(D.modified)} · ${esc(o.owner)}`, 'lock', { label: 'Last modified' })}
       <div class="fld"><span class="lab">Line items</span><div>${ED() ? `<button class="btn" data-act="toast" data-v="Would open the line item editor">${SVG.edit}Edit line items · ${items}</button>` : `<button class="btn" data-act="tab" data-v="items">View ${items}</button>`}</div></div>
-      ${o.kind === 'lost' ? F('reason', esc(o.reason), 'lock', { label: 'Loss reason', lockHelp: 'Recorded when it was closed lost.' }) : ''}
+      ${o.kind === 'lost' ? F('reason', esc(o.reason), 'lock', { label: 'Loss reason' }) : ''}
       ${F('desc', esc(v.desc), txa('desc', 'Anything the team should know'), { full: true, multi: true })}
       ${closed ? F('outcome', o.kind === 'won' ? `Closed won on ${dd(o.close)} · booked ${money(o.value)}` : `Closed lost on ${dd(o.close)} · ${esc(o.reason)}`, 'lock', { label: 'Outcome', full: true }) : ''}
     </div></section>
-    <section class="card"><div class="card-h"><div><h2>Qualification (BANT)</h2><p>Optional · fill in as you learn more</p></div><div class="r"><span class="pill ${rec === 4 ? 'ok' : ''}" id="bant-n">${rec} of 4 recorded</span></div></div><div class="fg c3">
-      ${F('need', esc(v.need), txa('need', 'What problem does the client want solved?'), { full: true, multi: true, req: isOpp, empty: 'Not recorded', help: isOpp ? 'Needed for an opportunity.' : 'Needed before converting to an opportunity.' })}
+    <section class="card"><div class="card-h"><div><h2>Qualification (BANT)</h2></div><div class="r"><span class="pill ${rec === 4 ? 'ok' : ''}" id="bant-n">${rec} of 4 recorded</span></div></div><div class="fg c3">
+      ${F('need', esc(v.need), txa('need', 'What problem does the client want solved?'), { full: true, multi: true, req: isOpp, empty: 'Not recorded', help: isOpp ? 'Needed for an opportunity.' : 'Optional for now.' })}
       ${F('budget', esc(v.budget), inp('budget'), { empty: 'Not recorded' })}
       ${F('authority', esc(v.authority), inp('authority', 'text', 'e.g. CIO'), { empty: 'Not recorded' })}
       ${F('timeline', esc(v.timeline), inp('timeline'), { empty: 'Not recorded' })}
@@ -625,7 +625,7 @@ function overview() {
 function itemsTab() {
   // a new opportunity lands here with no items yet: the one thing to do is add them (Candace, 2026-11-18)
   if (!D.items.length) return `<section class="card li-card"><div class="card-h"><div><h2>Line items</h2><p>The initiative value is the sum of these items</p></div></div>
-    <div class="empty"><b>No line items yet</b>Until you add them, the value is the estimate entered when the initiative was created.
+    <div class="empty"><b>No line items yet</b>
       <div style="margin-top: var(--space-4)"><button class="btn primary" data-act="toast" data-v="Would open the line item editor">${SVG.plus}Add line items</button></div></div></section>`;
   return `<section class="card li-card"><div class="card-h"><div><h2>Line items</h2><p>The initiative value is the sum of these items</p></div><div class="r"><button class="btn" data-act="toast" data-v="Would open the line item editor">${SVG.edit}Edit line items</button></div></div>
     <div class="tbl-wrap"><table class="tbl li">
@@ -642,7 +642,7 @@ function contactsTab() {
     ${D.contacts.map(c => { const a = n(c); return `<div class="ct">${CRM.avatar(c.n, (CONTACTS.find(x => x.acc === o.acc && x.n === c.n) || {}).id)}
       <div><b>${esc(c.n)}</b><span class="role ${c.role === 'Decision maker' ? 'dm' : ''}">${c.role}</span><small>${esc(c.t)}</small><small>${a.length ? `Last interaction ${dd(a[0].d)} · ${a.length} interaction${a.length === 1 ? '' : 's'}` : 'No interactions yet'}</small></div>
       <div class="ct-acts"><button class="btn icon-only" aria-disabled="true" aria-label="Call" data-tip="No phone number recorded for this contact.">${SVG.phone}</button><button class="btn" data-act="tab" data-v="activities">Log activity</button></div></div>`; }).join('')}
-    <p class="foot-note">Interactions count activities on this initiative that name the contact. Contacts come from ${esc(o.acc)} · <a href="#" data-act="toast" data-v="Would open all account contacts">All account contacts</a></p></section>`;
+    <p class="foot-note"><a href="#" data-act="toast" data-v="Would open all account contacts">All account contacts</a></p></section>`;
 }
 
 // Same period blocks as the Activities page: this week, last week, then by month (newest first)
@@ -731,14 +731,14 @@ function rail() {
     <section class="card"><h3>Outcome</h3><div class="kv" style="border-top: 0;margin-top:0;padding-top:0"><span>Result</span><b>${o.kind === 'won' ? 'Closed won' : 'Closed lost'}</b></div>
       <div class="kv" style="border-top: 0;margin-top:0;padding-top:8px"><span>Closed</span><b>${dd(o.close)}</b></div>
       ${o.kind === 'lost' ? `<div class="kv" style="border-top: 0;margin-top:0;padding-top:8px"><span>Loss reason</span><b>${esc(o.reason)}</b></div>` : ''}</section>`;
-  const account = ed ? lockedF('Account', o.acc, o.status === 'Opportunity' ? 'Locked for opportunities · use split / duplicate to move it.' : 'Locked after the initiative is created.')
+  const account = ed ? lockedF('Account', o.acc, o.status === 'Opportunity' ? 'Locked for opportunities · use Split / duplicate to move it.' : '')
     : `<div class="fld"><span class="lab">Account</span><div class="acc"><span class="av">${ini(o.acc)}</span><div><a href="#" data-act="acc">${esc(o.acc)}</a><small>${[D.sell.vertical, D.geo].filter(Boolean).join(' · ')} · ${D.existing || o.kind === 'won' ? 'Customer' : 'Prospect'}</small></div></div>
        <div class="links"><button class="link" data-act="toast" data-v="Would list the other ${others} initiatives at ${esc(o.acc)}">Other initiatives${others ? ` (${others})` : ''}</button><button class="link" data-act="acc">Account 360°</button></div></div>`;
   return `${ns}
     <section class="card"><h3>Account &amp; team</h3><div class="fg g1">
       ${account}
-      ${F('owner', `<div class="mem">${CRM.avatar(v.owner)}<div><b>${esc(v.owner)}</b><small>Sales owner</small></div></div>`, CRM.user.assigning ? sel('owner') : 'lock', CRM.user.assigning ? { req: true, help: 'Not restricted by team, geography or classification.' } : { lockVal: v.owner, lockHelp: 'Only a Sales Manager, Sales Head or Administrator can reassign it.' })}
-      ${F('team', esc(v.team), sel('team'), { help: 'Automatic when the owner is in one team.' })}
+      ${F('owner', `<div class="mem">${CRM.avatar(v.owner)}<div><b>${esc(v.owner)}</b><small>Sales owner</small></div></div>`, CRM.user.assigning ? sel('owner') : 'lock', CRM.user.assigning ? { req: true } : { lockVal: v.owner, lockHelp: 'Only a Sales Manager, Sales Head or Administrator can reassign it.' })}
+      ${F('team', esc(v.team), sel('team'), { help: 'Automatic when the owner is in one team; choose when in several.' })}
       <div class="fg">${F('geo', esc(v.geo), sel('geo'))}${F('region', esc(v.region), sel('region'))}</div>
       <div class="fld"><span class="lab">Contributors <span class="muted" style="font-weight:400;font-size: var(--text-xs)">· no booking credit</span></span><div class="contrib"><button class="btn" data-act="toast" data-v="Would open add contributor">${SVG.plus}Add contributor</button></div></div>
     </div></section>`;
@@ -782,7 +782,7 @@ function editBar() {
   const show = (k, x) => k === 'close' || k === 'follow' ? (x ? dd(x) : '—') : k === 'prob' ? x + '%' : x || '—';
   return `<span class="dot"></span>
     ${n ? `<button class="chg-btn" data-act="chgs" aria-expanded="${!!E.list}"><b>${n} unsaved change${n === 1 ? '' : 's'}</b>${CHEV_D}</button>` : '<b>No changes</b>'}
-    <span>${n ? 'Changed fields are marked with a dot' : 'The last saved version is shown.'}</span><span class="sp"></span>
+    <span class="sp"></span>
     <button class="btn ghost" data-act="cancel">Cancel</button>
     <button class="btn" data-act="discard" ${n ? '' : 'disabled'}>Discard changes</button>
     <button class="btn primary" data-act="save" ${n ? '' : 'disabled'}>Save changes</button>
@@ -832,7 +832,7 @@ async function askUnsaved(then) {
 }
 CRM.guardLeave(editDirty, (url) => askUnsaved(() => CRM.leave(url)));
 const STAGE_BY_NAME = Object.fromEntries(STAGES.map(x => [x.name, x]));
-function closeHelp() { if (o.kind !== 'open') return 'Set when the initiative closed.'; if (!E.v.close) return 'Not set · it stays out of every quarter.'; const q = fyq(E.v.close); return `Forecast in Q${q.q} FY${q.fy.slice(0, 2)}-${q.fy.slice(2)}.`; }
+function closeHelp() { if (o.kind !== 'open') return ''; if (!E.v.close) return o.status === 'Opportunity' ? 'Needed for the quarterly forecast.' : 'Optional until it becomes an opportunity.'; /* old closeHint */ const q = fyq(E.v.close); return `Forecast in Q${q.q} FY${q.fy.slice(0, 2)}-${q.fy.slice(2)}.`; }
 function probHelp() { const st = STAGE_BY_NAME[o.sub], w = `Weighted ${money(o.value * (+E.v.prob || 0) / 100)}`; if (!st) return w; return +E.v.prob === st.prob ? `${w} · stage default` : `${w} · default ${st.prob}%`; }
 
 function render() {

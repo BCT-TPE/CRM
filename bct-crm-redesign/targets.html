@@ -124,8 +124,7 @@ function body() {
     : `<div class="empty" style="padding:48px 12px"><b>No ${many} match</b>${S.q ? `Nothing matches "${esc(S.q)}".` : `No active ${many} to plan.`}</div>`;
   const ro = list.length && !list.some(r => canPlan(r.name)) ? `<p class="ro-note">You can read these targets; your role cannot plan ${one} targets.</p>` : '';
   return `<section class="card" aria-label="Targets by ${one}">${tabs}
-    ${ro}${table}</section>
-    <p class="list-note">Under each quarter's target: closed won in that quarter and the share of the target.<br>${S.fy === '2627' ? `<b>Red</b>: below today's pace (Q${CUR_Q} is ${PACE_NOW}% through, the year ${yPace()}%; a finished quarter counts as 100%). <b>Amber</b>: on pace, target not met yet. <b>Green</b>: target met.` : S.fy === '2526' ? '<b>Red</b>: under 100% of the target (the year is over). <b>Green</b>: target met.' : 'The year has not started.'}</p>`;
+    ${ro}${table}</section>`;
 }
 function render() {
   $('#page').innerHTML = body();
@@ -151,7 +150,7 @@ function openRow(name, editing) {
       ${editing ? `<div class="tf-2">${fld('Target value', `<div class="tg-amt">${inp('v' + i, v.val[i], `Q${i + 1} target value`)}<span>${v.cur}</span></div>`, { hint: 'Leave empty for no target.', err: bad()[i] ? 'Enter an amount of 0 or more, or leave it empty.' : '', id: 'v' + i })}
         ${fld('Remarks', `<textarea class="in" data-v="r${i}" aria-label="Q${i + 1} remarks" rows="2" ${parsed()[i] == null ? 'disabled' : ''}>${esc(v.rem[i])}</textarea>`)}</div>`
       : `<dl><div><dt>Target</dt><dd class="${r.q[i] == null ? 'no-t' : ''}">${r.q[i] == null ? 'No target' : r.cur === 'USD' ? money(r.q[i]) : `${r.cur} ${Math.round(r.q[i] * FX[r.cur]).toLocaleString('en-US')}`}</dd></div><div><dt>Remarks</dt><dd class="${r.rem[i] ? '' : 'no-t'}">${r.rem[i] ? esc(r.rem[i]) : '—'}</dd></div></dl>
-        ${code(i) ? `<details><summary>Revision history</summary><ul>${EDITS[`${S.fy}|${S.dim}|${name}`] ? `<li><span>Changed by ${esc(ME)}</span><small>${CRM.date(TODAY.toISOString().slice(0, 10))}</small></li>` : ''}<li><span>Set by the planning team</span><small>${CRM.date(`20${S.fy.slice(0, 2)}-03-20`)}</small></li></ul></details>` : ''}`}</section>`;
+        ${code(i) ? `<details><summary>Revision history</summary><ul>${EDITS[`${S.fy}|${S.dim}|${name}`] ? `<li><span>update by ${esc(ME)}</span><small>${CRM.date(TODAY.toISOString().slice(0, 10))}</small></li>` : ''}<li><span>create by ${esc(ME)}</span><small>${CRM.date(`20${S.fy.slice(0, 2)}-03-20`)}</small></li></ul></details>` : ''}`}</section>`;
   const foot = () => editing ? `<div class="op-r1"><span class="op-msg" role="status">${bad().some(Boolean) ? 'Fix the highlighted amounts.' : ''}</span></div><button type="button" class="btn ghost" data-x="close">Cancel</button><button type="submit" class="btn primary" ${bad().some(Boolean) ? 'disabled' : ''}>Save targets</button>`
     : `<div class="op-r1"><span class="op-msg">${can ? '' : esc(noPlan())}</span></div><button type="button" class="btn ghost" data-x="close">Close</button>${can ? '<button type="button" class="btn primary" data-x="edit">Edit</button>' : ''}`;
   const draw = () => `<form class="tf-form" novalidate>${head('Sales targets', `${editing ? 'Edit targets · ' : ''}${esc(name)}`, sub)}

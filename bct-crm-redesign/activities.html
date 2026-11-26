@@ -282,7 +282,7 @@ function openLog(pre) {
     const people = acc ? CONTACTS.filter(c => c.acc === acc && c.status === 'Active') : [];
     const targets = v.ctx === 'account' ? ACCOUNTS.map(a => [a.name, a.name]) : INITS.filter(o => o.kind === 'open').map(o => [o.id, o.name]);
     scrim.innerHTML = `<form class="tf-form" novalidate>
-      <header class="dr-head"><div><p class="dr-kind">Activities</p><h2 id="lf-t">Log activity</h2><p class="dr-sub">What happened with the customer, for the timeline and the record.</p></div>
+      <header class="dr-head"><div><p class="dr-kind">Activities</p><h2 id="lf-t">Log activity</h2><p class="dr-sub">Record what happened while it is fresh.</p></div>
         <button type="button" class="icon-btn" data-x="close" aria-label="Close panel">${CRM.icon('x')}</button></header>
       <div class="dr-body"><div class="tf-g">
         ${fld('Log against', `<div class="seg tf-seg" role="radiogroup" aria-label="Log against">${[['initiative', 'Sales initiative'], ['account', 'Account']].map(([k, l]) => `<button type="button" role="radio" aria-checked="${v.ctx === k}" class="${v.ctx === k ? 'on' : ''}" data-ctx="${k}">${l}</button>`).join('')}</div>`)}

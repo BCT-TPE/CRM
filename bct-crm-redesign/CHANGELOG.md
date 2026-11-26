@@ -7,7 +7,24 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-26 (eighth push)
+## 2026-11-26 (ninth push)
+
+**On-screen copy follows the old CRMpulse** (DESIGN §7.10): hints and notes the old screens don't have are removed; where the old app has the same hint, its wording is used. Home is out of scope (built from the requirement team's examples). Titles, data labels, shared dialogs and empty states, validation messages, next-step suggestions and the metric definitions (the old dashboards' footnotes, shown here as tooltips) stay.
+
+### Removed
+- **Sales targets**: the note under the table (what the cells show, colour thresholds). Revision history uses the old format "create / update by <user> · <date>".
+- **Accounts, Customer orders**: the notes under the list (customer value, red thresholds); the PO hint in the order panel's attachments.
+- **Sales initiatives**: zone subtitles, the funnel description and "Reached" note, tooltips defining Stage, Need attention and Weighted, the progress bar's dash legend.
+- **Pipeline, Sales performance**: zone subtitles ("The records behind every number above", period and deal counts) and Pipeline's "Not in any quarter above" note.
+- **Initiative record and New initiative**: section subtitles (Value & forecast, BANT, Classification), the rail note, owner / name / created / modified / loss-reason hints, the line-item and contacts explanations, "Changed fields are marked with a dot".
+
+### Changed
+- Old wording restored: Sales initiatives subtitle; Log activity subtitle ("Record what happened while it is fresh."); New initiative subtitle; need ("Optional for now."), team, expected close ("Needed for the quarterly forecast." / "Optional until it becomes an opportunity."), probability ("Changed from the N% default for …") and currency ("≈ $N USD for reporting.") hints; "Locked for opportunities · use Split / duplicate to move it."; no-target note ("No target is defined for this selection or anything under it.").
+- Reports catalogue column: "Report-specific filters" (old wording).
+
+---
+
+## 2026-11-26 (eighth push) · `d37326d`
 
 Today's three pages checked against the design review rounds 1–3.
 

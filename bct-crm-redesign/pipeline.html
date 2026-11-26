@@ -123,14 +123,14 @@ function render() {
   { const h = $('#hero-kpis'); h.classList.toggle('is-empty', [...h.querySelectorAll('.v2-kv')].every(v => { const c = v.cloneNode(true); c.querySelectorAll('.v2-badge').forEach(b => b.remove()); return /^(\$0|0|N\/A)$/.test(c.textContent.trim()); })); } // empty: slots collapse
   page.innerHTML = `
     <div class="grid">
-      ${zoneHead(1, 'Target &amp; forecast', `${qLabel} · bookings, target and deals closing`)}
+      ${zoneHead(1, 'Target &amp; forecast', '')}
       ${forecastHero(h)}
       ${ringCard(h)}
       ${quarterCard(base).replace('class="card s6"', 'class="card s5"')}
-      ${zoneHead(2, 'Pipeline now', `All open opportunities in the filters · ${list.length} deals`)}
+      ${zoneHead(2, 'Pipeline now', '')}
       <div class="s7 v2-stack">${mixPills(list)}${ageDots(list)}</div>
       ${teamMapCard(list).replace('card s6 geo-card', 'card s5 geo-card')}
-      ${zoneHead(3, 'Deals to act on', 'The records behind every number above')}
+      ${zoneHead(3, 'Deals to act on', '')}
       ${tableCard(list)}
     </div>`;
   CRM.riseIn();
@@ -158,7 +158,7 @@ addEventListener('resize', () => { clearTimeout(syncAgeDots.t); syncAgeDots.t = 
    1 Target & forecast (selected quarter, uses bookings + targets) · 2 Pipeline now (all open deals) · 3 Deals to act on (table). */
 function zoneHead(n, title, scope, legend) {
   const lg = legend ? `<span class="zone-lg" aria-label="Bar colours"><span>Bar colour = forecast category</span><span><i class="c-commit"></i>Commit · L1</span><span><i class="c-best"></i>Best case · L2</span><span><i class="c-pipe"></i>Pipeline · L3</span></span>` : '';
-  return `<div class="zone s12"><h2 class="zone-t">${title}</h2><span class="zone-s">${scope}</span>${lg}</div>`;
+  return `<div class="zone s12"><h2 class="zone-t">${title}</h2>${scope ? `<span class="zone-s">${scope}</span>` : ''}${lg}</div>`;
 }
 const chev = ''; // chevrons removed: hover fill already signals clickability
 
@@ -175,7 +175,7 @@ function forecastCard(h) {
   const remaining = h.target != null ? Math.max(h.target - h.won, 0) : null;
   const coverage = remaining ? h.openGross / remaining : null;
   let sowhat;
-  if (h.target == null) sowhat = `Targets are set for teams and geographies, not owners, so attainment is N/A.`;
+  if (h.target == null) sowhat = 'No target is defined for this selection or anything under it.'; // old CRMpulse target note
   else if (past) sowhat = `Closed at <b>${money(h.won)}</b>, ${gap >= 0 ? `<b>${money(gap)}</b> over` : `<b>${money(-gap)}</b> under`} target.`;
   else if (gap >= 0) sowhat = `Won + commit is <b>${money(gap)} ahead</b> of target.`;
   else sowhat = `<b>${money(-gap)} short</b> of target. ${h.best ? `Best case adds ${money(h.best)}${h.best >= -gap ? ', enough to close the gap' : `, still ${money(-gap - h.best)} short`}.` : 'No best-case deals close this quarter.'}`;
@@ -429,7 +429,7 @@ function quarterCard(base) {
   const qs = [1, 2, 3, 4].map(q => quarterStats(q, base));
   const max = Math.max(1, ...qs.map(x => Math.max(x.total, x.target || 0))) * 1.12;
   const h = (v) => (v / max * 100).toFixed(2) + '%';
-  const noDate = base.filter(o => !o.close), later = base.filter(o => o.q === 'next');
+
   const cols = qs.map(x => {
     const past = x.q < CUR_Q, cur = x.q === CUR_Q;
     const att = x.target ? pct(past ? x.won : x.forecast, x.target) : null;
@@ -450,15 +450,11 @@ function quarterCard(base) {
       <div class="qlab"><b>Q${x.q}${cur ? ' · now' : ''}${chev}</b><small><em class="qk">Target</em> <span>${x.target ? money(x.target) : 'N/A'}</span></small><div class="att ${attCls}">${attTxt.replace(/^(\d+%) /, '$1 <span>')}${/^\d+% /.test(attTxt) ? '</span>' : ''}</div></div>
     </button>`;
   }).join('');
-  const notes = [];
-  if (noDate.length) notes.push(`${noDate.length} open (${money(noDate.reduce((s, o) => s + o.value, 0))}) with no close date`);
-  if (later.length) notes.push(`${later.length} (${money(later.reduce((s, o) => s + o.value, 0))}) closing after FY26-27`);
   return `
   <section class="card s6" aria-labelledby="q-h">
     <div class="card-h"><div><h2 id="q-h">Bookings vs target by quarter</h2><p>Closed won + open pipeline by forecast category · select a quarter for its deals</p></div></div>
     <div class="legend" style="margin-bottom:12px"><span><i class="c-won"></i>Closed won</span><span><i class="c-commit"></i>Commit</span><span><i class="c-best"></i>Best case</span><span><i class="c-pipe"></i>Pipeline</span><span><i class="line"></i>Target</span></div>
     <div class="qchart">${cols}</div>
-    ${notes.length ? `<p class="qnote">Not in any quarter above: ${notes.join(' · ')}.</p>` : ''}
   </section>`;
 }
 
@@ -640,7 +636,7 @@ function forecastHero(h) {
   const w = (v) => (v / max * 100).toFixed(2) + '%';
   const gap = h.target != null ? headline - h.target : null;
   let sowhat;
-  if (h.target == null) sowhat = `Targets are set for teams and geographies, not owners, so attainment is N/A.`;
+  if (h.target == null) sowhat = 'No target is defined for this selection or anything under it.'; // old CRMpulse target note
   else if (past) sowhat = `Closed at <b>${money(h.won)}</b>, ${gap >= 0 ? `<b>${money(gap)}</b> over` : `<b>${money(-gap)}</b> under`} target.`;
   else if (gap >= 0) sowhat = `Won + commit is <b>${money(gap)} ahead</b> of target.`;
   else sowhat = `<b>${money(-gap)} short</b> of target. ${h.best ? `Best case adds ${money(h.best)}${h.best >= -gap ? ', enough to close the gap' : `, still ${money(-gap - h.best)} short`}.` : 'No best-case deals close this quarter.'}`;

@@ -118,6 +118,12 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 - **表格裡的人名欄一律「頭像＋名字」**（`.own` + `CRM.avatar()`）：Owner、Assigned to、Salesperson、報表的 Owner／Name（是人時）、Sales targets 的 Salesperson 分頁、Home 的 By salesperson。名字太長就截斷，不拿掉頭像。句子裡提到的人（例如「by John Mathew」）維持文字。
 
+## 7.10 文案只用舊版有的（2026-11-26）
+
+- **舊版畫面沒有的說明和提示不加**：卡片或區塊標題下的說明副標、表格下方的註記（包括顏色門檻）、欄位下的使用說明、名詞上的定義提示，舊版沒有就不放。舊版有同一句的，用舊版原文（例如「Optional for now.」「Needed for the quarterly forecast.」「No target is defined for this selection or anything under it.」）。
+- 保留：標題、資料標籤、全站共用的對話框和空白狀態、驗證訊息、商機的下一步建議，以及舊版放在頁尾註腳、新版改放在提示框裡的定義（Weighted、Forecast、Needs attention、Win rate、Expected by today）。Pipeline、Sales performance 的卡片副標跟舊版同類（「select … to filter」），保留。
+- Home 是依需求端範例做的，不在這次比對範圍。
+
 ## 7.9 表格列的 hover 與游標（2026-11-26）
 
 - **只有能打開東西的列才有 hover 底色和手指游標**：列加 `class="click"`（`crm.css`、`theme-v2.css`、`responsive.css` 都只對 `tr.click:hover` 上色）。其他列一律一般游標（`cursor: default`）、滑過不變色，例如 Home 的 By salesperson、報表的彙總列、商機頁的明細、Sales structure。
@@ -228,7 +234,7 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 
 ## 19. Customers 對照 design review（2026-11-25）
 
-- 手機總計放列表最上面；顏色門檻寫在列表下方（`.list-note`：Accounts「no interaction for over 60 days」、Customer orders「waiting for a PO for over 30 days」）；只有一個篩選時不做面板（`data-keep`）；歷史訂單列只放狀態標籤，列高 64px。
+- 手機總計放列表最上面；列表下方不寫顏色門檻說明（舊版沒有，2026-11-26 拿掉，§7.10）；只有一個篩選時不做面板（`data-keep`）；歷史訂單列只放狀態標籤，列高 64px。
 - 手機列表卡（Sales initiatives、Tasks、Accounts、Customer orders）還是一筆一張大卡；要改成精簡列就全站一起改，目前先不動。
 
 ## 20. Plan & report：Sales targets、Reports（2026-11-26）
@@ -237,8 +243,8 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - **Sales targets**（舊版 `/targets` 的資料架構；大標跟側邊欄一樣叫 Sales targets）：搜尋、FY25-26／26-27／27-28、九個維度一個分頁（各自規劃、不加總）、Q1–Q4 目標和每季成交與 %、年度目標、達成、%。
   - 照列表頁規則：拿掉鉛筆欄，**點整列**打開側邊面板：四季的目標、備註、編號和修改紀錄，下面有 Edit。編輯四季金額、備註、新目標的幣別；清空一季要先確認刪除；改過內容關閉前先問。
   - 誰能改：照舊版 Sales Head，全部都能改；其他角色也一樣（角色規則）。
-  - 顏色跟 Sales performance、Home 同一個標準（design review 第三輪，2026-11-26 改，不再照舊版）：達成 100% 綠色；**低於今天的進度紅色**；跟上進度但還沒達成黃色。進度＝期間已過的比例：已結束的季度 100%、進行中的季度用今天的進度、還沒開始 0%；全年是四季平均。門檻和今天的進度寫在表格下方。
-- **Reports**：目錄頁跟 Accounts、Customer orders 一樣——七張分組卡篩選下面**一張表格**（Report、Group、Report filters），表格不再依組分段加小標題（2026-11-26）；搜尋在篩選列；整列打開那份報表。
+  - 顏色跟 Sales performance、Home 同一個標準（design review 第三輪，2026-11-26 改，不再照舊版）：達成 100% 綠色；**低於今天的進度紅色**；跟上進度但還沒達成黃色。進度＝期間已過的比例：已結束的季度 100%、進行中的季度用今天的進度、還沒開始 0%；全年是四季平均。表格下方不放說明（舊版沒有，2026-11-26 拿掉）。Revision history 照舊版格式「create／update by 誰 · 日期」。
+- **Reports**：目錄頁跟 Accounts、Customer orders 一樣——七張分組卡篩選下面**一張表格**（Report、Group、Report-specific filters，欄名照舊版用詞），表格不再依組分段加小標題（2026-11-26）；搜尋在篩選列；整列打開那份報表。
 - **單份報表 `report.html?id=…`**：返回 Reports 的連結、標題、說明 · 期間 · USD；篩選列放搜尋、年度、季度、業務、團隊，More filters 放地區和報表專屬篩選（Main status、State、Classification），最後是 Details 和 Export（Excel／CSV）。這列比較長，**1499px 以下就用精簡篩選列**（`data-compact`）。摘要數字放在頁首右上（同 Home 的頁首 KPI，數字頂端跟標題對齊；≤1360 排到標題下面），不顯示「N rows」，表格可排序、每頁 20 筆；代表單一紀錄的列整列可點（商機、活動、任務、訂單），彙總列不能點。
 - 對照 design review（2026-11-26）：報表列高 64px（原本 56px）；Export 選單在手機上每項 44px，hover 只給滑鼠（`@media (hover: hover)`）。Sales structure 的列也是 64px（名稱＋代碼）。
 - 報表數字用本站資料計算，跟各頁一致：Open pipeline 等於 Pipeline & forecast；全公司的紀錄（照 Sales Head；角色只影響 Home 和側邊欄）。
@@ -251,4 +257,4 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - **Sales classifications 照舊版卡片**：每個分類一張，名稱、代碼、Mandatory，說明 · Values filtered by；列出全部值（代碼、名稱，Offering 右邊是所屬 Practice），卡片底下有舊版那句「Values used by records cannot be deleted; deactivate them instead.」。1280px 以上兩張一排，**同一排的卡片等高**，底下那句貼齊卡片底部。這頁沒有任何連結，表格列沒有 hover 效果（§7.9）。卡片網格沒有自己的左右 padding，卡片跟分頁左邊對齊。
 - **Sales classifications 全站照舊版的值**（2026-11-26，`crm-data.js` 的 `CLASSIFICATIONS`）：SBU 3、Practice / Service Line 5、Offering 10（依 Practice 篩選）、Technology 4、Vertical 5，代碼和順序同舊版。商機的分類（`sellOf`，記錄頁、新增頁、Sales initiatives 篩選、Sales targets、Reports 共用）都對應到這些值；Technology、Vertical 可以未設定。帳戶的 Industry / Vertical 也用 VERTICAL（舊版帳戶表單）：Pharma 歸 Healthcare，物流、港口、設施公司沒有對應值，顯示未設定。商機名稱裡的服務名（例如 Field Service App）不變，Offering 欄位是分類值。
 - **團隊、成員、地區全站照舊版**（2026-11-26，`crm-data.js`）：`TEAMS[].members` 是舊版成員（Rajesh Kumar、Omar Haddad 各在兩個團隊，`PERSON_TEAM` 取第一個）；`TEAM_MANAGER` 照舊版，只有 APAC Sales 是 Gaurav（取代 Kevin Lim，示範帳號的 Sales Manager 視角要有團隊；他不是成員，但跟以前一樣自己也賣，所以 `TEAMS[].people` 是成員加上他，儀表板的業務名單用 people）。原本的 Karthik Menon 改名 Rajesh Kumar（商機、目標、照片不變）；Sneha Nair、Fatima Al-Zahra 沒有商機和目標，業績頁顯示 No target。地區 `SALES_REGION` 是舊版 7 個（India North／South；Oman、Saudi Arabia、UAE；Malaysia、Singapore），代碼和 head 照舊版。
-- 表格下方不放自己加的說明（`.list-note` 只用來寫顏色門檻）。
+- 表格下方不放說明（§7.10）。

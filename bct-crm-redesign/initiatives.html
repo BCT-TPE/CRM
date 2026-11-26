@@ -143,7 +143,7 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 36px; 
     <header class="v2-head">
       <div class="v2-hello">
         <h1>Sales initiatives</h1>
-        <p>Prospects, leads and opportunities in one record, first interest to closure · USD</p>
+        <p>Prospects, leads and opportunities as one record, from first interest to closure.</p>
       </div>
       <div class="acts" style="display:flex;gap:8px">
         <button class="btn primary" id="new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New sales initiative</button>
@@ -234,15 +234,15 @@ function listRows() {
 
 /* ---------- Render ---------- */
 const page = document.getElementById('page');
-function zoneHead(n, title, scope) { return `<div class="zone s12"><h2 class="zone-t">${title}</h2><span class="zone-s">${scope}</span></div>`; }
+function zoneHead(n, title, scope = '') { return `<div class="zone s12"><h2 class="zone-t">${title}</h2>${scope ? `<span class="zone-s">${scope}</span>` : ''}</div>`; }
 function render() {
   syncControls();
   const b = base();
   page.innerHTML = `
     <div class="grid">
-      ${zoneHead(1, 'Lifecycle', 'Prospect → lead → opportunity → closed · select a status to filter')}
+      ${zoneHead(1, 'Lifecycle')}
       ${lifeStrip(b)}
-      ${zoneHead(2, 'Initiatives', S.view === 'list' ? 'One row per initiative · select a row to open it' : S.view === 'kanban' ? 'Grouped by main status and funnel code' : 'How far initiatives get · the status tiles above do not apply here')}
+      ${zoneHead(2, 'Initiatives')}
       ${listCard(b)}
     </div>`;
   CRM.enhanceSelects(page);
@@ -285,7 +285,7 @@ function listCard(b) {
       <span class="sum"><b>${rows.length}</b> ${NOUN[S.status]} · <b>${money(g)}</b> total value · <b>${money(w)}</b> weighted</span>
       <span class="chip-row">
         ${S.stage ? `<span class="filter-chip">Stage: ${esc(S.stage)}<button data-act="unstage" aria-label="Clear stage filter"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>` : ''}
-        ${attnN || S.attn ? `<button class="tog ${S.attn ? 'on' : ''}" data-act="attn" aria-pressed="${S.attn}" data-tip-h="Needs attention" data-tip="No next step, close date passed, over 30 days in stage, or open over 90 days."><b>${attnN}</b> need attention</button>` : ''}
+        ${attnN || S.attn ? `<button class="tog ${S.attn ? 'on' : ''}" data-act="attn" aria-pressed="${S.attn}"><b>${attnN}</b> need attention</button>` : ''}
       </span>
       <span class="sp"></span>
       ${S.view === 'list' ? `<label class="select" id="w-sort"><span class="lbl">Sort</span><select id="f-sort" aria-label="Sort">${['updated', 'value', 'close', 'stage', 'since', 'name', ...(['prob', 'next'].includes(S.sort) ? [S.sort] : [])].map(k => `<option value="${k}" ${S.sort === k ? 'selected' : ''}>${SORTS[k].label || { prob: 'Probability', next: 'Next follow-up' }[k]}</option>`).join('')}</select></label>` : ''}
@@ -321,8 +321,7 @@ function prog(o) {
   const tip = `<b>Lifecycle · step ${o.step + 1} of ${n}</b>`
     + grp('Prospect', PRE_STAGES.Prospect) + grp('Lead', PRE_STAGES.Lead) + grp('Opportunity', STAGES)
     + `<div class='row'><span>Now</span><span>${esc(o.sub)}</span></div>`
-    + (next ? `<div class='row'><span>Next</span><span>${esc(next)}</span></div>` : '')
-    + `<div class='row'><span>One dash per sub-stage · dark = now</span></div>`;
+    + (next ? `<div class='row'><span>Next</span><span>${esc(next)}</span></div>` : '');
   return `<div class="prog" tabindex="0" aria-label="Lifecycle step ${o.step + 1} of ${n}: ${esc(o.sub)}" data-tip-html="${tip}">${ALL_STEPS.map((_, i) => `<i class="${i < o.step ? 'f' : i === o.step ? 'c' : ''} ${i === 3 || i === 6 ? 'sep' : ''}"></i>`).join('')}</div>`;
 }
 function stagePill(o) { return o.kind === 'open' ? `<span class="st ${o.status}">${o.status}</span>` : `<span class="st ${o.kind}">${o.kind === 'won' ? 'Won' : 'Lost'}</span>`; }
@@ -335,7 +334,7 @@ function listView(rows) {
   return `
     <div class="tbl-wrap"><table class="tbl si">
       <colgroup><col class="c-name"><col class="c-stage"><col class="c-own"><col class="c-val"><col class="c-prob"><col class="c-close"><col class="c-next"></colgroup>
-      <thead><tr>${th('name', 'Initiative')}${th('stage', 'Stage', '', 'Main status and sub-stage. Bar = 13 steps: 3 prospect, 3 lead, 7 opportunity.')}${th('', 'Owner / team')}${th('value', 'Value', 'r')}${th('prob', 'Prob.', 'r')}${th('close', 'Close')}${th('next', 'Next step')}</tr></thead>
+      <thead><tr>${th('name', 'Initiative')}${th('stage', 'Stage')}${th('', 'Owner / team')}${th('value', 'Value', 'r')}${th('prob', 'Prob.', 'r')}${th('close', 'Close')}${th('next', 'Next step')}</tr></thead>
       <tbody>${shown.map(o => {
         const local = localAmount(o.value, o.cur), late = o.follow && new Date(o.follow) < TODAY, passed = o.kind === 'open' && o.close && new Date(o.close) < TODAY;
         return `<tr class="click" data-act="open" data-id="${o.id}" tabindex="0">
@@ -420,19 +419,18 @@ function funnelView(b) {
     <div class="fn-wrap">
       <div>
           <h3 class="fn-h">Lifecycle funnel</h3>
-          <p class="fn-p">Initiatives reaching each stage · solid = reached, faint = lost since the previous stage · select a stage to list what's in it</p>
       </div>
       <div class="fn-kpis">
         ${fk('Win rate', won.length + lost.length ? pct(won.length, won.length + lost.length) + '%' : '—', `${won.length} won · ${lost.length} lost`)}
         ${fk('Lost', lost.length, `${money(lost.reduce((s, o) => s + o.value, 0))} lost value`, lost.length ? 'neg' : '')}
         ${fk('Open pipeline', money(ov), `${open.length} open initiatives`)}
-        ${fk('<span class="def" tabindex="0" data-tip="Σ value × probability.">Weighted</span>', money(ow), 'Value × probability')}
+        ${fk('Weighted', money(ow), 'Value × probability')}
         ${fk('Avg days in stage', avgDays == null ? '—' : `${avgDays} days`, 'Open initiatives')}
-        ${fk('<span class="def" tabindex="0" data-tip="No next step, close date passed, over 30 days in stage, or open over 90 days.">Need attention</span>', attn, 'Open initiatives', attn ? 'warn' : '')}
+        ${fk('Need attention', attn, 'Open initiatives', attn ? 'warn' : '')}
       </div>
       <div>
         ${bands}
-        <p class="fn-note"><span class="def" tabindex="0" data-tip="Counted from each initiative's stage history.">“Reached”</span> counts initiatives whose furthest recorded stage is at or past the band, so a skipped stage still counts as passed. Lost initiatives (${lost.length}) count up to where they got and are never “here now”.</p>
+
       </div>
     </div>
     <div class="fn-list">

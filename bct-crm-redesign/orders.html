@@ -170,7 +170,7 @@ function register() {
     ${pager('page', S.page, list.length)}</section>`;
 }
 function render() {
-  $('#page').innerHTML = `<div class="or-stack">${stages()}${register()}</div>${S.tab === 'H' ? '' : '<p class="list-note"><b>Red</b>: waiting for a PO for over 30 days.</p>'}`;
+  $('#page').innerHTML = `<div class="or-stack">${stages()}${register()}</div>`;
   $('#reset').hidden = !anyFilter();
 }
 
@@ -211,7 +211,7 @@ function openOrder(o) {
         ${fld('Responsible salesperson', pick('owner', PEOPLE, v.owner, 'Responsible salesperson', final), { hint: 'Defaults to the initiative owner.' })}
         ${fld('Remarks', `<textarea class="in" data-v="remarks" aria-label="Remarks">${esc(v.remarks)}</textarea>`)}
         ${o.doneOn ? `<p class="tf-h" style="margin:0">Completed on ${CRM.date(o.doneOn)}.</p>` : ''}${o.cancel ? `<p class="tf-h" style="margin:0">Cancellation reason: ${esc(o.cancel)}</p>` : ''}
-        <h3 class="op-h">Attachments</h3><div class="tf"><button type="button" class="btn" data-x="file" style="align-self:flex-start">Attach file</button><span class="tf-h">No attachments yet. Attach the signed PO here after confirming.</span></div>
+        <h3 class="op-h">Attachments</h3><div class="tf"><button type="button" class="btn" data-x="file" style="align-self:flex-start">Attach file</button><span class="tf-h">No attachments yet.</span></div>
         <h3 class="op-h">History</h3><ul class="op-hist">${history.map(([t, d]) => `<li><span>${esc(t)}</span><small>${CRM.date(d)}</small></li>`).join('')}</ul>
       </div></div><div class="dr-foot op-foot">${foot()}</div></form>`;
   const P = openPanel(v, draw, `Discard changes to ${o.id}?`);

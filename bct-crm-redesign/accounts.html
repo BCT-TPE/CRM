@@ -188,7 +188,7 @@ function listCard() {
       <button data-act="page" data-v="${S.page + 1}" ${S.page === pages ? 'disabled' : ''} aria-label="Next page">›</button></div>`
     : `<div class="empty" style="padding:48px 12px"><b>No accounts here</b>No accounts match these filters.${anyFilter() ? '<br><button class="link" data-act="reset">Clear filters</button>' : ''}</div>`;
   return `<section class="card" aria-label="Accounts">${body}</section>
-    ${list.length ? '<p class="list-note">Customer value counts confirmed orders only. Draft orders waiting for a PO are flagged so a won deal never looks like a $0 customer.<br><b>Red</b>: no interaction for over 60 days.</p>' : ''}`;
+`;
 }
 function buildMore() {
   const regions = [...new Set(ALL.filter(a => !S.geo || a.geo === S.geo).map(a => a.region))].sort();

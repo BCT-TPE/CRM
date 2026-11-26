@@ -65,7 +65,7 @@ function render() {
   const dot = (g) => DOTS[REPORT_GROUPS.indexOf(g)];
   $('#page').innerHTML = `<div style="display:flex;flex-direction:column;gap:16px"><section class="card tint sc-tiles" role="tablist" aria-label="Report groups">${tiles}</section>
     <section class="card" aria-label="Reports">${shown.length ? `<div class="tbl-wrap"><table class="tbl rl"><colgroup><col class="c-r"><col class="c-g"><col class="c-f"></colgroup>
-      <thead><tr><th>Report</th><th>Group</th><th>Report filters</th></tr></thead>
+      <thead><tr><th>Report</th><th>Group</th><th>Report-specific filters</th></tr></thead>
       <tbody>${shown.map(r => `<tr class="click" data-href="report.html?id=${r.id}" tabindex="0"><td><div class="ell t-main">${esc(r.title)}</div><div class="t-sub">${esc(r.desc)}</div></td>
         <td><span class="rg-n"><i style="background:${dot(r.group)}"></i>${esc(r.group)}</span></td><td>${r.params.length ? r.params.map(p => `<span class="rp-tag">${REPORT_PARAM[p]}</span>`).join('') : '<span class="t-sub">—</span>'}</td></tr>`).join('')}</tbody></table></div>`
       : `<div class="empty" style="padding:48px 12px"><b>No reports match.</b><button class="link" data-reset>Clear filters</button></div>`}</section></div>`;

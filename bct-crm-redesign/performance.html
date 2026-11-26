@@ -179,7 +179,7 @@ function periodStats(q) {
 /* ---------- Render ---------- */
 const page = document.getElementById('page');
 function zoneHead(n, title, scope) {
-  return `<div class="zone s12"><h2 class="zone-t">${title}</h2><span class="zone-s">${scope}</span></div>`;
+  return `<div class="zone s12"><h2 class="zone-t">${title}</h2>${scope ? `<span class="zone-s">${scope}</span>` : ''}</div>`;
 }
 function render() {
   syncControls();
@@ -190,16 +190,16 @@ function render() {
   { const h = $('#hero-kpis'); h.classList.toggle('is-empty', [...h.querySelectorAll('.v2-kv')].every(v => { const c = v.cloneNode(true); c.querySelectorAll('.v2-badge').forEach(b => b.remove()); return /^(\$0|0|N\/A)$/.test(c.textContent.trim()); })); } // empty: slots collapse
   page.innerHTML = `
     <div class="grid">
-      ${zoneHead(1, 'Target attainment', `${label} · closed won bookings against target`)}
+      ${zoneHead(1, 'Target attainment', '')}
       ${attainCard(P, label)}
       ${ringCard(P, label)}
       ${quarterCard().replace('class="card s6"', 'class="card s5"')}
-      ${zoneHead(2, 'Win and loss', `Opportunities closed in ${label} · ${P.rows.length} deals`)}
+      ${zoneHead(2, 'Win and loss', '')}
       ${wonLostCard(P)}
       ${lossCard(P)}
-      ${zoneHead(3, 'Attainment by team and salesperson', `${label} · each against its own target`)}
+      ${zoneHead(3, 'Attainment by team and salesperson', '')}
       ${whoCard(P)}
-      ${zoneHead(4, 'Closed deals', 'The records behind every number above')}
+      ${zoneHead(4, 'Closed deals', '')}
       ${closedTable(P)}
     </div>`;
   CRM.riseIn();
@@ -217,7 +217,7 @@ function attainCard(P, label) {
   const vsExp = P.expected != null ? P.booked - P.expected : null;
   const needed = P.target != null ? Math.max(P.target - P.booked, 0) : null;
   let sowhat;
-  if (P.target == null) sowhat = 'No target is set for this filter, so attainment shows as N/A.';
+  if (P.target == null) sowhat = 'No target is defined for this selection or anything under it.'; // old CRMpulse target note
   else if (notStarted) sowhat = `${label} has not started yet.`;
   else if (variance >= 0) sowhat = `Target met: <b>${money(variance)} over</b>.`;
   else if (done) sowhat = `Closed <b>${money(-variance)} under</b> target.`;
