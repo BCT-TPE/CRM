@@ -265,10 +265,19 @@
   const tip = document.createElement('div');
   tip.className = 'tip'; tip.setAttribute('role', 'tooltip');
   let tipT = null, tipEl = null;
+  // Text cut short with "…" (text-overflow: ellipsis) shows its full text in the same tooltip, so every browser
+  // behaves alike (Safari otherwise adds its own native tooltip, Chrome shows nothing).
+  function clipped(t) {
+    for (let el = t, i = 0; el && el !== document.body && i < 4; el = el.parentElement, i++) {
+      if (el.nodeType !== 1) continue;
+      if (getComputedStyle(el).textOverflow === 'ellipsis' && el.scrollWidth > el.clientWidth + 1) return el;
+    }
+    return null;
+  }
   function showTip(el) {
     const html = el.dataset.tipHtml || ((el.dataset.tipH ? `<b>${el.dataset.tipH}</b>` : '') + (el.dataset.tip || ''));
-    if (!html) return;
-    tip.innerHTML = html;
+    if (!html && !el._clip) return;
+    if (html) tip.innerHTML = html; else tip.textContent = el.textContent.replace(/\s+/g, ' ').trim();
     if (!tip.isConnected) document.body.appendChild(tip);
     const r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
     let x = r.left + r.width / 2 - tw / 2;
@@ -289,7 +298,8 @@
   const noTip = (el) => touching && !!el.closest('button, a, [role="button"], [aria-disabled]');
   function hideTip() { clearTimeout(tipT); tipEl = null; tip.classList.remove('on'); }
   document.addEventListener('mouseover', (e) => {
-    const el = e.target.closest('[data-tip],[data-tip-html]');
+    let el = e.target.closest('[data-tip],[data-tip-html]');
+    if (!el && e.target.nodeType === 1) { el = clipped(e.target); if (el) el._clip = true; }
     if (el === tipEl) return;
     if (!el || noTip(el)) { hideTip(); return; }
     const wasOpen = tip.classList.contains('on');

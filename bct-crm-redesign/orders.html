@@ -6,10 +6,10 @@
 <title>Customer orders · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261127e">
+<link rel="stylesheet" href="assets/crm.css?v=20261127f">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261127b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261127a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261127c">
 <style>
 /* ---------- Page: Customer orders ----------
    Same content as CRMpulse /orders, as Option A (2026-11-25): one card per status (Draft carries the value waiting for a PO) and a
@@ -34,7 +34,7 @@
 .op-fig { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 14px 16px; border-radius: var(--radius-lg); background: var(--field); }
 .op-fig small { display: block; font-size: var(--text-xs); color: var(--t3); } .op-fig b { display: block; margin: 2px 0; font-size: var(--text-md); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .op-fig b.off { color: var(--warn); } .op-fig b.same { color: var(--ok-text); }
-.op-3 { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px; }
+.op-3 { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px; } /* design review 11/27: value + currency get the full row (a 64px box cut 2442213 to 244221); Expected completion goes to the next row */
 .op-hist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: var(--text-sm); color: var(--t2); } .op-hist li { display: flex; justify-content: space-between; gap: 12px; } .op-hist small { flex: none; color: var(--t3); }
 @media (max-width: 1279px) { .tbl.or { min-width: 950px; } }
 @media (max-width: 1100px) { .tbl.or { min-width: 1040px; } }
@@ -86,7 +86,7 @@
   </main>
 </div>
 
-<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm.js?v=20261127a"></script>
 <script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 const { money, toast } = CRM;
@@ -206,8 +206,8 @@ function openOrder(o) {
         <h3 class="op-h">Customer PO / contract</h3><span class="tf-h">The order value is the actual PO value; it never changes the initiative's booking value.</span>
         <div class="tf-2">${fld('PO / contract reference', inp('po', v.po, 'PO / contract reference', { dis: final, ph: 'e.g. OEC-PO-2026-118' }), { hint: 'Needed to confirm' })}
           ${fld('Order date', inp('date', v.date, 'Order date', { type: 'date', dis: final }), { hint: 'Date on the PO', err: calc().future ? FUTURE : '', id: 'date' })}</div>
-        <div class="tf-2"><div class="op-3">${fld('Order value', inp('value', v.value, 'Order value', { type: 'number', dis: final }), { req: true })}${fld('Currency', pick('cur', CURS.map(c => [c, c]), v.cur, 'Currency', final))}</div>
-          ${fld('Expected completion', inp('exp', v.exp, 'Expected completion', { type: 'date', dis: final }))}</div>
+        <div class="op-3">${fld('Order value', inp('value', v.value, 'Order value', { type: 'number', dis: final }), { req: true })}${fld('Currency', pick('cur', CURS.map(c => [c, c]), v.cur, 'Currency', final))}</div>
+          <div class="tf-2">${fld('Expected completion', inp('exp', v.exp, 'Expected completion', { type: 'date', dis: final }))}</div>
         <div data-why>${why()}</div>
         <h3 class="op-h">Delivery</h3>
         ${fld('Responsible salesperson', pick('owner', PEOPLE, v.owner, 'Responsible salesperson', final), { hint: 'Defaults to the initiative owner.' })}
@@ -246,8 +246,8 @@ function openRegister() {
         <h3 class="op-h">Customer PO / contract</h3><span class="tf-h">The order value is the actual PO value; it never changes the initiative's booking value.</span>
         <div class="tf-2">${fld('PO / contract reference', inp('po', v.po, 'PO / contract reference'))}
           ${fld('Order date', inp('date', v.date, 'Order date', { type: 'date' }), { hint: "Date on the PO. Can't be in the future.", err: v.date > TODAY_ISO ? FUTURE : '', id: 'date' })}</div>
-        <div class="tf-2"><div class="op-3">${fld('Order value', inp('value', v.value, 'Order value', { type: 'number' }), { req: true, err: errs.value, id: 'value' })}${fld('Currency', pick('cur', CURS.map(c => [c, c]), v.cur, 'Currency'))}</div>
-          ${fld('Expected completion', inp('exp', v.exp, 'Expected completion', { type: 'date' }))}</div>
+        <div class="op-3">${fld('Order value', inp('value', v.value, 'Order value', { type: 'number' }), { req: true, err: errs.value, id: 'value' })}${fld('Currency', pick('cur', CURS.map(c => [c, c]), v.cur, 'Currency'))}</div>
+          <div class="tf-2">${fld('Expected completion', inp('exp', v.exp, 'Expected completion', { type: 'date' }))}</div>
         ${fld('Responsible salesperson', pick('owner', [['', 'Not set'], ...PEOPLE], v.owner, 'Responsible salesperson'))}
         ${fld('Remarks', `<textarea class="in" data-v="remarks" aria-label="Description / remarks">${esc(v.remarks)}</textarea>`)}
       </div></div><div class="dr-foot"><button type="button" class="btn ghost" data-x="close">Cancel</button><button type="submit" class="btn primary">Register order</button></div></form>`;

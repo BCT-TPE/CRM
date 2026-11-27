@@ -6,10 +6,10 @@
 <title>Report · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261127e">
+<link rel="stylesheet" href="assets/crm.css?v=20261127f">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
 <link rel="stylesheet" href="assets/theme-v2.css?v=20261127b">
-<link rel="stylesheet" href="assets/responsive.css?v=20261127a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261127c">
 <style>
 /* ---------- Page: one report (old CRMpulse /reports/[id]) ----------
    Same layout as the list pages: back link and title, the filter bar (search in the report, fiscal year, quarter, salesperson,
@@ -24,7 +24,13 @@
 @media (max-width: 1360px) { body.v2 .v2-head > .kpis-rp { max-width: none; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
 @media (max-width: 768px) { body.v2 .v2-head > .kpis-rp { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .tbl.rp td { height: 64px; } /* DESIGN §2: table rows 64px */
-.tbl.rp th { white-space: nowrap; } .tbl.rp td { white-space: nowrap; } .tbl.rp td.wrap { white-space: normal; min-width: 200px; }
+.tbl.rp th { white-space: normal; vertical-align: bottom; } .tbl.rp td { white-space: nowrap; }
+/* design review 11/26: tables fit the card at 1440. The code sits under the name and the team under the person (two lines,
+   as the list pages), long text ends in "…" (the full text is in the tooltip) and rows stay 64px. Below 1100px the table
+   scrolls sideways with the first column pinned (responsive.css). */
+.tbl.rp { table-layout: fixed; width: 100%; } .tbl.rp th .th-sort { max-width: 100%; white-space: normal; text-align: inherit; }
+.tbl.rp td .ell, .tbl.rp td .own-t { min-width: 0; max-width: 100%; } .tbl.rp td .own { min-width: 0; }
+:is(.tbl.rp th.r + th:not(.r), .tbl.rp td.r + td:not(.r)) { padding-left: 24px; } /* a left-aligned column after a number keeps clear of it */
 .rd dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 16px; margin: 12px 0 0; }
 .rd dt { font-size: var(--text-xs); color: var(--t3); } .rd dd { margin: 2px 0 0; font-size: var(--text-sm); color: var(--ink); }
 .rd h3 { margin: 16px 0 8px; font-size: var(--text-xs); font-weight: 600; color: var(--t2); } .rd ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
@@ -74,7 +80,7 @@ body.v2 #more-pop label.select.fsel { display: flex; width: 100%; height: 40px; 
     <div id="page"></div>
   </main>
 </div>
-<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm.js?v=20261127a"></script>
 <script src="assets/crm-data.js?v=20261126d"></script>
 <script>
 const { money, moneyBig, toast } = CRM;
@@ -138,7 +144,7 @@ function build() { // { cols, rows, kpis, note }
       TARGET_DIMS.forEach(([dim, label], di) => targetRows(dim, S.fy).forEach((r, ri) => r.q.forEach((t, i) => { if (t == null || (S.qtr && i + 1 !== +S.qtr)) return;
         if (dim === 'salesperson' ? !seen(r.name) || (S.owner && r.name !== S.owner) : MINE) return; // a salesperson / manager sees their own salesperson targets
         if (S.geo && ((dim === 'geography' && r.name !== S.geo) || (dim === 'region' && SALES_REGION_GEO[r.name] !== S.geo))) return;
-        const a = i + 1 > cq ? 0 : r.ach[i]; rows.push({ code: `TGT-${S.fy}-${dim.slice(0, 3).toUpperCase()}-${String(di * 100 + ri * 4 + i + 1).padStart(4, '0')}`, fy: FYL(), quarter: `Q${i + 1}`, dimension: label, scope: r.name, target: t, achievement: a, variance: a - t, pct: t ? a / t * 100 : null, _link: 'targets.html' }); })));
+        const ns = i + 1 > cq && !r.ach[i], a = ns ? null : r.ach[i]; rows.push({ code: `TGT-${S.fy}-${dim.slice(0, 3).toUpperCase()}-${String(di * 100 + ri * 4 + i + 1).padStart(4, '0')}`, fy: FYL(), quarter: `Q${i + 1}`, dimension: label, scope: r.name, target: t, achievement: ns ? NOT_STARTED : a, variance: ns ? DASH : a - t, pct: ns ? DASH : t ? a / t * 100 : null, _link: 'targets.html' }); })));
       return { cols: [C('code', 'Target ID'), C('fy', 'Financial Year'), C('quarter', 'Quarter'), C('dimension', 'Dimension'), C('scope', 'Value'), C('target', 'Target', 'money'), C('achievement', 'Achievement', 'money'), C('variance', 'Variance', 'money'), C('pct', 'Achievement %', 'pct')], rows,
         note: 'Each target is for one dimension value and is compared independently; targets are not totalled.' }; }
     case 'activities': { const l = ACTIVITIES.filter(a => inPeriod(a.d.slice(0, 10)) && seen(a.owner) && (!S.owner || a.owner === S.owner)), by = {};
@@ -156,17 +162,44 @@ function build() { // { cols, rows, kpis, note }
   }
 }
 const NUM = ['money', 'count', 'pct', 'number'];
+// a quarter that hasn't started and has nothing booked yet reads as on Sales targets: "Not started", no variance or % (design review 11/26)
+const NOT_STARTED = 'Not started', DASH = '—';
 const PEOPLE_SET = new Set([...Object.values(TEAMS).flatMap(t => t.people), ...Object.keys(FUNC)]);
 // a column that names a person shows the avatar with the name, as in every table on the site
 const person = (c, v) => ['owner', 'name', 'scope'].includes(c.key) && PEOPLE_SET.has(v);
 const txt = (c, v) => cell(c, v).replace(/<[^>]+>/g, '');
-function cell(c, v) {
-  if (person(c, v)) return `<div class="own">${CRM.avatar(v)}<div class="own-t"><div class="ell">${esc(v)}</div></div></div>`;
+// columns as shown: the code moves under the name (Name, Subject, Title) and the team under the owner; export and Details keep every column
+const MAINK = ['name', 'subject', 'title'];
+function shownCols(cols) {
+  const has = (k) => cols.some(c => c.key === k), mk = MAINK.find(has);
+  return cols.filter(c => !(c.key === 'code' && mk) && !(c.key === 'team' && has('owner')) && !(c.key === 'funnel' && has('sub')))
+    .map(c => c.key === mk && has('code') ? { ...c, sub: 'code' } : c.key === 'owner' && has('team') ? { ...c, sub: 'team' } : c.key === 'sub' && has('funnel') ? { ...c, sub: 'funnel' } : c);
+}
+// fixed layout: numbers and dates get a set width (wide enough for their header), text columns share the rest (the name a
+// larger share); the table never gets narrower than its columns can take, and scrolls sideways below that
+function colW(c) {
+  // a two-word header wraps to two lines rather than widening its column
+  const lab = Math.max(...c.label.split(' ').map(w => w.length)) * 6.8 + 46; // padding + sort arrow
+  if (c.kind === 'money' || c.kind === 'number') return Math.max(104, lab); if (c.kind === 'pct') return Math.max(100, lab);
+  if (c.kind === 'count') return Math.max(80, lab); if (c.kind === 'date') return Math.max(112, lab);
+  if (['quarter', 'fy', 'currency', 'status', 'type', 'overdue', 'code', 'funnel'].includes(c.key)) return Math.max(c.key === 'code' ? 128 : 88, lab);
+  return 0; // shares the rest
+}
+function colgroup(cols) {
+  const fixed = cols.map((c, i) => colW(c) && (colW(c) + (i === cols.length - 1 ? 14 : 0))), /* the last cell has the card's 24px inset on its right */ flex = cols.map((c, i) => fixed[i] ? 0 : MAINK.includes(c.key) ? 1.5 : person({ key: c.key }, [...PEOPLE_SET][0]) ? 1.1 : 1), F = flex.reduce((a, b) => a + b, 0);
+  const min = fixed.reduce((a, b) => a + b, 0) + flex.reduce((a, f) => a + f * 110, 0) + cols.filter((c, i) => i && NUM.includes(cols[i - 1].kind) && !NUM.includes(c.kind)).length * 14; // the wider gap after a number
+  return { min, html: `<colgroup>${cols.map((c, i) => fixed[i] ? `<col style="width:${fixed[i]}px">` : `<col style="width:${Math.floor(flex[i] / F * 9990) / 100}%">`).join('')}</colgroup>` };
+}
+function cell(c, v, sub) {
+  if (person(c, v)) return `<div class="own">${CRM.avatar(v)}<div class="own-t"><div class="ell">${esc(v)}</div>${sub ? `<div class="ell t-sub">${esc(sub)}</div>` : ''}</div></div>`;
+  if (sub != null) return `<div class="ell ${MAINK.includes(c.key) ? 't-main' : ''}">${v == null || v === '' ? '—' : esc(String(v))}</div><div class="ell t-sub">${esc(String(sub))}</div>`;
+  if (!c.kind || c.kind === 'text') return v === null || v === undefined || v === '' ? '—' : `<div class="ell">${esc(String(v))}</div>`;
+  if (v === NOT_STARTED) return `<span class="muted">${v}</span>`; if (v === DASH) return DASH;
   if (v === null || v === undefined || v === '') return c.kind === 'money' || c.kind === 'pct' ? 'N/A' : '—';
   if (c.kind === 'money') return money(v); if (c.kind === 'pct') return `${(+v).toFixed(1)}%`; if (c.kind === 'number') return Math.round(v).toLocaleString('en-US');
   if (c.kind === 'date') return CRM.date(v); if (c.kind === 'count') return String(Math.round(v)); return esc(String(v));
 }
-const cmp = (c, a, b) => { const e = (v) => v === null || v === undefined || v === ''; if (e(a) || e(b)) return e(a) - e(b);
+const cmp = (c, a, b) => { const e = (v) => v === null || v === undefined || v === '' || v === NOT_STARTED || v === DASH; if (e(a) || e(b)) return e(a) - e(b);
   return NUM.includes(c.kind) ? a - b : String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }); };
 let R = null;
 function render() {
@@ -174,7 +207,7 @@ function render() {
   const t = S.q.trim().toLowerCase();
   let rows = t ? R.rows.filter(r => R.cols.some(c => txt(c, r[c.key]).toLowerCase().includes(t))) : R.rows;
   const col = S.sort && R.cols.find(c => c.key === S.sort.key);
-  if (col) rows = rows.slice().sort((x, y) => { const e = (v) => v === null || v === undefined || v === ''; return e(x[col.key]) || e(y[col.key]) ? cmp(col, x[col.key], y[col.key]) : cmp(col, x[col.key], y[col.key]) * S.sort.dir; });
+  if (col) rows = rows.slice().sort((x, y) => { const e = (v) => v === null || v === undefined || v === '' || v === NOT_STARTED || v === DASH; return e(x[col.key]) || e(y[col.key]) ? cmp(col, x[col.key], y[col.key]) : cmp(col, x[col.key], y[col.key]) * S.sort.dir; });
   const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE)); S.page = Math.min(S.page, pages);
   const shown = rows.slice((S.page - 1) * PER_PAGE, S.page * PER_PAGE);
   $('#r-sub').innerHTML = CRM.dots(`${INFO.desc} · ${INFO.id === 'initiative-register' ? 'All periods' : `${FYL()}${S.qtr ? ` Q${S.qtr}` : ''}`} · USD`);
@@ -187,8 +220,9 @@ function render() {
       <dl><div><dt>Group</dt><dd>${esc(INFO.group)}</dd></div><div><dt>Period</dt><dd>${INFO.id === 'initiative-register' ? 'All periods' : FYL() + (S.qtr ? ` Q${S.qtr}` : '')}</dd></div><div><dt>Currency</dt><dd>USD (every amount at the configured rates)</dd></div><div><dt>Rows</dt><dd>${R.rows.length}</dd></div>
         <div><dt>Filters on this view</dt><dd>${applied() ? `${applied()} applied` : 'None besides the financial year'}</dd></div><div><dt>Scope</dt><dd>Only the records you are allowed to see</dd></div><div><dt>Formats</dt><dd>Excel (.xlsx, formatted) · CSV (.csv, plain)</dd></div></dl>
       <h3>Columns</h3><ul>${R.cols.map(c => `<li><b>${c.label}</b> · ${KIND[c.kind]}</li>`).join('')}</ul></section>` : '';
-  const table = rows.length ? `<section class="card" aria-label="Report rows"><div class="tbl-wrap"><table class="tbl rp"><thead><tr>${R.cols.map(th).join('')}</tr></thead>
-      <tbody>${shown.map(r => `<tr class="${r._link ? 'click' : ''}" ${r._link ? `data-href="${r._link}" tabindex="0"` : ''}>${R.cols.map((c, j) => `<td class="${NUM.includes(c.kind) ? 'r num' : ''} ${/name|subject|title|stage$/i.test(c.key) ? 'wrap' : ''}">${j === 0 ? `<span class="t-main">${cell(c, r[c.key])}</span>` : cell(c, r[c.key])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  const SC = shownCols(R.cols), CG = colgroup(SC);
+  const table = rows.length ? `<section class="card" aria-label="Report rows"><div class="tbl-wrap"><table class="tbl rp" style="min-width:${CG.min}px">${CG.html}<thead><tr>${SC.map(th).join('')}</tr></thead>
+      <tbody>${shown.map(r => `<tr class="${r._link ? 'click' : ''}" ${r._link ? `data-href="${r._link}" tabindex="0"` : ''}>${SC.map((c, j) => `<td class="${NUM.includes(c.kind) ? 'r num' : ''} ${MAINK.includes(c.key) ? 'main' : ''}">${j === 0 && !c.sub && !person(c, r[c.key]) ? `<span class="t-main">${cell(c, r[c.key])}</span>` : cell(c, r[c.key], c.sub ? r[c.sub] : undefined)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
       ${rows.length > PER_PAGE ? `<div class="pager"><span>Showing ${(S.page - 1) * PER_PAGE + 1}–${Math.min(S.page * PER_PAGE, rows.length)} of ${rows.length}</span><span class="sp"></span>
         <button data-act="page" data-v="${S.page - 1}" ${S.page === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>
         ${Array.from({ length: pages }, (_, i) => `<button data-act="page" data-v="${i + 1}" class="${S.page === i + 1 ? 'on' : ''}" aria-label="Page ${i + 1}">${i + 1}</button>`).join('')}

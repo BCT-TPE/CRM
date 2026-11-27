@@ -27,7 +27,7 @@ body.v2 :is(.main, .drill, .pop) .seg button { height: 32px; }
 /* Compact filter bar (crm.js compactFilters): phones (≤768) on every page, and 769–1279px on Pipeline / Sales performance
    (design review D4 / M3). Row 2 wraps, it never scrolls sideways; the other filters sit at the top of More filters. */
 .filters.compact .f-scroll { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); min-width: 0; }
-.filters.compact .f-scroll:empty { display: none; }
+.filters.compact .f-scroll:empty, .filters.compact .f-scroll:not(:has(> :not([hidden]))) { display: none; } /* only a hidden Reset inside: no empty row and 8px gap under the search */
 .filters.compact .f-scroll > * { flex: none; max-width: 100%; }
 .filters.compact.two .f-scroll { flex: 1 1 100%; order: 3; }
 .filters.compact.one .f-scroll { flex: 1 1 0; }
@@ -318,3 +318,12 @@ body.v2 .main .filters.compact .m-moved .select:is(.select, .set, .open) { borde
 .m-moved .select > .dt { display: block; width: 100%; padding: 0; border: 0; background: none; }
 .m-moved .select.dr > .dt > .dt-btn { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); }
 .m-moved .select.dr::after { display: none; } /* the date field has its own calendar icon */
+
+/* Phones (2026-11-27): the view tiles (Accounts, Orders, Tasks, Reports) take less height, and the filter bar
+   sits flush on what follows with the same 12px above and below its controls. */
+@media (max-width: 768px) {
+  .main .filters.compact { padding-bottom: var(--space-3); margin-bottom: 0; }
+  .main .sc-tiles { gap: 4px; padding: 4px; }
+  .main .sc-tiles .tt { padding: 10px 12px; row-gap: 2px; gap: 2px; }
+  .main .sc-tiles .tt-n { font-size: var(--text-2xl); }
+}

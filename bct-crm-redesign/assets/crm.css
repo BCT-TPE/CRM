@@ -475,8 +475,9 @@ body.v2 .tf label.select.fsel { display: flex; width: 100%; height: 40px; border
 .sp-now { display: none; }
 
 /* ---- Record pages (shared 2026-11-27; initiative.html, account.html): the pill tab row and the highlighted rail card ---- */
-.rec-tabs { display: flex; gap: 0; padding: 6px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line-2); }
-.rtab { flex: 1 1 0; justify-content: center; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 14px; white-space: nowrap; min-width: 0; border: 0; border-radius: var(--radius-control); background: none; font: inherit; font-size: var(--text-sm); color: var(--t2); cursor: pointer; }
+.rec-tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; padding: 6px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line-2); }
+.rtab { flex: 1 0 auto; justify-content: center; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 8px; white-space: nowrap; min-width: 0; /* design review 11/27: each tab at least its own text wide; when the row runs out it scrolls instead of overlapping */ border: 0; border-radius: var(--radius-control); background: none; font: inherit; font-size: var(--text-sm); color: var(--t2); cursor: pointer; }
+.rec-tabs::-webkit-scrollbar { display: none; }
 .rtab:hover { background: var(--hover); color: var(--ink); }
 .rtab.on { background: var(--deep); color: var(--on-dark); font-weight: 500; }
 .rtab .tab-n { background: var(--hover); }

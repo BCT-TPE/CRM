@@ -7,7 +7,26 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-27 (eleventh push)
+## 2026-11-27 (twelfth push)
+
+Design review fixes (desktop priority items) and phone spacing. Cache-busters: `crm.css?v=20261127f`, `crm.js?v=20261127a`, `responsive.css?v=20261127c` (all pages that load them).
+
+### Added
+- **Tooltip for truncated text** (`crm.js`): any text cut short with `text-overflow: ellipsis` shows its full text in the shared `.tip` tooltip on hover, so every browser behaves alike (Safari added its own system tooltip; Chrome showed nothing).
+
+### Changed
+- **Record tabs** (`crm.css` `.rec-tabs` / `.rtab`, Account and Initiative records): each tab is at least as wide as its label (`flex: 1 0 auto`, side padding 14px → 8px) and the row scrolls sideways when it runs out of room, instead of labels overlapping at 1101–1365px.
+- **Order side panel and Register historical order** (`orders.html`): Order value + Currency get a full row (the value box was 64px and cut amounts); Expected completion moves to the next row.
+- **Reports tables** (`report.html`): fixed table layout so all 15 reports fit their card at 1440px with 64px rows. The code sits under the name, the team under the person and the funnel under the stage; numbers and dates get set widths, text columns share the rest and end in "…"; headers may wrap to two lines. Export and Details still list every column. Below 1100px the table scrolls with the first column pinned (existing rule).
+- **Sales Target vs Achievement report**: a quarter that hasn't started and has nothing booked shows "Not started" with "—" for Variance and % (as on Sales targets), instead of $0 and a negative variance; these cells sort last.
+- **Phones** (`responsive.css`, ≤768px): the view tiles on Tasks, Accounts, Orders and Reports are shorter (4px gaps, 10/12px tile padding, 24px figures); the filter bar has no bottom margin and 12px above and below its controls.
+
+### Fixed
+- Filter bar on phones: a row holding only the hidden Reset button no longer adds an empty row and 8px gap under the search.
+
+---
+
+## 2026-11-27 (eleventh push) · `affa50f`
 
 **Account page** (`account.html?id=ACC-…`, old CRMpulse `/accounts/[id]`) and **shared side panels**. Cache-busters: `crm.css?v=20261127e`, `theme-v2.css?v=20261127b` (all pages that load them); new `contact-form.js`, `activity-form.js`, `task-form.js` at `?v=20261127a`.
 
