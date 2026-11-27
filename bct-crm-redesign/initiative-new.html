@@ -8,14 +8,14 @@
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
 <link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: new sales initiative ----------
    Same fields and order as CRMpulse /initiatives/new (status & sub-stage, account & ownership, value & forecast,
    next step, BANT, classification). Inputs, labels, quick picks, readiness checks and the sticky bar are the
    ones from the initiative edit form, so creating and editing look the same. */
-.back { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--t3); text-decoration: none; }
+.back { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin: -10px 0; font-size: var(--text-sm); color: var(--t3); text-decoration: none; } /* 40px to tap, same line as before (as report.html) */
 .back:hover { color: var(--deep); }
 .back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .nw-head { margin: 4px 0 20px; }
@@ -70,9 +70,9 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .fsel.ph .sel-btn { color: var(--t3); }
 .fsel .sel-pop { max-height: 280px; }
 .picks { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 2px; font-size: var(--text-xs); color: var(--t3); }
-.picks button { height: 28px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface); font: inherit; font-size: var(--text-xs); color: var(--t1); cursor: pointer; }
+.picks button { height: 40px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface); font: inherit; font-size: var(--text-xs); color: var(--t1); cursor: pointer; }
 .picks button:hover { border-color: var(--deep); color: var(--deep); }
-.fold { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.fold { display: flex; align-items: flex-start; gap: 12px; width: 100%; min-height: 40px; padding: 7px 0; margin: -7px 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .fold .sec-h { flex: 1; margin-bottom: 0; }
 .fold > svg { width: 18px; height: 18px; flex: none; margin-top: 4px; fill: none; stroke: var(--t3); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
 .fold.open > svg { transform: rotate(180deg); }

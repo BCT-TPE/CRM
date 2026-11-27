@@ -7,7 +7,21 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-26 (ninth push)
+## 2026-11-27 (tenth push)
+
+Site-wide UI/UX check (16 pages × 1920 / 1440 / 1280 / 1024 / 768 / 390; side panels, back navigation, role sync) and its fixes. Cache-busters: `theme-v2.css?v=20261127a`, `responsive.css?v=20261127a` (all pages that load them).
+
+### Changed
+- **Contacts, wide screens**: the contact detail card ends on the same line as the last contact card when the page is scrolled to the bottom (`fitPanel()`: window height − its sticky top − what sits below the list, never taller than the list). Longer details scroll inside the card. Both views; measured with layout offsets so the cards' rise-in transform does not skew it.
+- **Text links and text buttons are 40px to tap** (negative margins keep the layout): back links on the initiative record and New initiative, the account links in the record header and Account & team, Other initiatives / Account 360°, the phone top bar logo, New initiative's collapsible section header. Quick picks are 40px.
+- **Pipeline / Sales performance progress cards**: when a label wraps, the values in that row stay on one line.
+
+### Removed
+- Leftover hints the old app lacks (DESIGN §7.10): "Checked when you use change stage." (record Next steps), "select a row to open it" (Sales initiatives funnel list, Pipeline table), "first interest to opportunity" and "all time" (Lifecycle cards).
+
+---
+
+## 2026-11-26 (ninth push) · `5300a0b`
 
 **On-screen copy follows the old CRMpulse** (DESIGN §7.10): hints and notes the old screens don't have are removed; where the old app has the same hint, its wording is used. Home is out of scope (built from the requirement team's examples). Titles, data labels, shared dialogs and empty states, validation messages, next-step suggestions and the metric definitions (the old dashboards' footnotes, shown here as tooltips) stay.
 

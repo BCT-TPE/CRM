@@ -116,6 +116,7 @@ body.v2 .fbar-target span { color: var(--midnight); }
 .ring-card .minis { grid-template-columns: 1fr 1fr; gap: 14px 12px; margin-top: auto; padding-top: 18px; }
 .ring-card .mini .k { white-space: normal; line-height: 18px; }
 .ring-card .mini .v { margin-top: 2px; }
+.ring-card .mini { display: flex; flex-direction: column; justify-content: space-between; } /* a label that wraps keeps its row's values on one line (2026-11-27) */
 /* Pipeline: one-line labels so the rows line up with the forecast card's legend */
 .ring-card .minis.one-line { grid-template-columns: max-content max-content; justify-content: space-between; }
 .ring-card .minis.one-line .mini .k { white-space: nowrap; }

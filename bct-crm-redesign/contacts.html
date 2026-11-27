@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
 <link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: Contacts ----------
    Same IA as CRMpulse /contacts: search / role / status filters, By account or List view, a toggle for accounts
@@ -48,7 +48,7 @@
 .tbl.ct tr.on td { background: var(--hover); }
 
 /* Detail panel */
-.cp { position: sticky; top: 72px; } /* below the stuck filter bar */
+.cp { position: sticky; top: 72px; overflow-y: auto; overscroll-behavior: contain; } /* below the stuck filter bar; fitPanel() sets its height */
 .cp-h { display: flex; gap: 14px; align-items: flex-start; }
 .cp-h .av { width: 48px; height: 48px; font-size: var(--text-md); flex: none; }
 .cp-h h2 { margin: 0; font-size: var(--text-md); font-weight: 600; color: var(--ink); } /* card title */
@@ -240,6 +240,7 @@ function render() {
   $('#page').innerHTML = (list.length
     ? `<div class="ct-grid"><div class="ct-main">${S.view === 'acc' ? byAccount(shown) : listView(shown)}${pager}</div>${panel()}</div>`
     : `<section class="card"><div class="empty" style="padding:48px 12px"><b>No contacts here</b>Nothing matches these filters.<br><button class="link" data-act="reset">Clear filters</button></div></section>`);
+  fitPanel();
   $('#f-nodm').setAttribute('aria-pressed', String(S.noDM));
   $('#reset').hidden = !(S.q || S.role || S.status); // the toggle clears itself with one click, so it does not bring up Reset (as on Tasks)
 }
@@ -354,6 +355,22 @@ function openForm(c) {
 }
 $('#new').addEventListener('click', () => openForm(null));
 
+// The detail card ends on the same line as the last contact card once the page is scrolled to the bottom (2026-11-27):
+// its height = window height − its sticky top − what sits below the list at the bottom of the page (pager, page padding),
+// never taller than the list itself. Longer details scroll inside the card. Only where the card is shown (over 1100px).
+function fitPanel() {
+  const cp = document.querySelector('.ct-grid > .cp'), main = document.querySelector('.ct-main');
+  if (!cp || !main || getComputedStyle(cp).display === 'none') { if (cp) cp.style.height = ''; return; }
+  cp.style.height = '1px'; // measure the page without the card's own height
+  const last = [...main.children].filter(el => !el.classList.contains('pager')).pop();
+  const top = parseFloat(getComputedStyle(cp).top) || 0;
+  const docTop = (el) => { let t = 0; for (; el; el = el.offsetParent) t += el.offsetTop; return t; }; // layout position: ignores the cards' rise-in transform
+  const listTop = docTop(main), listEnd = docTop(last) + last.offsetHeight;
+  const below = document.documentElement.scrollHeight - listEnd;
+  cp.style.height = Math.max(240, Math.min(innerHeight - top - below, listEnd - listTop)) + 'px';
+}
+addEventListener('resize', fitPanel);
+addEventListener('load', fitPanel);
 CRM.renderShell('contacts');
 CRM.watchSticky($('#filters'));
 render();

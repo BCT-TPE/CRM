@@ -129,6 +129,15 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - **只有能打開東西的列才有 hover 底色和手指游標**：列加 `class="click"`（`crm.css`、`theme-v2.css`、`responsive.css` 都只對 `tr.click:hover` 上色）。其他列一律一般游標（`cursor: default`）、滑過不變色，例如 Home 的 By salesperson、報表的彙總列、商機頁的明細、Sales structure。
 - 新表格：列能點就加 `click`，不能點就什麼都不加；不要在頁面裡另外寫覆寫來關掉 hover。
 
+## 7.11 全站 UI/UX 檢查修正（2026-11-27）
+
+- Contacts 寬螢幕右側的聯絡人卡：滑到底時，卡片底部跟左邊最後一張清單卡切齊（`fitPanel()`：高度＝視窗高度－固定在上方的位置－清單下方的分頁器與頁面留白，不超過清單本身）。內容比較長時在卡片裡捲動；內容少時卡片下方留白。依客戶分組和 List 兩種檢視都一樣。
+
+- 文字連結和文字按鈕一律 40px 可點（用負 margin 抵掉多出的高度，版面不變）：商機記錄頁、新增頁的返回連結，記錄頁頁首和 Account & team 的客戶連結、Other initiatives／Account 360°；手機頂端列的 Logo；新增頁可展開的區塊標題。Quick picks 按鈕 40px。
+- 切換鈕（外框 40px、選項 32px）照 §2 不算點擊範圍不足，例如記錄頁的分頁、Everyone／My initiatives。
+- Pipeline／Sales performance 的 progress 卡：標籤換行時，同一排的數字仍對齊在同一條線（`.ring-card .mini` 把數字推到底）。
+- 拿掉漏網的說明：記錄頁 Next steps 的「Checked when you use change stage.」、Sales initiatives 漏斗清單和 Pipeline 表格的「select a row to open it」、Lifecycle 卡的「first interest to opportunity」「all time」（§7.10）。
+
 ## 8. 不要做的事
 
 - 不加 `title` tooltip，也不加多餘的 alt／說明文字。

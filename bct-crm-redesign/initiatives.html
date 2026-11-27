@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
 <link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: Sales initiatives (list page) ---------- */
 /* Lifecycle strip: status tiles filter the list (list-page behaviour, as in the old CRM) */
@@ -260,7 +260,7 @@ function lifeStrip(b) {
   const [, closedV] = sum(o => o.kind !== 'open'), closedN = sum(o => o.kind !== 'open')[0];
   return `
     <section class="card s7 life-g life-open tint" aria-label="Open initiatives">
-      <div class="life-h">Open<span>first interest to opportunity</span></div>
+      <div class="life-h">Open</div>
       <div class="life-cells">${tile(open, 'All open')}${tile(pro)}${tile(lead)}${tile(opp, 'Opportunities')}</div>
     </section>
     <section class="card s3 life-g life-closed" aria-label="Closed initiatives">
@@ -268,7 +268,7 @@ function lifeStrip(b) {
       <div class="life-cells">${tile(won, 'Won')}${tile(lost, 'Lost')}</div>
     </section>
     <section class="card s2 life-g life-all" aria-label="All initiatives">
-      <div class="life-h">Total<span>all time</span></div>
+      <div class="life-h">Total</div>
       <div class="life-cells">${tile(all)}</div>
     </section>`;
 }
@@ -434,7 +434,7 @@ function funnelView(b) {
       </div>
     </div>
     <div class="fn-list">
-      <div class="fn-list-h"><b>In ${band.n.charAt(0).toLowerCase() + band.n.slice(1)}${band.sub ? ' · ' + band.sub.split(' · ')[0] : ''} now</b><span>${rows.length} initiative${rows.length === 1 ? '' : 's'} · ${money(rows.reduce((s, o) => s + o.value, 0))} · select a row to open it</span></div>
+      <div class="fn-list-h"><b>In ${band.n.charAt(0).toLowerCase() + band.n.slice(1)}${band.sub ? ' · ' + band.sub.split(' · ')[0] : ''} now</b><span>${rows.length} initiative${rows.length === 1 ? '' : 's'} · ${money(rows.reduce((s, o) => s + o.value, 0))}</span></div>
       ${rows.length ? `<div class="tbl-wrap"><table class="tbl fnt">
         <colgroup><col class="c-n"><col class="c-s"><col class="c-o"><col class="c-v"><col class="c-d"></colgroup>
         <thead><tr><th>Initiative</th><th>Stage</th><th>Owner</th><th class="r">Value</th><th class="r">${band.k === 'won' ? 'Closed' : 'Days in stage'}</th></tr></thead>

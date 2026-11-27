@@ -8,13 +8,13 @@
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
 <link rel="stylesheet" href="assets/crm.css?v=20261126a">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261126a">
-<link rel="stylesheet" href="assets/responsive.css?v=20261126c">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
    Same content as the CRMpulse record page: header + actions, stage stepper, key facts, seven tabs,
    and a right rail with next steps, account and team. Visual language = the rest of the redesign. */
-.back { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--t3); text-decoration: none; }
+.back { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin: -10px 0; font-size: var(--text-sm); color: var(--t3); text-decoration: none; } /* 40px to tap, same line as before (as report.html) */
 .back:hover { color: var(--deep); }
 .back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .back b { font-weight: 500; color: var(--t2); }
@@ -32,7 +32,7 @@
 .more-pop .mi[aria-disabled="true"]:hover { background: none; }
 .more-pop hr { margin: 6px 4px; border: 0; border-top: 1px solid var(--line); }
 .rec-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--text-sm); color: var(--t3); }
-.rec-meta a { color: var(--deep); font-weight: 500; text-decoration: none; }
+.rec-meta a { display: inline-flex; align-items: center; min-height: 40px; margin: -10px 0; color: var(--deep); font-weight: 500; text-decoration: none; } /* text links are 40px to tap */
 .rec-meta a:hover { text-decoration: underline; }
 .rec-acts { display: flex; gap: 8px; flex: none; padding-top: 4px; }
 .btn.icon-only { width: 36px; padding: 0; justify-content: center; }
@@ -223,7 +223,7 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .fsel .sel-btn { max-width: none; width: 100%; padding-left: 12px; font-weight: 400; color: var(--ink); }
 .fsel .sel-pop { max-height: 280px; }
 .picks { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 2px; font-size: var(--text-xs); color: var(--t3); }
-.picks button { height: 28px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface); font: inherit; font-size: var(--text-xs); color: var(--t1); cursor: pointer; }
+.picks button { height: 40px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface); font: inherit; font-size: var(--text-xs); color: var(--t1); cursor: pointer; }
 .picks button:hover { border-color: var(--deep); color: var(--deep); }
 .ed-note { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; font-size: var(--text-xs); color: var(--t3); }
 .ed-note svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -360,9 +360,9 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .ns .btn { width: 100%; justify-content: center; margin-top: 8px; }
 .acc { display: flex; gap: 12px; align-items: center; }
 .acc .av { border-radius: var(--radius-control); width: 40px; height: 40px; }
-.acc a { font-size: var(--text-md); font-weight: 600; color: var(--deep); text-decoration: none; }
+.acc a { display: inline-flex; align-items: center; min-height: 40px; margin: -10px 0; font-size: var(--text-md); font-weight: 600; color: var(--deep); text-decoration: none; } /* text links are 40px to tap */
 .acc small { display: block; font-size: var(--text-xs); color: var(--t3); margin-top: 2px; }
-.links { display: flex; gap: 14px; margin-top: 12px; }
+.links { display: flex; gap: 14px; margin: 2px 0 -10px; } .links .link { min-height: 40px; } /* 40px to tap; the margin shrank by the same 10px, so the row sits where it did */
 .at-div { margin: 16px 0 14px; border: 0; border-top: 1px solid var(--line); }
 .rail h4 { margin: 0 0 10px; font-size: var(--text-xs); font-weight: 500; color: var(--t3); }
 .mem { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
@@ -520,8 +520,7 @@ function gateHtml() {
   const st = stepsOf(o).list, nextName = st[st.indexOf(o.sub) + 1], ok = g.filter(x => x[1]).length;
   const to = o.status === 'Opportunity' ? `To reach ${esc(lc(nextName))}` : 'To convert to an opportunity'; // §5.4 conditions apply to conversion, not to prospect / lead sub-stages
   return `<p class="ns-to">${to}<span class="pill ${ok === g.length ? 'ok' : 'warn'}">${ok}/${g.length}</span></p>
-    ${g.map(([t, d]) => `<div class="chk ${d ? 'ok' : ''}"><i>${d ? SVG.check : ''}</i><span>${t}</span></div>`).join('')}
-    <p class="ns-foot">Checked when you use change stage.</p>`;
+    ${g.map(([t, d]) => `<div class="chk ${d ? 'ok' : ''}"><i>${d ? SVG.check : ''}</i><span>${t}</span></div>`).join('')}`;
 }
 
 function header() {

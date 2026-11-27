@@ -125,7 +125,7 @@ body.v2 :is(.main .filters.compact, .filters) .m-moved .select { display: grid; 
   body.side-collapsed .filters.stuck::before { display: none; }
   .m-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: var(--space-3); height: 56px; padding: 0 var(--pad-page);
     background: var(--glass-bar); backdrop-filter: var(--blur-bar); -webkit-backdrop-filter: var(--blur-bar); border-bottom: 1px solid var(--line); }
-  .m-bar .brand { padding: 0; flex: none; }
+  .m-bar .brand { padding: 0; flex: none; min-height: 40px; } /* the logo link is 40px to tap, like every link */
   .m-bar .sp { flex: 1; }
   .m-bar .avatar-img { width: 28px; height: 28px; border-radius: var(--radius-sm); }
   .v2-head { padding-top: var(--space-6); margin-bottom: var(--space-3); }
