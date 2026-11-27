@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account · BCT CRM</title>
+<link rel="icon" type="image/svg+xml" href="assets/fav.svg">
+<link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
+<link rel="stylesheet" href="assets/crm.css?v=20261127e">
+<link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127b">
+<link rel="stylesheet" href="assets/responsive.css?v=20261127a">
+<style>
+/* ---------- Page: one Account (old CRMpulse /accounts/[id], AccountDetailView) ----------
+   Same content as the old page: header with status and actions, the not-approved notice and the "no recent interaction"
+   nudge, four figures, seven tabs (Overview, Initiatives, Contacts, Activities, Tasks, Orders, Attachments), and a right
+   rail (Record something now, Account details, Order value by financial year). Layout and components = the initiative
+   record page (initiative.html): back bar, title row, figures card, pill tabs, sticky rail. */
+.back { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin: -10px 0; font-size: var(--text-sm); color: var(--t3); text-decoration: none; }
+.back:hover { color: var(--deep); }
+.back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.back b { font-weight: 500; color: var(--t2); }
+.rec-head { display: flex; align-items: flex-start; gap: 24px; margin: 4px 0 20px; }
+.rec-t { flex: 1; min-width: 0; }
+.rec-t h1 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 8px; font-size: var(--text-4xl); font-weight: 400; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
+.rec-t h1 .tag { transform: translateY(3px); letter-spacing: 0; }
+.rec-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--text-sm); color: var(--t3); }
+.rec-acts { position: relative; display: flex; gap: 8px; flex: none; padding-top: 4px; }
+.rec-acts svg, .rs-f svg, .card-h svg, .notice .btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.more-pop { top: 44px; right: 0; width: 280px; padding: 6px; }
+.more-pop .mi { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; min-height: 40px; padding: 9px 12px; border: 0; border-radius: var(--radius-control); background: none; text-align: left; font: inherit; font-size: var(--text-sm); color: var(--ink); cursor: pointer; }
+.more-pop .mi small { font-size: var(--text-xs); color: var(--t3); }
+.more-pop .mi[aria-disabled="true"] { color: var(--t3); cursor: not-allowed; }
+@media (hover: hover) { .more-pop .mi:not([aria-disabled="true"]):hover { background: var(--hover); } }
+.more-pop hr { margin: 6px 4px; border: 0; border-top: 1px solid var(--line); }
+
+.tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: 600; white-space: nowrap; }
+.tag.Customer { background: var(--ok-bg); color: var(--ok-text); } .tag.Prospect { background: var(--cyan-50); color: var(--cyan-text); }
+.tag.Lead, .tag.Opportunity, .tag.strat { background: var(--info-bg); color: var(--deep); }
+.tag.state { background: var(--hover); color: var(--t2); } .tag.state.warn { background: var(--warn-bg); color: var(--warn-text); }
+.chip-s { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; }
+.chip-s.Prospect { background: var(--cyan-50); color: var(--cyan-text); } .chip-s.Lead { background: var(--ice); color: var(--cyan-text); } .chip-s.Opportunity { background: var(--info-bg); color: var(--deep); }
+.chip-s.won { background: var(--chart-pipe-soft); color: var(--ink); } .chip-s.lost, .chip-s.sub { background: var(--hover); color: var(--t2); }
+.chip-s.Draft { background: var(--warn-bg); color: var(--warn-text); } .chip-s.Open { background: var(--info-bg); color: var(--deep); } .chip-s.Completed { background: var(--ok-bg); color: var(--ok-text); } .chip-s.Cancelled { background: var(--field); color: var(--t3); }
+.chip-s.Active { background: var(--ok-bg); color: var(--ok-text); } .chip-s.Inactive { background: var(--field); color: var(--t3); }
+.chip-s.dm { background: var(--info-bg); color: var(--deep); } .chip-s.role { background: var(--hover); color: var(--t2); }
+
+/* notices above the figures (old: not-approved notice, "no recent interaction" nudge) */
+.notice { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0 0 16px; padding: 12px 16px; border-radius: var(--radius-lg); background: var(--warn-bg); font-size: var(--text-sm); color: var(--warn-text); }
+.notice svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.notice span { flex: 1; min-width: 0; }
+.notice .btn { flex: none; }
+
+/* figures: four equal cells, label on top, value on one line, note under it */
+.figs { display: grid; grid-template-columns: repeat(4, minmax(max-content, 1fr)); gap: 12px 24px; padding: 18px 24px 20px; } /* each figure at least as wide as its own text, the rest shared: no note wraps (2026-11-27) */
+.figs .f small { display: block; font-size: var(--text-xs); color: var(--t3); }
+.figs .f b { display: block; margin-top: 6px; font-size: var(--text-3xl); font-weight: 400; letter-spacing: -.02em; line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.figs .f span { display: block; margin-top: 6px; font-size: var(--text-xs); color: var(--t3); white-space: nowrap; }
+
+.rec-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; margin-top: 16px; }
+.rec-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* Overview sections */
+.people { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pc { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: var(--radius-lg); text-decoration: none; color: inherit; }
+@media (hover: hover) { .pc:hover { border-color: var(--deep); } }
+.pc .t { flex: 1; min-width: 0; } .pc b { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pc small { display: block; font-size: var(--text-xs); color: var(--t3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ov-note { margin: 10px 0 0; font-size: var(--text-xs); color: var(--t3); }
+
+/* lists (Overview previews and the tabs) */
+.tbl.ac td { height: 64px; }
+.tbl.ac .r { text-align: right; }
+
+/* activity timeline (as the initiative record) */
+.tlg + .tlg { margin-top: 28px; }
+.tl-g { display: flex; align-items: baseline; gap: 8px; margin: 0 0 14px; font-size: var(--text-lg); font-weight: 600; color: var(--ink); }
+.tl-g small { font-size: var(--text-xs); font-weight: 500; color: var(--t3); }
+.tl { display: grid; grid-template-columns: 96px 18px minmax(0, 1fr); gap: 14px; padding-bottom: 18px; }
+.tl:last-child { padding-bottom: 0; }
+.tl-d { font-size: var(--text-xs); color: var(--t3); line-height: 1.4; white-space: nowrap; }
+.tl-d b { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--t1); }
+.tl-dot { position: relative; display: flex; justify-content: center; }
+.tl-dot::before { content: ""; position: relative; z-index: 1; width: 10px; height: 10px; margin-top: 5px; border-radius: var(--radius-full); background: var(--deep); box-shadow: 0 0 0 3px var(--info-bg); }
+.tl:not(:last-child) .tl-dot::after { content: ""; position: absolute; top: 10px; bottom: -28px; width: 2px; border-radius: 1px; background: var(--line-2); }
+.tl-b b { font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
+.tl-b p { margin: 4px 0 0; font-size: var(--text-sm); color: var(--t2); }
+.tl-d .wd { font-weight: 400; color: var(--t3); }
+.tl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tl-tags span { display: inline-flex; height: 20px; align-items: center; padding: 0 7px; border-radius: var(--radius-sm); background: var(--hover); font-size: var(--text-2xs); font-weight: 500; color: var(--t2); white-space: nowrap; }
+.tl-tags a { display: inline-flex; align-items: center; min-height: 40px; margin: -10px 0; font-size: var(--text-xs); color: var(--deep); text-decoration: none; }
+
+/* tasks: the initiative record's quick add and checklist (initiative.html) */
+body.v2 label.select.fsel { display: flex; width: 100%; height: 40px; border-radius: var(--radius-control); border-color: var(--line-2); background: var(--surface); box-shadow: none; }
+body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(--line-3); }
+.tk-form { display: grid; grid-template-columns: minmax(0, 1fr) 170px 200px auto; gap: 8px; align-items: center; padding: 12px; border-radius: var(--radius-lg); background: var(--field); }
+.tk-form .in { min-width: 0; }
+.tk-form .btn { height: 40px; } /* same inputs and custom select as the edit form */
+.tk-err { grid-column: 1 / -1; font-size: var(--text-xs); color: var(--danger); }
+.tk { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.tk input { width: 16px; height: 16px; accent-color: var(--deep); margin: 0; }
+.tk b { font-size: var(--text-sm); font-weight: 500; color: var(--ink); } .tk.done b { color: var(--t3); text-decoration: line-through; font-weight: 400; }
+.tk small { font-size: var(--text-xs); color: var(--t3); }
+
+.drop { display: grid; place-items: center; gap: 6px; padding: 32px 16px; border: 1.5px dashed var(--line-3); border-radius: var(--radius-lg); background: var(--field); text-align: center; font-size: var(--text-sm); color: var(--t3); cursor: pointer; }
+.drop svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.drop b { color: var(--deep); font-weight: 500; }
+
+/* rail */
+.rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 56px; }
+.rail h3 { margin: 0 0 12px; font-size: var(--text-md); font-weight: 600; color: var(--ink); }
+/* highlighted card = the record's Next steps card; fields = the record's read-only fields */
+.rs-f { display: grid; gap: 8px; margin-top: 4px; } /* the type picker and Add log share a row (they belong together); Add task has its own (2026-11-27) */
+.rs-log { display: flex; gap: 8px; } .rs-log .select { flex: 1; min-width: 0; } .rs-log .btn { flex: none; width: auto; margin: 0; }
+.rs-f > .btn { width: 100%; justify-content: center; margin: 0; }
+.rs-or { display: flex; align-items: center; gap: 10px; font-size: var(--text-xs); color: var(--t3); } /* log or task: two different things */
+.rs-or::before, .rs-or::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
+.ns-p { margin: 0 0 12px; font-size: var(--text-xs); color: var(--t2); }
+.fg { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+.fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fld > .lab { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
+.fld .help { font-size: var(--text-xs); color: var(--t3); }
+.in.in-ro { display: flex; align-items: center; gap: 10px; height: auto; min-height: 40px; padding: 9px 12px; background: var(--field); border-color: var(--line); color: var(--ink); cursor: default; overflow-wrap: anywhere; }
+.in.in-ro:hover { border-color: var(--line); }
+.in.in-ro.multi { align-items: flex-start; min-height: 64px; line-height: 1.5; }
+.in.in-ro.muted { color: var(--t3); }
+.fg.g1 { grid-template-columns: 1fr; gap: 16px; }
+.fy { display: grid; grid-template-columns: 64px minmax(0, 1fr) 76px; align-items: center; gap: 8px; margin-top: 10px; font-size: var(--text-sm); font-variant-numeric: tabular-nums; color: var(--t2); }
+.fy i { display: block; height: 8px; border-radius: var(--radius-2xs); background: var(--chart-track); overflow: hidden; }
+.fy i em { display: block; height: 100%; border-radius: var(--radius-2xs); background: var(--chart-step); }
+.fy.cur i em { background: var(--deep); } .fy.cur b { font-weight: 600; color: var(--ink); }
+.fy b { text-align: right; font-weight: 400; }
+.fy-note { margin: 12px 0 0; font-size: var(--text-xs); color: var(--t3); }
+
+@media (max-width: 1279px) { .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .figs .f span { white-space: normal; } } /* four in a row need about 900px */
+@media (max-width: 768px) {
+  .figs { padding: 16px; gap: 16px; }
+  .figs .f b { font-size: var(--text-2xl); }
+  .people { grid-template-columns: minmax(0, 1fr); }
+  .tl { grid-template-columns: 18px minmax(0, 1fr); column-gap: 12px; row-gap: 2px; }
+  .tl-dot { grid-column: 1; grid-row: 1 / span 2; } .tl-d { grid-column: 2; grid-row: 1; display: flex; gap: 6px; align-items: baseline; } .tl-d b { display: inline; } .tl-b { grid-column: 2; }
+  .rec-acts { flex-wrap: wrap; width: 100%; } .rec-acts > .btn:not(.icon-only) { flex: 1 1 0; justify-content: center; }
+}
+</style>
+</head>
+<body class="v2">
+<div class="app">
+  <aside class="side" id="side" aria-label="Navigation"></aside>
+  <main class="main" id="main"></main>
+</div>
+
+<script src="assets/crm.js?v=20261126e"></script>
+<script src="assets/crm-data.js?v=20261126d"></script>
+<script src="assets/contact-form.js?v=20261127a"></script>
+<script src="assets/activity-form.js?v=20261127a"></script>
+<script src="assets/task-form.js?v=20261127a"></script>
+<script>
+const { money, toast } = CRM;
+const $ = (s) => document.querySelector(s);
+const SVG = {
+  back: '<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+  edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  more: '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>',
+  log: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>', // Activities (menu icon)
+  alert: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  file: '<svg viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"/></svg>'
+};
+// activity type icons, as on Activities
+const TICON = {
+  'Customer / prospect visit': '<path d="M12 21s-6-5.3-6-11a6 6 0 0112 0c0 5.7-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',
+  'Phone call': '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/>',
+  'Virtual meeting': '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/>',
+  'Email': '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/>',
+  'Messaging': '<path d="M4 5h16v11H8l-4 4z"/>',
+  'Internal meeting': '<circle cx="9" cy="8" r="3"/><path d="M3 19c.8-3 3.2-5 6-5s5.2 2 6 5M16 5.5a3 3 0 010 5.5M18 14c1.6.6 2.7 2.4 3 5"/>',
+  'Event / conference': '<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  'Other': '<circle cx="12" cy="12" r="8.5"/><path d="M8 12h8"/>'
+};
+const plural = (n, one, many = one + 's') => `${n} ${n === 1 ? one : many}`;
+const dd = (d) => d ? CRM.date(d) : '';
+const fyOf = (d) => { const y = +d.slice(2, 4), m = +d.slice(5, 7); const s = m >= 4 ? y : y - 1; return `FY${s}-${s + 1}`; };
+const CUR_FY = 'FY26-27';
+
+// ---- the account ----
+const ALL = [...ACCOUNTS, ...(typeof FRESH_ACCOUNTS !== 'undefined' ? FRESH_ACCOUNTS : [])];
+const A = ALL.find(a => a.id === new URLSearchParams(location.search).get('id')) || ALL[0];
+document.title = `${A.name} · BCT CRM`;
+const ITS = INITS.filter(o => o.acc === A.name).sort((x, y) => (x.kind === 'open' ? 0 : 1) - (y.kind === 'open' ? 0 : 1) || (y.close || '').localeCompare(x.close || ''));
+let PEOPLE = CONTACTS.filter(c => c.acc === A.name);
+let ACTS = ACTIVITIES.filter(x => x.acc === A.name).sort((x, y) => y.d.localeCompare(x.d));
+const TKS = TASKS.filter(t => t.acc === A.name).sort((x, y) => (taskOpen(y) - taskOpen(x)) || (x.due || '9').localeCompare(y.due || '9'));
+const ORDS = ORDERS.filter(o => o.acc === A.name).sort((x, y) => (y.date || '9999').localeCompare(x.date || '9999'));
+const OPEN_OPPS = ITS.filter(o => o.kind === 'open' && o.status === 'Opportunity');
+const WON = ITS.filter(o => o.kind === 'won');
+const confirmed = ORDS.filter(o => o.status === 'Open' || o.status === 'Completed');
+const approved = A.status === 'Approved';
+const logReason = approved ? '' : 'Activities can be logged only on Approved accounts.';
+const dom = A.name.replace(/^Al /, '').split(' ')[0].toLowerCase() + '.example';
+const CODE = { India: '+91 22', 'Middle East': '+971 4', APAC: '+65' }[A.geo] || '+1';
+const DETAILS = { hq: A.hq, cur: FX_OF(A.name), phone: `${CODE} ${String(_hash(A.name + 'ph')).slice(0, 4)} ${String(_hash(A.name + 'pk')).slice(0, 4)}`, web: `www.${dom}`, bill: `${A.hq}${A.geo === 'India' ? ', India' : ''}`, parent: '', desc: '' };
+const T = { tab: 'overview', more: false, actType: 'All', logType: 'Phone call', tasks: TKS.map(t => ({ t: t.title, a: t.to, d: t.due, done: !taskOpen(t), si: t.siName })) };
+{ const t = new URLSearchParams(location.search).get('tab'); if (['overview', 'initiatives', 'contacts', 'activities', 'tasks', 'orders', 'files'].includes(t)) T.tab = t; } // ?tab=… opens that tab
+
+// ---- header ----
+function header() {
+  const state = `${A.status} · ${A.engagement || 'Active'}`;
+  return `
+    <div class="back-bar"><a class="back" href="accounts.html">${SVG.back}Accounts<span>·</span><b>${A.id}</b></a></div>
+    <header class="rec-head">
+      <div class="rec-t">
+        <h1>${esc(A.name)}<span class="tag ${A.lifecycle}">${A.lifecycle}</span><span class="tag state ${approved ? '' : 'warn'}">${state}</span>${A.strategic ? '<span class="tag strat">Strategic</span>' : ''}</h1>
+        <div class="rec-meta">${[A.type, A.vertical || 'Vertical not set', [A.geo, A.region].filter(Boolean).join(' › '), `Owner ${A.owner}`].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('')}</div>
+      </div>
+      <div class="rec-acts">
+        <button class="btn" data-act="toast" data-v="Would open Edit account">${SVG.edit}Edit</button>
+        <button class="btn" data-act="log" ${logReason ? `aria-disabled="true" data-tip="${logReason}"` : ''}>${SVG.log}Log activity</button>
+        <a class="btn primary" ${approved ? `href="initiative-new.html?acc=${encodeURIComponent(A.name)}"` : `aria-disabled="true" data-tip="${A.status} accounts can't be used until they are Approved"`}>${SVG.plus}New initiative</a>
+        <button class="btn icon-only" aria-label="More actions" aria-haspopup="menu" aria-expanded="${T.more}" data-act="more">${SVG.more}</button>
+        <div class="pop more-pop" role="menu" ${T.more ? '' : 'hidden'}>
+          <button class="mi" role="menuitem" data-act="toast" data-v="Would open Change status for ${esc(A.name)}">Change status</button>
+          <button class="mi" role="menuitem" data-act="toast" data-v="Would open the change history of ${esc(A.name)}">Show history</button>
+          <hr>
+          <button class="mi" role="menuitem" aria-disabled="true">Delete account<small>Only an Administrator can delete accounts</small></button>
+        </div>
+      </div>
+    </header>
+    ${notices()}
+    ${figures()}`;
+}
+function notices() {
+  if (!approved) return `<p class="notice" role="status">${SVG.alert}<span>${A.status === 'Fresh' ? 'This account is Fresh: a Sales Manager, Sales Head or Administrator must approve it before it can be used in Sales Initiatives, Activities or other transactions.' : 'This account is Inactive: it is not available for new transactions. Its history stays accessible.'}</span></p>`;
+  const lastWon = WON.map(o => o.close).filter(Boolean).sort().pop(), wonSince = lastWon && (!A.lastDate || lastWon > A.lastDate), stale = A.last > 60;
+  if (!stale && !wonSince) return '';
+  const last = A.lastDate ? `Last interaction logged ${plural(A.last, 'day')} ago (${dd(A.lastDate)}).` : 'No customer interaction logged yet.';
+  const deal = WON.find(o => o.close === lastWon);
+  const why = wonSince ? ` ${deal ? esc(deal.name) : 'A deal'} was won on ${dd(lastWon)}, so recent contact isn't being recorded.` : ' Log calls, meetings and emails so the account doesn\'t look quiet.';
+  return `<p class="notice" role="status">${SVG.alert}<span><b>${last}</b>${why}</span><button class="btn" data-act="log">Log activity</button></p>`;
+}
+function figures() {
+  const since = confirmed.map(o => o.date).filter(Boolean).sort()[0];
+  const weighted = OPEN_OPPS.reduce((t, o) => t + o.value * o.prob / 100, 0);
+  const openOrd = ORDS.filter(o => o.status === 'Open'), openVal = openOrd.reduce((t, o) => t + orderUsd(o), 0);
+  const wonFy = WON.filter(o => o.fy === '2627'), wonVal = wonFy.reduce((t, o) => t + o.value, 0), lastWon = WON.map(o => o.close).filter(Boolean).sort().pop();
+  const f = (k, v, sub) => `<div class="f"><small>${k}</small><b>${v}</b><span>${sub}</span></div>`;
+  return `<section class="card sum-card" aria-label="Account figures" style="padding:0"><div class="figs">
+    ${f('Customer value', money(A.value || 0), since ? `Confirmed orders · customer since ${dd(since)}` : 'Confirmed orders only')}
+    ${f('Open pipeline', money(A.pipeline || 0), `${plural(OPEN_OPPS.length, 'open initiative')} · ${money(weighted)} weighted`)}
+    ${f('Open orders', money(openVal), openOrd.length ? plural(openOrd.length, 'open order') : 'No open orders')}
+    ${f(`Won in ${CUR_FY}`, money(wonVal), wonFy.length ? `${plural(wonFy.length, 'initiative')}${lastWon ? ` · last ${dd(lastWon)}` : ''}` : lastWon ? `Last win ${dd(lastWon)}` : 'No wins yet')}
+  </div></section>`;
+}
+
+// ---- tabs ----
+const TABS = [['overview', 'Overview'], ['initiatives', 'Initiatives', ITS.length], ['contacts', 'Contacts', PEOPLE.length], ['activities', 'Activities'], ['tasks', 'Tasks'], ['orders', 'Orders'], ['files', 'Attachments']];
+const tabsBar = () => `<div class="rec-tabs" role="tablist">${TABS.map(([k, n, c]) => { if (k === 'contacts') c = PEOPLE.length; return `<button class="rtab ${T.tab === k ? 'on' : ''}" role="tab" aria-selected="${T.tab === k}" data-act="tab" data-v="${k}">${n}${c != null ? ` <span class="tab-n">${c}</span>` : ''}</button>`; }).join('')}</div>`; // counts read at every draw (a new contact shows at once)
+
+const stage = (o) => o.kind === 'open' ? `<span class="chip-s ${o.status}">${o.status}</span> <span class="chip-s sub">${esc(o.sub)}</span>` : `<span class="chip-s ${o.kind}">${o.kind === 'won' ? 'Closed won' : 'Closed lost'}</span>`;
+const closeNote = (o) => o.kind === 'won' ? (o.close ? `Won ${dd(o.close)}` : 'Won') : o.kind === 'lost' ? (o.close ? `Lost ${dd(o.close)}` : 'Lost') : (o.close ? `Close ${dd(o.close)}` : 'No close date');
+const initTable = (list) => `<div class="tbl-wrap"><table class="tbl ac">
+    <colgroup><col style="width:38%"><col style="width:30%"><col style="width:14%"><col style="width:18%"></colgroup>
+    <thead><tr><th>Initiative</th><th>Stage</th><th class="r">Value</th><th class="r">Close</th></tr></thead>
+    <tbody>${list.map(o => `<tr class="click" data-href="initiative.html?id=${o.id}" tabindex="0"><td><div class="ell t-main">${esc(o.name)}</div><div class="ell t-sub">${o.id} · ${esc(o.owner)}</div></td><td>${stage(o)}</td><td class="r num"><b>${money(o.value)}</b></td><td class="r">${closeNote(o)}</td></tr>`).join('')}</tbody></table></div>`;
+const orderTable = (list) => `<div class="tbl-wrap"><table class="tbl ac">
+    <colgroup><col style="width:40%"><col style="width:28%"><col style="width:16%"><col style="width:16%"></colgroup>
+    <thead><tr><th>Order</th><th>Status</th><th class="r">Order value</th><th class="r">USD</th></tr></thead>
+    <tbody>${list.map(o => `<tr class="click" data-href="orders.html?open=${o.id}" tabindex="0"><td><div class="ell t-main">${o.id}</div><div class="ell t-sub">${esc([o.po || 'No PO yet', o.si ? `from ${o.siName}` : 'historical'].join(' · '))}</div></td><td><span class="chip-s ${o.status}">${o.status}</span><div class="t-sub">${o.date ? `Ordered ${dd(o.date)}` : 'Not ordered yet'}</div></td><td class="r num"><b>${o.cur} ${Math.round(o.value).toLocaleString('en-US')}</b></td><td class="r num">${o.cur === 'USD' ? 'USD' : money(orderUsd(o))}</td></tr>`).join('')}</tbody></table></div>`;
+
+const empty = (b, t = '') => `<div class="empty"><b>${b}</b>${t}</div>`; // shared empty state (crm.css .empty)
+function overview() {
+  const active = PEOPLE.filter(c => c.status === 'Active'), inactive = PEOPLE.length - active.length;
+  const people = `<section class="card" aria-label="People we know here"><div class="card-h"><div><h2>People we know here</h2></div><div class="r"><button class="link" data-act="add-contact">+ Add contact</button></div></div>
+    ${active.length ? `<div class="people">${active.map(c => `<a class="pc" href="contacts.html?q=${encodeURIComponent(c.n)}">${CRM.avatar(c.n, c.id)}<span class="t"><b>${esc(c.n)}</b><small>${esc(c.title || 'No designation')}</small></span>${c.role ? `<span class="chip-s ${c.role === 'Decision maker' ? 'dm' : 'role'}">${esc(c.role)}</span>` : ''}</a>`).join('')}</div>` : empty('No active contacts yet.')}
+    ${inactive ? `<p class="ov-note">${plural(inactive, 'inactive contact')} in the Contacts tab.</p>` : ''}</section>`;
+  const head = (t, k, n) => `<div class="card-h"><div><h2>${t}</h2></div>${n ? `<div class="r"><button class="link" data-act="tab" data-v="${k}">View all</button></div>` : ''}</div>`; // up to three rows here; View all opens the tab
+  const inits = `<section class="card" aria-label="Sales initiatives">${head('Sales initiatives', 'initiatives', ITS.length)}${ITS.length ? initTable(ITS.slice(0, 3)) : empty('No Sales Initiatives yet.')}</section>`;
+  const ords = `<section class="card" aria-label="Customer orders">${head('Customer orders', 'orders', ORDS.length)}${ORDS.length ? orderTable(ORDS.slice(0, 3)) : empty('No customer orders yet.')}</section>`;
+  return people + inits + ords;
+}
+function initiativesTab() { return `<section class="card" aria-label="Initiatives"><div class="card-h"><div><h2>Sales initiatives</h2></div></div>${ITS.length ? initTable(ITS) : empty('No Sales Initiatives yet.')}</section>`; }
+function contactsTab() {
+  return `<section class="card" aria-label="Contacts"><div class="card-h"><div><h2>Contacts</h2></div><div class="r"><button class="btn primary" data-act="add-contact">${SVG.plus}Add contact</button></div></div>
+    ${PEOPLE.length ? `<div class="tbl-wrap"><table class="tbl ac"><colgroup><col style="width:34%"><col style="width:22%"><col style="width:32%"><col style="width:12%"></colgroup>
+    <thead><tr><th>Name</th><th>Account role</th><th>Business email</th><th>Status</th></tr></thead>
+    <tbody>${PEOPLE.map(c => `<tr class="click" data-href="contacts.html?q=${encodeURIComponent(c.n)}" tabindex="0"><td><div class="own">${CRM.avatar(c.n, c.id)}<div class="own-t"><div class="ell t-main">${esc(c.n)}</div><div class="ell t-sub">${esc([c.title, c.dept].filter(Boolean).join(' · '))}</div></div></div></td><td><span class="chip-s ${c.role === 'Decision maker' ? 'dm' : 'role'}">${esc(c.role)}</span></td><td><div class="ell">${esc(c.email)}</div></td><td><span class="chip-s ${c.status || 'Active'}">${c.status || 'Active'}</span></td></tr>`).join('')}</tbody></table></div>` : empty('No contacts yet.')}</section>`;
+}
+// Activity timeline = the initiative record's: type tabs with counts, This week / Last week / month groups, + Log activity
+const DAY = 864e5;
+function tlGroups(list) {
+  const ws = new Date(TODAY.getTime() - ((TODAY.getDay() + 6) % 7) * DAY), g = [];
+  list.slice().sort((x, y) => y.d.localeCompare(x.d)).forEach(a => { const d = new Date(a.d.slice(0, 10));
+    const k = d >= ws ? 'This week' : d >= new Date(ws.getTime() - 7 * DAY) ? 'Last week' : d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    if (!g.length || g[g.length - 1][0] !== k) g.push([k, []]); g[g.length - 1][1].push(a); });
+  return g;
+}
+function activitiesTab() {
+  const types = ['All', ...new Set(ACTS.map(a => a.type))];
+  const rows = ACTS.filter(a => T.actType === 'All' || a.type === T.actType);
+  return `<section class="card"><div class="card-h"><div><h2>Activity timeline</h2><p>Calls, emails, meetings and notes at this account and its initiatives</p></div><div class="r">${logReason ? '' : `<button class="btn primary" data-act="log">${SVG.plus}Log activity</button>`}</div></div>
+    ${ACTS.length ? `<div class="tabs" role="tablist" aria-label="Filter by type">${types.map(t => `<button class="tab ${T.actType === t ? 'on' : ''}" role="tab" aria-selected="${T.actType === t}" data-act="atype" data-v="${esc(t)}">${t}<span class="tab-n">${t === 'All' ? ACTS.length : ACTS.filter(a => a.type === t).length}</span></button>`).join('')}</div>` : ''}
+    ${rows.length ? tlGroups(rows).map(([k, l]) => `<section class="tlg" aria-label="${k}"><h3 class="tl-g">${k}<small>${l.length}</small></h3>${l.map(a => { const d = new Date(a.d); return `<div class="tl"><div class="tl-d"><b>${CRM.date(d, false)} <span class="wd">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</span></b>${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div><div class="tl-dot"></div>
+      <div class="tl-b"><b>${esc(a.t)}</b>${a.note ? `<p>${esc(a.note)}</p>` : ''}<div class="tl-tags"><span>${a.type}</span>${a.purpose ? `<span>${a.purpose}</span>` : ''}${a.si ? `<a href="initiative.html?id=${a.si}">${esc(a.siName)}</a>` : ''}</div></div></div>`; }).join('')}</section>`).join('') : empty('No activities yet', logReason)}
+  </section>`;
+}
+// Tasks = the initiative record's quick add and checklist
+function tasksTab() {
+  const open = T.tasks.filter(t => !t.done).length;
+  const who = [A.owner, ME, ...((TEAMS[A.team] || {}).people || [])].filter((v, i, a) => v && a.indexOf(v) === i);
+  return `<section class="card"><div class="card-h"><div><h2>Tasks</h2><p>${open} open · tasks here also appear in each assignee's <a class="link" href="tasks.html">Tasks</a> list</p></div></div>
+    <form class="tk-form" id="tk-form" novalidate>
+      <input class="in" id="tk-t" placeholder="New task" aria-label="Task title">
+      <input class="in" id="tk-d" type="date" aria-label="Due date">
+      <label class="select fsel"><select id="tk-a" aria-label="Assignee">${who.map(p => `<option>${esc(p)}</option>`).join('')}</select></label>
+      <button class="btn primary" type="submit">Add</button>
+      <div class="tk-err" id="tk-err" hidden></div>
+    </form>
+    ${T.tasks.length ? T.tasks.map((t, i) => `<label class="tk ${t.done ? 'done' : ''}"><input type="checkbox" data-act="tk" data-v="${i}" ${t.done ? 'checked' : ''}><div><b>${esc(t.t)}</b><br><small>${esc(t.a)}${t.si ? ` · ${esc(t.si)}` : ''}</small></div><small class="${!t.done && t.d && new Date(t.d) < TODAY ? 'hot' : ''}">${t.d ? 'Due ' + dd(t.d) : 'No due date'}</small></label>`).join('')
+      : empty('No tasks yet', 'Add one above.')}
+  </section>`;
+}
+function ordersTab() { return `<section class="card" aria-label="Orders"><div class="card-h"><div><h2>Customer orders</h2></div></div>${ORDS.length ? orderTable(ORDS) : empty('No customer orders yet.')}</section>`; }
+function filesTab() {
+  return `<section class="card"><div class="card-h"><div><h2>Attachments</h2><p>Contracts, agreements and account documents</p></div></div>
+    <div class="drop" data-act="toast" data-v="Would open the file picker">${SVG.file}<span>Drop files here or <b>browse</b></span><small>PDF, Word, Excel, PowerPoint, CSV, text or images</small></div>
+    <div class="empty" style="padding-bottom:8px">No attachments yet.</div></section>`;
+}
+
+// ---- rail: the highlighted card = the record's Next steps card; details = the record's read-only fields ----
+function rail() {
+  const rec = `<section class="card ns tint" aria-label="Record something now"><div class="ns-h"><b>Record something now</b></div><p class="ns-p">${logReason || 'Logged here, it\'s linked to this account. Pick an initiative in the drawer to link it there too.'}</p>
+    <div class="rs-f"><div class="rs-log"><label class="select fsel"><select id="rs-type" aria-label="Activity type" ${logReason ? 'disabled' : ''}>${ACT_TYPES.map(t => `<option ${t === T.logType ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+      <button class="btn primary" data-act="log" data-v="type" ${logReason ? 'aria-disabled="true"' : ''}>${SVG.plus}Add log</button></div>
+      <div class="rs-or" role="separator"><span>or</span></div>
+      <button class="btn" data-act="task">${SVG.plus}Add task</button></div>
+</section>`;
+  const fld = (k, x, extra = '') => `<div class="fld"><span class="lab">${k}</span><div class="in in-ro ${x ? '' : 'muted'}">${x || 'None'}</div>${extra}</div>`;
+  const det = `<section class="card" aria-label="Account details"><h3>Account details</h3><div class="fg g1">
+    ${fld('HQ', esc(DETAILS.hq))}${fld('Currency', DETAILS.cur)}${fld('Phone', DETAILS.phone)}${fld('Parent account', DETAILS.parent)}${fld('Website', esc(DETAILS.web))}${fld('Billing address', esc(DETAILS.bill))}
+    ${fld('Last interaction', A.lastDate ? dd(A.lastDate) : 'None logged', '<span class="help">From logged activities; internal meetings don\'t count</span>')}
+    ${fld('Description', DETAILS.desc)}</div></section>`;
+  const byFy = {}; confirmed.forEach(o => { if (o.date) { const k = fyOf(o.date); byFy[k] = (byFy[k] || 0) + orderUsd(o); } });
+  const rows = Object.entries(byFy).sort((a, b) => b[0].localeCompare(a[0])), max = Math.max(1, ...rows.map(r => r[1]));
+  const first = confirmed.map(o => o.date).filter(Boolean).sort()[0], last = confirmed.map(o => o.date).filter(Boolean).sort().pop();
+  const fy = `<section class="card" aria-label="Order value by financial year"><h3>Order value by financial year</h3>
+    ${rows.length ? rows.map(([k, val]) => `<div class="fy ${k === CUR_FY ? 'cur' : ''}"><span>${k}</span><i><em style="width:${Math.max(val / max * 100, 2).toFixed(1)}%"></em></i><b>${money(val)}</b></div>`).join('') : empty('No confirmed orders yet.')}
+    ${first ? `<p class="fy-note">First order ${dd(first)}${last && last !== first ? ` · last order ${dd(last)}` : ''}</p>` : ''}</section>`;
+  return rec + det + fy;
+}
+
+const BODY = { overview, initiatives: initiativesTab, contacts: contactsTab, activities: activitiesTab, tasks: tasksTab, orders: ordersTab, files: filesTab };
+function render() {
+  const tabsX = document.querySelector('.rec-tabs')?.scrollLeft || 0;
+  $('#main').innerHTML = `${header()}<div class="rec-grid"><div class="rec-main">${tabsBar()}${BODY[T.tab]()}</div><aside class="rail" aria-label="Account summary">${rail()}</aside></div>`;
+  CRM.enhanceSelects?.($('#main'));
+  const row = document.querySelector('.rec-tabs'); // as the initiative record: keep the row where it was, then bring the open tab into view
+  if (row) { row.scrollLeft = tabsX; const on = row.querySelector('.rtab.on'), pad = 8;
+    if (on) { const l = on.getBoundingClientRect().left - row.getBoundingClientRect().left + row.scrollLeft, r = l + on.offsetWidth; if (l < row.scrollLeft + pad) row.scrollLeft = l - pad; else if (r > row.scrollLeft + row.clientWidth - pad) row.scrollLeft = r - row.clientWidth + pad; } }
+}
+
+$('#main').addEventListener('click', (e) => {
+  const tr = e.target.closest('tr[data-href]'); if (tr && !e.target.closest('a, button')) { location.href = tr.dataset.href; return; }
+  const a = e.target.closest('[data-act]'); if (!a) { if (T.more && !e.target.closest('.more-pop')) { T.more = false; render(); } return; }
+  if (a.getAttribute('aria-disabled') === 'true') return;
+  const act = a.dataset.act;
+  if (act === 'tab') { T.tab = a.dataset.v; T.more = false; render(); if (a.closest('.card-h')) $('.rec-tabs').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+  else if (act === 'more') { T.more = !T.more; render(); }
+  else if (act === 'log') CRM.logActivity({ ctx: 'account', to: A.name, type: a.dataset.v === 'type' ? T.logType : '' }, { onSaved: () => { ACTS = ACTIVITIES.filter(x => x.acc === A.name).sort((x, y) => y.d.localeCompare(x.d)); render(); } }); // the Activities page's side panel, on this page
+  else if (act === 'task') CRM.taskForm(null, { acc: A.name, onSaved: (t) => { if (t.acc === A.name) T.tasks.unshift({ t: t.title, a: t.to, d: t.due, done: false, si: t.siName }); render(); } }); // the Tasks page's side panel
+  else if (act === 'add-contact') CRM.contactForm(null, { acc: A.name, onSaved: () => { PEOPLE = CONTACTS.filter(c => c.acc === A.name); render(); } }); // the Contacts page's side panel
+  else if (act === 'atype') { T.actType = a.dataset.v; render(); }
+  else if (act === 'tk') { T.tasks[+a.dataset.v].done = a.checked; render(); }
+  else if (act === 'toast') { T.more = false; render(); toast(a.dataset.v); }
+});
+$('#main').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tr[data-href], [role=button][data-act]')) e.target.click(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && T.more) { T.more = false; render(); $('[data-act="more"]').focus(); } }); // the menu closes with Esc, focus back on its button
+document.addEventListener('click', (e) => { if (T.more && !e.target.closest('.rec-acts')) { T.more = false; render(); } });
+
+$('#main').addEventListener('submit', (e) => { // quick add, as the initiative record
+  if (e.target.id !== 'tk-form') return; e.preventDefault();
+  const t = $('#tk-t').value.trim(), d = $('#tk-d').value, err = $('#tk-err');
+  const miss = [!t && 'a title', !d && 'a due date'].filter(Boolean);
+  if (miss.length) { err.textContent = `Enter ${miss.join(' and ')} first.`; err.hidden = false; return; }
+  T.tasks.unshift({ t, d, a: $('#tk-a').value, done: false }); render(); toast('Task added', 'ok');
+});
+$('#main').addEventListener('change', (e) => { if (e.target.id === 'rs-type') T.logType = e.target.value; });
+$('#main').addEventListener('input', (e) => { if (e.target.closest('#tk-form')) { const err = $('#tk-err'); if (err) err.hidden = true; } });
+CRM.renderShell('accounts');
+render();
+CRM.riseIn();
+</script>
+</body>
+</html>

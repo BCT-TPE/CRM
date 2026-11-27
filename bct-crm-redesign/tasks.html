@@ -6,9 +6,9 @@
 <title>Tasks · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261126a">
+<link rel="stylesheet" href="assets/crm.css?v=20261127e">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127b">
 <link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: Tasks (CRM V1 §7) ----------
@@ -40,23 +40,14 @@
 tr.is-done .open, tr.is-cxl .open { color: var(--t3); text-decoration: line-through; font-weight: 400; }
 .tk-t .t-sub .link { font-size: var(--text-xs); }
 .late { color: var(--danger); } .today { color: var(--warn-text); }
-.sb { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--radius-sm); font-size: var(--text-2xs); font-weight: 600; white-space: nowrap; }
-.sb.ns { background: var(--hover); color: var(--t2); } .sb.ip { background: var(--info-bg); color: var(--deep); }
-.sb.done { background: var(--ok-bg); color: var(--ok-text); } .sb.cxl { background: var(--field); color: var(--t3); }
 .dlg .ed { display: grid; gap: 12px; margin-top: 12px; }
 .dlg .ed label { display: flex; flex-direction: column; gap: 6px; font-size: var(--text-xs); font-weight: 500; color: var(--t2); }
 .dlg .ed .in { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); font: inherit; font-size: var(--text-sm); color: var(--ink); }
 .dlg .ed .fsel { display: flex; width: 100%; }
 /* Task form in the side panel (.drill, as on Pipeline / Performance) */
-.tf-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 0; font-size: var(--text-xs); color: var(--t3); }
-.sb.late { background: var(--danger-bg); color: var(--danger); }
-.tf-ctx { margin: 0; font-size: var(--text-sm); color: var(--t3); } .tf-ctx b { font-weight: 500; color: var(--t1); }
 .tf textarea.in { height: auto; min-height: 76px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
 .tf .in:focus { border-color: var(--deep); } .tf .in:disabled { background: var(--field); color: var(--t2); }
 .tf.bad .in, .tf.bad .dt-btn { border-color: var(--danger); }
-body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shadow: none; }
-.tf-ro { margin: 0; font-size: var(--text-sm); color: var(--t1); }
-@media (max-width: 480px) { .tf-2 { grid-template-columns: 1fr; } .tf-seg { flex-wrap: wrap; } }
 @media (max-width: 1180px) { .sc-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 768px) {
   .sc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -95,6 +86,7 @@ body.v2 .tf-seg { display: flex; width: 100%; background: var(--track); box-shad
 
 <script src="assets/crm.js?v=20261126e"></script>
 <script src="assets/crm-data.js?v=20261126d"></script>
+<script src="assets/task-form.js?v=20261127a"></script>
 <script>
 const { toast } = CRM;
 const $ = (s) => document.querySelector(s);
@@ -104,7 +96,7 @@ const TODAY_ISO = iso(TODAY);
 const SUNDAY = new Date(TODAY.getTime() + ((7 - TODAY.getDay()) % 7) * DAY);
 const PEOPLE = [...new Set([ME, ...Object.values(TEAMS).flatMap(t => t.people), ...Object.keys(FUNC)])].sort((a, b) => a === ME ? -1 : b === ME ? 1 : a.localeCompare(b));
 const nameOf = (p) => p === ME ? `${p} (you)` : p;
-const STATUS_LABEL = { ns: 'Not started', ip: 'In progress', done: 'Completed', cxl: 'Cancelled' };
+const STATUS_LABEL = CRM.TASK_STATUS; // assets/task-form.js
 const pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const daysUntil = (d) => Math.round((new Date(d) - TODAY) / DAY);
 
@@ -152,7 +144,7 @@ function row(t) {
   const closed = !taskOpen(t), late = taskLate(t), n = t.due ? daysUntil(t.due) : null;
   const rel = closed ? (t.status === 'done' && t.done ? `Done ${CRM.date(t.done)}` : 'Cancelled') : late ? `${pl(-n, 'day')} overdue` : n === 0 ? 'Today' : n != null ? `In ${pl(n, 'day')}` : '';
   const block = t.status === 'done' ? 'Completed tasks are final.' : t.status === 'cxl' ? 'Cancelled tasks are final.' : '';
-  const rel2 = [t.si ? `<a class="link" href="initiative.html?id=${encodeURIComponent(t.si)}#tasks">${esc(t.siName)}</a>` : t.acc ? `<a class="link" href="accounts.html?q=${encodeURIComponent(t.acc)}">${esc(t.acc)}</a>` : '', t.act ? `<a class="link" href="activities.html?q=${t.act}">from ${t.act}</a>` : ''].filter(Boolean).join(' · ');
+  const rel2 = [t.si ? `<a class="link" href="initiative.html?id=${encodeURIComponent(t.si)}#tasks">${esc(t.siName)}</a>` : t.acc ? `<a class="link" href="${(ACCOUNTS.find(x => x.name === t.acc) || {}).id ? `account.html?id=${ACCOUNTS.find(x => x.name === t.acc).id}` : `accounts.html?q=${encodeURIComponent(t.acc)}`}">${esc(t.acc)}</a>` : '', t.act ? `<a class="link" href="activities.html?q=${t.act}">from ${t.act}</a>` : ''].filter(Boolean).join(' · ');
   return `<tr class="click is-${t.status}" data-act="edit" data-v="${t.id}" data-id="${t.id}" tabindex="0">
     <td><div class="tk-t"><label class="ck40" data-act="ck"><input type="checkbox" data-act="done" data-v="${t.id}" ${t.status === 'done' ? 'checked' : ''} ${block ? 'disabled' : ''} aria-label="Mark ${esc(t.title)} complete${block ? ` (${block})` : ''}"></label>
       <div style="min-width:0"><div class="open">${esc(t.title)}</div>${ell(`${t.id}${rel2 ? ' · ' + rel2 : ''}`, 't-sub')}</div></div></td>
@@ -194,79 +186,8 @@ function render() {
 // Task form (stands in for CRMpulse's task drawer) — the one way to add a task on this page (the quick-add row was dropped:
 // it couldn't link an account or initiative). New task opens it with due tomorrow and you as assignee; a task's title or edit button opens it filled.
 // Cancelling asks why (required); completing takes an optional outcome. Completed and cancelled tasks are read-only.
-const fld = (label, ctl, { req, hint, err, id } = {}) => `<div class="tf ${err ? 'bad' : ''}" ${id ? `data-f="${id}"` : ''}><span class="tf-l">${label}${req ? '<span class="rq">*</span>' : ''}</span>${ctl}${err ? `<span class="tf-e">${err}</span>` : hint ? `<span class="tf-h">${hint}</span>` : ''}</div>`;
-function openForm(t) {
-  const isNew = !t, final = !!t && !taskOpen(t);
-  const v = isNew ? { acc: '', si: '', title: '', to: ME, due: iso(TODAY.getTime() + DAY), status: 'ns', note: '', desc: '' }
-    : { acc: t.acc, si: t.si || '', title: t.title, to: t.to, due: t.due || '', status: t.status, note: t.note || '', desc: t.desc || '' };
-  let errs = {};
-  // Side panel: the same .drill panel as the Pipeline / Performance drill-downs (slides in from the right)
-  const scrim = document.createElement('aside'); scrim.className = 'drill tf-panel'; scrim.setAttribute('role', 'dialog'); scrim.setAttribute('aria-labelledby', 'tf-t');
-  const prev = document.activeElement;
-  const close = () => { document.removeEventListener('keydown', key, true); document.body.classList.remove('drill-open'); setTimeout(() => scrim.remove(), 300); prev && prev.focus && prev.focus(); };
-  // Cancel, × and Esc ask first when something was entered or changed (design review D3, same dialog as the record page)
-  const start = JSON.stringify(v);
-  const askClose = async () => { if (final || JSON.stringify(v) === start) return close();
-    const r = await CRM.confirm({ title: isNew ? 'Discard this task?' : 'Discard your changes?', body: '<p>What you entered will be lost.</p>',
-      actions: [{ label: 'Discard', value: 'discard', kind: 'quiet' }, { label: 'Keep editing', value: null, kind: 'primary' }] });
-    if (r === 'discard') close(); };
-  const key = (e) => { if (e.key === 'Escape' && !document.body.classList.contains('dlg-open')) { e.preventDefault(); askClose(); } };
-  const changing = !isNew && v.status !== t.status && (v.status === 'done' || v.status === 'cxl');
-  const draw = () => {
-    const sis = INITS.filter(o => o.kind === 'open' && (!v.acc || o.acc === v.acc));
-    const closing = !isNew && v.status !== t.status && (v.status === 'done' || v.status === 'cxl');
-    const ctx = !isNew && (t.siName || t.acc) ? `<p class="tf-ctx"><b>${esc(t.siName || t.acc)}</b>${t.act ? ` · from ${t.act}` : ''}</p>` : '';
-    scrim.innerHTML = `<form class="tf-form" novalidate>
-      <header class="dr-head"><div><p class="dr-kind">${isNew ? 'Tasks' : t.id}</p><h2 id="tf-t">${isNew ? 'New task' : esc(t.title)}</h2>
-      ${isNew ? '<p class="dr-sub">Follow-ups for anyone: Sales, Presales, Delivery, Finance, Legal.</p>' : `<p class="tf-sub"><span class="sb ${t.status}">${STATUS_LABEL[t.status]}</span>${taskLate(t) ? '<span class="sb late">Overdue</span>' : ''} ${t.id} · assigned by ${t.by === ME ? 'you' : esc(t.by)}</p>`}
-      </div><button type="button" class="icon-btn" data-x="close" aria-label="Close panel">${CRM.icon('x')}</button></header>
-      <div class="dr-body"><div class="tf-g">
-        ${isNew ? fld('Account', `<label class="select fsel"><select data-v="acc"><option value="">No account</option>${ACCOUNTS.map(a => `<option ${a.name === v.acc ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</select></label>`, { hint: 'Optional.' })
-          + fld('Sales initiative', `<label class="select fsel"><select data-v="si"><option value="">No initiative</option>${sis.map(o => `<option value="${o.id}" ${o.id === v.si ? 'selected' : ''}>${esc(o.name)}</option>`).join('')}</select></label>`, { hint: 'Optional; sets the account.' }) : ctx}
-        ${fld('What needs doing?', `<input class="in" data-v="title" value="${esc(v.title)}" ${final ? 'disabled' : ''} aria-label="What needs doing?">`, { req: !final, err: errs.title, id: 'title' })}
-        <div class="tf-2">
-          ${fld('Who should do it?', `<label class="select fsel"><select data-v="to" ${final ? 'disabled' : ''}>${PEOPLE.map(x => `<option value="${esc(x)}" data-short="${esc(nameOf(x))}" ${x === v.to ? 'selected' : ''}>${esc(nameOf(x))} · ${funcOf(x)}</option>`).join('')}</select></label>`, { req: !final, hint: !isNew && !final ? 'Reassigning keeps the previous owner in the history.' : '' })}
-          ${fld('When is it due?', `<input class="in" type="date" data-v="due" value="${v.due}" ${final ? 'disabled' : ''} aria-label="When is it due?">`, { req: !final, err: errs.due, id: 'due' })}
-        </div>
-        ${isNew ? '' : fld('Status', `<div class="seg tf-seg" role="radiogroup" aria-label="Status">${Object.entries(STATUS_LABEL).map(([k, l]) => `<button type="button" role="radio" aria-checked="${v.status === k}" class="${v.status === k ? 'on' : ''}" data-st="${k}" ${final ? 'disabled' : ''}>${l}</button>`).join('')}</div>`)}
-        ${closing ? fld(v.status === 'cxl' ? 'Why is it cancelled?' : 'Outcome', `<textarea class="in" data-v="note" aria-label="${v.status === 'cxl' ? 'Why is it cancelled?' : 'Outcome'}">${esc(v.note)}</textarea>`, { req: v.status === 'cxl', hint: v.status === 'done' ? 'Optional.' : '', err: errs.note, id: 'note' }) : ''}
-        ${final && t.note ? fld(t.status === 'cxl' ? 'Why it was cancelled' : 'Outcome', `<p class="tf-ro">${esc(t.note)}</p>`) : ''}
-        ${fld('Details', `<textarea class="in" data-v="desc" ${final ? 'disabled' : ''} aria-label="Details">${esc(v.desc)}</textarea>`, { hint: final ? '' : 'Optional: context, progress notes.' })}
-      </div>
-      </div></div>
-      <div class="dr-foot">${final ? '<button type="button" class="btn primary" data-x="close">Close</button>' : `<button type="button" class="btn ghost" data-x="close">Cancel</button><button type="submit" class="btn primary">${isNew ? 'Create task' : 'Save'}</button>`}</div>
-    </form>`;
-    CRM.enhanceSelects(scrim); CRM.enhanceDates(scrim);
-  };
-  scrim.addEventListener('click', (e) => {
-    if (e.target.closest('[data-x="close"]')) { askClose(); return; }
-    const b = e.target.closest('[data-st]'); if (b && !final) { v.status = b.dataset.st; draw(); }
-  });
-  scrim.addEventListener('change', (e) => { const k = e.target.dataset.v; if (!k) return; v[k] = e.target.value;
-    if (k === 'si') { const o = INITS.find(x => x.id === v.si); if (o) v.acc = o.acc; draw(); } else if (k === 'acc') { v.si = ''; draw(); } });
-  scrim.addEventListener('input', (e) => { const k = e.target.dataset.v; if (k) v[k] = e.target.value; });
-  scrim.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const closing = !isNew && v.status !== t.status && (v.status === 'done' || v.status === 'cxl');
-    errs = {};
-    if (!v.title.trim()) errs.title = 'Say what needs doing.';
-    if (!v.due) errs.due = 'Pick a due date.';
-    if (closing && v.status === 'cxl' && !v.note.trim()) errs.note = 'Say why it is cancelled.';
-    if (Object.keys(errs).length) { draw(); scrim.querySelector('.tf.bad .in, .tf.bad .dt-btn')?.focus(); return; }
-    const o = INITS.find(x => x.id === v.si);
-    if (isNew) {
-      const n = String(Math.max(...TASKS.map(x => +x.id.slice(-4))) + 1).padStart(4, '0');
-      const nt = { id: 'TSK-2026-' + n, title: v.title.trim(), si: o ? o.id : null, siName: o ? o.name : '', acc: o ? o.acc : v.acc, to: v.to, by: ME, status: 'ns', due: v.due, act: null, done: null, desc: v.desc };
-      TASKS.unshift(nt); close(); render(); toast(`${nt.id} added for ${nt.to === ME ? 'you' : nt.to}.`, 'ok'); return;
-    }
-    const moved = v.to !== t.to;
-    Object.assign(t, { title: v.title.trim(), to: v.to, due: v.due, status: v.status, desc: v.desc, note: closing ? v.note.trim() : t.note, done: v.status === 'done' ? (t.done || TODAY_ISO) : null });
-    close(); render(); toast(v.status === 'cxl' && closing ? `${t.id} cancelled.` : moved ? `${t.id} reassigned to ${v.to}.` : `${t.id} saved.`, 'ok');
-  });
-  document.querySelectorAll('.tf-panel').forEach(x => x.remove());
-  draw(); document.body.appendChild(scrim); document.addEventListener('keydown', key, true);
-  requestAnimationFrame(() => { document.body.classList.add('drill-open'); setTimeout(() => scrim.querySelector(final ? '[data-x="close"]' : '[data-v="title"]')?.focus(), 280); });
-}
+// Task form: the shared side panel (assets/task-form.js)
+const openForm = (x) => CRM.taskForm(x, { onSaved: render });
 
 // ---- Events ----
 document.addEventListener('click', (e) => {

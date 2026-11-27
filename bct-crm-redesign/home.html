@@ -6,9 +6,9 @@
 <title>Home · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261126a">
+<link rel="stylesheet" href="assets/crm.css?v=20261127e">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127b">
 <link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: Home (requirement "CRMpulse Home page – by role", 2026-11-24) ----------
@@ -159,6 +159,7 @@ const QUIET = 30; // same rule as Activities' "Accounts idle 30+ days"
 const ICON = {
   cal: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',
   flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  message: '<path d="M4 5h16v11H8l-4 4z"/>', // Activities (menu icon)
   phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
   layers: '<path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 13 9 5 9-5"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
@@ -228,7 +229,7 @@ function recordActs() { // "Record something now": the page-header actions, as o
       <button class="btn" type="button" data-act="toast" data-v="Would open New sales initiative">${svg('layers')}New initiative</button>
       <button class="btn" type="button" data-act="toast" data-v="Would open New contact">${svg('user')}New contact</button>
       <button class="btn" type="button" data-act="toast" data-v="Would open New task">${svg('task')}New task</button>
-      <button class="btn primary" type="button" data-act="toast" data-v="Would open Log activity">${svg('phone')}Log activity</button><!-- primary last, on the right, as everywhere -->
+      <button class="btn primary" type="button" data-act="toast" data-v="Would open Log activity">${svg('message')}Log activity</button><!-- primary last, on the right, as everywhere -->
     </div>`;
 }
 

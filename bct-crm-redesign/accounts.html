@@ -6,9 +6,9 @@
 <title>Accounts · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261126a">
+<link rel="stylesheet" href="assets/crm.css?v=20261127e">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127b">
 <link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: Accounts ----------
@@ -100,7 +100,7 @@ const { money, toast } = CRM;
 const $ = (s) => document.querySelector(s);
 const ALL = [...ACCOUNTS, ...FRESH_ACCOUNTS];
 const IC = {
-  log: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>',
+  log: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>', // Log activity: the Activities icon from the menu, not a pencil (a pencil reads as Edit)
   plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
 };
 // Group cards (old AccountGroupCards): each owns lifecycle / strategic / attention; its count applies every other filter
@@ -214,7 +214,7 @@ page.addEventListener('click', (e) => {
   else if (act === 'reset') resetAll();
 });
 // No account page in this round: the row says what it would open (rows open the record on every list page)
-const openAccount = (tr) => toast(`Would open ${tr.dataset.name}`);
+const openAccount = (tr) => { location.href = `account.html?id=${encodeURIComponent(tr.dataset.id)}`; }; // the account page (2026-11-27)
 page.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('tbody tr[data-id]')) openAccount(e.target); });
 function fill(sel, opts) { sel.innerHTML = opts.map(([k, l]) => `<option value="${esc(k)}">${esc(l)}</option>`).join(''); }
 fill($('#f-owner'), [['', 'All'], ...[...new Set(ALL.map(a => a.owner))].sort().map(p => [p, p === ME ? `${p} (you)` : p])]);
@@ -243,7 +243,7 @@ function openNew() {
   const v = { name: '', type: '', vertical: '', parent: '', geo: '', region: '', hq: '', cur: 'USD', phone: '', web: '', bill: '', owner: ME, strategic: false, since: '', desc: '' };
   let conflicts = [];
   const similar = () => { const n = v.name.trim().toLowerCase(); return n.length < 3 ? [] : ALL.filter(a => a.name.toLowerCase().includes(n) || n.includes(a.name.toLowerCase())).slice(0, 4); };
-  const li = (a) => `<li><a class="link" href="accounts.html?q=${encodeURIComponent(a.name)}" target="_blank">${esc(a.name)}</a> <small>· ${a.id} · ${esc([a.status === 'Approved' ? '' : a.status, a.geo].filter(Boolean).join(' · '))}</small></li>`;
+  const li = (a) => `<li><a class="link" href="account.html?id=${encodeURIComponent(a.id)}" target="_blank">${esc(a.name)}</a> <small>· ${a.id} · ${esc([a.status === 'Approved' ? '' : a.status, a.geo].filter(Boolean).join(' · '))}</small></li>`;
   const dup = () => { const l = similar(); return conflicts.length ? `<div class="op-why" role="status"><p><b>Possible duplicates. Review before saving:</b></p><ul>${conflicts.map(li).join('')}</ul><p>Save again to create the record anyway.</p></div>`
     : l.length ? `<div class="op-why" role="status"><p><b>Similar account already exists.</b> Open it instead of creating a duplicate:</p><ul>${l.map(li).join('')}</ul></div>` : ''; };
   const foot = () => `<div class="op-r1"><span class="op-msg" role="status">${similar().length ? 'Check the similar account first' : 'Only the name is required'}</span></div><button type="button" class="btn ghost" data-x="close">Cancel</button><button type="submit" class="btn primary" ${v.name.trim() ? '' : 'disabled'}>${conflicts.length ? 'Create anyway' : 'Create account'}</button>`;

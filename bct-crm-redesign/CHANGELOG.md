@@ -7,7 +7,35 @@ Conventions: pages are static HTML + shared assets in `assets/`. Pages pull the 
 
 ---
 
-## 2026-11-27 (tenth push)
+## 2026-11-27 (eleventh push)
+
+**Account page** (`account.html?id=ACC-…`, old CRMpulse `/accounts/[id]`) and **shared side panels**. Cache-busters: `crm.css?v=20261127e`, `theme-v2.css?v=20261127b` (all pages that load them); new `contact-form.js`, `activity-form.js`, `task-form.js` at `?v=20261127a`.
+
+### Added
+- **Account page**, same layout and components as the initiative record (back bar, title row, figures card, pill tabs, sticky rail):
+  - Header: name, lifecycle, "Approved · Active", Strategic; type · vertical · geography › region · owner. Edit, Log activity, New initiative (pre-filled), More (Change status, Show history; Delete account disabled with "Only an Administrator can delete accounts", as the old Sales Head view). Edit / Change status / Show history are placeholders.
+  - Old notices: not-approved, and no interaction for 60+ days or none since a win.
+  - Four figures: Customer value, Open pipeline, Open orders, Won in FY26-27. Columns are at least as wide as their own text, so no note wraps; 2×2 below 1280px.
+  - Tabs: Overview (people, the latest three initiatives and orders with "View all"), Initiatives, Contacts, Activity timeline (type tabs, This week / Last week / month groups), Tasks (quick add + checklist, as the record), Orders, Attachments. `?tab=` opens a tab; on phones the open tab scrolls into view.
+  - Rail: Record something now (activity type picker + Add log on one row, "or", Add task), Account details (read-only fields), Order value by financial year.
+  - Linked from Accounts rows, the record's account name / Account 360° / Other initiatives (Initiatives tab), Contacts and Tasks account names, and New account's similar-account links.
+- **Shared side panels** that open in place on any page: `CRM.contactForm` (`assets/contact-form.js`), `CRM.logActivity` (`assets/activity-form.js`), `CRM.taskForm` (`assets/task-form.js`). Contacts, Activities and Tasks now use them; the account page opens them pre-filled with the account (no page change). Each page decides how to refresh after a save. Their styles moved to `crm.css`.
+
+### Changed
+- **Links**: hover is one shade darker (`--deep` → `--midnight`), never underlined, mouse only. The confirm dialog's red text button (Discard) likewise.
+- **Shared steps bar** (`crm.css` `.steps2` / `.sp` / `.sp-bar`): the Customer order panel's progress (Draft / Open / Completed, old notes under each) now uses the initiative record's step bar; "counts in customer value" fits on one line where the panel is 480px wide.
+- **Record pages**: the pill tab row and the highlighted rail card live once in `crm.css` (were copied per page; the account page had missed the `.v2` overrides).
+- **Sales initiatives** stage dashes use the step bar's colours (done: cyan → deep, now: midnight).
+- **Same labels in new and edit forms**: Register historical order uses the order edit labels (PO / contract reference, Expected completion, Remarks); initiative edit mode uses New initiative's (What are we selling?, Expected close date, What happens next?, Follow-up date, Need / business requirement).
+- **Log activity icon** is the Activities chat bubble (was a pencil on Accounts rows, a phone on Home).
+- Button text has no "…" (Cancel order).
+
+### Fixed
+- Kanban cards broke owner names at the hyphen ("Ahmed Al-Mansoori").
+
+---
+
+## 2026-11-27 (tenth push) · `b86af73`
 
 Site-wide UI/UX check (16 pages × 1920 / 1440 / 1280 / 1024 / 768 / 390; side panels, back navigation, role sync) and its fixes. Cache-busters: `theme-v2.css?v=20261127a`, `responsive.css?v=20261127a` (all pages that load them).
 

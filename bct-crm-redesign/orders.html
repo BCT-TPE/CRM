@@ -6,9 +6,9 @@
 <title>Customer orders · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261126a">
+<link rel="stylesheet" href="assets/crm.css?v=20261127e">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127b">
 <link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: Customer orders ----------
@@ -27,11 +27,10 @@
 .os.Draft { background: var(--warn-bg); color: var(--warn-text); } .os.Open { background: var(--info-bg); color: var(--deep); } .os.Completed { background: var(--ok-bg); color: var(--ok-text); } .os.Cancelled, .os.Historical { background: var(--field); color: var(--t3); }
 .or-stack { display: flex; flex-direction: column; gap: 16px; }
 /* Order panel */
-.op-steps { display: flex; gap: 8px; margin: 0; padding: 12px 24px; border-bottom: 1px solid var(--line); list-style: none; }
-.op-steps li { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; padding: 6px 8px; border-radius: var(--radius-md); font-size: var(--text-xs); color: var(--t3); }
-.op-steps li[aria-current] { background: var(--info-bg); font-weight: 500; color: var(--deep); }
-.op-steps i { display: grid; place-items: center; flex: none; width: 20px; height: 20px; border-radius: var(--radius-full); background: var(--field); font-size: var(--text-2xs); font-style: normal; font-weight: 600; }
-.op-steps li.done i { background: var(--ok-bg); color: var(--ok-text); } .op-steps li[aria-current] i { background: var(--deep); color: var(--on-dark); }
+.op-prog { padding: 16px 24px 12px; border-bottom: 1px solid var(--line); } /* shared steps (crm.css .steps2), as on the initiative record */
+.op-prog.cxl { padding: 12px 24px; font-size: var(--text-xs); color: var(--t3); }
+.op-prog .sp { padding: 0; } .op-prog .sp-note { white-space: nowrap; } /* each note on one line where the panel is 480px wide */
+@media (max-width: 480px) { .op-prog .sp-note { white-space: normal; } } /* phones: on one line it would run into "waiting for PO" and read as one sentence */
 .op-fig { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 14px 16px; border-radius: var(--radius-lg); background: var(--field); }
 .op-fig small { display: block; font-size: var(--text-xs); color: var(--t3); } .op-fig b { display: block; margin: 2px 0; font-size: var(--text-md); font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .op-fig b.off { color: var(--warn); } .op-fig b.same { color: var(--ok-text); }
@@ -42,7 +41,7 @@
 @media (max-width: 768px) {
   .tbl.or td[data-label="Account · Initiative"] { grid-column: 1 / -1; }
 }
-@media (max-width: 480px) { .op-steps { padding: 10px 16px; } .op-steps li span span { display: none; } }
+@media (max-width: 480px) { .op-prog { padding-left: 16px; padding-right: 16px; } }
 .sc-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 8px; } /* design review: 8px between scope cards */
 .tt { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 16px; border: 0; border-radius: var(--radius-lg); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .tt:hover { background: var(--hover); }
@@ -99,6 +98,7 @@ const CAN_REGISTER = CRM.user.oversight; // HISTORICAL_ORDER_ROLES
 const iso = (d) => new Date(d).toISOString().slice(0, 10), TODAY_ISO = iso(TODAY);
 const TABS = [['', 'All current'], ['Draft', 'Draft'], ['Open', 'Open'], ['Completed', 'Completed'], ['Cancelled', 'Cancelled']];
 const STEPS = [['Draft', 'waiting for PO'], ['Open', 'counts in customer value'], ['Completed', '']];
+const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const CURS = ['USD', 'AED', 'INR', 'OMR', 'SAR'];
 const PER_PAGE = 10;
 const S = { q: '', period: '', tab: '', sort: 'id', page: 1 };
@@ -189,7 +189,7 @@ function openOrder(o) {
   const blockers = () => { const c = calc(); return [!v.po.trim() && 'add the PO reference', !v.date && 'add the order date', c.future && 'the order date is in the future', (v.value === '' || num() < 0) && 'enter the order value', c.off && !c.why && 'choose why the value differs'].filter(Boolean); };
   const foot = () => { const b = blockers(), c = calc(), can = v.value !== '' && num() >= 0 && !c.future;
     const msg = o.status === 'Draft' ? (b.length ? `To confirm: ${b.join(', ')}` : 'Ready to confirm') : o.status === 'Open' ? (b.length ? `To save: ${b.join(', ')}` : 'Confirmed. Counts in customer value.') : '';
-    return `<div class="op-r1"><span class="op-msg" role="status">${msg}</span>${final ? '' : '<button type="button" class="btn ghost op-cancel" data-x="cancel">Cancel order…</button>'}</div>
+    return `<div class="op-r1"><span class="op-msg" role="status">${msg}</span>${final ? '' : '<button type="button" class="btn ghost op-cancel" data-x="cancel">Cancel order</button>'}</div>
       <button type="button" class="btn ghost" data-x="close">Close</button>
       ${final ? '<button type="button" class="btn" data-x="save">Save remarks</button>' : `<button type="button" class="btn" data-x="save" ${can && (o.status === 'Draft' || !b.length) ? '' : 'disabled'}>${o.status === 'Draft' ? 'Save draft' : 'Save changes'}</button>
       <button type="button" class="btn primary" data-x="next" ${b.length ? 'disabled' : ''}>${o.status === 'Draft' ? 'Confirm order' : 'Mark completed'}</button>`}`; };
@@ -198,7 +198,9 @@ function openOrder(o) {
   const history = [o.cancel !== '' || o.status === 'Cancelled' ? ['Cancelled', o.cancelOn || TODAY_ISO] : null, o.doneOn ? ['Completed', o.doneOn] : null, o.status !== 'Draft' && o.date && o.type === 'Current' && o.po ? [`Confirmed with ${o.po}`, o.date] : null, o.wonOn ? ['Draft created when the initiative was won', o.wonOn] : ['Registered as a historical order', o.date]].filter(Boolean);
   const why = () => { const c = calc(); return c.off || (final && o.why) ? `<div class="op-why">${fld('Why is the PO value different from the won value?', pick('why', [['', 'Choose a reason'], ...VARIANCE_REASONS.map(r => [r, r]), ['Other', 'Other']], v.why, 'Why is the PO value different from the won value?', final), { req: true })}${v.why === 'Other' ? `<div class="tf">${inp('whyText', v.whyText, 'Other reason', { ph: 'Say what changed', dis: final })}</div>` : ''}</div>` : ''; };
   const draw = () => `<form class="tf-form" novalidate>${head(`${o.id} ${chip(o)}`, `${esc(o.acc)}${o.si ? ` · from <a class="link" href="initiative.html?id=${encodeURIComponent(o.si)}">${o.si} ${esc(o.siName)}</a>` : ''}`)}
-      ${o.status === 'Cancelled' ? '<p class="op-steps tf-h">Cancelled: this order no longer counts in customer value.</p>' : `<ol class="op-steps" aria-label="Order progress">${STEPS.map(([s, n], i) => { const done = i < at || o.status === 'Completed', cur = i === at && !done; return `<li class="${done ? 'done' : ''}" ${cur ? 'aria-current="step"' : ''}><i aria-hidden="true">${done ? '✓' : i + 1}</i><span>${s}${n ? `<span> · ${n}</span>` : ''}</span></li>`; }).join('')}</ol>`}
+      ${o.status === 'Cancelled' ? '<p class="op-prog cxl">Cancelled: this order no longer counts in customer value.</p>' : `<div class="steps2 op-prog" style="--n:${STEPS.length}" aria-label="Order progress"><ol>${STEPS.map(([s, n], i) => { const done = i < at || o.status === 'Completed', cur = i === at && !done;
+        return `<li class="sp ${done ? 'done' : cur ? 'cur' : ''}" ${cur ? 'aria-current="step"' : ''}><span class="sp-dot">${done ? CHECK : i + 1}</span><span class="sp-lab">${s}${n ? `<span class="sp-note">${n}</span>` : ''}</span></li>`; }).join('')}</ol>
+        <div class="sp-bar"><i style="width:${o.status === 'Completed' ? 100 : ((at + .5) / STEPS.length * 100).toFixed(1)}%"></i></div></div>`}
       <div class="dr-body"><div class="tf-g">
         ${tracked ? `<div class="op-fig">${figs()}</div>` : ''}
         <h3 class="op-h">Customer PO / contract</h3><span class="tf-h">The order value is the actual PO value; it never changes the initiative's booking value.</span>
@@ -242,12 +244,12 @@ function openRegister() {
           ${fld('Status', pick('status', ['Completed', 'Open', 'Draft'].map(s => [s, s]), v.status, 'Status'))}</div>
         ${fld('Linked Sales Initiative (optional)', pick('si', [['', v.acc ? 'None' : 'Choose the account first'], ...INITS.filter(o => o.acc === v.acc).map(o => [o.id, o.name])], v.si, 'Linked Sales Initiative', !v.acc))}
         <h3 class="op-h">Customer PO / contract</h3><span class="tf-h">The order value is the actual PO value; it never changes the initiative's booking value.</span>
-        <div class="tf-2">${fld('Customer PO / Contract Reference', inp('po', v.po, 'Customer PO / Contract Reference'))}
+        <div class="tf-2">${fld('PO / contract reference', inp('po', v.po, 'PO / contract reference'))}
           ${fld('Order date', inp('date', v.date, 'Order date', { type: 'date' }), { hint: "Date on the PO. Can't be in the future.", err: v.date > TODAY_ISO ? FUTURE : '', id: 'date' })}</div>
         <div class="tf-2"><div class="op-3">${fld('Order value', inp('value', v.value, 'Order value', { type: 'number' }), { req: true, err: errs.value, id: 'value' })}${fld('Currency', pick('cur', CURS.map(c => [c, c]), v.cur, 'Currency'))}</div>
-          ${fld('Expected completion date', inp('exp', v.exp, 'Expected completion date', { type: 'date' }))}</div>
+          ${fld('Expected completion', inp('exp', v.exp, 'Expected completion', { type: 'date' }))}</div>
         ${fld('Responsible salesperson', pick('owner', [['', 'Not set'], ...PEOPLE], v.owner, 'Responsible salesperson'))}
-        ${fld('Description / remarks', `<textarea class="in" data-v="remarks" aria-label="Description / remarks">${esc(v.remarks)}</textarea>`)}
+        ${fld('Remarks', `<textarea class="in" data-v="remarks" aria-label="Description / remarks">${esc(v.remarks)}</textarea>`)}
       </div></div><div class="dr-foot"><button type="button" class="btn ghost" data-x="close">Cancel</button><button type="submit" class="btn primary">Register order</button></div></form>`;
   const P = openPanel(v, draw, 'Discard this order?');
   P.el.addEventListener('input', (e) => { if (e.target.dataset.v) v[e.target.dataset.v] = e.target.value; });

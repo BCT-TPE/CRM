@@ -124,12 +124,32 @@ RWD 細節另見 [RWD.md](RWD.md)；每次推送的變更見 [CHANGELOG.md](CHAN
 - 保留：標題、資料標籤、全站共用的對話框和空白狀態、驗證訊息、商機的下一步建議，以及舊版放在頁尾註腳、新版改放在提示框裡的定義（Weighted、Forecast、Needs attention、Win rate、Expected by today）。Pipeline、Sales performance 的卡片副標跟舊版同類（「select … to filter」），保留。
 - Home 是依需求端範例做的，不在這次比對範圍。
 
+## 22. Customers：客戶詳細頁 account.html（2026-11-27）
+
+- **照舊版 `/accounts/[id]`（AccountDetailView）**，版面跟商機記錄頁一樣：返回 Accounts 的連結＋客戶編號、標題列、數字卡、分頁按鈕、右側欄（`rec-grid`、`rail`、`rec-tabs` 沿用 `responsive.css` 的共用手機規則）。
+- **標題列**：名稱＋Lifecycle（Customer／Opportunity／Lead／Prospect）＋「Approved · Active」狀態＋Strategic；下面一行 Type · Vertical · Geography › Region · Owner。按鈕：Edit、Log activity（Activities 的對話框圖示，連到 Activities 打開 Log 面板並帶入客戶）、New initiative（新增商機頁帶入客戶）、More（Change status、Show history，Delete account 停用並寫「Only an Administrator can delete accounts」，照舊版 Sales Head 看到的）。Edit、Change status、Show history 目前是提示訊息。Add contact（三個入口）打開 Contacts 頁同一個側邊欄（`assets/contact-form.js` 的 `CRM.contactForm`），客戶預先帶入但可改（同舊版），存檔後聯絡人和分頁數字即時更新。
+- **提醒**：未核准（Fresh／Inactive）時顯示舊版的說明；超過 60 天沒有互動，或成交後還沒記錄互動時，顯示舊版的提醒和 Log activity。
+- **四個數字**：Customer value（已確認的訂單）、Open pipeline（商機數、加權值）、Open orders、Won in FY26-27，說明文字照舊版。每欄至少是自己文字的寬度、剩下平分（第一欄的「customer since …」最長），說明不換行；1279px 以下改 2×2（四欄一排需要約 900px）。
+- **七個分頁**：Overview（People we know here（2026-11-27 拿掉 Roles covered 那一行）、最近 3 筆商機、最近 3 筆訂單，右上「View all」不帶數字，數字看分頁）、Initiatives、Contacts、Activities（依月份分組的時間軸）、Tasks、Orders、Attachments。列可以點：商機到記錄頁、訂單到 Customer orders 打開該筆、聯絡人到 Contacts 搜尋該人。`?tab=` 可以直接打開某個分頁。手機上切分頁時，選中的分頁會捲進畫面（同商機記錄頁）。
+- **右側欄**：Record something now（活動類型下拉選單＋「Add log」同一行（看得出是一組），中間一條寫「or」的分隔線，「Add task」獨立一行滿寬，預設 Phone call：在這頁直接打開 Log activity／New task 側邊欄並帶入客戶和類型，2026-11-27 改；頁首 Log activity、Activity timeline 的「＋ Log activity」、提醒裡的 Log activity 也都在原頁打開）、Account details（HQ、Currency、Phone、Parent account、Website、Billing address、Last interaction＋舊版說明、Description）、Order value by financial year（本財年深藍）。
+- **跟商機記錄頁用同一套元件（2026-11-27）**：卡片標題一律 `.card-h`（標題＋副標＋右側動作，View all 是 40px 文字連結）、空白狀態一律 `.empty`；Activity timeline 同商機頁（類型篩選分頁含數量、This week／Last week／月份分組、日期格式、右上「＋ Log activity」）；Tasks 同商機頁（上方快速新增：標題、到期日、指派對象＋Add，清單直接勾選完成）；Attachments 同商機頁（上傳區塊＋檔案類型＋No attachments yet.）；右側欄的醒目卡片同商機頁 Next steps（`.ns`），Account details 用商機頁的唯讀欄位（標籤在上、灰底欄位）。不要在客戶頁另寫卡片標題、空白狀態或欄位樣式。分頁列（`.rec-tabs`／`.rtab`，膠囊外框、半透明白底）和醒目卡片（`.ns`）的樣式在 `crm.css` 的「Record pages」區塊，兩頁共用同一份；之前客戶頁抄了一份卻漏掉 `.v2` 的覆寫，所以外框不一樣（2026-11-27 修正）。兩頁共有的元件已逐項比對計算後的樣式：23 項相同。
+- **入口**：Accounts 點列、商機記錄頁的客戶名稱和 Account 360°、Other initiatives（打開 Initiatives 分頁）、Contacts 的客戶名稱、Tasks 的客戶名稱、新增客戶時的「相似客戶」連結。側邊欄維持 Accounts 選中。
+
 ## 7.9 表格列的 hover 與游標（2026-11-26）
 
 - **只有能打開東西的列才有 hover 底色和手指游標**：列加 `class="click"`（`crm.css`、`theme-v2.css`、`responsive.css` 都只對 `tr.click:hover` 上色）。其他列一律一般游標（`cursor: default`）、滑過不變色，例如 Home 的 By salesperson、報表的彙總列、商機頁的明細、Sales structure。
 - 新表格：列能點就加 `click`，不能點就什麼都不加；不要在頁面裡另外寫覆寫來關掉 hover。
 
 ## 7.11 全站 UI/UX 檢查修正（2026-11-27）
+
+- **步驟條全站同一種**（`crm.css` 的 `.steps2`／`.sp`／`.sp-bar`）：圓點編號、名稱在下方、底部一條漸層進度條，完成的打勾。商機記錄頁的階段、Customer order 側邊欄的進度（Draft／Open／Completed，舊版的「waiting for PO」「counts in customer value」放在名稱下方小字）。
+- 按鈕文字不加「…」（例如 Cancel order）。
+- Sales initiatives 列表的階段小橫線（每列 13 段，表格放不下圓點）用步驟條的配色：已完成從青色漸層到深藍、目前深藍（midnight）、未到淺色底。
+- 人名在句中一律不斷行（`.nb`），例如 Kanban 卡片的「Ahmed Al-Mansoori」。
+- **連結 hover 不加底線，顏色深一階**：藍色連結（`--deep`）滑鼠移上去變 `--midnight`，只在有滑鼠的裝置（`@media (hover: hover)`）；確認對話框的紅字按鈕（Discard）同樣不加底線、顏色加深。規則在 `crm.css` 的 `.link` 和 `theme-v2.css`，各頁不要另寫底線。
+- **新增用的側邊欄全站共用，在原頁打開**：Log activity（`assets/activity-form.js`，`CRM.logActivity`）、New / edit task（`assets/task-form.js`，`CRM.taskForm`）、New / edit contact（`assets/contact-form.js`，`CRM.contactForm`）。Activities、Tasks、Contacts 和客戶頁都打開同一張，從客戶頁打開時預先帶入客戶，不換頁；存檔後由各頁決定怎麼更新畫面。表單樣式在 `crm.css`。
+- **Log activity 的圖示就是側邊欄 Activities 的對話框圖示**（`message`），不用筆（筆代表 Edit）：Accounts 每列的快速動作、Home 的 Log activity 按鈕。按鈕上有文字又是「新增」語意時（Activities 頁、商機的 Activity timeline）用「＋」。
+- **新增和編輯的欄位名稱一致**：同一個欄位在新增表單和編輯表單用同一個名稱。商機編輯模式改用新增頁的名稱（舊版兩者是同一張表單）：What are we selling?、Expected close date、What happens next?、Follow-up date、Need / business requirement；查看模式維持自己的名稱（Offering、Next step on record、Next follow-up）。登錄歷史訂單對齊訂單編輯：PO / contract reference、Expected completion、Remarks。Contacts、Tasks 的新增和編輯本來就是同一張表單。
 
 - Contacts 寬螢幕右側的聯絡人卡：滑到底時，卡片底部跟左邊最後一張清單卡切齊（`fitPanel()`：高度＝視窗高度－固定在上方的位置－清單下方的分頁器與頁面留白，不超過清單本身）。內容比較長時在卡片裡捲動；內容少時卡片下方留白。依客戶分組和 List 兩種檢視都一樣。
 

@@ -6,9 +6,9 @@
 <title>Sales initiative · BCT CRM</title>
 <link rel="icon" type="image/svg+xml" href="assets/fav.svg">
 <link rel="stylesheet" href="design-system/tokens.css?v=20261123a">
-<link rel="stylesheet" href="assets/crm.css?v=20261126a">
+<link rel="stylesheet" href="assets/crm.css?v=20261127e">
 <link rel="stylesheet" href="assets/dashboard.css?v=20261124b">
-<link rel="stylesheet" href="assets/theme-v2.css?v=20261127a">
+<link rel="stylesheet" href="assets/theme-v2.css?v=20261127b">
 <link rel="stylesheet" href="assets/responsive.css?v=20261127a">
 <style>
 /* ---------- Page: one Sales initiative (the level below the Sales initiatives list) ----------
@@ -33,7 +33,6 @@
 .more-pop hr { margin: 6px 4px; border: 0; border-top: 1px solid var(--line); }
 .rec-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--text-sm); color: var(--t3); }
 .rec-meta a { display: inline-flex; align-items: center; min-height: 40px; margin: -10px 0; color: var(--deep); font-weight: 500; text-decoration: none; } /* text links are 40px to tap */
-.rec-meta a:hover { text-decoration: underline; }
 .rec-acts { display: flex; gap: 8px; flex: none; padding-top: 4px; }
 .btn.icon-only { width: 36px; padding: 0; justify-content: center; }
 
@@ -72,12 +71,6 @@
 /* Body: tabs + rail */
 .rec-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; margin-top: 16px; }
 .rec-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.rec-tabs { display: flex; gap: 0; padding: 6px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line-2); }
-.rtab { flex: 1 1 0; justify-content: center; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 14px; white-space: nowrap; min-width: 0; border: 0; border-radius: var(--radius-control); background: none; font: inherit; font-size: var(--text-sm); color: var(--t2); cursor: pointer; }
-.rtab:hover { background: var(--hover); color: var(--ink); }
-.rtab.on { background: var(--deep); color: var(--on-dark); font-weight: 500; }
-.rtab .tab-n { background: var(--hover); }
-.rtab.on .tab-n { background: color-mix(in srgb, var(--surface) 20%, transparent); color: var(--on-dark); }
 .card-h .r .btn { height: 32px; }
 
 .dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; }
@@ -175,11 +168,7 @@
 .drop b { color: var(--deep); font-weight: 500; }
 
 /* v2: pill tabs and stepper on glass, owner avatars use the shared tints */
-.v2 .rec-tabs { border-radius: var(--radius-pill); padding: 3px; border-color: var(--surface); background: var(--glass); box-shadow: var(--shadow-card); }
-.v2 .rtab { border-radius: var(--radius-pill); }
-.v2 .rtab.on { background: var(--midnight); }
 .v2 .stp.cur { background: var(--midnight); }
-.v2 .ns { background: var(--grad-tint); border-color: var(--surface); }
 .v2 .ns-h i { background: var(--midnight); }
 /* Next steps uses the same tinted hero style as the forecast card; boxes and secondary buttons go white on the tint */
 body.v2 .card.ns .in.in-ro, body.v2 .card.ns .in:disabled { background: var(--glass-soft); border-color: var(--surface); }
@@ -256,24 +245,8 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .ed-bar span { font-size: var(--text-sm); color: var(--t3); }
 .ed-bar .sp { flex: 1; }
 
-/* Stage steps: numbered dots, labels under them, one progress bar (replaces the chevron stepper) */
-.steps2 { padding: 20px 24px 8px; }
-.steps2 ol { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
-.sp { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; padding: 0 4px; text-align: center; }
-.sp-dot { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--radius-full); border: 1.5px solid var(--line-3); background: var(--surface); font-size: var(--text-xs); font-weight: 600; color: var(--t3); font-variant-numeric: tabular-nums; }
-.sp-dot svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
-.sp-lab { font-size: var(--text-xs); line-height: 1.35; color: var(--t3); }
-.sp.done .sp-dot { border-color: transparent; background: var(--info-bg); color: var(--deep); }
-.sp.done .sp-lab { color: var(--t2); }
-.sp.cur .sp-dot { border-color: var(--midnight); background: var(--midnight); color: var(--on-dark); box-shadow: 0 0 0 4px var(--info-bg); }
-.sp.cur .sp-lab { color: var(--ink); font-weight: 600; }
-.sp.lost .sp-dot { border-color: transparent; background: var(--chart-pipe-soft); color: var(--t2); font-size: var(--text-sm); }
-.sp.lost .sp-lab { color: var(--t1); font-weight: 600; }
-.sp-bar { position: relative; height: 4px; margin-top: 16px; border-radius: var(--radius-2xs); background: var(--chart-track); overflow: hidden; }
-.sp-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--radius-2xs); background: linear-gradient(90deg, var(--cyan), var(--deep)); }
-.sp-bar.lost i { background: var(--chart-gray); }
+/* Stage steps (.steps2 / .sp / .sp-bar) are shared: crm.css */
 .steps2.jr { padding: 4px 0 0; }
-.sp-now { display: none; }
 @media (max-width: 768px) {
   /* Summary stepper: every step as a dot across the full width (no sideways scroll), the bar under them lines up again,
      and the current step is named in one caption */
@@ -344,11 +317,8 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 
 /* Rail */
 .rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 56px; /* below the 40px back bar */ }
-.ns { border-color: color-mix(in srgb, var(--deep) 30%, transparent); background: linear-gradient(180deg, var(--info-bg), var(--surface) 40%); }
-.ns-h { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
 .ns-h i { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--radius-md); background: var(--deep); color: var(--on-dark); }
 .ns-h i svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.ns-h b { font-size: var(--text-lg); font-weight: 600; color: var(--ink); }
 .ns-to { margin: 0 0 10px; font-size: var(--text-sm); font-weight: 600; color: var(--deep); }
 .req { display: flex; gap: 10px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--line-2); border-radius: var(--radius-control); background: var(--surface); }
 .req::before { content: ""; width: 6px; height: 6px; margin-top: 7px; flex: none; border-radius: var(--radius-full); background: var(--deep); }
@@ -357,7 +327,6 @@ body.v2 label.select.fsel:hover { background: var(--surface); border-color: var(
 .kv { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: var(--text-sm); color: var(--t3); }
 .ns-rec { padding: 4px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
 .kv b { text-align: right; font-weight: 600; color: var(--ink); } .kv b.hot { color: var(--danger); } .kv b.none { color: var(--warn); font-weight: 500; }
-.ns .btn { width: 100%; justify-content: center; margin-top: 8px; }
 .acc { display: flex; gap: 12px; align-items: center; }
 .acc .av { border-radius: var(--radius-control); width: 40px; height: 40px; }
 .acc a { display: inline-flex; align-items: center; min-height: 40px; margin: -10px 0; font-size: var(--text-md); font-weight: 600; color: var(--deep); text-decoration: none; } /* text links are 40px to tap */
@@ -732,7 +701,7 @@ function rail() {
       ${o.kind === 'lost' ? `<div class="kv" style="border-top: 0;margin-top:0;padding-top:8px"><span>Loss reason</span><b>${esc(o.reason)}</b></div>` : ''}</section>`;
   const account = ed ? lockedF('Account', o.acc, o.status === 'Opportunity' ? 'Locked for opportunities · use Split / duplicate to move it.' : '')
     : `<div class="fld"><span class="lab">Account</span><div class="acc"><span class="av">${ini(o.acc)}</span><div><a href="#" data-act="acc">${esc(o.acc)}</a><small>${[D.sell.vertical, D.geo].filter(Boolean).join(' · ')} · ${D.existing || o.kind === 'won' ? 'Customer' : 'Prospect'}</small></div></div>
-       <div class="links"><button class="link" data-act="toast" data-v="Would list the other ${others} initiatives at ${esc(o.acc)}">Other initiatives${others ? ` (${others})` : ''}</button><button class="link" data-act="acc">Account 360°</button></div></div>`;
+       <div class="links"><button class="link" data-act="acc-its">Other initiatives${others ? ` (${others})` : ''}</button><button class="link" data-act="acc">Account 360°</button></div></div>`;
   return `${ns}
     <section class="card"><h3>Account &amp; team</h3><div class="fg g1">
       ${account}
@@ -760,8 +729,9 @@ const OPT = {
   tech: () => CLASS_VALUES('TECHNOLOGY'),
   vertical: () => CLASS_VALUES('VERTICAL')
 };
-const LABEL = { owner: 'Sales owner', offering: 'Offering', name: 'Initiative name', close: 'Expected close', prob: 'Probability', next: 'Next step on record', follow: 'Next follow-up',
-  need: 'Need', budget: 'Budget', authority: 'Authority', timeline: 'Timeline', remarks: 'Qualification remarks', leadType: 'Lead type', source: 'Lead source', category: 'Business category',
+// Edit labels = New initiative's (old CRMpulse uses one form for both; 2026-11-27). View mode keeps its own labels (opts.label).
+const LABEL = { owner: 'Sales owner', offering: 'What are we selling?', name: 'Initiative name', close: 'Expected close date', prob: 'Probability', next: 'What happens next?', follow: 'Follow-up date',
+  need: 'Need / business requirement', budget: 'Budget', authority: 'Authority', timeline: 'Timeline', remarks: 'Qualification remarks', leadType: 'Lead type', source: 'Lead source', category: 'Business category',
   team: 'Accountable sales team', geo: 'Geography', region: 'Region', sbu: 'SBU', practice: 'Practice / service line', tech: 'Technology', vertical: 'Vertical', desc: 'Description / remarks' };
 const E = { init: null, v: null, err: {}, list: false };
 function editStart() { E.init = saved(); E.v = { ...E.init }; E.err = {}; E.list = false; }
@@ -865,7 +835,8 @@ $('#main').addEventListener('click', (e) => {
   else if (act === 'atype') { T.actType = a.dataset.v; render(); }
   else if (act === 'road') { T.road = a.dataset.v; render(); }
   else if (act === 'tk') { T.tasks[+a.dataset.v].done = a.checked; render(); }
-  else if (act === 'acc') toast(`Would open the ${o.acc} account`);
+  else if (act === 'acc-its') { const a = ACCOUNTS.find(x => x.name === o.acc); if (a) location.href = `account.html?id=${a.id}&tab=initiatives`; }
+  else if (act === 'acc') { const a = ACCOUNTS.find(x => x.name === o.acc); if (a) location.href = `account.html?id=${a.id}`; }
   else if (act === 'toast') toast(a.dataset.v);
 });
 $('#main').addEventListener('submit', (e) => {

@@ -215,7 +215,7 @@ body.v2 .card .search { box-shadow: none; }
    Secondary  .btn          white, 1px line-2 border, ink text; hover darkens the border. Same on the canvas, white cards,
                             tinted cards, dialogs and the sticky bars; only on the page canvas does it carry the card shadow.
    Ghost      .btn.ghost    no fill or border, t2 text; hover shows a soft fill (Cancel, Reset). .btn.quiet = ghost in red.
-   Link       .link, text links in content  deep blue text, underline on hover. Not a button: it goes somewhere. */
+   Link       .link, text links in content  deep blue text, one shade darker (midnight) on hover, never underlined. Not a button: it goes somewhere. */
 body.v2 .btn { border-radius: var(--radius-pill); border: 1px solid var(--line-2); background: var(--surface); color: var(--t1); box-shadow: var(--shadow-card); }
 body.v2 .btn:hover { background: var(--surface); border-color: var(--line-3); color: var(--ink); }
 body.v2 .card .btn, body.v2 .dlg .btn, body.v2 .ed-bar .btn, body.v2 .pop .btn, body.v2 .qa .btn, body.v2 .tk-form .btn { box-shadow: none; }
@@ -227,4 +227,4 @@ body.v2 .btn.quiet { color: var(--danger); }
 body.v2 .btn:disabled, body.v2 .btn:disabled:hover, body.v2 .btn[aria-disabled="true"] { color: var(--t3); background: var(--field); border-color: var(--line); box-shadow: none; cursor: not-allowed; }
 body.v2 .btn.primary:disabled, body.v2 .btn.primary:disabled:hover { color: var(--on-dark); background: var(--primary-disabled); border-color: var(--primary-disabled); }
 body.v2 .link, body.v2 .rec-meta a, body.v2 .acc a, body.v2 .cp-in a, body.v2 .rel a { color: var(--deep); font-weight: 500; text-decoration: none; cursor: pointer; }
-body.v2 .link:hover, body.v2 .rec-meta a:hover, body.v2 .acc a:hover, body.v2 .cp-in a:hover, body.v2 .rel a:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (hover: hover) { body.v2 .link:hover, body.v2 .rec-meta a:hover, body.v2 .acc a:hover, body.v2 .cp-in a:hover, body.v2 .rel a:hover { color: var(--midnight); text-decoration: none; } } /* one shade darker, no underline (2026-11-27) */

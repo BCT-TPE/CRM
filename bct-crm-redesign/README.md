@@ -16,6 +16,7 @@ Redesign of the CRM V1 classic pages, following the old CRMpulse information arc
 | Activities | `activities.html` | Every call, meeting, visit and email, newest first: log one, see the week at a glance, filter by type, purpose and period |
 | Tasks | `tasks.html` | Follow-ups for anyone (sales, presales, delivery, finance, legal): my tasks, ones I gave, team overdue, due this week; quick add, complete, edit |
 | Accounts | `accounts.html` | Every customer and prospect organisation: lifecycle, owner, open pipeline, customer value, last interaction, what needs attention |
+| Account | `account.html?id=ACC-2026-0001` | One account: figures, overview of people, initiatives and orders, and tabs for initiatives, contacts, activities, tasks, orders and attachments. Every account row and account name opens it |
 | Contacts | `contacts.html` | People at each account, by account or as a list; accounts without an active decision maker; contact details beside the list |
 | Customer orders | `orders.html` | Won deals waiting for a PO, open, completed and cancelled orders, and historical orders: confirm a PO, compare it with the won value, register past business |
 | Sales targets | `targets.html` | Quarterly booking targets per dimension (geography, region, salesperson, SBU, practice, offering, technology, vertical) against closed won; edit a row's targets |
